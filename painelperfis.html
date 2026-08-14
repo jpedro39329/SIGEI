@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGEI — Seleção de Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ddeeff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .bg-svg {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      align-items: stretch;
+    }
+
+    /* ---- LADO ESQUERDO ---- */
+    .caixa.esquerda {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: left;
+      padding: 60px 80px 120px 160px;
+      margin-top: -80px;
+    }
+
+    .logo-bloco {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 340px;
+      height: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .logo-texto h1 {
+      color: #0d47a1;
+      font-size: 4.8rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      line-height: 1;
+    }
+
+    .logo-texto span {
+      color: #1565c0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      display: block;
+      line-height: 1.5;
+    }
+
+    .caixa.esquerda p {
+      color: #1565c0;
+      font-size: 1.25rem;
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0;
+    }
+
+    /* ---- LADO DIREITO ---- */
+    .caixa.direita {
+      flex: 0 0 33.333vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #ffffff;
+      padding: 60px 48px;
+      box-shadow: -6px 0 32px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-label {
+      color: #0d47a1;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      color: #555;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 24px;
+    }
+
+    .footer-note {
+      color: #757575;
+      font-size: 0.82rem;
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 0;
+    }
+
+    /* ---- LINKS DE PERFIL ---- */
+    .profile-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #e8e8e8;
+      padding: 14px 20px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s ease-in-out;
+      border: 1px solid transparent;
+    }
+
+    .profile-info {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .profile-prefix {
+      font-size: 0.9rem;
+      color: #666666;
+    }
+
+    .profile-name {
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #0d47a1;
+    }
+
+    .profile-desc {
+      font-size: 0.88rem;
+      color: #555555;
+    }
+
+    .arrow {
+      color: #0d47a1;
+      font-weight: bold;
+      font-size: 1.2rem;
+      transition: transform 0.2s ease;
+    }
+
+    .profile-link:hover {
+      background-color: #0d47a1;
+      transform: translateX(4px);
+    }
+
+    .profile-link:hover .profile-prefix,
+    .profile-link:hover .profile-name,
+    .profile-link:hover .profile-desc,
+    .profile-link:hover .arrow {
+      color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .caixa.esquerda {
+        padding: 40px 24px;
+      }
+
+      .caixa.direita {
+        flex: none;
+        width: 100%;
+        padding: 40px 24px;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <svg class="bg-svg" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
+    <rect width="1440" height="900" fill="#ddeeff"/>
+    <ellipse cx="200" cy="820" rx="280" ry="110" fill="#40d9b8"/>
+    <ellipse cx="620" cy="790" rx="300" ry="120" fill="#40d9b8"/>
+    <ellipse cx="1050" cy="810" rx="290" ry="115" fill="#40d9b8"/>
+    <ellipse cx="1380" cy="830" rx="220" ry="105" fill="#40d9b8"/>
+    <rect x="0" y="820" width="1440" height="80" fill="#40d9b8"/>
+    <ellipse cx="100" cy="845" rx="260" ry="100" fill="#2ebfa0"/>
+    <ellipse cx="480" cy="830" rx="310" ry="115" fill="#2ebfa0"/>
+    <ellipse cx="870" cy="840" rx="295" ry="108" fill="#2ebfa0"/>
+    <ellipse cx="1260" cy="835" rx="270" ry="110" fill="#2ebfa0"/>
+    <rect x="0" y="845" width="1440" height="55" fill="#2ebfa0"/>
+    <ellipse cx="250" cy="862" rx="300" ry="95" fill="#1a9e85"/>
+    <ellipse cx="700" cy="855" rx="320" ry="100" fill="#1a9e85"/>
+    <ellipse cx="1150" cy="860" rx="300" ry="95" fill="#1a9e85"/>
+    <rect x="0" y="862" width="1440" height="38" fill="#1a9e85"/>
+    <ellipse cx="150" cy="878" rx="270" ry="90" fill="#1565c0"/>
+    <ellipse cx="560" cy="872" rx="310" ry="95" fill="#1565c0"/>
+    <ellipse cx="980" cy="875" rx="300" ry="92" fill="#1565c0"/>
+    <ellipse cx="1380" cy="873" rx="240" ry="88" fill="#1565c0"/>
+    <rect x="0" y="878" width="1440" height="22" fill="#1565c0"/>
+    <ellipse cx="320" cy="895" rx="350" ry="88" fill="#0d47a1"/>
+    <ellipse cx="800" cy="892" rx="370" ry="90" fill="#0d47a1"/>
+    <ellipse cx="1300" cy="895" rx="320" ry="85" fill="#0d47a1"/>
+    <rect x="0" y="892" width="1440" height="8" fill="#0d47a1"/>
+  </svg>
+
+  <section class="container">
+    <div class="caixa esquerda">
+      <div class="logo-bloco">
+        <img src="assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
+        <div class="logo-texto">
+          <h1>SIGEI</h1>
+          <span>Sistema de Gestão Escolar<br>para a Inclusão</span>
+        </div>
+      </div>
+      <p>Gestão eficiente para uma educação inclusiva.<br>O SIGEI centraliza informações, auxilia no acompanhamento de alunos elegíveis à educação especial e apoia a distribuição de Profissionais de Apoio Escolar.</p>
+    </div>
+
+    <div class="caixa direita">
+      <p class="section-label">Selecione seu perfil</p>
+      <p class="section-sub">Escolha o perfil correspondente ao seu tipo de acesso.</p>
+
+      <a href="views/login.php" class="profile-link">
+        <div class="profile-info">
+          <span class="profile-prefix">Sou</span>
+          <span class="profile-name">PAE</span>
+          <span class="profile-desc">Profissional de Apoio Escolar</span>
+        </div>
+        <span class="arrow">&#8594;</span>
+      </a>
+
+      <a href="views/login.php" class="profile-link">
+        <div class="profile-info">
+          <span class="profile-prefix">Sou</span>
+          <span class="profile-name">Empresa</span>
+          <span class="profile-desc">Acesso Empresarial</span>
+        </div>
+        <span class="arrow">&#8594;</span>
+      </a>
+
+      <a href="views/login.php" class="profile-link">
+        <div class="profile-info">
+          <span class="profile-prefix">Sou</span>
+          <span class="profile-name">SEFISC</span>
+          <span class="profile-desc">Setor de Fiscalização</span>
+        </div>
+        <span class="arrow">&#8594;</span>
+      </a>
+
+      <a href="views/login.php" class="profile-link">
+        <div class="profile-info">
+          <span class="profile-prefix">Sou</span>
+          <span class="profile-name">AEE</span>
+          <span class="profile-desc">Educação Especial</span>
+        </div>
+        <span class="arrow">&#8594;</span>
+      </a>
+
+      <a href="views/login.php" class="profile-link">
+        <div class="profile-info">
+          <span class="profile-prefix">Sou</span>
+          <span class="profile-name">UE</span>
+          <span class="profile-desc">Unidade Escolar</span>
+        </div>
+        <span class="arrow">&#8594;</span>
+      </a>
+
+      <p class="footer-note">Todos os acessos são monitorados e registrados.</p>
+    </div>
+  </section>
+</body>
+</html>

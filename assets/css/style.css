@@ -1,0 +1,331 @@
+/* ===== dashboard.php ===== */
+.page-dashboard {
+    background-color: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-dashboard .sidebar {
+    width: 260px;
+    background: #1e293b;
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+.page-dashboard .sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.page-dashboard .sidebar .nav-link:hover {
+    background: #334155;
+    color: white;
+}
+
+.page-dashboard .sidebar .nav-link.active {
+    background: #0f172a;
+    color: white;
+}
+
+.page-dashboard .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.page-dashboard .table-custom th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    border-bottom-width: 1px;
+}
+
+.page-dashboard .btn-ver-mais {
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+    background: white;
+    padding: 0.25rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 20px;
+    transition: 0.2s;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.page-dashboard .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.page-dashboard footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+@media (max-width: 768px) {
+    .page-dashboard .sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .page-dashboard .d-flex {
+        flex-direction: column;
+    }
+}
+
+/* ===== dashboard_admin.php ===== */
+.page-dashboard-admin {
+    background: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-dashboard-admin .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #1e293b;
+    color: #fff;
+}
+
+.page-dashboard-admin .sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.page-dashboard-admin .sidebar .nav-link:hover {
+    background: #334155;
+    color: white;
+}
+
+.page-dashboard-admin .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.page-dashboard-admin .cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.page-dashboard-admin .cards .card {
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
+    padding: 1.25rem;
+}
+
+.page-dashboard-admin .cards .card strong {
+    color: #0f172a;
+    display: block;
+    font-size: 2rem;
+    line-height: 1;
+    margin-top: 0.5rem;
+}
+
+.page-dashboard-admin .table thead {
+    background: #f8fafc;
+}
+
+@media (max-width: 992px) {
+    .page-dashboard-admin .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .page-dashboard-admin > .d-flex {
+        flex-direction: column;
+    }
+
+    .page-dashboard-admin .sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-dashboard-admin .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .page-dashboard-admin .content {
+        padding: 1rem;
+    }
+}
+
+/* ===== alunos_listar.php ===== */
+.page-alunos-listar {
+    background: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-alunos-listar .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #1e293b;
+    color: #fff;
+}
+
+.page-alunos-listar .sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.page-alunos-listar .sidebar .nav-link:hover {
+    background: #334155;
+    color: white;
+}
+
+.page-alunos-listar .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.page-alunos-listar .table thead {
+    background: #f8fafc;
+}
+
+.page-alunos-listar .badge {
+    font-size: 0.8rem;
+}
+
+/* ===== alunos_cadastrar.php ===== */
+.page-alunos-cadastrar {
+    background: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-alunos-cadastrar .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #1e293b;
+    color: #fff;
+}
+
+.page-alunos-cadastrar .sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.page-alunos-cadastrar .sidebar .nav-link:hover {
+    background: #334155;
+    color: white;
+}
+
+.page-alunos-cadastrar .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.page-alunos-cadastrar .card-form {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* ===== cuidadores_listar.php ===== */
+.page-cuidadores-listar {
+    background: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-cuidadores-listar .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #1e293b;
+    color: #fff;
+}
+
+.page-cuidadores-listar .sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.page-cuidadores-listar .sidebar .nav-link:hover {
+    background: #334155;
+    color: white;
+}
+
+.page-cuidadores-listar .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.page-cuidadores-listar .table thead {
+    background: #f8fafc;
+}
+
+.page-cuidadores-listar .badge {
+    font-size: 0.8rem;
+}
+
+/* ===== cuidadores_cadastrar.php ===== */
+.page-cuidadores-cadastrar {
+    background: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-cuidadores-cadastrar .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #1e293b;
+    color: #fff;
+}
+
+.page-cuidadores-cadastrar .sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.page-cuidadores-cadastrar .sidebar .nav-link:hover {
+    background: #334155;
+    color: white;
+}
+
+.page-cuidadores-cadastrar .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.page-cuidadores-cadastrar .card-form {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.page-cuidadores-cadastrar .password-wrapper {
+    position: relative;
+}
+
+.page-cuidadores-cadastrar .password-wrapper .toggle-senha {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* ===== login.php ===== */
+.page-login .login-card {
+    width: 100%;
+    max-width: 400px;
+}
