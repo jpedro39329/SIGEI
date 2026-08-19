@@ -25,11 +25,7 @@ $userPerfil = $_SESSION['user_perfil'];
 </head>
 <body class="page-alunos-cadastrar">
 
-<div class="d-flex">
-
-    <!-- SIDEBAR -->   
-
-    <?php require("navbar.php"); ?>
+<?php require("navbar.php"); ?>
 
     <!-- CONTEÚDO -->
     <div class="content">
@@ -45,6 +41,9 @@ $userPerfil = $_SESSION['user_perfil'];
                         <h2 class="mb-4">
                             Cadastro de Aluno
                         </h2>
+                        <p class="text-muted mb-4">
+                            Olá, <?php echo htmlspecialchars($userName); ?> — preencha os dados do novo aluno.
+                        </p>
 
                         <form action="../controllers/alunos_salvar.php" method="POST">
 
@@ -177,12 +176,6 @@ $userPerfil = $_SESSION['user_perfil'];
         </div>
 
     </div>
-
-</div>
-
-
-
-
 
 <script>
 

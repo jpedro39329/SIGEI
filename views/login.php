@@ -60,6 +60,16 @@
                     </button>
                 </div>
 
+                <div class="text-center">
+                    <button 
+                        type="button" 
+                        class="btn btn-link text-decoration-none p-0"
+                        onclick="window.location.href='../painelperfis.html';"
+                    >
+                        Voltar
+                    </button>
+                </div>
+
             </form>
 
         </div>

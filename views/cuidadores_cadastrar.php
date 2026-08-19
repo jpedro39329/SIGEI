@@ -30,12 +30,8 @@ $userPerfil = $_SESSION['user_perfil'];
 
 <body class="page-cuidadores-cadastrar">
 
-    <div class="d-flex">
-
-        <!-- SIDEBAR -->       
-
     <?php require("navbar.php"); ?>
- 
+
         <!-- CONTEÚDO -->
         <div class="content">
 
@@ -50,6 +46,10 @@ $userPerfil = $_SESSION['user_perfil'];
                             <h2 class="mb-4">
                                 Cadastro de Cuidador
                             </h2>
+
+                            <p class="text-muted mb-4">
+                                Olá, <?php echo htmlspecialchars($userName); ?> — preencha os dados do novo cuidador.
+                            </p>
 
                             <?php if (isset($_GET['erro'])): ?>
 
@@ -227,8 +227,6 @@ $userPerfil = $_SESSION['user_perfil'];
             </div>
 
         </div>
-
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 

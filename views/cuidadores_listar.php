@@ -81,11 +81,8 @@ $cuidadores = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 <body class="page-cuidadores-listar">
 
-<div class="d-flex">
+<?php require("navbar.php"); ?>
 
-    <!-- SIDEBAR -->
-    <?php require("navbar.php"); ?>
-    
     <!-- CONTEÚDO -->
     <div class="content">
 
@@ -98,7 +95,7 @@ $cuidadores = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 </h2>
 
                 <p class="text-muted">
-                    Gerencie os cuidadores cadastrados.
+                    Olá, <?php echo htmlspecialchars($userName); ?> — gerencie os cuidadores cadastrados.
                 </p>
 
             </div>
@@ -200,8 +197,6 @@ $cuidadores = mysqli_fetch_all($result, MYSQLI_ASSOC);
         </div>
 
     </div>
-
-</div>
 
 </body>
 

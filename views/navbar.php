@@ -1,67 +1,74 @@
 <?php
-$userName = $userName ?? ($_SESSION['user_name'] ?? 'Usuario');
-$userPerfil = $userPerfil ?? ($_SESSION['user_perfil'] ?? '');
+$userName    = $userName ?? ($_SESSION['user_name'] ?? 'Usuario');
+$userPerfil  = $userPerfil ?? ($_SESSION['user_perfil'] ?? '');
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+$homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
 ?>
 
-<div class="sidebar p-3">
+<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
+    <div class="container-fluid">
 
-    <h3 class="mb-4">
-        SIGEI
-    </h3>
-
-    <p>
-        Olá,
-        <strong>
-            <?php echo htmlspecialchars($userName); ?>
-        </strong>
-    </p>
-
-    <hr>
-
-    <div class="nav flex-column">
-
-        <a href="<?php echo $userPerfil === 'ADMIN' ? 'dashboard_admin.php' : 'dashboard.php'; ?>" class="nav-link">
-            Início
+        <a class="navbar-brand d-flex align-items-center gap-2" href="<?php echo $homePage; ?>">
+            <img src="../assets/imgs/logo_nav.png" alt="SIGEI" height="50" class="d-inline-block logo-nav">
+            <span class="fw-bold">SIGEI</span>
         </a>
 
-        <?php if(in_array($userPerfil, ['UNIDADE_ESCOLAR', 'EDUCACAO_ESPECIAL', 'SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSIGEI" aria-controls="navbarSIGEI" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <a href="alunos_listar.php" class="nav-link">
-                Alunos
-            </a>
+        <div class="collapse navbar-collapse" id="navbarSIGEI">
 
-        <?php } ?>
+            <!-- Links principais (esquerda) -->
+            <ul class="navbar-nav me-auto">
 
-        <?php if(in_array($userPerfil, ['EMPRESA_TERCEIRIZADA', 'SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo ($currentPage === $homePage) ? 'active' : ''; ?>" href="<?php echo $homePage; ?>">Início</a>
+                </li>
 
-            <a href="cuidadores_listar.php" class="nav-link">
-                Cuidadores
-            </a>
+                <?php if (in_array($userPerfil, ['UNIDADE_ESCOLAR', 'EDUCACAO_ESPECIAL', 'SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
 
-        <?php } ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'alunos_listar.php') ? 'active' : ''; ?>" href="alunos_listar.php">Alunos</a>
+                    </li>
 
-        <?php if(in_array($userPerfil, ['SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
+                <?php } ?>
 
-            <a href="empresa.php" class="nav-link">
-                Empresas
-            </a>
+                <?php if (in_array($userPerfil, ['EMPRESA_TERCEIRIZADA', 'SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
 
-        <?php } ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'cuidadores_listar.php') ? 'active' : ''; ?>" href="cuidadores_listar.php">Cuidadores</a>
+                    </li>
 
-        <?php if($userPerfil == 'ADMIN') { ?>
+                <?php } ?>
 
-            <a href="usuarios.php" class="nav-link">
-                Usuários
-            </a>
+                <?php if (in_array($userPerfil, ['SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
 
-        <?php } ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'empresa.php') ? 'active' : ''; ?>" href="empresa.php">Empresas</a>
+                    </li>
 
+                <?php } ?>
+
+                <?php if ($userPerfil === 'ADMIN') { ?>
+
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'usuarios.php') ? 'active' : ''; ?>" href="usuarios.php">Usuários</a>
+                    </li>
+
+                <?php } ?>
+
+                <!-- Perfil junto com os demais links (esquerda) -->
+                <li class="nav-item">
+                    <a class="nav-link <?php echo ($currentPage === 'perfil.php') ? 'active' : ''; ?>" href="perfil.php">Perfil</a>
+                </li>
+
+            </ul>
+
+            
+        </div>
     </div>
+</nav>
 
-    <hr>
-
-    <a href="../controllers/logout.php" class="nav-link text-danger">
-        Sair
-    </a>
-
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>

@@ -70,11 +70,7 @@ $alunos = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </head>
 <body class="page-alunos-listar">
 
-<div class="d-flex">
-
-    <!-- SIDEBAR -->     
-
-    <?php require("navbar.php"); ?>    
+<?php require("navbar.php"); ?>
 
     <!-- CONTEÚDO -->
     <div class="content">
@@ -88,7 +84,7 @@ $alunos = mysqli_fetch_all($result, MYSQLI_ASSOC);
                 </h2>
 
                 <p class="text-muted">
-                    Gerencie os alunos cadastrados pela unidade escolar.
+                    Olá, <?php echo htmlspecialchars($userName); ?> — gerencie os alunos cadastrados pela unidade escolar.
                 </p>
 
             </div>
@@ -198,8 +194,6 @@ $alunos = mysqli_fetch_all($result, MYSQLI_ASSOC);
         </div>
 
     </div>
-
-</div>
 
 </body>
 </html>

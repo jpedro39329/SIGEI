@@ -186,15 +186,16 @@ if (!empty($sqlPendentes)) {
 </head>
 <body class="page-dashboard">
 
-<div class="d-flex flex-wrap flex-md-nowrap">
-    <!-- Sidebar -->   
+<?php require("navbar.php"); ?>
 
-    <?php require("navbar.php"); ?>    
+<div class="content">
 
-    <!-- Conteúdo principal -->
-    <div class="content">
-        
-        <!-- ========== SEÇÃO: ALUNOS EM ATENDIMENTO ========== -->
+    <div class="mb-4">
+        <h4 class="mb-1">Olá, <?php echo htmlspecialchars($userName); ?> 👋</h4>
+        <p class="text-muted mb-0">Bem-vindo(a) ao painel do SIGEI.</p>
+    </div>
+
+    <!-- ========== SEÇÃO: ALUNOS EM ATENDIMENTO ========== -->
         <?php if (!empty($alunosAtendimento)): ?>
         <div class="card border-0 shadow-sm mb-5">
             <div class="card-body p-4">
@@ -302,7 +303,6 @@ if (!empty($sqlPendentes)) {
             SIGEI – Sistema de Gestão Integrada | Painel colaborativo
         </footer>
     </div>
-</div>
 
 </body>
 </html>

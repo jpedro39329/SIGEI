@@ -80,14 +80,13 @@ $usuarios = $resultUsuarios ? mysqli_fetch_all($resultUsuarios, MYSQLI_ASSOC) : 
 </head>
 <body class="page-dashboard-admin">
 
-<div class="d-flex">
-    <?php require("navbar.php"); ?>
+<?php require("navbar.php"); ?>
 
     <main class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="mb-1">Painel Administrativo</h2>
-                <p class="text-muted mb-0">Visao geral completa do SIGEI.</p>
+                <p class="text-muted mb-0">Olá, <?php echo htmlspecialchars($userName); ?> — visão geral completa do SIGEI.</p>
             </div>
         </div>
 
@@ -232,7 +231,6 @@ $usuarios = $resultUsuarios ? mysqli_fetch_all($resultUsuarios, MYSQLI_ASSOC) : 
             </div>
         </section>
     </main>
-</div>
 
 </body>
 </html>
