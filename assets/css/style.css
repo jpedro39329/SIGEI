@@ -366,6 +366,102 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
+/* ===== PÁGINAS GERAIS (novas páginas) ===== */
+/* Aplicado em: alunos_aprovar, associacoes, relatorios,
+   cuidadores_visualizar, alunos_visualizar, alunos_editar,
+   escolas_cadastrar, empresas_cadastrar, usuarios */
+.page-alunos-aprovar,
+.page-alunos-pendentes,
+.page-associacoes,
+.page-relatorios,
+.page-cuidadores-visualizar,
+.page-alunos-visualizar,
+.page-alunos-editar,
+.page-escolas,
+.page-empresas,
+.page-usuarios,
+.page-paes-listar,
+.page-paes-cadastrar,
+.page-paes-visualizar,
+.page-paes-editar,
+.page-solicitacoes,
+.page-solicitacao-analisar {
+    background: #f1f5f9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.page-alunos-aprovar .content,
+.page-alunos-pendentes .content,
+.page-associacoes .content,
+.page-relatorios .content,
+.page-cuidadores-visualizar .content,
+.page-alunos-visualizar .content,
+.page-alunos-editar .content,
+.page-escolas .content,
+.page-empresas .content,
+.page-usuarios .content,
+.page-paes-listar .content,
+.page-paes-cadastrar .content,
+.page-paes-visualizar .content,
+.page-paes-editar .content,
+.page-solicitacoes .content,
+.page-solicitacao-analisar .content {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* Cards de resumo (usado em dashboards e páginas com contadores) */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.cards .card {
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
+    padding: 1.25rem;
+}
+
+.cards .card strong {
+    color: #0f172a;
+    display: block;
+    font-size: 2rem;
+    line-height: 1;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 992px) {
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+    .page-alunos-aprovar .content,
+    .page-alunos-pendentes .content,
+    .page-associacoes .content,
+    .page-relatorios .content,
+    .page-cuidadores-visualizar .content,
+    .page-alunos-visualizar .content,
+    .page-alunos-editar .content,
+    .page-escolas .content,
+    .page-empresas .content,
+    .page-usuarios .content,
+    .page-paes-listar .content,
+    .page-paes-cadastrar .content,
+    .page-paes-visualizar .content,
+    .page-paes-editar .content,
+    .page-solicitacoes .content,
+    .page-solicitacao-analisar .content {
+        padding: 1rem;
+    }
+}
+
 @media (max-width: 576px) {
     .page-perfil .content {
         padding: 1rem;

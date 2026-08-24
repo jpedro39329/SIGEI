@@ -1,177 +1,19 @@
 <?php
 session_start();
 include("../config/database.php");
+include("../config/perfil_functions.php");
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+exigirLogin();
 
-$userName  = $_SESSION['user_name'];
+$userName = $_SESSION['user_name'];
 $userPerfil = $_SESSION['user_perfil'];
-$userId    = $_SESSION['user_id'];
+$userId = (int) $_SESSION['user_id'];
 
-// ==================================================================
-// 1. DEFINIÇÃO DAS CONSULTAS CONFORME PERFIL
-// ==================================================================
-
-// --- Alunos em atendimento (APROVADO + associação ativa) ---
-$sqlAtendimento = "";
-$sqlPendentes   = "";
-
-switch ($userPerfil) {
-    case 'ADMIN':
-        // Admin: todos os alunos aprovados com cuidador (dados completos)
-        $sqlAtendimento = "
-            SELECT 
-                a.nome AS aluno_nome,
-                a.cpf AS aluno_cpf,
-                escola.nome AS escola_nome,
-                cuidador.nome AS cuidador_nome,
-                cuidador.cpf AS cuidador_cpf
-            FROM alunos a
-            JOIN associacoes ass ON a.id_aluno = ass.id_aluno AND ass.ativo = 1
-            JOIN usuarios cuidador ON ass.id_cuidador = cuidador.id_usuario
-            JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
-            WHERE a.status_aprovacao = 'APROVADO'
-            ORDER BY a.nome
-        ";
-        // Admin vê todos os pendentes (sem cuidador)
-        $sqlPendentes = "
-            SELECT 
-                a.nome AS aluno_nome,
-                a.cpf AS aluno_cpf,
-                escola.nome AS escola_nome
-            FROM alunos a
-            JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
-            WHERE a.status_aprovacao = 'PENDENTE'
-            ORDER BY a.data_cadastro DESC
-        ";
-        break;
-
-    case 'UNIDADE_ESCOLAR':
-        // Unidade Escolar: só vê os alunos da própria escola
-        $sqlAtendimento = "
-            SELECT 
-                a.nome AS aluno_nome,
-                a.cpf AS aluno_cpf,
-                escola.nome AS escola_nome,
-                cuidador.nome AS cuidador_nome
-            FROM alunos a
-            JOIN associacoes ass ON a.id_aluno = ass.id_aluno AND ass.ativo = 1
-            JOIN usuarios cuidador ON ass.id_cuidador = cuidador.id_usuario
-            JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
-            WHERE a.status_aprovacao = 'APROVADO'
-              AND a.id_usuario_escola = $userId
-            ORDER BY a.nome
-        ";
-        $sqlPendentes = "
-            SELECT 
-                a.nome AS aluno_nome,
-                a.cpf AS aluno_cpf,
-                escola.nome AS escola_nome
-            FROM alunos a
-            JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
-            WHERE a.status_aprovacao = 'PENDENTE'
-              AND a.id_usuario_escola = $userId
-            ORDER BY a.data_cadastro DESC
-        ";
-        break;
-
-    case 'EDUCACAO_ESPECIAL':
-    case 'SETOR_FISCALIZACAO':
-        // Educação Especial e Fiscalização: todos os alunos aprovados e pendentes
-        // (apenas nome do cuidador, sem CPF)
-        $sqlAtendimento = "
-            SELECT 
-                a.nome AS aluno_nome,
-                escola.nome AS escola_nome,
-                cuidador.nome AS cuidador_nome
-            FROM alunos a
-            JOIN associacoes ass ON a.id_aluno = ass.id_aluno AND ass.ativo = 1
-            JOIN usuarios cuidador ON ass.id_cuidador = cuidador.id_usuario
-            JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
-            WHERE a.status_aprovacao = 'APROVADO'
-            ORDER BY a.nome
-        ";
-        $sqlPendentes = "
-            SELECT 
-                a.nome AS aluno_nome,
-                escola.nome AS escola_nome
-            FROM alunos a
-            JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
-            WHERE a.status_aprovacao = 'PENDENTE'
-            ORDER BY a.data_cadastro DESC
-        ";
-        break;
-
-    case 'EMPRESA_TERCEIRIZADA':
-    // Empresa: alunos associados a cuidadores da própria empresa
-
-    // Obtém o nome da empresa do usuário logado
-    $sqlEmpresa = "SELECT empresa FROM usuarios WHERE id_usuario = $userId";
-    $resEmpresa = mysqli_query($conexao, $sqlEmpresa);
-
-    $empresaNome = mysqli_fetch_assoc($resEmpresa)['empresa'];
-    $empresaNome = mysqli_real_escape_string($conexao, $empresaNome);
-
-    $sqlAtendimento = "
-        SELECT DISTINCT
-            a.nome AS aluno_nome,
-            a.deficiencia AS aluno_deficiencia,
-            cuidador.nome AS cuidador_nome
-        FROM alunos a
-        JOIN associacoes ass 
-            ON a.id_aluno = ass.id_aluno 
-           AND ass.ativo = 1
-        JOIN usuarios cuidador 
-            ON ass.id_cuidador = cuidador.id_usuario
-        WHERE a.status_aprovacao = 'APROVADO'
-          AND cuidador.empresa = '$empresaNome'
-        ORDER BY a.nome
-    ";
-
-    // Empresa não vê alunos pendentes
-    $sqlPendentes = "";
-    break;
-
-    case 'CUIDADOR':
-        // Cuidador: apenas os alunos diretamente associados a ele
-        $sqlAtendimento = "
-            SELECT 
-                a.nome AS aluno_nome,
-                a.deficiencia AS aluno_deficiencia
-            FROM alunos a
-            JOIN associacoes ass ON a.id_aluno = ass.id_aluno AND ass.ativo = 1
-            WHERE a.status_aprovacao = 'APROVADO'
-              AND ass.id_cuidador = $userId
-            ORDER BY a.nome
-        ";
-        $sqlPendentes = "";
-        break;
-
-    default:
-        // Perfil desconhecido: não mostra nada
-        $sqlAtendimento = "";
-        $sqlPendentes = "";
-        break;
-}
-
-// Executa as consultas (se houver)
-$alunosAtendimento = [];
-if (!empty($sqlAtendimento)) {
-    $resultAtendimento = mysqli_query($conexao, $sqlAtendimento);
-    if ($resultAtendimento) {
-        $alunosAtendimento = mysqli_fetch_all($resultAtendimento, MYSQLI_ASSOC);
-    }
-}
-
-$alunosPendentes = [];
-if (!empty($sqlPendentes)) {
-    $resultPendentes = mysqli_query($conexao, $sqlPendentes);
-    if ($resultPendentes) {
-        $alunosPendentes = mysqli_fetch_all($resultPendentes, MYSQLI_ASSOC);
-    }
+function totalDashboard($conexao, $sql) {
+    $result = mysqli_query($conexao, $sql);
+    if (!$result) return 0;
+    $row = mysqli_fetch_assoc($result);
+    return (int) ($row['total'] ?? 0);
 }
 ?>
 
@@ -191,118 +33,301 @@ if (!empty($sqlPendentes)) {
 <div class="content">
 
     <div class="mb-4">
-        <h4 class="mb-1">Olá, <?php echo htmlspecialchars($userName); ?> 👋</h4>
-        <p class="text-muted mb-0">Bem-vindo(a) ao painel do SIGEI.</p>
+        <h4 class="mb-1">Ola, <?php echo htmlspecialchars($userName); ?></h4>
+        <p class="text-muted mb-0"><?php echo htmlspecialchars(nomePerfil($userPerfil)); ?> - bem-vindo(a) ao painel do SIGEI.</p>
     </div>
 
-    <!-- ========== SEÇÃO: ALUNOS EM ATENDIMENTO ========== -->
-        <?php if (!empty($alunosAtendimento)): ?>
-        <div class="card border-0 shadow-sm mb-5">
+    <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
+
+        <?php
+        $idEscola = idEscolaUsuario($conexao, $userId);
+
+        $alunosEmAtendimento = totalDashboard($conexao, "
+            SELECT COUNT(DISTINCT a.id_aluno) AS total
+            FROM alunos a
+            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
+            WHERE a.id_escola = $idEscola AND a.status_aprovacao = 'APROVADO'
+        ");
+        $alunosSemAtendimento = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            WHERE a.id_escola = $idEscola
+              AND a.status_aprovacao = 'APROVADO'
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass
+                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+              )
+        ");
+        $alunosPendentes = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE id_escola = $idEscola AND status_aprovacao = 'PENDENTE'");
+
+        $sqlAlunos = "
+            SELECT a.id_aluno, a.nome, a.status_aprovacao,
+                   (SELECT p.nome FROM associacoes ass
+                    JOIN paes p ON ass.id_pae = p.id_pae
+                    WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+                    LIMIT 1) AS pae_nome
+            FROM alunos a
+            WHERE a.id_escola = $idEscola
+            ORDER BY a.data_cadastro DESC
+            LIMIT 10
+        ";
+        $resultadoAlunos = mysqli_query($conexao, $sqlAlunos);
+        $alunos = $resultadoAlunos ? mysqli_fetch_all($resultadoAlunos, MYSQLI_ASSOC) : [];
+        ?>
+
+        <div class="cards mb-4">
+            <div class="card"><span class="text-muted">Em atendimento</span><strong><?php echo $alunosEmAtendimento; ?></strong></div>
+            <div class="card"><span class="text-muted">Sem atendimento</span><strong><?php echo $alunosSemAtendimento; ?></strong></div>
+            <div class="card"><span class="text-muted">Pendentes</span><strong><?php echo $alunosPendentes; ?></strong></div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="card-title">📋 Alunos em atendimento</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-custom">
-                            <?php if ($userPerfil == 'ADMIN'): ?>
-                                <tr>
-                                    <th>Nome</th><th>CPF</th><th>Escola</th><th>Cuidador</th><th>CPF do Cuidador</th>
-                                </tr>
-                            <?php elseif ($userPerfil == 'UNIDADE_ESCOLAR'): ?>
-                                <tr>
-                                    <th>Nome</th><th>CPF</th><th>Escola</th><th>Cuidador</th>
-                                </tr>
-                            <?php elseif (in_array($userPerfil, ['EDUCACAO_ESPECIAL', 'SETOR_FISCALIZACAO'])): ?>
-                                <tr>
-                                    <th>Nome</th><th>Escola</th><th>Cuidador</th>
-                                </tr>
-                            <?php elseif ($userPerfil == 'EMPRESA_TERCEIRIZADA'): ?>
-                                <tr>
-                                    <th>Nome do Aluno</th><th>Deficiência</th><th>Cuidador</th>
-                                </tr>
-                            <?php elseif ($userPerfil == 'CUIDADOR'): ?>
-                                <tr>
-                                    <th>Nome do Aluno</th><th>Deficiência</th>
-                                </tr>
-                            <?php endif; ?>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($alunosAtendimento as $aluno): ?>
-                                <tr>
-                                    <?php if ($userPerfil == 'ADMIN'): ?>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_cpf']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['escola_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['cuidador_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['cuidador_cpf']); ?></td>
-                                    <?php elseif ($userPerfil == 'UNIDADE_ESCOLAR'): ?>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_cpf']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['escola_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['cuidador_nome']); ?></td>
-                                    <?php elseif (in_array($userPerfil, ['EDUCACAO_ESPECIAL', 'SETOR_FISCALIZACAO'])): ?>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['escola_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['cuidador_nome']); ?></td>
-                                    <?php elseif ($userPerfil == 'EMPRESA_TERCEIRIZADA'): ?>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_deficiencia']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['cuidador_nome']); ?></td>
-                                    <?php elseif ($userPerfil == 'CUIDADOR'): ?>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_deficiencia']); ?></td>
-                                    <?php endif; ?>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-end mt-2">
-                    <button class="btn-ver-mais">Ver mais →</button>
-                </div>
+                <h5 class="mb-3">Resumo dos alunos</h5>
+                <canvas id="graficoEscola" height="120"></canvas>
             </div>
         </div>
-        <?php endif; ?>
 
-        <!-- ========== SEÇÃO: ALUNOS PENDENTES ========== -->
-        <?php if (!empty($alunosPendentes) && in_array($userPerfil, ['ADMIN','UNIDADE_ESCOLAR','EDUCACAO_ESPECIAL','SETOR_FISCALIZACAO'])): ?>
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
-                <h5 class="card-title">⏳ Alunos Pendentes</h5>
+                <h5 class="mb-3">Alunos da minha escola</h5>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead class="table-custom">
-                            <tr>
-                                <th>Nome</th>
-                                <?php if (in_array($userPerfil, ['ADMIN', 'UNIDADE_ESCOLAR'])): ?>
-                                    <th>CPF</th>
-                                <?php endif; ?>
-                                <th>Escola</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Nome</th><th>Status</th><th>PAE</th></tr></thead>
                         <tbody>
-                            <?php foreach ($alunosPendentes as $aluno): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
-                                    <?php if (in_array($userPerfil, ['ADMIN', 'UNIDADE_ESCOLAR'])): ?>
-                                        <td><?php echo htmlspecialchars($aluno['aluno_cpf']); ?></td>
-                                    <?php endif; ?>
-                                    <td><?php echo htmlspecialchars($aluno['escola_nome']); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
+                            <?php if (count($alunos) > 0): ?>
+                                <?php foreach ($alunos as $aluno): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($aluno['nome']); ?></td>
+                                        <td><?php echo htmlspecialchars($aluno['status_aprovacao']); ?></td>
+                                        <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem PAE'); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="3" class="text-center text-muted">Nenhum aluno cadastrado.</td></tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-                <div class="text-end mt-2">
-                    <button class="btn-ver-mais">Ver mais →</button>
+            </div>
+        </div>
+
+    <?php elseif ($userPerfil == 'USUARIO_EDUCACAO_ESPECIAL'): ?>
+
+        <?php
+        $alunosEmAtendimento = totalDashboard($conexao, "
+            SELECT COUNT(DISTINCT a.id_aluno) AS total
+            FROM alunos a
+            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
+            WHERE a.status_aprovacao = 'APROVADO'
+        ");
+        $alunosSemAtendimento = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            WHERE a.status_aprovacao = 'APROVADO'
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass
+                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+              )
+        ");
+        $alunosPendentes = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE status_aprovacao = 'PENDENTE'");
+        ?>
+
+        <div class="cards mb-4">
+            <div class="card"><span class="text-muted">Em atendimento</span><strong><?php echo $alunosEmAtendimento; ?></strong></div>
+            <div class="card"><span class="text-muted">Sem atendimento</span><strong><?php echo $alunosSemAtendimento; ?></strong></div>
+            <div class="card"><span class="text-muted">Pendentes</span><strong><?php echo $alunosPendentes; ?></strong></div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Resumo da Educacao Especial</h5>
+                <canvas id="graficoEducacao" height="120"></canvas>
+            </div>
+        </div>
+
+    <?php elseif ($userPerfil == 'USUARIO_EMPRESA'): ?>
+
+        <?php
+        $idEmpresa = idEmpresaUsuario($conexao, $userId);
+        $totalPAEs = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM paes WHERE id_empresa = $idEmpresa");
+        $paesAtendendo = totalDashboard($conexao, "
+            SELECT COUNT(DISTINCT p.id_pae) AS total
+            FROM paes p
+            JOIN associacoes ass ON ass.id_pae = p.id_pae AND ass.ativo = 1
+            WHERE p.id_empresa = $idEmpresa
+        ");
+        $paesSemAlunos = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total
+            FROM paes p
+            WHERE p.id_empresa = $idEmpresa
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass
+                  WHERE ass.id_pae = p.id_pae AND ass.ativo = 1
+              )
+        ");
+        ?>
+
+        <div class="cards mb-4">
+            <div class="card"><span class="text-muted">Total de PAEs</span><strong><?php echo $totalPAEs; ?></strong></div>
+            <div class="card"><span class="text-muted">PAEs atendendo alunos</span><strong><?php echo $paesAtendendo; ?></strong></div>
+            <div class="card"><span class="text-muted">PAEs sem alunos</span><strong><?php echo $paesSemAlunos; ?></strong></div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Resumo dos PAEs</h5>
+                <canvas id="graficoEmpresa" height="120"></canvas>
+            </div>
+        </div>
+
+    <?php elseif ($userPerfil == 'PAE'): ?>
+
+        <?php
+        $sqlAlunos = "
+            SELECT a.id_aluno, a.nome, a.descricao_deficiencia
+            FROM associacoes ass
+            JOIN alunos a ON ass.id_aluno = a.id_aluno
+            WHERE ass.id_pae = $userId AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
+            ORDER BY a.nome
+        ";
+        $alunos = mysqli_fetch_all(mysqli_query($conexao, $sqlAlunos), MYSQLI_ASSOC);
+        ?>
+
+        <div class="cards mb-4">
+            <div class="card"><span class="text-muted">Meus alunos</span><strong><?php echo count($alunos); ?></strong></div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Meus alunos</h5>
+                    <a href="relatorios.php" class="btn btn-primary btn-sm">Registrar Relatorio</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead><tr><th>Nome</th><th>Deficiencia</th></tr></thead>
+                        <tbody>
+                            <?php if (count($alunos) > 0): ?>
+                                <?php foreach ($alunos as $aluno): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($aluno['nome']); ?></td>
+                                        <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="2" class="text-center text-muted">Nenhum aluno associado.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <?php endif; ?>
 
-        <footer>
-            SIGEI – Sistema de Gestão Integrada | Painel colaborativo
-        </footer>
-    </div>
+    <?php elseif ($userPerfil == 'USUARIO_SEFISC'): ?>
+
+        <?php
+        $alunosEmAtendimento = totalDashboard($conexao, "
+            SELECT COUNT(DISTINCT a.id_aluno) AS total
+            FROM alunos a
+            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
+            WHERE a.status_aprovacao = 'APROVADO'
+        ");
+        $profissionaisAtivos = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM paes WHERE ativo = 1");
+        $alunosPendentes = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE status_aprovacao = 'PENDENTE'");
+        ?>
+
+        <div class="cards mb-4">
+            <div class="card"><span class="text-muted">Alunos em atendimento</span><strong><?php echo $alunosEmAtendimento; ?></strong></div>
+            <div class="card"><span class="text-muted">Profissionais ativos</span><strong><?php echo $profissionaisAtivos; ?></strong></div>
+            <div class="card"><span class="text-muted">Alunos pendentes</span><strong><?php echo $alunosPendentes; ?></strong></div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Resumo da fiscalizacao</h5>
+                <canvas id="graficoSefisc" height="120"></canvas>
+            </div>
+        </div>
+
+        <p class="text-muted">Acesse os menus acima para ver alunos, PAEs e empresas.</p>
+
+    <?php else: ?>
+
+        <div class="alert alert-info">Bem-vindo(a) ao sistema SIGEI.</div>
+
+    <?php endif; ?>
+
+    <footer>
+        SIGEI - Sistema de Gestao Integrada | Painel colaborativo
+    </footer>
+
+</div>
+
+<?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_SEFISC', 'USUARIO_EMPRESA', 'USUARIO_EDUCACAO_ESPECIAL'])): ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+<?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
+new Chart(document.getElementById('graficoEscola'), {
+    type: 'bar',
+    data: {
+        labels: ['Em atendimento', 'Sem atendimento', 'Pendentes'],
+        datasets: [{
+            label: 'Alunos',
+            data: [<?php echo $alunosEmAtendimento; ?>, <?php echo $alunosSemAtendimento; ?>, <?php echo $alunosPendentes; ?>],
+            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+<?php endif; ?>
+
+<?php if ($userPerfil == 'USUARIO_SEFISC'): ?>
+new Chart(document.getElementById('graficoSefisc'), {
+    type: 'bar',
+    data: {
+        labels: ['Alunos em atendimento', 'Profissionais ativos', 'Alunos pendentes'],
+        datasets: [{
+            label: 'Total',
+            data: [<?php echo $alunosEmAtendimento; ?>, <?php echo $profissionaisAtivos; ?>, <?php echo $alunosPendentes; ?>],
+            backgroundColor: ['#198754', '#0d6efd', '#ffc107']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+<?php endif; ?>
+
+<?php if ($userPerfil == 'USUARIO_EMPRESA'): ?>
+new Chart(document.getElementById('graficoEmpresa'), {
+    type: 'bar',
+    data: {
+        labels: ['Total de PAEs', 'PAEs atendendo', 'PAEs sem alunos'],
+        datasets: [{
+            label: 'PAEs',
+            data: [<?php echo $totalPAEs; ?>, <?php echo $paesAtendendo; ?>, <?php echo $paesSemAlunos; ?>],
+            backgroundColor: ['#0d47a1', '#1565c0', '#90caf9']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+<?php endif; ?>
+
+<?php if ($userPerfil == 'USUARIO_EDUCACAO_ESPECIAL'): ?>
+new Chart(document.getElementById('graficoEducacao'), {
+    type: 'bar',
+    data: {
+        labels: ['Em atendimento', 'Sem atendimento', 'Pendentes'],
+        datasets: [{
+            label: 'Alunos',
+            data: [<?php echo $alunosEmAtendimento; ?>, <?php echo $alunosSemAtendimento; ?>, <?php echo $alunosPendentes; ?>],
+            backgroundColor: ['#0d47a1', '#1565c0', '#90caf9']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+<?php endif; ?>
+</script>
+<?php endif; ?>
 
 </body>
 </html>

@@ -27,7 +27,7 @@ $homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
                     <a class="nav-link <?php echo ($currentPage === $homePage) ? 'active' : ''; ?>" href="<?php echo $homePage; ?>">Início</a>
                 </li>
 
-                <?php if (in_array($userPerfil, ['UNIDADE_ESCOLAR', 'EDUCACAO_ESPECIAL', 'SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
+                <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'ADMIN'])) { ?>
 
                     <li class="nav-item">
                         <a class="nav-link <?php echo ($currentPage === 'alunos_listar.php') ? 'active' : ''; ?>" href="alunos_listar.php">Alunos</a>
@@ -35,18 +35,26 @@ $homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
 
                 <?php } ?>
 
-                <?php if (in_array($userPerfil, ['EMPRESA_TERCEIRIZADA', 'SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
+                <?php if ($userPerfil === 'USUARIO_ESCOLA') { ?>
 
                     <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'cuidadores_listar.php') ? 'active' : ''; ?>" href="cuidadores_listar.php">Cuidadores</a>
+                        <a class="nav-link <?php echo ($currentPage === 'alunos_pendentes.php') ? 'active' : ''; ?>" href="alunos_pendentes.php">Pendentes</a>
                     </li>
 
                 <?php } ?>
 
-                <?php if (in_array($userPerfil, ['SETOR_FISCALIZACAO', 'ADMIN'])) { ?>
+                <?php if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') { ?>
 
                     <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'empresa.php') ? 'active' : ''; ?>" href="empresa.php">Empresas</a>
+                        <a class="nav-link <?php echo ($currentPage === 'solicitacoes.php') ? 'active' : ''; ?>" href="solicitacoes.php">Solicitações</a>
+                    </li>
+
+                <?php } ?>
+
+                <?php if (in_array($userPerfil, ['USUARIO_EMPRESA', 'USUARIO_SEFISC', 'ADMIN'])) { ?>
+
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'paes_listar.php') ? 'active' : ''; ?>" href="paes_listar.php">PAEs</a>
                     </li>
 
                 <?php } ?>
@@ -54,12 +62,36 @@ $homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
                 <?php if ($userPerfil === 'ADMIN') { ?>
 
                     <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'associacoes.php') ? 'active' : ''; ?>" href="associacoes.php">Associações</a>
+                    </li>
+
+                <?php } ?>
+
+                <?php if ($userPerfil === 'PAE') { ?>
+
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'relatorios.php') ? 'active' : ''; ?>" href="relatorios.php">Relatórios</a>
+                    </li>
+
+                <?php } ?>
+
+                <?php if ($userPerfil === 'ADMIN') { ?>
+
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'escolas_cadastrar.php') ? 'active' : ''; ?>" href="escolas_cadastrar.php">Escolas</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo ($currentPage === 'empresas_cadastrar.php') ? 'active' : ''; ?>" href="empresas_cadastrar.php">Empresas</a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link <?php echo ($currentPage === 'usuarios.php') ? 'active' : ''; ?>" href="usuarios.php">Usuários</a>
                     </li>
 
                 <?php } ?>
 
-                <!-- Perfil junto com os demais links (esquerda) -->
+                <!-- Perfil (todos) -->
                 <li class="nav-item">
                     <a class="nav-link <?php echo ($currentPage === 'perfil.php') ? 'active' : ''; ?>" href="perfil.php">Perfil</a>
                 </li>

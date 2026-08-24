@@ -1,72 +1,58 @@
 <?php
 session_start();
 include("../config/database.php");
+include("../config/perfil_functions.php");
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_perfil'] !== 'ADMIN') {
-    header('Location: login.php');
-    exit();
-}
+// Apenas ADMIN pode acessar
+exigirPerfil(array('ADMIN'));
 
 $userName = $_SESSION['user_name'];
-$userPerfil = $_SESSION['user_perfil'];
 
 function buscarTotal($conexao, $sql) {
     $result = mysqli_query($conexao, $sql);
-
-    if (!$result) {
-        return 0;
-    }
-
+    if (!$result) return 0;
     $row = mysqli_fetch_assoc($result);
     return (int) ($row['total'] ?? 0);
 }
 
-$totalUsuarios = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM usuarios");
 $totalAlunos = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM alunos");
-$totalCuidadores = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM usuarios WHERE perfil = 'CUIDADOR'");
+$totalPAEs = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM paes");
+$totalEscolas = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM escolas");
+$totalEmpresas = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM empresas");
 $totalPendentes = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE status_aprovacao = 'PENDENTE'");
+$totalAssociacoes = buscarTotal($conexao, "SELECT COUNT(*) AS total FROM associacoes WHERE ativo = 1");
 
+// Alunos recentes
 $sqlAlunos = "
-    SELECT
-        a.nome,
-        a.cpf,
-        a.deficiencia,
-        a.status_aprovacao,
-        a.data_cadastro,
-        escola.nome AS escola_nome
+    SELECT a.id_aluno, a.nome, a.cpf, a.descricao_deficiencia, a.status_aprovacao, a.data_cadastro,
+           e.nome AS escola_nome
     FROM alunos a
-    LEFT JOIN usuarios escola ON a.id_usuario_escola = escola.id_usuario
+    LEFT JOIN escolas e ON a.id_escola = e.id_escola
     ORDER BY a.data_cadastro DESC
+    LIMIT 10
 ";
 $resultAlunos = mysqli_query($conexao, $sqlAlunos);
 $alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
 
-$sqlCuidadores = "
-    SELECT
-        nome,
-        cpf,
-        empresa,
-        ativo,
-        data_cadastro
-    FROM usuarios
-    WHERE perfil = 'CUIDADOR'
-    ORDER BY data_cadastro DESC
-";
-$resultCuidadores = mysqli_query($conexao, $sqlCuidadores);
-$cuidadores = $resultCuidadores ? mysqli_fetch_all($resultCuidadores, MYSQLI_ASSOC) : [];
+// PAEs recentes
+$sqlPAEs = "SELECT p.nome, p.cpf, p.ativo, emp.nome AS empresa_nome
+            FROM paes p
+            LEFT JOIN empresas emp ON p.id_empresa = emp.id_empresa
+            ORDER BY p.data_cadastro DESC
+            LIMIT 10";
+$resultPAEs = mysqli_query($conexao, $sqlPAEs);
+$paes = $resultPAEs ? mysqli_fetch_all($resultPAEs, MYSQLI_ASSOC) : [];
 
-$sqlUsuarios = "
-    SELECT
-        nome,
-        cpf,
-        perfil,
-        ativo,
-        data_cadastro
-    FROM usuarios
-    ORDER BY data_cadastro DESC
-";
-$resultUsuarios = mysqli_query($conexao, $sqlUsuarios);
-$usuarios = $resultUsuarios ? mysqli_fetch_all($resultUsuarios, MYSQLI_ASSOC) : [];
+// Associações recentes
+$sqlAssociacoes = "SELECT ass.id_associacao, a.nome AS aluno_nome, p.nome AS pae_nome, ass.data_inicio
+    FROM associacoes ass
+    JOIN alunos a ON ass.id_aluno = a.id_aluno
+    JOIN paes p ON ass.id_pae = p.id_pae
+    WHERE ass.ativo = 1
+    ORDER BY ass.data_inicio DESC
+    LIMIT 10";
+$resultAssociacoes = mysqli_query($conexao, $sqlAssociacoes);
+$associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>
@@ -90,77 +76,61 @@ $usuarios = $resultUsuarios ? mysqli_fetch_all($resultUsuarios, MYSQLI_ASSOC) : 
             </div>
         </div>
 
+        <!-- Cards -->
         <div class="cards mb-4">
-            <div class="card">
-                <span class="text-muted">Usuarios</span>
-                <strong><?php echo $totalUsuarios; ?></strong>
-            </div>
-
-            <div class="card">
-                <span class="text-muted">Alunos</span>
-                <strong><?php echo $totalAlunos; ?></strong>
-            </div>
-
-            <div class="card">
-                <span class="text-muted">Cuidadores</span>
-                <strong><?php echo $totalCuidadores; ?></strong>
-            </div>
-
-            <div class="card">
-                <span class="text-muted">Pendentes</span>
-                <strong><?php echo $totalPendentes; ?></strong>
-            </div>
+            <div class="card"><span class="text-muted">Alunos</span><strong><?php echo $totalAlunos; ?></strong></div>
+            <div class="card"><span class="text-muted">PAEs</span><strong><?php echo $totalPAEs; ?></strong></div>
+            <div class="card"><span class="text-muted">Escolas</span><strong><?php echo $totalEscolas; ?></strong></div>
+            <div class="card"><span class="text-muted">Empresas</span><strong><?php echo $totalEmpresas; ?></strong></div>
+            <div class="card"><span class="text-muted">Pendentes</span><strong><?php echo $totalPendentes; ?></strong></div>
+            <div class="card"><span class="text-muted">Associações</span><strong><?php echo $totalAssociacoes; ?></strong></div>
         </div>
 
+        <!-- Alunos recentes -->
         <section class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Todos os alunos</h5>
-                    <a href="alunos_cadastrar.php" class="btn btn-primary btn-sm">+ Cadastrar aluno</a>
+                    <h5 class="mb-0">Alunos recentes</h5>
+                    <a href="alunos_listar.php" class="btn btn-primary btn-sm">Ver todos</a>
                 </div>
-
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
                             <tr>
                                 <th>Nome</th>
                                 <th>CPF</th>
-                                <th>Deficiencia</th>
+                                <th>Deficiência</th>
                                 <th>Escola</th>
                                 <th>Status</th>
-                                <th>Data</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (count($alunos) > 0) { ?>
-                                <?php foreach ($alunos as $aluno) { ?>
+                            <?php if (count($alunos) > 0): ?>
+                                <?php foreach ($alunos as $aluno): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($aluno['nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['cpf']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['deficiencia']); ?></td>
+                                        <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
+                                        <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
                                         <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
                                         <td><?php echo htmlspecialchars($aluno['status_aprovacao']); ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($aluno['data_cadastro'])); ?></td>
                                     </tr>
-                                <?php } ?>
-                            <?php } else { ?>
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted">Nenhum aluno cadastrado.</td>
-                                </tr>
-                            <?php } ?>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="5" class="text-center text-muted">Nenhum aluno cadastrado.</td></tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
+        <!-- PAEs recentes -->
         <section class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Todos os cuidadores</h5>
-                    <a href="cuidadores_cadastrar.php" class="btn btn-primary btn-sm">+ Cadastrar cuidador</a>
+                    <h5 class="mb-0">PAEs recentes</h5>
+                    <a href="cuidadores_listar.php" class="btn btn-primary btn-sm">Ver todos</a>
                 </div>
-
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
@@ -169,64 +139,70 @@ $usuarios = $resultUsuarios ? mysqli_fetch_all($resultUsuarios, MYSQLI_ASSOC) : 
                                 <th>CPF</th>
                                 <th>Empresa</th>
                                 <th>Status</th>
-                                <th>Data</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (count($cuidadores) > 0) { ?>
-                                <?php foreach ($cuidadores as $cuidador) { ?>
+                            <?php if (count($paes) > 0): ?>
+                                <?php foreach ($paes as $pae): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($cuidador['nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($cuidador['cpf']); ?></td>
-                                        <td><?php echo htmlspecialchars($cuidador['empresa']); ?></td>
-                                        <td><?php echo $cuidador['ativo'] == 1 ? 'Ativo' : 'Inativo'; ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($cuidador['data_cadastro'])); ?></td>
+                                        <td><?php echo htmlspecialchars($pae['nome']); ?></td>
+                                        <td><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></td>
+                                        <td><?php echo htmlspecialchars($pae['empresa_nome'] ?? '-'); ?></td>
+                                        <td><?php echo $pae['ativo'] == 1 ? 'Ativo' : 'Inativo'; ?></td>
                                     </tr>
-                                <?php } ?>
-                            <?php } else { ?>
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">Nenhum cuidador cadastrado.</td>
-                                </tr>
-                            <?php } ?>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="4" class="text-center text-muted">Nenhum PAE cadastrado.</td></tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <section class="card border-0 shadow-sm">
+        <!-- Associações recentes -->
+        <section class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Todos os usuarios</h5>
-
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Associações recentes</h5>
+                    <a href="associacoes.php" class="btn btn-primary btn-sm">Gerenciar</a>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Perfil</th>
-                                <th>Status</th>
-                                <th>Data</th>
+                                <th>Aluno</th>
+                                <th>PAE</th>
+                                <th>Data Início</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (count($usuarios) > 0) { ?>
-                                <?php foreach ($usuarios as $usuario) { ?>
+                            <?php if (count($associacoes) > 0): ?>
+                                <?php foreach ($associacoes as $assoc): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($usuario['nome']); ?></td>
-                                        <td><?php echo htmlspecialchars($usuario['cpf']); ?></td>
-                                        <td><?php echo htmlspecialchars($usuario['perfil']); ?></td>
-                                        <td><?php echo $usuario['ativo'] == 1 ? 'Ativo' : 'Inativo'; ?></td>
-                                        <td><?php echo date('d/m/Y', strtotime($usuario['data_cadastro'])); ?></td>
+                                        <td><?php echo htmlspecialchars($assoc['aluno_nome']); ?></td>
+                                        <td><?php echo htmlspecialchars($assoc['pae_nome']); ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($assoc['data_inicio'])); ?></td>
                                     </tr>
-                                <?php } ?>
-                            <?php } else { ?>
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">Nenhum usuario cadastrado.</td>
-                                </tr>
-                            <?php } ?>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="3" class="text-center text-muted">Nenhuma associação.</td></tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ações rápidas -->
+        <section class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Ações rápidas</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="escolas_cadastrar.php" class="btn btn-outline-primary">Cadastrar Escola</a>
+                    <a href="empresas_cadastrar.php" class="btn btn-outline-primary">Cadastrar Empresa</a>
+                    <a href="associacoes.php" class="btn btn-outline-primary">Associar PAE a Aluno</a>
+                    <a href="usuarios.php" class="btn btn-outline-primary">Ver Usuários</a>
                 </div>
             </div>
         </section>

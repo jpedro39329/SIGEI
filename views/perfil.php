@@ -11,8 +11,20 @@ $userId     = $_SESSION['user_id'];
 $userName   = $_SESSION['user_name'];
 $userPerfil = $_SESSION['user_perfil'];
 
-// Dados completos do usuário logado
-$sql = "SELECT * FROM usuarios WHERE id_usuario = $userId";
+// Escolhe a tabela correta conforme o perfil
+$tabelasPerfil = array(
+    'ADMIN'                    => array('admin',                     'id_admin'),
+    'USUARIO_ESCOLA'           => array('usuarios_escola',           'id_usuario_escola'),
+    'USUARIO_EMPRESA'          => array('usuarios_empresa',          'id_usuario_empresa'),
+    'PAE'                      => array('paes',                      'id_pae'),
+    'USUARIO_SEFISC'           => array('usuarios_sefisc',           'id_usuario_sefisc'),
+    'USUARIO_EDUCACAO_ESPECIAL'=> array('usuarios_educacao_especial','id_usuario_edu')
+);
+
+$tabela = $tabelasPerfil[$userPerfil][0] ?? 'admin';
+$campoId = $tabelasPerfil[$userPerfil][1] ?? 'id_admin';
+
+$sql = "SELECT * FROM $tabela WHERE $campoId = $userId";
 $result = mysqli_query($conexao, $sql);
 $usuario = mysqli_fetch_assoc($result);
 
@@ -63,14 +75,8 @@ $homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span class="text-muted">Perfil</span>
-                    <strong><?php echo htmlspecialchars($usuario['perfil']); ?></strong>
+                    <strong><?php echo htmlspecialchars($userPerfil); ?></strong>
                 </li>
-                <?php if (!empty($usuario['empresa'])): ?>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="text-muted">Empresa</span>
-                    <strong><?php echo htmlspecialchars($usuario['empresa']); ?></strong>
-                </li>
-                <?php endif; ?>
                 <li class="list-group-item d-flex justify-content-between">
                     <span class="text-muted">Usuário desde</span>
                     <strong><?php echo date('d/m/Y', strtotime($usuario['data_cadastro'])); ?></strong>
