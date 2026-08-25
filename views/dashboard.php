@@ -31,7 +31,7 @@ function totalDashboard($conexao, $sql) {
 <div class="content">
 
     <div class="mb-4">
-        <h4 class="mb-1">Ola, <?php echo htmlspecialchars($userName); ?></h4>
+        <h4 class="mb-1">Olá, <?php echo htmlspecialchars($userName); ?></h4>
         <p class="text-muted mb-0"><?php echo htmlspecialchars(nomePerfil($userPerfil)); ?> - bem-vindo(a) ao painel do SIGEI.</p>
     </div>
 

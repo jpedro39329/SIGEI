@@ -59,7 +59,7 @@ $homePage = 'dashboard.php';
 
                 <?php } ?>
 
-                <?php if ($userPerfil === 'ADMIN') { ?>
+                <?php if (in_array($userPerfil, ['ADMIN', 'USUARIO_EMPRESA'])) { ?>
 
                     <li class="nav-item">
                         <a class="nav-link <?php echo ($currentPage === 'associacoes.php') ? 'active' : ''; ?>" href="associacoes.php">Associações</a>

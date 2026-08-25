@@ -1,8 +1,8 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN pode acessar
-exigirPerfil(array('ADMIN'));
+// Apenas ADMIN e USUARIO_EMPRESA podem acessar
+exigirPerfil(array('ADMIN', 'USUARIO_EMPRESA'));
 
 $userName = $_SESSION['user_name'];
 

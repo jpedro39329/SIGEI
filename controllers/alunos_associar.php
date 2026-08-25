@@ -1,8 +1,8 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN pode associar PAE a aluno
-exigirPerfil(array('ADMIN'));
+// Apenas ADMIN e USUARIO_EMPRESA podem associar PAE a aluno
+exigirPerfil(array('ADMIN', 'USUARIO_EMPRESA'));
 exigirTokenCSRF();
 
 $id_aluno = (int) ($_POST['id_aluno'] ?? 0);
