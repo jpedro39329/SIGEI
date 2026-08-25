@@ -1,71 +1,114 @@
--- Cria o banco de dados
-CREATE DATABASE IF NOT EXISTS `sigei` 
-CHARACTER SET utf8mb4 
-COLLATE utf8mb4_general_ci;
+-- ============================================================
+-- SIGEI - BANCO DE DADOS
+-- MariaDB / MySQL
+-- ============================================================
 
--- Seleciona o banco de dados
+DROP DATABASE IF EXISTS `sigei`;
+
+CREATE DATABASE `sigei`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
 USE `sigei`;
 
--- --------------------------------------------------------
--- Estrutura para tabela `admin`
--- --------------------------------------------------------
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+START TRANSACTION;
+
+-- ============================================================
+-- TABELA: unidades_gestoras
+-- ============================================================
+
+CREATE TABLE `unidades_gestoras` (
+  `id_uge` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_uge`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `unidades_gestoras`
+(`id_uge`, `nome`, `endereco`, `telefone`, `email`)
+VALUES
+(1, 'Unidade Regional de Ensino de Bragança Paulista', NULL, NULL, NULL);
+
+
+-- ============================================================
+-- TABELA: admin
+-- ============================================================
+
 CREATE TABLE `admin` (
-  `id_admin` int(11) NOT NULL,
+  `id_admin` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
   `cpf` char(11) NOT NULL,
   `senha` varchar(255) NOT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_admin`),
+  UNIQUE KEY `cpf` (`cpf`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `alunos`
--- --------------------------------------------------------
-CREATE TABLE `alunos` (
-  `id_aluno` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) DEFAULT NULL,
-  `ra` varchar(20) DEFAULT NULL,
-  `data_nascimento` date DEFAULT NULL,
-  `descricao_deficiencia` varchar(255) DEFAULT NULL,
-  `descricao_cuidados` text DEFAULT NULL,
-  `nome_responsavel` varchar(150) DEFAULT NULL,
-  `cpf_responsavel` char(11) DEFAULT NULL,
-  `foto_arquivo` varchar(255) DEFAULT NULL,
-  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','ARQUIVADO') DEFAULT 'PENDENTE',
-  `motivo_reprovacao` text DEFAULT NULL,
-  `id_escola` int(11) NOT NULL,
-  `id_usuario_escola` int(11) NOT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
+INSERT INTO `admin`
+(`id_admin`, `nome`, `cpf`, `senha`)
+VALUES
+(1, 'Administrador Geral', '00000000001',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+
+
+-- ============================================================
+-- TABELA: sefisc
+-- ============================================================
+
+CREATE TABLE `sefisc` (
+  `id_sefisc` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL DEFAULT 'Seção de Fiscalização',
+  `id_uge` int(11) NOT NULL DEFAULT 1,
+  `telefone` varchar(20) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_sefisc`),
+  KEY `fk_sefisc_uge` (`id_uge`),
+  CONSTRAINT `fk_sefisc_uge`
+    FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `associacoes`
--- --------------------------------------------------------
-CREATE TABLE `associacoes` (
-  `id_associacao` int(11) NOT NULL,
-  `id_aluno` int(11) NOT NULL,
-  `id_pae` int(11) NOT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_inicio` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `sefisc`
+(`id_sefisc`, `nome`, `id_uge`)
+VALUES
+(1, 'Seção de Fiscalização', 1);
 
--- --------------------------------------------------------
--- Estrutura para tabela `educacao_especial`
--- --------------------------------------------------------
+
+-- ============================================================
+-- TABELA: educacao_especial
+-- ============================================================
+
 CREATE TABLE `educacao_especial` (
-  `id_edu` int(11) NOT NULL,
+  `id_edu` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL DEFAULT 'Educação Especial',
   `id_uge` int(11) NOT NULL DEFAULT 1,
   `telefone` varchar(20) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_edu`),
+  KEY `fk_edu_uge` (`id_uge`),
+  CONSTRAINT `fk_edu_uge`
+    FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `empresas`
--- --------------------------------------------------------
+INSERT INTO `educacao_especial`
+(`id_edu`, `nome`, `id_uge`)
+VALUES
+(1, 'Educação Especial', 1);
+
+
+-- ============================================================
+-- TABELA: empresas
+-- ============================================================
+
 CREATE TABLE `empresas` (
-  `id_empresa` int(11) NOT NULL,
+  `id_empresa` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
   `cnpj` char(14) NOT NULL,
   `rua` varchar(150) DEFAULT NULL,
@@ -77,14 +120,37 @@ CREATE TABLE `empresas` (
   `contrato_arquivo` varchar(255) DEFAULT NULL,
   `telefone` varchar(20) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_empresa`),
+  UNIQUE KEY `cnpj` (`cnpj`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `escolas`
--- --------------------------------------------------------
+INSERT INTO `empresas`
+(`id_empresa`, `nome`, `cnpj`, `rua`, `numero`, `bairro`, `cidade`,
+ `cep`, `numero_contrato`, `contrato_arquivo`, `telefone`, `email`)
+VALUES
+(1, 'Apoio Inclusivo Ltda', '12345678000199',
+ 'Rua dos Cuidadores', '100', 'Centro', 'Bragança Paulista',
+ '12900100', 'CT-2024-001', 'uploads/contratos/apoiocontrato.pdf',
+ '(11) 9999-2000', 'contato@apoioinclusivo.com'),
+
+(2, 'Inclusão Total S/A', '98765432000188',
+ 'Av. Inclusão', '500', 'Jardim América', 'Bragança Paulista',
+ '12900110', 'CT-2024-002', 'uploads/contratos/inclusaocontrato.pdf',
+ '(11) 9999-2001', 'contato@inclusaototal.com'),
+
+(3, 'Educa Mais Terceirizados', '45678912000177',
+ 'Rua Educacional', '200', 'Vila Nova', 'Bragança Paulista',
+ '12900120', 'CT-2024-003', 'uploads/contratos/educamaiscontrato.pdf',
+ '(11) 9999-2002', 'contato@educamais.com');
+
+
+-- ============================================================
+-- TABELA: escolas
+-- ============================================================
+
 CREATE TABLE `escolas` (
-  `id_escola` int(11) NOT NULL,
+  `id_escola` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
   `cie` char(6) NOT NULL,
   `rua` varchar(150) DEFAULT NULL,
@@ -97,26 +163,194 @@ CREATE TABLE `escolas` (
   `horario_funcionamento` varchar(100) DEFAULT NULL,
   `telefone` varchar(20) DEFAULT NULL,
   `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_escola`),
+  UNIQUE KEY `cie` (`cie`),
+  KEY `fk_escola_uge` (`id_uge`),
+  CONSTRAINT `fk_escola_uge`
+    FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `laudos`
--- --------------------------------------------------------
-CREATE TABLE `laudos` (
-  `id_laudo` int(11) NOT NULL,
-  `id_aluno` int(11) NOT NULL,
-  `nome_arquivo` varchar(255) DEFAULT NULL,
-  `caminho_arquivo` varchar(255) DEFAULT NULL,
-  `descricao` text DEFAULT NULL,
-  `data_envio` datetime DEFAULT current_timestamp()
+INSERT INTO `escolas`
+(`id_escola`, `nome`, `cie`, `rua`, `numero`, `bairro`, `cidade`,
+ `cep`, `modalidade`, `id_uge`, `horario_funcionamento`,
+ `telefone`, `email`)
+VALUES
+(1, 'EE Professor José Alves', '123456',
+ 'Rua das Flores', '100', 'Centro', 'Bragança Paulista',
+ '12900000', 'REGULAR', 1, '07:00 às 17:00',
+ '(11) 9999-1112', 'ee.josealves@email.com'),
+
+(2, 'EE Maria de Lourdes', '234567',
+ 'Av. Brasil', '250', 'Jardim América', 'Bragança Paulista',
+ '12900010', 'PEI', 1, '07:00 às 17:00',
+ '(11) 9999-1113', 'ee.marialourdes@email.com'),
+
+(3, 'EE São Francisco', '345678',
+ 'Rua dos Estudantes', '450', 'Vila Nova', 'Bragança Paulista',
+ '12900020', 'REGULAR', 1, '07:00 às 17:00',
+ '(11) 9999-1114', 'ee.saofrancisco@email.com'),
+
+(4, 'EE Padre Anchieta', '456789',
+ 'Rua Anchieta', '789', 'Centro', 'Bragança Paulista',
+ '12900030', 'PEI', 1, '07:00 às 17:00',
+ '(11) 9999-1115', 'ee.padreanchieta@email.com');
+
+
+-- ============================================================
+-- TABELA: usuarios_escola
+-- ============================================================
+
+CREATE TABLE `usuarios_escola` (
+  `id_usuario_escola` int(11) NOT NULL AUTO_INCREMENT,
+  `id_escola` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_escola`),
+  UNIQUE KEY `cpf` (`cpf`),
+  KEY `fk_userescola_escola` (`id_escola`),
+  CONSTRAINT `fk_userescola_escola`
+    FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `paes`
--- --------------------------------------------------------
+INSERT INTO `usuarios_escola`
+(`id_usuario_escola`, `id_escola`, `nome`, `cpf`, `senha`,
+ `email`, `telefone`, `ativo`)
+VALUES
+(1, 1, 'Carlos Silva', '11111111111',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'carlos.silva@escola1.com', '(11) 9999-1122', 1),
+
+(2, 1, 'Mariana Santos', '11111111112',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'mariana.santos@escola1.com', '(11) 9999-1123', 1),
+
+(3, 2, 'José Oliveira', '11111111113',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'jose.oliveira@escola2.com', '(11) 9999-1124', 1),
+
+(4, 3, 'Pedro Costa', '11111111115',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'pedro.costa@escola3.com', '(11) 9999-1126', 1);
+
+
+-- ============================================================
+-- TABELA: usuarios_sefisc
+-- ============================================================
+
+CREATE TABLE `usuarios_sefisc` (
+  `id_usuario_sefisc` int(11) NOT NULL AUTO_INCREMENT,
+  `id_sefisc` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_sefisc`),
+  UNIQUE KEY `cpf` (`cpf`),
+  KEY `fk_usersefisc_sefisc` (`id_sefisc`),
+  CONSTRAINT `fk_usersefisc_sefisc`
+    FOREIGN KEY (`id_sefisc`) REFERENCES `sefisc` (`id_sefisc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_sefisc`
+(`id_usuario_sefisc`, `id_sefisc`, `nome`, `cpf`, `senha`,
+ `email`, `telefone`, `ativo`)
+VALUES
+(1, 1, 'Fiscal José', '44444444441',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'fiscal.jose@sefisc.sp.gov.br', '(11) 9999-4001', 1),
+
+(2, 1, 'Fiscal Maria', '44444444442',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'fiscal.maria@sefisc.sp.gov.br', '(11) 9999-4002', 1);
+
+
+-- ============================================================
+-- TABELA: usuarios_educacao_especial
+-- ============================================================
+
+CREATE TABLE `usuarios_educacao_especial` (
+  `id_usuario_edu` int(11) NOT NULL AUTO_INCREMENT,
+  `id_edu` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_edu`),
+  UNIQUE KEY `cpf` (`cpf`),
+  KEY `fk_useredu_edu` (`id_edu`),
+  CONSTRAINT `fk_useredu_edu`
+    FOREIGN KEY (`id_edu`) REFERENCES `educacao_especial` (`id_edu`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_educacao_especial`
+(`id_usuario_edu`, `id_edu`, `nome`, `cpf`, `senha`,
+ `email`, `telefone`, `ativo`)
+VALUES
+(1, 1, 'Especialista Ana', '55555555551',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'ana.especial@edu.sp.gov.br', '(11) 9999-5001', 1),
+
+(2, 1, 'Especialista Paulo', '55555555552',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'paulo.especial@edu.sp.gov.br', '(11) 9999-5002', 1);
+
+
+-- ============================================================
+-- TABELA: usuarios_empresa
+-- ============================================================
+
+CREATE TABLE `usuarios_empresa` (
+  `id_usuario_empresa` int(11) NOT NULL AUTO_INCREMENT,
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_empresa`),
+  UNIQUE KEY `cpf` (`cpf`),
+  KEY `fk_userempresa_empresa` (`id_empresa`),
+  CONSTRAINT `fk_userempresa_empresa`
+    FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_empresa`
+(`id_usuario_empresa`, `id_empresa`, `nome`, `cpf`, `senha`,
+ `email`, `telefone`, `ativo`)
+VALUES
+(1, 1, 'Roberto Gerente', '22222222222',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'roberto@apoioinclusivo.com', '(11) 9999-2005', 1),
+
+(2, 1, 'Carla Recursos', '22222222223',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'carla@apoioinclusivo.com', '(11) 9999-2006', 1),
+
+(3, 2, 'Marcos Diretor', '22222222224',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'marcos@inclusaototal.com', '(11) 9999-2007', 1);
+
+
+-- ============================================================
+-- TABELA: paes
+-- ============================================================
+
 CREATE TABLE `paes` (
-  `id_pae` int(11) NOT NULL,
+  `id_pae` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
   `cpf` char(11) NOT NULL,
   `senha` varchar(255) NOT NULL,
@@ -125,15 +359,306 @@ CREATE TABLE `paes` (
   `contrato_arquivo` varchar(255) DEFAULT NULL,
   `id_empresa` int(11) NOT NULL,
   `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp()
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_pae`),
+  UNIQUE KEY `cpf` (`cpf`),
+  KEY `fk_pae_empresa` (`id_empresa`),
+  CONSTRAINT `fk_pae_empresa`
+    FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `recuperacao_senha`
--- --------------------------------------------------------
+INSERT INTO `paes`
+(`id_pae`, `nome`, `cpf`, `senha`, `telefone`, `email`,
+ `contrato_arquivo`, `id_empresa`, `ativo`)
+VALUES
+(1, 'Ana Paula Silva', '33333333331',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '(11) 9999-3001', 'ana.silva@pae.com',
+ 'uploads/contratos/pae_ana.pdf', 1, 1),
+
+(2, 'Beatriz Santos', '33333333332',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '(11) 9999-3002', 'beatriz.santos@pae.com',
+ 'uploads/contratos/pae_beatriz.pdf', 1, 1),
+
+(3, 'Carlos Eduardo', '33333333333',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '(11) 9999-3003', 'carlos.eduardo@pae.com',
+ 'uploads/contratos/pae_carlos.pdf', 1, 1),
+
+(4, 'Daniela Oliveira', '33333333334',
+ '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '(11) 9999-3004', 'daniela.oliveira@pae.com',
+ 'uploads/contratos/pae_daniela.pdf', 2, 1);
+
+
+-- ============================================================
+-- TABELA: alunos
+-- ============================================================
+
+CREATE TABLE `alunos` (
+  `id_aluno` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) DEFAULT NULL,
+  `ra` varchar(20) DEFAULT NULL,
+  `turno_aula` enum('MANHÃ','TARDE','NOITE','INTEGRAL') DEFAULT NULL,
+  `genero` varchar(50) DEFAULT NULL,
+  `raca` varchar(50) DEFAULT NULL,
+  `municipio_nascimento` varchar(100) DEFAULT NULL,
+  `serie` varchar(50) DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `descricao_deficiencia` varchar(255) DEFAULT NULL,
+  `descricao_cuidados` text DEFAULT NULL,
+  `nome_responsavel` varchar(150) DEFAULT NULL,
+  `cpf_responsavel` char(11) DEFAULT NULL,
+  `foto_arquivo` varchar(255) DEFAULT NULL,
+  `termo_responsabilidade_arquivo` varchar(255) DEFAULT NULL,
+  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','ARQUIVADO')
+    DEFAULT 'PENDENTE',
+  `motivo_reprovacao` text DEFAULT NULL,
+  `id_escola` int(11) NOT NULL,
+  `id_usuario_escola` int(11) NOT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_aluno`),
+  UNIQUE KEY `cpf` (`cpf`),
+  KEY `fk_aluno_escola` (`id_escola`),
+  KEY `fk_aluno_userescola` (`id_usuario_escola`),
+  CONSTRAINT `fk_aluno_escola`
+    FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
+  CONSTRAINT `fk_aluno_userescola`
+    FOREIGN KEY (`id_usuario_escola`)
+    REFERENCES `usuarios_escola` (`id_usuario_escola`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `alunos`
+(`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`,
+ `municipio_nascimento`, `serie`, `data_nascimento`,
+ `descricao_deficiencia`, `descricao_cuidados`,
+ `nome_responsavel`, `cpf_responsavel`,
+ `foto_arquivo`, `termo_responsabilidade_arquivo`,
+ `status_aprovacao`, `motivo_reprovacao`,
+ `id_escola`, `id_usuario_escola`)
+VALUES
+
+(1, 'João Pedro Santos', '66666666661', '2024001',
+ 'MANHÃ', 'Masculino', NULL, 'Bragança Paulista', '5º Ano',
+ '2015-05-15',
+ 'TEA - Transtorno do Espectro Autista',
+ 'Necessita de acompanhamento em sala de aula',
+ 'Ana Maria Santos', '77777777771',
+ 'uploads/fotos/joao_pedro.jpg', NULL,
+ 'APROVADO', NULL, 1, 1),
+
+(2, 'Mariana Oliveira', '66666666662', '2024002',
+ 'TARDE', 'Feminino', NULL, 'Bragança Paulista', '4º Ano',
+ '2016-08-22',
+ 'Síndrome de Down',
+ 'Precisa de auxílio para alimentação e higiene',
+ 'José Oliveira', '77777777772',
+ 'uploads/fotos/mariana_oliveira.jpg', NULL,
+ 'APROVADO', NULL, 1, 1),
+
+(3, 'Lucas Pereira', '66666666663', '2024003',
+ 'MANHÃ', 'Masculino', NULL, 'Atibaia', '3º Ano',
+ '2017-03-10',
+ 'TEA - Nível 2 de suporte',
+ 'Necessita de suporte visual',
+ 'Maria Pereira', '77777777773',
+ 'uploads/fotos/lucas_pereira.jpg', NULL,
+ 'PENDENTE', NULL, 2, 3),
+
+(4, 'Sofia Almeida', '66666666664', '2024004',
+ 'TARDE', 'Feminino', NULL, 'Bragança Paulista', '5º Ano',
+ '2015-11-30',
+ 'Deficiência Física - Cadeirante',
+ 'Necessita de acessibilidade física',
+ 'Carlos Almeida', '77777777774',
+ 'uploads/fotos/sofia_almeida.jpg', NULL,
+ 'APROVADO', NULL, 2, 3),
+
+(5, 'Pedro Henrique Costa', '66666666665', '2024005',
+ 'MANHÃ', 'Masculino', NULL, 'Bragança Paulista', '4º Ano',
+ '2016-07-18',
+ 'TEA - Transtorno do Espectro Autista',
+ 'Comportamento seletivo com alimentos',
+ 'Fernanda Costa', '77777777775',
+ 'uploads/fotos/pedro_henrique.jpg', NULL,
+ 'APROVADO', NULL, 3, 4),
+
+(6, 'Laura Rodrigues', '66666666666', '2024006',
+ 'TARDE', 'Feminino', NULL, 'Bragança Paulista', '3º Ano',
+ '2018-02-25',
+ 'Síndrome de Asperger',
+ 'Dificuldade de interação social',
+ 'Ricardo Rodrigues', '77777777776',
+ 'uploads/fotos/laura_rodrigues.jpg', NULL,
+ 'PENDENTE', NULL, 3, 4);
+
+
+-- ============================================================
+-- TABELA: associacoes
+-- ============================================================
+
+CREATE TABLE `associacoes` (
+  `id_associacao` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
+  `id_pae` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_inicio` date DEFAULT NULL,
+  PRIMARY KEY (`id_associacao`),
+  KEY `fk_assoc_aluno` (`id_aluno`),
+  KEY `fk_assoc_pae` (`id_pae`),
+  CONSTRAINT `fk_assoc_aluno`
+    FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`),
+  CONSTRAINT `fk_assoc_pae`
+    FOREIGN KEY (`id_pae`) REFERENCES `paes` (`id_pae`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- ============================================================
+-- TRIGGER: limite de 3 alunos por PAE
+-- ============================================================
+
+DELIMITER $$
+
+CREATE TRIGGER `trg_limite_pae`
+BEFORE INSERT ON `associacoes`
+FOR EACH ROW
+BEGIN
+    DECLARE total INT;
+
+    IF NEW.ativo = 1 THEN
+
+        SELECT COUNT(*)
+        INTO total
+        FROM associacoes
+        WHERE id_pae = NEW.id_pae
+          AND ativo = 1;
+
+        IF total >= 3 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT =
+            'PAE já possui 3 alunos ativos associados';
+        END IF;
+
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+INSERT INTO `associacoes`
+(`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`)
+VALUES
+(1, 1, 1, 1, '2025-01-15'),
+(2, 2, 1, 1, '2025-01-15'),
+(3, 3, 2, 1, '2025-01-20'),
+(4, 4, 2, 1, '2025-02-01'),
+(5, 5, 3, 1, '2025-01-25'),
+(6, 6, 4, 1, '2025-02-01');
+
+
+-- ============================================================
+-- TABELA: laudos
+-- ============================================================
+
+CREATE TABLE `laudos` (
+  `id_laudo` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
+  `nome_arquivo` varchar(255) DEFAULT NULL,
+  `caminho_arquivo` varchar(255) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_envio` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_laudo`),
+  KEY `fk_laudo_aluno` (`id_aluno`),
+  CONSTRAINT `fk_laudo_aluno`
+    FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `laudos`
+(`id_laudo`, `id_aluno`, `nome_arquivo`,
+ `caminho_arquivo`, `descricao`)
+VALUES
+(1, 1, 'laudo_joao_tea.pdf',
+ 'uploads/laudos/laudo_joao_tea.pdf',
+ 'Laudo médico - TEA'),
+
+(2, 1, 'relatorio_joao_psicologico.pdf',
+ 'uploads/laudos/relatorio_joao_psicologico.pdf',
+ 'Relatório psicológico'),
+
+(3, 2, 'laudo_mariana_down.pdf',
+ 'uploads/laudos/laudo_mariana_down.pdf',
+ 'Laudo médico - Síndrome de Down'),
+
+(4, 4, 'laudo_sofia_fisica.pdf',
+ 'uploads/laudos/laudo_sofia_fisica.pdf',
+ 'Laudo médico - Deficiência Física'),
+
+(5, 5, 'laudo_pedro_tea.pdf',
+ 'uploads/laudos/laudo_pedro_tea.pdf',
+ 'Laudo médico - TEA');
+
+
+-- ============================================================
+-- TABELA: relatorios
+-- ============================================================
+
+CREATE TABLE `relatorios` (
+  `id_relatorio` int(11) NOT NULL AUTO_INCREMENT,
+  `id_associacao` int(11) NOT NULL,
+  `tipo` enum('DIARIO','MENSAL') DEFAULT 'DIARIO',
+  `descricao` text DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_relatorio`),
+  KEY `fk_relatorio_assoc` (`id_associacao`),
+  CONSTRAINT `fk_relatorio_assoc`
+    FOREIGN KEY (`id_associacao`)
+    REFERENCES `associacoes` (`id_associacao`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `relatorios`
+(`id_relatorio`, `id_associacao`, `tipo`, `descricao`, `data_cadastro`)
+VALUES
+(1, 1, 'DIARIO',
+ 'João Pedro participou bem das atividades.',
+ '2025-03-10 14:30:00'),
+
+(2, 1, 'MENSAL',
+ 'João Pedro apresentou evolução significativa.',
+ '2025-03-31 17:00:00'),
+
+(3, 2, 'DIARIO',
+ 'Mariana precisou de auxílio na alimentação.',
+ '2025-03-10 12:00:00'),
+
+(4, 2, 'MENSAL',
+ 'Mariana tem se adaptado bem.',
+ '2025-03-31 16:00:00'),
+
+(5, 3, 'DIARIO',
+ 'Lucas apresentou dificuldade de comunicação.',
+ '2025-03-11 10:00:00'),
+
+(6, 4, 'DIARIO',
+ 'Sofia participou das atividades com adaptações.',
+ '2025-03-12 10:00:00');
+
+
+-- ============================================================
+-- TABELA: recuperacao_senha
+-- ============================================================
+
 CREATE TABLE `recuperacao_senha` (
-  `id_recuperacao` int(11) NOT NULL,
-  `tipo_perfil` enum('ADMIN','USUARIO_SEFISC','USUARIO_EDUCACAO_ESPECIAL','USUARIO_ESCOLA','USUARIO_EMPRESA','PAE') NOT NULL,
+  `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo_perfil` enum(
+    'ADMIN',
+    'USUARIO_SEFISC',
+    'USUARIO_EDUCACAO_ESPECIAL',
+    'USUARIO_ESCOLA',
+    'USUARIO_EMPRESA',
+    'PAE'
+  ) NOT NULL,
   `id_referencia` int(11) NOT NULL,
   `token` varchar(64) NOT NULL,
   `codigo` varchar(6) NOT NULL,
@@ -141,496 +666,67 @@ CREATE TABLE `recuperacao_senha` (
   `contato` varchar(100) NOT NULL,
   `expira_em` datetime NOT NULL,
   `usado` tinyint(1) DEFAULT 0,
-  `data_criacao` datetime DEFAULT current_timestamp()
+  `data_criacao` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_recuperacao`),
+  UNIQUE KEY `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `relatorios`
--- --------------------------------------------------------
-CREATE TABLE `relatorios` (
-  `id_relatorio` int(11) NOT NULL,
-  `id_associacao` int(11) NOT NULL,
-  `tipo` enum('DIARIO','MENSAL') DEFAULT 'DIARIO',
-  `descricao` text DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Estrutura para tabela `sefisc`
--- --------------------------------------------------------
-CREATE TABLE `sefisc` (
-  `id_sefisc` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL DEFAULT 'Seção de Fiscalização',
-  `id_uge` int(11) NOT NULL DEFAULT 1,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
--- Estrutura para tabela `unidades_gestoras`
--- --------------------------------------------------------
-CREATE TABLE `unidades_gestoras` (
-  `id_uge` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `endereco` varchar(255) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
--- Estrutura para tabela `usuarios_educacao_especial`
--- --------------------------------------------------------
-CREATE TABLE `usuarios_educacao_especial` (
-  `id_usuario_edu` int(11) NOT NULL,
-  `id_edu` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
--- Estrutura para tabela `usuarios_empresa`
--- --------------------------------------------------------
-CREATE TABLE `usuarios_empresa` (
-  `id_usuario_empresa` int(11) NOT NULL,
-  `id_empresa` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
--- Estrutura para tabela `usuarios_escola`
--- --------------------------------------------------------
-CREATE TABLE `usuarios_escola` (
-  `id_usuario_escola` int(11) NOT NULL,
-  `id_escola` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
--- Estrutura para tabela `usuarios_sefisc`
--- --------------------------------------------------------
-CREATE TABLE `usuarios_sefisc` (
-  `id_usuario_sefisc` int(11) NOT NULL,
-  `id_sefisc` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
--- Índices
--- --------------------------------------------------------
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`id_admin`),
-  ADD UNIQUE KEY `cpf` (`cpf`);
-
-ALTER TABLE `alunos`
-  ADD PRIMARY KEY (`id_aluno`),
-  ADD UNIQUE KEY `cpf` (`cpf`),
-  ADD KEY `fk_aluno_escola` (`id_escola`),
-  ADD KEY `fk_aluno_userescola` (`id_usuario_escola`);
-
-ALTER TABLE `associacoes`
-  ADD PRIMARY KEY (`id_associacao`),
-  ADD KEY `fk_assoc_aluno` (`id_aluno`),
-  ADD KEY `fk_assoc_pae` (`id_pae`);
-
-ALTER TABLE `educacao_especial`
-  ADD PRIMARY KEY (`id_edu`),
-  ADD KEY `fk_edu_uge` (`id_uge`);
-
-ALTER TABLE `empresas`
-  ADD PRIMARY KEY (`id_empresa`),
-  ADD UNIQUE KEY `cnpj` (`cnpj`);
-
-ALTER TABLE `escolas`
-  ADD PRIMARY KEY (`id_escola`),
-  ADD UNIQUE KEY `cie` (`cie`),
-  ADD KEY `fk_escola_uge` (`id_uge`);
-
-ALTER TABLE `laudos`
-  ADD PRIMARY KEY (`id_laudo`),
-  ADD KEY `fk_laudo_aluno` (`id_aluno`);
-
-ALTER TABLE `paes`
-  ADD PRIMARY KEY (`id_pae`),
-  ADD UNIQUE KEY `cpf` (`cpf`),
-  ADD KEY `fk_pae_empresa` (`id_empresa`);
-
-ALTER TABLE `recuperacao_senha`
-  ADD PRIMARY KEY (`id_recuperacao`),
-  ADD UNIQUE KEY `token` (`token`);
-
-ALTER TABLE `relatorios`
-  ADD PRIMARY KEY (`id_relatorio`),
-  ADD KEY `fk_relatorio_assoc` (`id_associacao`);
-
-ALTER TABLE `sefisc`
-  ADD PRIMARY KEY (`id_sefisc`),
-  ADD KEY `fk_sefisc_uge` (`id_uge`);
-
-ALTER TABLE `unidades_gestoras`
-  ADD PRIMARY KEY (`id_uge`);
-
-ALTER TABLE `usuarios_educacao_especial`
-  ADD PRIMARY KEY (`id_usuario_edu`),
-  ADD UNIQUE KEY `cpf` (`cpf`),
-  ADD KEY `fk_useredu_edu` (`id_edu`);
-
-ALTER TABLE `usuarios_empresa`
-  ADD PRIMARY KEY (`id_usuario_empresa`),
-  ADD UNIQUE KEY `cpf` (`cpf`),
-  ADD KEY `fk_userempresa_empresa` (`id_empresa`);
-
-ALTER TABLE `usuarios_escola`
-  ADD PRIMARY KEY (`id_usuario_escola`),
-  ADD UNIQUE KEY `cpf` (`cpf`),
-  ADD KEY `fk_userescola_escola` (`id_escola`);
-
-ALTER TABLE `usuarios_sefisc`
-  ADD PRIMARY KEY (`id_usuario_sefisc`),
-  ADD UNIQUE KEY `cpf` (`cpf`),
-  ADD KEY `fk_usersefisc_sefisc` (`id_sefisc`);
-
--- --------------------------------------------------------
+-- ============================================================
 -- AUTO_INCREMENT
--- --------------------------------------------------------
+-- ============================================================
+
 ALTER TABLE `admin`
-  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  AUTO_INCREMENT = 2;
 
 ALTER TABLE `alunos`
-  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  AUTO_INCREMENT = 7;
 
 ALTER TABLE `associacoes`
-  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  AUTO_INCREMENT = 7;
 
 ALTER TABLE `educacao_especial`
-  MODIFY `id_edu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  AUTO_INCREMENT = 2;
 
 ALTER TABLE `empresas`
-  MODIFY `id_empresa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  AUTO_INCREMENT = 4;
 
 ALTER TABLE `escolas`
-  MODIFY `id_escola` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  AUTO_INCREMENT = 5;
 
 ALTER TABLE `laudos`
-  MODIFY `id_laudo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  AUTO_INCREMENT = 6;
 
 ALTER TABLE `paes`
-  MODIFY `id_pae` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  AUTO_INCREMENT = 5;
 
 ALTER TABLE `recuperacao_senha`
-  MODIFY `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT;
+  AUTO_INCREMENT = 1;
 
 ALTER TABLE `relatorios`
-  MODIFY `id_relatorio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  AUTO_INCREMENT = 7;
 
 ALTER TABLE `sefisc`
-  MODIFY `id_sefisc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  AUTO_INCREMENT = 2;
 
 ALTER TABLE `unidades_gestoras`
-  MODIFY `id_uge` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  AUTO_INCREMENT = 2;
 
 ALTER TABLE `usuarios_educacao_especial`
-  MODIFY `id_usuario_edu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  AUTO_INCREMENT = 3;
 
 ALTER TABLE `usuarios_empresa`
-  MODIFY `id_usuario_empresa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  AUTO_INCREMENT = 4;
 
 ALTER TABLE `usuarios_escola`
-  MODIFY `id_usuario_escola` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  AUTO_INCREMENT = 5;
 
 ALTER TABLE `usuarios_sefisc`
-  MODIFY `id_usuario_sefisc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  AUTO_INCREMENT = 3;
 
--- --------------------------------------------------------
--- Restrições (Chaves Estrangeiras)
--- --------------------------------------------------------
-ALTER TABLE `alunos`
-  ADD CONSTRAINT `fk_aluno_escola` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
-  ADD CONSTRAINT `fk_aluno_userescola` FOREIGN KEY (`id_usuario_escola`) REFERENCES `usuarios_escola` (`id_usuario_escola`);
 
-ALTER TABLE `associacoes`
-  ADD CONSTRAINT `fk_assoc_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`),
-  ADD CONSTRAINT `fk_assoc_pae` FOREIGN KEY (`id_pae`) REFERENCES `paes` (`id_pae`);
-
-ALTER TABLE `educacao_especial`
-  ADD CONSTRAINT `fk_edu_uge` FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`);
-
-ALTER TABLE `escolas`
-  ADD CONSTRAINT `fk_escola_uge` FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`);
-
-ALTER TABLE `laudos`
-  ADD CONSTRAINT `fk_laudo_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`);
-
-ALTER TABLE `paes`
-  ADD CONSTRAINT `fk_pae_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`);
-
-ALTER TABLE `relatorios`
-  ADD CONSTRAINT `fk_relatorio_assoc` FOREIGN KEY (`id_associacao`) REFERENCES `associacoes` (`id_associacao`);
-
-ALTER TABLE `sefisc`
-  ADD CONSTRAINT `fk_sefisc_uge` FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`);
-
-ALTER TABLE `usuarios_educacao_especial`
-  ADD CONSTRAINT `fk_useredu_edu` FOREIGN KEY (`id_edu`) REFERENCES `educacao_especial` (`id_edu`);
-
-ALTER TABLE `usuarios_empresa`
-  ADD CONSTRAINT `fk_userempresa_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`);
-
-ALTER TABLE `usuarios_escola`
-  ADD CONSTRAINT `fk_userescola_escola` FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`);
-
-ALTER TABLE `usuarios_sefisc`
-  ADD CONSTRAINT `fk_usersefisc_sefisc` FOREIGN KEY (`id_sefisc`) REFERENCES `sefisc` (`id_sefisc`);
-
--- --------------------------------------------------------
--- TRIGGERS
--- --------------------------------------------------------
-DELIMITER $$
-CREATE TRIGGER `trg_limite_pae` BEFORE INSERT ON `associacoes` FOR EACH ROW BEGIN
-    DECLARE total INT;
-    IF NEW.ativo = 1 THEN
-        SELECT COUNT(*) INTO total FROM associacoes
-        WHERE id_pae = NEW.id_pae AND ativo = 1;
-        IF total >= 3 THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'PAE já possui 3 alunos ativos associados';
-        END IF;
-    END IF;
-END$$
-DELIMITER ;
-
--- --------------------------------------------------------
--- INSERTS - Dados iniciais
--- --------------------------------------------------------
-
--- Unidade Gestora
-INSERT INTO `unidades_gestoras` (`id_uge`, `nome`, `endereco`, `telefone`, `email`, `data_cadastro`) VALUES
-(1, 'Unidade Regional de Ensino de Bragança Paulista', NULL, NULL, NULL, '2026-08-23 15:09:48');
-
--- Admin
-INSERT INTO `admin` (`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`) VALUES
-(1, 'Administrador Geral', '00000000001', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-08-23 16:31:43');
-
--- Educação Especial
-INSERT INTO `educacao_especial` (`id_edu`, `nome`, `id_uge`, `telefone`, `email`, `data_cadastro`) VALUES
-(1, 'Educação Especial', 1, NULL, NULL, '2026-08-23 15:09:49');
-
--- SEFISC
-INSERT INTO `sefisc` (`id_sefisc`, `nome`, `id_uge`, `telefone`, `email`, `data_cadastro`) VALUES
-(1, 'Seção de Fiscalização', 1, NULL, NULL, '2026-08-23 15:09:49');
-
--- Empresas
-INSERT INTO `empresas` (`id_empresa`, `nome`, `cnpj`, `rua`, `numero`, `bairro`, `cidade`, `cep`, `numero_contrato`, `contrato_arquivo`, `telefone`, `email`, `data_cadastro`) VALUES
-(1, 'Apoio Inclusivo Ltda', '12345678000199', 'Rua dos Cuidadores', '100', 'Centro', 'Bragança Paulista', '12900100', 'CT-2024-001', 'uploads/contratos/apoiocontrato.pdf', '(11) 9999-2000', 'contato@apoioinclusivo.com', '2026-08-23 16:31:43'),
-(2, 'Inclusão Total S/A', '98765432000188', 'Av. Inclusão', '500', 'Jardim América', 'Bragança Paulista', '12900110', 'CT-2024-002', 'uploads/contratos/inclusaocontrato.pdf', '(11) 9999-2001', 'contato@inclusaototal.com', '2026-08-23 16:31:43'),
-(3, 'Educa Mais Terceirizados', '45678912000177', 'Rua Educacional', '200', 'Vila Nova', 'Bragança Paulista', '12900120', 'CT-2024-003', 'uploads/contratos/educamaiscontrato.pdf', '(11) 9999-2002', 'contato@educamais.com', '2026-08-23 16:31:43'),
-(4, 'Cuidar Bem Ltda', '78912345000166', 'Av. Cuidar', '300', 'Jardim das Flores', 'Bragança Paulista', '12900130', 'CT-2024-004', 'uploads/contratos/cuidarbemcontrato.pdf', '(11) 9999-2003', 'contato@cuidarbem.com', '2026-08-23 16:31:43'),
-(5, 'Acolher Serviços', '32165498000155', 'Rua Acolhimento', '150', 'Centro', 'Bragança Paulista', '12900140', 'CT-2024-005', 'uploads/contratos/acolhercontrato.pdf', '(11) 9999-2004', 'contato@acolher.com', '2026-08-23 16:31:43');
-
--- Escolas
-INSERT INTO `escolas` (`id_escola`, `nome`, `cie`, `rua`, `numero`, `bairro`, `cidade`, `cep`, `modalidade`, `id_uge`, `horario_funcionamento`, `telefone`, `email`, `data_cadastro`) VALUES
-(1, 'EE Professor José Alves', '123456', 'Rua das Flores', '100', 'Centro', 'Bragança Paulista', '12900000', 'REGULAR', 1, '07:00 às 17:00', '(11) 9999-1112', 'ee.josealves@email.com', '2026-08-23 16:31:43'),
-(2, 'EE Maria de Lourdes', '234567', 'Av. Brasil', '250', 'Jardim América', 'Bragança Paulista', '12900010', 'PEI', 1, '07:00 às 17:00', '(11) 9999-1113', 'ee.marialourdes@email.com', '2026-08-23 16:31:43'),
-(3, 'EE São Francisco', '345678', 'Rua dos Estudantes', '450', 'Vila Nova', 'Bragança Paulista', '12900020', 'REGULAR', 1, '07:00 às 17:00', '(11) 9999-1114', 'ee.saofrancisco@email.com', '2026-08-23 16:31:43'),
-(4, 'EE Padre Anchieta', '456789', 'Rua Anchieta', '789', 'Centro', 'Bragança Paulista', '12900030', 'PEI', 1, '07:00 às 17:00', '(11) 9999-1115', 'ee.padreanchieta@email.com', '2026-08-23 16:31:43'),
-(5, 'EE Professora Ana Nery', '567890', 'Rua Ana Nery', '321', 'Jardim das Flores', 'Bragança Paulista', '12900040', 'REGULAR', 1, '07:00 às 17:00', '(11) 9999-1116', 'ee.ananery@email.com', '2026-08-23 16:31:43'),
-(6, 'EE Euclides da Cunha', '678901', 'Av. Euclides', '1000', 'Vila Industrial', 'Bragança Paulista', '12900050', 'REGULAR', 1, '07:00 às 17:00', '(11) 9999-1117', 'ee.euclides@email.com', '2026-08-23 16:31:43'),
-(7, 'EE Machado de Assis', '789012', 'Rua Machado', '200', 'Centro', 'Bragança Paulista', '12900060', 'PEI', 1, '07:00 às 17:00', '(11) 9999-1118', 'ee.machado@email.com', '2026-08-23 16:31:43'),
-(8, 'EE Carlos Drummond', '890123', 'Av. Drummond', '500', 'Jardim Paulista', 'Bragança Paulista', '12900070', 'REGULAR', 1, '07:00 às 17:00', '(11) 9999-1119', 'ee.drummond@email.com', '2026-08-23 16:31:43'),
-(9, 'EE Cecília Meireles', '901234', 'Rua Cecília', '150', 'Vila Esperança', 'Bragança Paulista', '12900080', 'REGULAR', 1, '07:00 às 17:00', '(11) 9999-1120', 'ee.cecilia@email.com', '2026-08-23 16:31:43'),
-(10, 'EE Monteiro Lobato', '012345', 'Av. Lobato', '300', 'Jardim Europa', 'Bragança Paulista', '12900090', 'PEI', 1, '07:00 às 17:00', '(11) 9999-1121', 'ee.lobato@email.com', '2026-08-23 16:31:43');
-
--- Usuários Escola
-INSERT INTO `usuarios_escola` (`id_usuario_escola`, `id_escola`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
-(1, 1, 'Carlos Silva', '11111111111', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'carlos.silva@escola1.com', '(11) 9999-1122', 1, '2026-08-23 16:31:43'),
-(2, 1, 'Mariana Santos', '11111111112', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'mariana.santos@escola1.com', '(11) 9999-1123', 1, '2026-08-23 16:31:43'),
-(3, 2, 'José Oliveira', '11111111113', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'jose.oliveira@escola2.com', '(11) 9999-1124', 1, '2026-08-23 16:31:43'),
-(4, 2, 'Ana Pereira', '11111111114', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ana.pereira@escola2.com', '(11) 9999-1125', 1, '2026-08-23 16:31:43'),
-(5, 3, 'Pedro Costa', '11111111115', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'pedro.costa@escola3.com', '(11) 9999-1126', 1, '2026-08-23 16:31:43'),
-(6, 3, 'Luciana Martins', '11111111116', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'luciana.martins@escola3.com', '(11) 9999-1127', 1, '2026-08-23 16:31:43'),
-(7, 4, 'Rafael Almeida', '11111111117', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'rafael.almeida@escola4.com', '(11) 9999-1128', 1, '2026-08-23 16:31:43'),
-(8, 4, 'Fernanda Lima', '11111111118', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'fernanda.lima@escola4.com', '(11) 9999-1129', 1, '2026-08-23 16:31:43'),
-(9, 5, 'Paulo Souza', '11111111119', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'paulo.souza@escola5.com', '(11) 9999-1130', 1, '2026-08-23 16:31:43'),
-(10, 5, 'Juliana Ferreira', '11111111120', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'juliana.ferreira@escola5.com', '(11) 9999-1131', 1, '2026-08-23 16:31:43'),
-(11, 6, 'Ricardo Gonçalves', '11111111121', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ricardo.goncalves@escola6.com', '(11) 9999-1132', 1, '2026-08-23 16:31:43'),
-(12, 6, 'Amanda Rodrigues', '11111111122', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'amanda.rodrigues@escola6.com', '(11) 9999-1133', 1, '2026-08-23 16:31:43'),
-(13, 7, 'Vinícius Araujo', '11111111123', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'vinicius.araujo@escola7.com', '(11) 9999-1134', 1, '2026-08-23 16:31:43'),
-(14, 7, 'Camila Nunes', '11111111124', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'camila.nunes@escola7.com', '(11) 9999-1135', 1, '2026-08-23 16:31:43'),
-(15, 8, 'Diego Freitas', '11111111125', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'diego.freitas@escola8.com', '(11) 9999-1136', 1, '2026-08-23 16:31:43'),
-(16, 8, 'Letícia Barbosa', '11111111126', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'leticia.barbosa@escola8.com', '(11) 9999-1137', 1, '2026-08-23 16:31:43'),
-(17, 9, 'Gustavo Rocha', '11111111127', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'gustavo.rocha@escola9.com', '(11) 9999-1138', 1, '2026-08-23 16:31:43'),
-(18, 9, 'Patrícia Castro', '11111111128', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'patricia.castro@escola9.com', '(11) 9999-1139', 1, '2026-08-23 16:31:43'),
-(19, 10, 'Thiago Moreira', '11111111129', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'thiago.moreira@escola10.com', '(11) 9999-1140', 1, '2026-08-23 16:31:43'),
-(20, 10, 'Bianca Carvalho', '11111111130', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'bianca.carvalho@escola10.com', '(11) 9999-1141', 1, '2026-08-23 16:31:43');
-
--- PAEs
-INSERT INTO `paes` (`id_pae`, `nome`, `cpf`, `senha`, `telefone`, `email`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`) VALUES
-(1, 'Ana Paula Silva', '33333333331', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3001', 'ana.silva@pae.com', 'uploads/contratos/pae_ana.pdf', 1, 1, '2026-08-23 16:31:43'),
-(2, 'Beatriz Santos', '33333333332', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3002', 'beatriz.santos@pae.com', 'uploads/contratos/pae_beatriz.pdf', 1, 1, '2026-08-23 16:31:43'),
-(3, 'Carlos Eduardo', '33333333333', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3003', 'carlos.eduardo@pae.com', 'uploads/contratos/pae_carlos.pdf', 1, 1, '2026-08-23 16:31:43'),
-(4, 'Daniela Oliveira', '33333333334', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3004', 'daniela.oliveira@pae.com', 'uploads/contratos/pae_daniela.pdf', 2, 1, '2026-08-23 16:31:43'),
-(5, 'Eduardo Martins', '33333333335', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3005', 'eduardo.martins@pae.com', 'uploads/contratos/pae_eduardo.pdf', 2, 1, '2026-08-23 16:31:43'),
-(6, 'Fernanda Lima', '33333333336', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3006', 'fernanda.lima@pae.com', 'uploads/contratos/pae_fernanda.pdf', 2, 1, '2026-08-23 16:31:43'),
-(7, 'Gabriel Costa', '33333333337', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3007', 'gabriel.costa@pae.com', 'uploads/contratos/pae_gabriel.pdf', 3, 1, '2026-08-23 16:31:43'),
-(8, 'Helena Almeida', '33333333338', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3008', 'helena.almeida@pae.com', 'uploads/contratos/pae_helena.pdf', 3, 1, '2026-08-23 16:31:43'),
-(9, 'Igor Ferreira', '33333333339', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3009', 'igor.ferreira@pae.com', 'uploads/contratos/pae_igor.pdf', 3, 1, '2026-08-23 16:31:43'),
-(10, 'Juliana Nunes', '33333333340', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3010', 'juliana.nunes@pae.com', 'uploads/contratos/pae_juliana.pdf', 4, 1, '2026-08-23 16:31:43'),
-(11, 'Kleber Rodrigues', '33333333341', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3011', 'kleber.rodrigues@pae.com', 'uploads/contratos/pae_kleber.pdf', 4, 1, '2026-08-23 16:31:43'),
-(12, 'Larissa Barbosa', '33333333342', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3012', 'larissa.barbosa@pae.com', 'uploads/contratos/pae_larissa.pdf', 4, 1, '2026-08-23 16:31:43'),
-(13, 'Márcio Gonçalves', '33333333343', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3013', 'marcio.goncalves@pae.com', 'uploads/contratos/pae_marcio.pdf', 5, 1, '2026-08-23 16:31:43'),
-(14, 'Natália Castro', '33333333344', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3014', 'natalia.castro@pae.com', 'uploads/contratos/pae_natalia.pdf', 5, 1, '2026-08-23 16:31:43'),
-(15, 'Otávio Rocha', '33333333345', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '(11) 9999-3015', 'otavio.rocha@pae.com', 'uploads/contratos/pae_otavio.pdf', 5, 1, '2026-08-23 16:31:43');
-
--- Usuários Empresa
-INSERT INTO `usuarios_empresa` (`id_usuario_empresa`, `id_empresa`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
-(1, 1, 'Roberto Gerente', '22222222222', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'roberto@apoioinclusivo.com', '(11) 9999-2005', 1, '2026-08-23 16:31:43'),
-(2, 1, 'Carla Recursos', '22222222223', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'carla@apoioinclusivo.com', '(11) 9999-2006', 1, '2026-08-23 16:31:43'),
-(3, 2, 'Marcos Diretor', '22222222224', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'marcos@inclusaototal.com', '(11) 9999-2007', 1, '2026-08-23 16:31:43'),
-(4, 2, 'Sandra RH', '22222222225', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'sandra@inclusaototal.com', '(11) 9999-2008', 1, '2026-08-23 16:31:43'),
-(5, 3, 'Paulo Operacional', '22222222226', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'paulo@educamais.com', '(11) 9999-2009', 1, '2026-08-23 16:31:43'),
-(6, 3, 'Fernanda Adm', '22222222227', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'fernanda@educamais.com', '(11) 9999-2010', 1, '2026-08-23 16:31:43'),
-(7, 4, 'Ricardo Gerente', '22222222228', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ricardo@cuidarbem.com', '(11) 9999-2011', 1, '2026-08-23 16:31:43'),
-(8, 4, 'Juliana RH', '22222222229', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'juliana@cuidarbem.com', '(11) 9999-2012', 1, '2026-08-23 16:31:43'),
-(9, 5, 'Anderson Diretor', '22222222230', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'anderson@acolher.com', '(11) 9999-2013', 1, '2026-08-23 16:31:43'),
-(10, 5, 'Patrícia RH', '22222222231', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'patricia@acolher.com', '(11) 9999-2014', 1, '2026-08-23 16:31:43');
-
--- Usuários SEFISC
-INSERT INTO `usuarios_sefisc` (`id_usuario_sefisc`, `id_sefisc`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
-(1, 1, 'Fiscal José', '44444444441', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'fiscal.jose@sefisc.sp.gov.br', '(11) 9999-4001', 1, '2026-08-23 16:31:43'),
-(2, 1, 'Fiscal Maria', '44444444442', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'fiscal.maria@sefisc.sp.gov.br', '(11) 9999-4002', 1, '2026-08-23 16:31:43');
-
--- Usuários Educação Especial
-INSERT INTO `usuarios_educacao_especial` (`id_usuario_edu`, `id_edu`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
-(1, 1, 'Especialista Ana', '55555555551', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ana.especial@edu.sp.gov.br', '(11) 9999-5001', 1, '2026-08-23 16:31:43'),
-(2, 1, 'Especialista Paulo', '55555555552', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'paulo.especial@edu.sp.gov.br', '(11) 9999-5002', 1, '2026-08-23 16:31:43');
-
--- Alunos
-INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `id_escola`, `id_usuario_escola`, `data_cadastro`) VALUES
-(1, 'João Pedro Santos', '66666666661', '2024001', '2015-05-15', 'TEA - Transtorno do Espectro Autista', 'Necessita de acompanhamento em sala de aula, apresenta dificuldade de socialização', 'Ana Maria Santos', '77777777771', 'uploads/fotos/joao_pedro.jpg', 'APROVADO', NULL, 1, 1, '2026-08-23 16:31:43'),
-(2, 'Mariana Oliveira', '66666666662', '2024002', '2016-08-22', 'Síndrome de Down', 'Precisa de auxílio para alimentação e higiene', 'José Oliveira', '77777777772', 'uploads/fotos/mariana_oliveira.jpg', 'APROVADO', NULL, 1, 1, '2026-08-23 16:31:43'),
-(3, 'Lucas Pereira', '66666666663', '2024003', '2017-03-10', 'TEA - Nível 2 de suporte', 'Dificuldade de comunicação, necessita de suporte visual', 'Maria Pereira', '77777777773', 'uploads/fotos/lucas_pereira.jpg', 'PENDENTE', NULL, 1, 2, '2026-08-23 16:31:43'),
-(4, 'Sofia Almeida', '66666666664', '2024004', '2015-11-30', 'Deficiência Física - Cadeirante', 'Necessita de acessibilidade física e auxílio para locomoção', 'Carlos Almeida', '77777777774', 'uploads/fotos/sofia_almeida.jpg', 'APROVADO', NULL, 1, 2, '2026-08-23 16:31:43'),
-(5, 'Pedro Henrique Costa', '66666666665', '2024005', '2016-07-18', 'TEA - Transtorno do Espectro Autista', 'Apresenta comportamento seletivo com alimentos', 'Fernanda Costa', '77777777775', 'uploads/fotos/pedro_henrique.jpg', 'APROVADO', NULL, 2, 3, '2026-08-23 16:31:43'),
-(6, 'Laura Rodrigues', '66666666666', '2024006', '2018-02-25', 'Síndrome de Asperger', 'Dificuldade de interação social, alta habilidade em matemática', 'Ricardo Rodrigues', '77777777776', 'uploads/fotos/laura_rodrigues.jpg', 'PENDENTE', NULL, 2, 3, '2026-08-23 16:31:43'),
-(7, 'Matheus Souza', '66666666667', '2024007', '2015-09-14', 'Deficiência Intelectual', 'Necessita de apoio pedagógico individualizado', 'Carla Souza', '77777777777', 'uploads/fotos/matheus_souza.jpg', 'REPROVADO', 'Documentação incompleta', 2, 4, '2026-08-23 16:31:43'),
-(8, 'Isabela Lima', '66666666668', '2024008', '2017-12-05', 'TEA - Nível 1 de suporte', 'Apresenta ansiedade em situações de prova', 'Marcos Lima', '77777777778', 'uploads/fotos/isabela_lima.jpg', 'APROVADO', NULL, 2, 4, '2026-08-23 16:31:43'),
-(9, 'Guilherme Martins', '66666666669', '2024009', '2016-04-12', 'Síndrome de Down', 'Necessita de acompanhamento constante', 'André Martins', '77777777779', 'uploads/fotos/guilherme_martins.jpg', 'APROVADO', NULL, 3, 5, '2026-08-23 16:31:43'),
-(10, 'Alice Ferreira', '66666666670', '2024010', '2018-06-20', 'TEA - Transtorno do Espectro Autista', 'Dificuldade de fala, utiliza comunicação alternativa', 'Paula Ferreira', '77777777780', 'uploads/fotos/alice_ferreira.jpg', 'PENDENTE', NULL, 3, 5, '2026-08-23 16:31:43'),
-(11, 'Daniel Nunes', '66666666671', '2024011', '2015-10-08', 'Deficiência Física - Cadeirante', 'Necessita de adaptações na sala de aula', 'Roberto Nunes', '77777777781', 'uploads/fotos/daniel_nunes.jpg', 'APROVADO', NULL, 3, 6, '2026-08-23 16:31:43'),
-(12, 'Larissa Barbosa', '66666666672', '2024012', '2017-01-17', 'TEA - Nível 2 de suporte', 'Apresenta crises de ansiedade, necessita de suporte emocional', 'Renata Barbosa', '77777777782', 'uploads/fotos/larissa_barbosa.jpg', 'APROVADO', NULL, 3, 6, '2026-08-23 16:31:43'),
-(13, 'Rafael Gonçalves', '66666666673', '2024013', '2016-09-28', 'Síndrome de Asperger', 'Dificuldade de socialização, interesse específico por ciências', 'Paulo Gonçalves', '77777777783', 'uploads/fotos/rafael_goncalves.jpg', 'APROVADO', NULL, 4, 7, '2026-08-23 16:31:43'),
-(14, 'Beatriz Rocha', '66666666674', '2024014', '2015-08-14', 'TEA - Transtorno do Espectro Autista', 'Alta sensibilidade sensorial', 'Tatiana Rocha', '77777777784', 'uploads/fotos/beatriz_rocha.jpg', 'PENDENTE', NULL, 4, 7, '2026-08-23 16:31:43'),
-(15, 'Gabriel Castro', '66666666675', '2024015', '2018-03-29', 'Deficiência Intelectual', 'Necessita de atividades adaptadas', 'Luiz Castro', '77777777785', 'uploads/fotos/gabriel_castro.jpg', 'APROVADO', NULL, 4, 8, '2026-08-23 16:31:43'),
-(16, 'Camila Alves', '66666666676', '2024016', '2017-07-22', 'TEA - Nível 1 de suporte', 'Dificuldade de compreensão de regras sociais', 'Márcia Alves', '77777777786', 'uploads/fotos/camila_alves.jpg', 'REPROVADO', 'Laudos médicos inconsistentes', 4, 8, '2026-08-23 16:31:43'),
-(17, 'Thiago Moreira', '66666666677', '2024017', '2015-12-01', 'Síndrome de Down', 'Precisa de estimulação motora', 'Fernando Moreira', '77777777787', 'uploads/fotos/thiago_moreira.jpg', 'APROVADO', NULL, 5, 9, '2026-08-23 16:31:43'),
-(18, 'Juliana Carvalho', '66666666678', '2024018', '2016-05-19', 'TEA - Transtorno do Espectro Autista', 'Apresenta seletividade alimentar', 'Andréia Carvalho', '77777777788', 'uploads/fotos/juliana_carvalho.jpg', 'APROVADO', NULL, 5, 9, '2026-08-23 16:31:43'),
-(19, 'André Freitas', '66666666679', '2024019', '2018-10-09', 'Deficiência Física - Cadeirante', 'Necessita de acessibilidade total', 'Cristina Freitas', '77777777789', 'uploads/fotos/andre_freitas.jpg', 'PENDENTE', NULL, 5, 10, '2026-08-23 16:31:43'),
-(20, 'Vitória Santos', '66666666680', '2024020', '2017-02-18', 'TEA - Nível 2 de suporte', 'Comunicação não verbal', 'Sérgio Santos', '77777777790', 'uploads/fotos/vitoria_santos.jpg', 'APROVADO', NULL, 5, 10, '2026-08-23 16:31:43'),
-(21, 'Felipe Araujo', '66666666681', '2024021', '2016-11-11', 'Síndrome de Asperger', 'Dificuldade de empatia', 'Alessandra Araujo', '77777777791', 'uploads/fotos/felipe_araujo.jpg', 'APROVADO', NULL, 6, 11, '2026-08-23 16:31:43'),
-(22, 'Amanda Dias', '66666666682', '2024022', '2015-04-20', 'TEA - Transtorno do Espectro Autista', 'Necessita de estruturação de rotina', 'Roberto Dias', '77777777792', 'uploads/fotos/amanda_dias.jpg', 'PENDENTE', NULL, 6, 11, '2026-08-23 16:31:43'),
-(23, 'Rodrigo Nascimento', '66666666683', '2024023', '2018-08-03', 'Deficiência Intelectual', 'Acompanhamento pedagógico individual', 'Cláudia Nascimento', '77777777793', 'uploads/fotos/rodrigo_nascimento.jpg', 'APROVADO', NULL, 6, 12, '2026-08-23 16:31:43'),
-(24, 'Letícia Cardoso', '66666666684', '2024024', '2017-06-25', 'TEA - Nível 1 de suporte', 'Ansiedade social intensa', 'Ricardo Cardoso', '77777777794', 'uploads/fotos/leticia_cardoso.jpg', 'APROVADO', NULL, 6, 12, '2026-08-23 16:31:43'),
-(25, 'Gustavo Pires', '66666666685', '2024025', '2015-01-13', 'Síndrome de Down', 'Necessita de estímulo cognitivo', 'Helena Pires', '77777777795', 'uploads/fotos/gustavo_pires.jpg', 'APROVADO', NULL, 7, 13, '2026-08-23 16:31:43'),
-(26, 'Bruna Mendes', '66666666686', '2024026', '2016-12-09', 'TEA - Transtorno do Espectro Autista', 'Dificuldade de interação social', 'Carlos Mendes', '77777777796', 'uploads/fotos/bruna_mendes.jpg', 'PENDENTE', NULL, 7, 13, '2026-08-23 16:31:43'),
-(27, 'Eduardo Ribeiro', '66666666687', '2024027', '2018-09-15', 'Deficiência Física - Cadeirante', 'Adaptação de espaço necessário', 'Sônia Ribeiro', '77777777797', 'uploads/fotos/eduardo_ribeiro.jpg', 'APROVADO', NULL, 7, 14, '2026-08-23 16:31:43'),
-(28, 'Marina Castro', '66666666688', '2024028', '2017-04-08', 'TEA - Nível 2 de suporte', 'Necessita de PECS para comunicação', 'Paulo Castro', '77777777798', 'uploads/fotos/marina_castro.jpg', 'APROVADO', NULL, 7, 14, '2026-08-23 16:31:43'),
-(29, 'Luan Ferreira', '66666666689', '2024029', '2016-02-27', 'Síndrome de Asperger', 'Interesse específico por informática', 'Cristina Ferreira', '77777777799', 'uploads/fotos/luan_ferreira.jpg', 'APROVADO', NULL, 8, 15, '2026-08-23 16:31:43'),
-(30, 'Laís Oliveira', '66666666690', '2024030', '2015-10-06', 'TEA - Transtorno do Espectro Autista', 'Sensibilidade a ruídos', 'Jorge Oliveira', '77777777800', 'uploads/fotos/lais_oliveira.jpg', 'REPROVADO', 'Não apresenta laudo atualizado', 8, 15, '2026-08-23 16:31:43'),
-(31, 'Henrique Silva', '66666666691', '2024031', '2018-05-30', 'Deficiência Intelectual', 'Auxílio em sala de aula', 'Rosa Silva', '77777777801', 'uploads/fotos/henrique_silva.jpg', 'APROVADO', NULL, 8, 16, '2026-08-23 16:31:43'),
-(32, 'Gabi Costa', '66666666692', '2024032', '2017-11-14', 'TEA - Nível 1 de suporte', 'Dificuldade com mudanças de rotina', 'Fábio Costa', '77777777802', 'uploads/fotos/gabi_costa.jpg', 'PENDENTE', NULL, 8, 16, '2026-08-23 16:31:43'),
-(33, 'Kaique Santos', '66666666693', '2024033', '2015-08-12', 'Síndrome de Down', 'Precisa de auxílio na alimentação', 'Carla Santos', '77777777803', 'uploads/fotos/kaique_santos.jpg', 'APROVADO', NULL, 9, 17, '2026-08-23 16:31:43'),
-(34, 'Nathália Martins', '66666666694', '2024034', '2016-03-04', 'TEA - Transtorno do Espectro Autista', 'Comportamentos repetitivos', 'José Martins', '77777777804', 'uploads/fotos/nathalia_martins.jpg', 'APROVADO', NULL, 9, 17, '2026-08-23 16:31:43'),
-(35, 'Otávio Lima', '66666666695', '2024035', '2018-07-21', 'Deficiência Física - Cadeirante', 'Acessibilidade total necessária', 'Fernanda Lima', '77777777805', 'uploads/fotos/otavio_lima.jpg', 'PENDENTE', NULL, 9, 18, '2026-08-23 16:31:43'),
-(36, 'Patrícia Rodrigues', '66666666696', '2024036', '2017-09-17', 'TEA - Nível 2 de suporte', 'Comunicação alternativa', 'André Rodrigues', '77777777806', 'uploads/fotos/patricia_rodrigues.jpg', 'APROVADO', NULL, 9, 18, '2026-08-23 16:31:43'),
-(37, 'Ruan Gomes', '66666666697', '2024037', '2016-06-26', 'Síndrome de Asperger', 'Dificuldade de socialização', 'Letícia Gomes', '77777777807', 'uploads/fotos/ruan_gomes.jpg', 'APROVADO', NULL, 10, 19, '2026-08-23 16:31:43'),
-(38, 'Sabrina Alves', '66666666698', '2024038', '2015-12-03', 'TEA - Transtorno do Espectro Autista', 'Apresenta crises de choro', 'Ricardo Alves', '77777777808', 'uploads/fotos/sabrina_alves.jpg', 'PENDENTE', NULL, 10, 19, '2026-08-23 16:31:43'),
-(39, 'Talles Nogueira', '66666666699', '2024039', '2018-04-19', 'Deficiência Intelectual', 'Necessita de atividades adaptadas', 'Sílvia Nogueira', '77777777809', 'uploads/fotos/talles_nogueira.jpg', 'APROVADO', NULL, 10, 20, '2026-08-23 16:31:43'),
-(40, 'Vitória Prado', '66666666700', '2024040', '2017-10-10', 'TEA - Nível 1 de suporte', 'Alta sensibilidade sensorial', 'Marcos Prado', '77777777810', 'uploads/fotos/vitoria_prado.jpg', 'APROVADO', NULL, 10, 20, '2026-08-23 16:31:43');
-
--- Laudos
-INSERT INTO `laudos` (`id_laudo`, `id_aluno`, `nome_arquivo`, `caminho_arquivo`, `descricao`, `data_envio`) VALUES
-(1, 1, 'laudo_joao_tea.pdf', 'uploads/laudos/laudo_joao_tea.pdf', 'Laudo médico - TEA Nível 1 - Dra. Ana Beatriz - CRM 12345', '2026-08-23 16:31:43'),
-(2, 1, 'relatorio_joao_psicologico.pdf', 'uploads/laudos/relatorio_joao_psicologico.pdf', 'Relatório psicológico - TEA - Prof. Carlos', '2026-08-23 16:31:43'),
-(3, 1, 'avaliacao_joao_ocupacional.pdf', 'uploads/laudos/avaliacao_joao_ocupacional.pdf', 'Avaliação terapêutica ocupacional - TEA', '2026-08-23 16:31:43'),
-(4, 2, 'laudo_mariana_down.pdf', 'uploads/laudos/laudo_mariana_down.pdf', 'Laudo médico - Síndrome de Down - Dr. Roberto - CRM 54321', '2026-08-23 16:31:43'),
-(5, 2, 'relatorio_mariana_fono.pdf', 'uploads/laudos/relatorio_mariana_fono.pdf', 'Relatório fonoaudiológico', '2026-08-23 16:31:43'),
-(6, 2, 'avaliacao_mariana_fisioterapia.pdf', 'uploads/laudos/avaliacao_mariana_fisioterapia.pdf', 'Avaliação fisioterápica - Down', '2026-08-23 16:31:43');
-
--- Associações
-INSERT INTO `associacoes` (`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`) VALUES
-(1, 1, 1, 1, '2025-01-15'),
-(2, 2, 1, 1, '2025-01-15'),
-(3, 4, 1, 1, '2025-02-01'),
-(4, 5, 2, 1, '2025-01-20'),
-(5, 8, 2, 1, '2025-01-20'),
-(6, 9, 2, 1, '2025-02-10'),
-(7, 11, 3, 1, '2025-01-25'),
-(8, 12, 3, 1, '2025-01-25'),
-(9, 13, 3, 1, '2025-02-15'),
-(10, 15, 4, 1, '2025-02-01'),
-(11, 17, 4, 1, '2025-02-01'),
-(12, 18, 4, 1, '2025-02-20'),
-(13, 20, 5, 1, '2025-02-10'),
-(14, 21, 5, 1, '2025-02-10'),
-(15, 23, 5, 1, '2025-03-01'),
-(16, 24, 6, 1, '2025-02-15'),
-(17, 25, 6, 1, '2025-02-15'),
-(18, 27, 6, 1, '2025-03-10'),
-(19, 28, 7, 1, '2025-02-20'),
-(20, 29, 7, 1, '2025-02-20'),
-(21, 31, 7, 1, '2025-03-15'),
-(22, 33, 8, 1, '2025-03-01'),
-(23, 34, 8, 1, '2025-03-01'),
-(24, 36, 8, 1, '2025-03-20'),
-(25, 37, 9, 1, '2025-03-05'),
-(26, 39, 9, 1, '2025-03-05'),
-(27, 40, 9, 1, '2025-03-25'),
-(28, 3, 10, 1, '2025-01-10'),
-(29, 6, 10, 1, '2025-01-10'),
-(30, 10, 10, 1, '2025-02-05'),
-(31, 16, 11, 1, '2025-01-15'),
-(32, 19, 11, 1, '2025-01-15'),
-(33, 22, 11, 1, '2025-02-10'),
-(34, 26, 12, 1, '2025-01-20'),
-(35, 30, 12, 1, '2025-01-20'),
-(36, 32, 12, 1, '2025-02-15'),
-(37, 35, 13, 1, '2025-02-01'),
-(38, 38, 13, 1, '2025-02-01'),
-(39, 7, 14, 1, '2025-02-05'),
-(40, 14, 15, 1, '2025-02-10');
-
--- Relatórios
-INSERT INTO `relatorios` (`id_relatorio`, `id_associacao`, `tipo`, `descricao`, `data_cadastro`) VALUES
-(1, 1, 'DIARIO', 'Aluno João Pedro participou bem das atividades. Esteve mais comunicativo hoje, interagindo com colegas durante o recreio.', '2025-03-10 14:30:00'),
-(2, 1, 'DIARIO', 'João apresentou dificuldade na aula de matemática, mas conseguiu se concentrar com auxílio visual.', '2025-03-11 15:00:00'),
-(3, 1, 'DIARIO', 'Bom dia, João Pedro conseguiu realizar todas as atividades propostas. Parabéns!', '2025-03-12 16:30:00'),
-(4, 1, 'MENSAL', 'Relatório mensal de março: João Pedro apresentou evolução significativa na interação social. Continua com dificuldade em matemática, mas tem se esforçado.', '2025-03-31 17:00:00'),
-(5, 2, 'DIARIO', 'Mariana precisou de auxílio na alimentação hoje. Conseguiu comer toda a refeição.', '2025-03-10 12:00:00'),
-(6, 2, 'DIARIO', 'Mariana participou da aula de artes com entusiasmo. Pintou um desenho lindo.', '2025-03-12 14:00:00'),
-(7, 2, 'MENSAL', 'Mariana tem se adaptado bem. A alimentação continua sendo um desafio, mas tem melhorado.', '2025-03-31 16:00:00');
+-- ============================================================
+-- FINAL
+-- ============================================================
 
 COMMIT;
