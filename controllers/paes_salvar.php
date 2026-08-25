@@ -1,17 +1,9 @@
 <?php
-session_start();
-
-require_once '../config/database.php';
+require_once '../config/init.php';
 require_once 'upload.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../views/login.php");
-    exit();
-}
-
-if ($_SESSION['user_perfil'] !== 'USUARIO_EMPRESA') {
-    die("Acesso negado.");
-}
+exigirPerfil(array('USUARIO_EMPRESA'));
+exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../views/paes_listar.php");

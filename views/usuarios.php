@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 // Apenas ADMIN pode acessar
 exigirPerfil(array('ADMIN'));
@@ -25,7 +23,13 @@ foreach ($perfis as $info) {
     $campo = $info['campo'];
     $perfil = $info['perfil'];
 
-    $sql = "SELECT nome, cpf, ativo, data_cadastro FROM $tabela";
+    // A tabela `admin` não possui a coluna `ativo`
+    if ($tabela === 'admin') {
+        $sql = "SELECT nome, cpf, data_cadastro FROM `$tabela`";
+    } else {
+        $sql = "SELECT nome, cpf, ativo, data_cadastro FROM `$tabela`";
+    }
+
     $result = mysqli_query($conexao, $sql);
 
     if ($result) {

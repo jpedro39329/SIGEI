@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirLogin();
 

@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_EMPRESA'));
 
@@ -35,6 +33,7 @@ $userPerfil = $_SESSION['user_perfil'];
                     <?php endif; ?>
 
                     <form action="../controllers/paes_salvar.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Nome</label>

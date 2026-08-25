@@ -1,3 +1,6 @@
+<?php
+require_once "../config/init.php";
+?><!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -364,6 +367,8 @@
       </div>
 
       <form class="login-form" action="../controllers/login.php" method="post">
+
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
 
         <div class="form-group">
           <label for="cpf">CPF</label>

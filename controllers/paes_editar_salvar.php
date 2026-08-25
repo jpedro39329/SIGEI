@@ -1,9 +1,8 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_EMPRESA'));
+exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../views/paes_listar.php");
@@ -14,37 +13,36 @@ $idPae = (int) ($_POST['id_pae'] ?? 0);
 $idUsuarioEmpresa = (int) $_SESSION['user_id'];
 $idEmpresa = idEmpresaUsuario($conexao, $idUsuarioEmpresa);
 
-$nome = mysqli_real_escape_string($conexao, trim($_POST['nome'] ?? ''));
-$telefone = mysqli_real_escape_string($conexao, trim($_POST['telefone'] ?? ''));
-$email = mysqli_real_escape_string($conexao, trim($_POST['email'] ?? ''));
+$nome = trim($_POST['nome'] ?? '');
+$telefone = trim($_POST['telefone'] ?? '');
+$email = trim($_POST['email'] ?? '');
 $ativo = (int) ($_POST['ativo'] ?? 1);
 
 if ($idPae <= 0 || $idEmpresa <= 0 || $nome === '') {
-    die("Dados invalidos.");
+    die("Dados inválidos.");
 }
 
-$queryVerifica = "SELECT id_pae FROM paes WHERE id_pae = $idPae AND id_empresa = $idEmpresa";
-$resultVerifica = mysqli_query($conexao, $queryVerifica);
+$stmtVerifica = $conexao->prepare("SELECT id_pae FROM paes WHERE id_pae = ? AND id_empresa = ?");
+$stmtVerifica->bind_param("ii", $idPae, $idEmpresa);
+$stmtVerifica->execute();
 
-if (!$resultVerifica || mysqli_num_rows($resultVerifica) == 0) {
-    die("PAE nao encontrado ou nao pertence a sua empresa.");
+if ($stmtVerifica->get_result()->num_rows == 0) {
+    die("PAE não encontrado ou não pertence à sua empresa.");
 }
 
-$query = "
-    UPDATE paes
-    SET nome = '$nome',
-        telefone = '$telefone',
-        email = '$email',
-        ativo = $ativo
-    WHERE id_pae = $idPae
-      AND id_empresa = $idEmpresa
-";
-$result = mysqli_query($conexao, $query);
+$stmtVerifica->close();
 
-if ($result) {
+$stmt = $conexao->prepare(
+    "UPDATE paes
+     SET nome = ?, telefone = ?, email = ?, ativo = ?
+     WHERE id_pae = ? AND id_empresa = ?"
+);
+$stmt->bind_param("sssiii", $nome, $telefone, $email, $ativo, $idPae, $idEmpresa);
+
+if ($stmt->execute()) {
     header("Location: ../views/paes_visualizar.php?id=$idPae&msg=editado");
     exit();
 }
 
-echo "Erro ao editar PAE: " . mysqli_error($conexao);
+echo "Erro ao editar PAE: " . $stmt->error;
 ?>

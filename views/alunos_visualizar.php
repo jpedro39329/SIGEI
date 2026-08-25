@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirLogin();
 
@@ -206,6 +204,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
             <h5 class="mb-3">📄 Laudos</h5>
             <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
                 <form action="../controllers/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="mb-4">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                     <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-5">

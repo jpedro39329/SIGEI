@@ -1,9 +1,8 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_ESCOLA'));
+exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../views/alunos_pendentes.php");
@@ -15,36 +14,38 @@ $id_usuario_escola = (int) $_SESSION['user_id'];
 $id_escola = idEscolaUsuario($conexao, $id_usuario_escola);
 
 if ($id_aluno <= 0 || $id_escola <= 0) {
-    die("Aluno ou escola invalido.");
+    die("Aluno ou escola inválidos.");
 }
 
-$queryVerifica = "
-    SELECT id_aluno
-    FROM alunos
-    WHERE id_aluno = $id_aluno
-      AND id_escola = $id_escola
-      AND status_aprovacao = 'REPROVADO'
-";
-$resultVerifica = mysqli_query($conexao, $queryVerifica);
+$stmtVerifica = $conexao->prepare(
+    "SELECT id_aluno
+     FROM alunos
+     WHERE id_aluno = ?
+       AND id_escola = ?
+       AND status_aprovacao = 'REPROVADO'"
+);
+$stmtVerifica->bind_param("ii", $id_aluno, $id_escola);
+$stmtVerifica->execute();
 
-if (!$resultVerifica || mysqli_num_rows($resultVerifica) == 0) {
-    die("Aluno nao encontrado, nao pertence a sua escola ou nao esta reprovado.");
+if ($stmtVerifica->get_result()->num_rows == 0) {
+    die("Aluno não encontrado, não pertence à sua escola ou não está reprovado.");
 }
 
-$query = "
-    UPDATE alunos
-    SET status_aprovacao = 'PENDENTE',
-        motivo_reprovacao = ''
-    WHERE id_aluno = $id_aluno
-      AND id_escola = $id_escola
-";
+$stmtVerifica->close();
 
-$result = mysqli_query($conexao, $query);
+$stmt = $conexao->prepare(
+    "UPDATE alunos
+     SET status_aprovacao = 'PENDENTE',
+         motivo_reprovacao = ''
+     WHERE id_aluno = ?
+       AND id_escola = ?"
+);
+$stmt->bind_param("ii", $id_aluno, $id_escola);
 
-if ($result) {
+if ($stmt->execute()) {
     header("Location: ../views/alunos_pendentes.php?msg=reenviado");
     exit();
 }
 
-echo "Erro ao reenviar solicitacao: " . mysqli_error($conexao);
+echo "Erro ao reenviar solicitação: " . $stmt->error;
 ?>

@@ -1,6 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
+require_once "../config/init.php";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -38,7 +37,7 @@ if (strlen($cpf) === 11) {
     $cpf = substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2);
 }
 
-$homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
+$homePage = 'dashboard.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">

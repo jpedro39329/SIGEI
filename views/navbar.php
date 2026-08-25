@@ -3,7 +3,7 @@ $userName    = $userName ?? ($_SESSION['user_name'] ?? 'Usuario');
 $userPerfil  = $userPerfil ?? ($_SESSION['user_perfil'] ?? '');
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-$homePage = ($userPerfil === 'ADMIN') ? 'dashboard_admin.php' : 'dashboard.php';
+$homePage = 'dashboard.php';
 ?>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">

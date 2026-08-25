@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_ESCOLA'));
 
@@ -85,6 +83,7 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
                                         <?php if ($aluno['status_aprovacao'] == 'REPROVADO'): ?>
                                             <form action="../controllers/alunos_reenviar.php" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                 <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
                                                 <button type="submit" class="btn btn-sm btn-primary">Reenviar</button>
                                             </form>

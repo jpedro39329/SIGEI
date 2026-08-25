@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 // Apenas USUARIO_EDUCACAO_ESPECIAL pode acessar
 exigirPerfil(array('USUARIO_EDUCACAO_ESPECIAL'));
@@ -164,6 +162,7 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
 
 <!-- Formulário oculto para aprovar -->
 <form id="formAprovar" action="../controllers/solicitacao_processar.php" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
     <input type="hidden" name="id_aluno" id="aprovar_id">
     <input type="hidden" name="acao" value="APROVAR">
 </form>
@@ -178,6 +177,7 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                     <input type="hidden" name="id_aluno" id="reprovar_id">
                     <input type="hidden" name="acao" value="REPROVAR">
                     <label class="form-label">Motivo da Reprovação</label>

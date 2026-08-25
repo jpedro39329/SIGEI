@@ -19,15 +19,31 @@ function uploadArquivo($arquivo, $pasta) {
         return false;
     }
 
-    // Tipos de arquivo permitidos
+    // Tipos de arquivo permitidos (MIME -> extensão)
     $tiposPermitidos = array(
         'image/jpeg' => 'jpg',
         'image/png'  => 'png',
         'application/pdf' => 'pdf'
     );
 
-    $tipoArquivo = $arquivo['type'];
-    if (!isset($tiposPermitidos[$tipoArquivo])) {
+    // Valida o tipo REAL do conteúdo do arquivo (ignora o MIME informado pelo navegador)
+    $mimeReal = null;
+
+    if (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+        if ($finfo) {
+            $mimeReal = finfo_file($finfo, $arquivo['tmp_name']);
+            finfo_close($finfo);
+        }
+    }
+
+    if ($mimeReal === null) {
+        // Fallback: usa o MIME enviado pelo cliente
+        $mimeReal = $arquivo['type'];
+    }
+
+    if (!isset($tiposPermitidos[$mimeReal])) {
         return false;
     }
 
@@ -37,8 +53,8 @@ function uploadArquivo($arquivo, $pasta) {
     }
 
     // Gera nome único para o arquivo
-    $extensao = $tiposPermitidos[$tipoArquivo];
-    $nomeArquivo = date('YmdHis') . '_' . rand(1000, 9999) . '.' . $extensao;
+    $extensao = $tiposPermitidos[$mimeReal];
+    $nomeArquivo = date('YmdHis') . '_' . bin2hex(random_bytes(6)) . '.' . $extensao;
 
     // Caminho completo da pasta
     $caminhoPasta = "../uploads/" . $pasta . "/";

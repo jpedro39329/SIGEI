@@ -1,21 +1,24 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 // Apenas ADMIN pode desassociar PAE de aluno
 exigirPerfil(array('ADMIN'));
+exigirTokenCSRF();
 
-$id_associacao = (int) $_POST['id_associacao'];
+$id_associacao = (int) ($_POST['id_associacao'] ?? 0);
+
+if ($id_associacao <= 0) {
+    die("Associação inválida.");
+}
 
 // Desativa a associação
-$query = "UPDATE associacoes SET ativo = 0 WHERE id_associacao = $id_associacao";
-$result = mysqli_query($conexao, $query);
+$stmt = $conexao->prepare("UPDATE associacoes SET ativo = 0 WHERE id_associacao = ?");
+$stmt->bind_param("i", $id_associacao);
 
-if ($result) {
+if ($stmt->execute()) {
     header("Location: ../views/associacoes.php?msg=removido");
     exit();
-} else {
-    echo "Erro ao desassociar: " . mysqli_error($conexao);
 }
+
+echo "Erro ao desassociar: " . $stmt->error;
 ?>

@@ -1,9 +1,8 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_ESCOLA'));
+exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../views/alunos_listar.php");
@@ -15,40 +14,60 @@ $id_usuario_escola = (int) $_SESSION['user_id'];
 $id_escola = idEscolaUsuario($conexao, $id_usuario_escola);
 
 if ($id_aluno <= 0 || $id_escola <= 0) {
-    die("Aluno ou escola invalidos.");
+    die("Aluno ou escola inválidos.");
 }
 
-$queryAluno = "SELECT id_aluno FROM alunos WHERE id_aluno = $id_aluno AND id_escola = $id_escola";
-$resultAluno = mysqli_query($conexao, $queryAluno);
+// Verifica se o aluno pertence à escola do usuário
+$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_escola = ?");
+$stmtAluno->bind_param("ii", $id_aluno, $id_escola);
+$stmtAluno->execute();
+$resultAluno = $stmtAluno->get_result();
 
-if (!$resultAluno || mysqli_num_rows($resultAluno) == 0) {
-    die("Aluno nao encontrado ou nao pertence a sua escola.");
+if ($resultAluno->num_rows == 0) {
+    die("Aluno não encontrado ou não pertence à sua escola.");
 }
 
-$nome = mysqli_real_escape_string($conexao, trim($_POST['nome'] ?? ''));
-$deficiencia = mysqli_real_escape_string($conexao, trim($_POST['deficiencia'] ?? ''));
-$cuidados = mysqli_real_escape_string($conexao, trim($_POST['observacoes'] ?? ''));
-$nomeResponsavel = mysqli_real_escape_string($conexao, trim($_POST['nome_responsavel'] ?? ''));
+$stmtAluno->close();
+
+$nome = trim($_POST['nome'] ?? '');
+$deficiencia = trim($_POST['deficiencia'] ?? '');
+$cuidados = trim($_POST['observacoes'] ?? '');
+$nomeResponsavel = trim($_POST['nome_responsavel'] ?? '');
 $cpfResponsavel = preg_replace('/\D/', '', $_POST['cpf_responsavel'] ?? '');
 
 if ($nome === '' || $deficiencia === '') {
-    die("Nome e deficiencia sao obrigatorios.");
+    die("Nome e deficiência são obrigatórios.");
 }
 
 $query = "UPDATE alunos SET
-    nome = '$nome',
-    descricao_deficiencia = '$deficiencia',
-    descricao_cuidados = '$cuidados',
-    nome_responsavel = '$nomeResponsavel',
-    cpf_responsavel = '$cpfResponsavel'
-    WHERE id_aluno = $id_aluno AND id_escola = $id_escola";
+    nome = ?,
+    descricao_deficiencia = ?,
+    descricao_cuidados = ?,
+    nome_responsavel = ?,
+    cpf_responsavel = ?
+    WHERE id_aluno = ? AND id_escola = ?";
 
-$result = mysqli_query($conexao, $query);
+$stmt = $conexao->prepare($query);
 
-if ($result) {
+if (!$stmt) {
+    die("Erro ao preparar a consulta: " . $conexao->error);
+}
+
+$stmt->bind_param(
+    "sssssii",
+    $nome,
+    $deficiencia,
+    $cuidados,
+    $nomeResponsavel,
+    $cpfResponsavel,
+    $id_aluno,
+    $id_escola
+);
+
+if ($stmt->execute()) {
     header("Location: ../views/alunos_visualizar.php?id=$id_aluno&msg=editado");
     exit();
 }
 
-echo "Erro ao editar aluno: " . mysqli_error($conexao);
+echo "Erro ao editar aluno: " . $stmt->error;
 ?>

@@ -14,11 +14,52 @@ function temPermissao($perfil, $perfisPermitidos) {
     return in_array($perfil, $perfisPermitidos);
 }
 
+// Retorna o caminho correto da página de login (views/ ou controllers/)
+function urlLogin() {
+    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $dir = strtolower(basename(dirname($script)));
+
+    if ($dir === 'controllers') {
+        return '../views/login.php';
+    }
+
+    return 'login.php';
+}
+
 // Redireciona para o login se não estiver logado
 function exigirLogin() {
     if (!estaLogado()) {
-        header("Location: login.php");
+        header("Location: " . urlLogin());
         exit();
+    }
+}
+
+// ============================================================
+// PROTEÇÃO CSRF
+// ============================================================
+
+// Gera (ou reaproveita) o token CSRF da sessão
+function gerarTokenCSRF() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+// Valida o token CSRF recebido no formulário
+function validarTokenCSRF($token) {
+    return isset($_SESSION['csrf_token'], $token)
+        && is_string($token)
+        && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+// Exige que a requisição POST contenha um token CSRF válido
+function exigirTokenCSRF() {
+    $token = $_POST['csrf_token'] ?? '';
+    if (!validarTokenCSRF($token)) {
+        http_response_code(403);
+        die("Token de segurança inválido. Recarregue a página e tente novamente.");
     }
 }
 

@@ -1,39 +1,47 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
-// Apenas PAE pode registrar relatórios
 exigirPerfil(array('PAE'));
+exigirTokenCSRF();
 
-$id_pae = $_SESSION['user_id'];
-$id_aluno = (int) $_POST['id_aluno'];
-$tipo = $_POST['tipo']; // DIARIO ou MENSAL
-$descricao = mysqli_real_escape_string($conexao, $_POST['descricao']);
+$id_pae = (int) $_SESSION['user_id'];
+$id_aluno = (int) ($_POST['id_aluno'] ?? 0);
+$tipo = $_POST['tipo'] ?? ''; // DIARIO ou MENSAL
+$descricao = trim($_POST['descricao'] ?? '');
+
+if ($id_aluno <= 0 || !in_array($tipo, array('DIARIO', 'MENSAL')) || $descricao === '') {
+    die("Dados do relatório inválidos.");
+}
 
 // Verifica se o aluno está associado a este PAE
-$queryVerifica = "SELECT id_associacao FROM associacoes
-                  WHERE id_aluno = $id_aluno AND id_pae = $id_pae AND ativo = 1";
-$resultVerifica = mysqli_query($conexao, $queryVerifica);
+$stmtVerifica = $conexao->prepare(
+    "SELECT id_associacao FROM associacoes
+     WHERE id_aluno = ? AND id_pae = ? AND ativo = 1
+     LIMIT 1"
+);
+$stmtVerifica->bind_param("ii", $id_aluno, $id_pae);
+$stmtVerifica->execute();
+$resultVerifica = $stmtVerifica->get_result();
 
-if (mysqli_num_rows($resultVerifica) == 0) {
+if ($resultVerifica->num_rows == 0) {
     die("Aluno não está associado a você.");
 }
 
-// Busca o id da associação
-$rowAssoc = mysqli_fetch_assoc($resultVerifica);
-$id_associacao = $rowAssoc['id_associacao'];
+$rowAssoc = $resultVerifica->fetch_assoc();
+$id_associacao = (int) $rowAssoc['id_associacao'];
+
+$stmtVerifica->close();
 
 // Insere o relatório
-$query = "INSERT INTO relatorios (id_associacao, tipo, descricao)
-          VALUES ($id_associacao, '$tipo', '$descricao')";
+$stmt = $conexao->prepare(
+    "INSERT INTO relatorios (id_associacao, tipo, descricao) VALUES (?, ?, ?)"
+);
+$stmt->bind_param("iss", $id_associacao, $tipo, $descricao);
 
-$result = mysqli_query($conexao, $query);
-
-if ($result) {
+if ($stmt->execute()) {
     header("Location: ../views/relatorios.php?msg=ok");
     exit();
-} else {
-    echo "Erro ao salvar relatório: " . mysqli_error($conexao);
 }
+
+echo "Erro ao salvar relatório: " . $stmt->error;
 ?>

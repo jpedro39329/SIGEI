@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_EMPRESA'));
 
@@ -40,6 +38,7 @@ if (!$pae) {
                     <h2 class="mb-4">Editar PAE</h2>
 
                     <form action="../controllers/paes_editar_salvar.php" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <input type="hidden" name="id_pae" value="<?php echo $pae['id_pae']; ?>">
 
                         <div class="row">

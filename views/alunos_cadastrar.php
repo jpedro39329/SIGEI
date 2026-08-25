@@ -1,6 +1,5 @@
 <?php
-session_start();
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 exigirPerfil(array('USUARIO_ESCOLA'));
 
@@ -56,6 +55,8 @@ $userPerfil = $_SESSION['user_perfil'];
                         method="POST"
                         enctype="multipart/form-data"
                     >
+
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
 
                         <div class="row">
 

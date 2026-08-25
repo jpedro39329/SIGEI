@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 // Apenas PAE pode acessar
 exigirPerfil(array('PAE'));
@@ -63,6 +61,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
         <div class="card-body p-4">
             <h5 class="mb-3">Novo Relatório</h5>
             <form action="../controllers/relatorios_salvar.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Aluno</label>

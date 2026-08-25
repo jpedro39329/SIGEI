@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 // Apenas USUARIO_ESCOLA pode editar alunos
 exigirPerfil(array('USUARIO_ESCOLA'));
@@ -42,6 +40,7 @@ if (!$aluno) {
                     <p class="text-muted mb-4">Edite os dados do aluno. Não é possível modificar CPF, RA, data de nascimento ou status.</p>
 
                     <form action="../controllers/alunos_editar_salvar.php" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
 
                         <div class="row">

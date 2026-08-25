@@ -1,7 +1,5 @@
 <?php
-session_start();
-include("../config/database.php");
-include("../config/perfil_functions.php");
+require_once "../config/init.php";
 
 // Apenas ADMIN pode acessar
 exigirPerfil(array('ADMIN'));
@@ -81,6 +79,7 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
         <div class="card-body p-4">
             <h5 class="mb-3">Nova Associação</h5>
             <form action="../controllers/alunos_associar.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Aluno (aprovado, sem 3 PAEs)</label>
@@ -145,6 +144,7 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
                                     <td><?php echo date('d/m/Y', strtotime($associacao['data_inicio'])); ?></td>
                                     <td>
                                         <form action="../controllers/alunos_desassociar.php" method="POST" style="display:inline;" onsubmit="return confirm('Deseja desassociar este PAE do aluno?');">
+                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                             <input type="hidden" name="id_associacao" value="<?php echo $associacao['id_associacao']; ?>">
                                             <button type="submit" class="btn btn-sm btn-danger">Desassociar</button>
                                         </form>
