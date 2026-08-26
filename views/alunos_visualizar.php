@@ -156,6 +156,26 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <strong><?php echo $aluno['data_nascimento'] ? date('d/m/Y', strtotime($aluno['data_nascimento'])) : '-'; ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Gênero</span>
+                            <strong><?php echo htmlspecialchars($aluno['genero'] ?? '-'); ?></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Raça/Cor</span>
+                            <strong><?php echo htmlspecialchars($aluno['raca'] ?? '-'); ?></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Município de Nascimento</span>
+                            <strong><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?? '-'); ?></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Série</span>
+                            <strong><?php echo htmlspecialchars($aluno['serie'] ?? '-'); ?></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Turno de Aula</span>
+                            <strong><?php echo htmlspecialchars($aluno['turno_aula'] ?? '-'); ?></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Deficiência</span>
                             <strong><?php echo htmlspecialchars($aluno['descricao_deficiencia'] ?? '-'); ?></strong>
                         </li>
@@ -171,7 +191,15 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <span class="text-muted">CPF do Responsável</span>
                             <strong><?php echo htmlspecialchars(formatarCPF($aluno['cpf_responsavel'] ?? '')); ?></strong>
                         </li>
-                        <?php if ($aluno['motivo_reprovacao']): ?>
+                        <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Termo de Responsabilidade</span>
+                            <a href="../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                📄 Visualizar Termo
+                            </a>
+                        </li>
+                        <?php endif; ?>
+                        <?php if (!empty($aluno['motivo_reprovacao'])): ?>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Motivo da Reprovação</span>
                             <strong class="text-danger"><?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?></strong>
