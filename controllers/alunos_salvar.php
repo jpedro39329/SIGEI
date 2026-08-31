@@ -90,8 +90,8 @@ $query = "INSERT INTO alunos (
     foto_arquivo,
     termo_responsabilidade_arquivo,
     status_aprovacao,
-    id_escola,
-    id_usuario_escola
+    id_ue,
+    id_usuario_ue
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDENTE', ?, ?)";
 
 $stmt = $conexao->prepare($query);

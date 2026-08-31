@@ -7,26 +7,22 @@ $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
 $id_pae = (int) ($_GET['id'] ?? 0);
 
-if (!in_array($userPerfil, ['ADMIN', 'USUARIO_EMPRESA', 'USUARIO_SEFISC'])) {
-    die("Acesso negado.");
-}
-
 $sql = "
     SELECT p.*, e.nome AS empresa_nome
-    FROM paes p
+    FROM usuarios_pae p
     LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
     WHERE p.id_pae = $id_pae
 ";
 $result = mysqli_query($conexao, $sql);
-$pae = mysqli_fetch_assoc($result);
+$pae = $result ? mysqli_fetch_assoc($result) : null;
 
 if (!$pae) {
-    die("PAE nao encontrado.");
+    die("PAE não encontrado.");
 }
 
-if ($userPerfil == 'USUARIO_EMPRESA') {
-    $idEmpresa = idEmpresaUsuario($conexao, $userId);
-    if ($pae['id_empresa'] != $idEmpresa) {
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    $idEmpresa = idEmpresaSupervisor($conexao, $userId);
+    if ((int) $pae['id_empresa'] !== $idEmpresa) {
         die("Acesso negado.");
     }
 }
@@ -35,7 +31,7 @@ $sqlAlunos = "
     SELECT a.nome AS aluno_nome, e.nome AS escola_nome
     FROM associacoes ass
     JOIN alunos a ON ass.id_aluno = a.id_aluno
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     WHERE ass.id_pae = $id_pae AND ass.ativo = 1
     ORDER BY a.nome
 ";

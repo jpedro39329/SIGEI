@@ -1,18 +1,30 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas USUARIO_EDUCACAO_ESPECIAL pode acessar
-exigirPerfil(array('USUARIO_EDUCACAO_ESPECIAL'));
+exigirPerfil(array('USUARIO_EDUCACAO_ESPECIAL', 'ADMIN', 'SEDUC'));
 
 $userName = $_SESSION['user_name'];
+$userPerfil = $_SESSION['user_perfil'];
+$userId = (int) $_SESSION['user_id'];
+$idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
 
-// Lista alunos com status PENDENTE
+if ($idUreUsuario <= 0 && $userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
+    $idUreUsuario = idUreUsuario($conexao, $userId);
+}
+
+$whereUre = "";
+if ($idUreUsuario > 0) {
+    $whereUre = "AND e.id_ure = $idUreUsuario";
+}
+
+// Lista alunos com status PENDENTE da URE
 $sql = "
     SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia,
            a.data_cadastro, e.nome AS escola_nome
     FROM alunos a
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     WHERE a.status_aprovacao = 'PENDENTE'
+    $whereUre
     ORDER BY a.data_cadastro DESC
 ";
 $result = mysqli_query($conexao, $sql);

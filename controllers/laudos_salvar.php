@@ -18,7 +18,7 @@ if ($id_aluno <= 0 || $id_escola <= 0) {
     die("Aluno ou escola inválidos.");
 }
 
-$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_escola = ?");
+$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_ue = ?");
 $stmtAluno->bind_param("ii", $id_aluno, $id_escola);
 $stmtAluno->execute();
 

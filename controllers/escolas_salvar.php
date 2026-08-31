@@ -1,49 +1,68 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN pode cadastrar escolas
-exigirPerfil(array('ADMIN'));
+exigirPerfil(array('DIRIGENTE', 'ADMIN', 'SEDUC'));
 exigirTokenCSRF();
 
-// Coleta os campos do formulário
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../views/escolas_cadastrar.php");
+    exit();
+}
+
+$userPerfil = $_SESSION['user_perfil'];
+$userId = (int) $_SESSION['user_id'];
+
+if ($userPerfil === 'DIRIGENTE') {
+    $idUre = (int) ($_SESSION['id_ure'] ?? 0);
+    if ($idUre <= 0) {
+        $idUre = idUreUsuario($conexao, $userId);
+    }
+} else {
+    $idUre = (int) ($_POST['id_ure'] ?? 0);
+}
+
 $nome = trim($_POST['nome'] ?? '');
 $cie = trim($_POST['cie'] ?? '');
+$modalidade = $_POST['modalidade'] ?? 'REGULAR';
 $rua = trim($_POST['rua'] ?? '');
 $numero = trim($_POST['numero'] ?? '');
 $bairro = trim($_POST['bairro'] ?? '');
 $cidade = trim($_POST['cidade'] ?? '');
 $cep = preg_replace('/\D/', '', $_POST['cep'] ?? '');
-$modalidade = $_POST['modalidade'] ?? ''; // PEI ou REGULAR
 $horario = trim($_POST['horario_funcionamento'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $email = trim($_POST['email'] ?? '');
 
-if ($nome === '' || $cie === '' || !in_array($modalidade, array('PEI', 'REGULAR'))) {
-    die("Preencha o nome, o CIE e a modalidade.");
+if ($nome === '' || $cie === '' || $idUre <= 0 || !in_array($modalidade, array('PEI', 'REGULAR'))) {
+    header("Location: ../views/escolas_cadastrar.php?erro=" . urlencode("Preencha o nome, o CIE, a modalidade e a URE da escola."));
+    exit();
 }
 
 // Verifica se o CIE já existe
-$stmtVerifica = $conexao->prepare("SELECT id_escola FROM escolas WHERE cie = ?");
+$stmtVerifica = $conexao->prepare("SELECT id_ue FROM unidades_escolares WHERE cie = ?");
 $stmtVerifica->bind_param("s", $cie);
 $stmtVerifica->execute();
-
 if ($stmtVerifica->get_result()->num_rows > 0) {
-    die("Já existe uma escola com este CIE.");
+    header("Location: ../views/escolas_cadastrar.php?erro=" . urlencode("Já existe uma escola cadastrada com este CIE."));
+    exit();
 }
-
 $stmtVerifica->close();
 
-// Insere a escola
 $stmt = $conexao->prepare(
-    "INSERT INTO escolas (
+    "INSERT INTO unidades_escolares (
         nome, cie, rua, numero, bairro, cidade, cep,
-        modalidade, horario_funcionamento, telefone, email
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        modalidade, id_ure, horario_funcionamento, telefone, email
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
+
+if (!$stmt) {
+    die("Erro ao preparar consulta: " . $conexao->error);
+}
+
 $stmt->bind_param(
-    "sssssssssss",
+    "ssssssssisss",
     $nome, $cie, $rua, $numero, $bairro, $cidade, $cep,
-    $modalidade, $horario, $telefone, $email
+    $modalidade, $idUre, $horario, $telefone, $email
 );
 
 if ($stmt->execute()) {
@@ -51,5 +70,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao cadastrar escola: " . $stmt->error;
+header("Location: ../views/escolas_cadastrar.php?erro=" . urlencode("Erro ao cadastrar escola: " . $stmt->error));
+exit();
 ?>

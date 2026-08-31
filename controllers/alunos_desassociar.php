@@ -1,8 +1,7 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN pode desassociar PAE de aluno
-exigirPerfil(array('ADMIN', 'USUARIO_EMPRESA'));
+exigirPerfil(array('ADMIN', 'SEDUC', 'SUPERVISOR', 'USUARIO_EMPRESA'));
 exigirTokenCSRF();
 
 $id_associacao = (int) ($_POST['id_associacao'] ?? 0);

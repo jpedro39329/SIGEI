@@ -6,20 +6,27 @@ exigirLogin();
 $userName = $_SESSION['user_name'];
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
-
-if (!in_array($userPerfil, ['USUARIO_EMPRESA', 'USUARIO_SEFISC', 'ADMIN'])) {
-    die("Acesso negado.");
-}
+$idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+$idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 
 $where = "";
-if ($userPerfil == 'USUARIO_EMPRESA') {
-    $idEmpresa = idEmpresaUsuario($conexao, $userId);
-    $where = "WHERE p.id_empresa = $idEmpresa";
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    if ($idEmpresaUsuario <= 0) {
+        $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
+    }
+    $where = "WHERE p.id_empresa = $idEmpresaUsuario";
+} elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC'])) {
+    if ($idUreUsuario <= 0) {
+        $idUreUsuario = idUreUsuario($conexao, $userId);
+    }
+    if ($idUreUsuario > 0) {
+        $where = "WHERE p.id_empresa IN (SELECT id_empresa FROM empresa_ure WHERE id_ure = $idUreUsuario)";
+    }
 }
 
 $sql = "
-    SELECT p.id_pae, p.nome, p.cpf, p.ativo, p.data_cadastro, e.nome AS empresa_nome
-    FROM paes p
+    SELECT p.id_pae, p.nome, p.cpf, p.email, p.telefone, p.ativo, p.data_cadastro, e.nome AS empresa_nome
+    FROM usuarios_pae p
     LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
     $where
     ORDER BY p.data_cadastro DESC
@@ -44,11 +51,11 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <div class="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Profissionais de Apoio Escolar</h2>
-            <p class="text-muted">Ola, <?php echo htmlspecialchars($userName); ?> - acompanhe os PAEs cadastrados.</p>
+            <h2 class="mb-1">Profissionais de Apoio Escolar (PAEs)</h2>
+            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe os PAEs cadastrados.</p>
         </div>
 
-        <?php if ($userPerfil == 'USUARIO_EMPRESA') { ?>
+        <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN', 'SEDUC'])) { ?>
             <a href="paes_cadastrar.php" class="btn btn-primary">Cadastrar PAE</a>
         <?php } ?>
     </div>

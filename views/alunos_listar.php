@@ -6,10 +6,8 @@ exigirLogin();
 $userName = $_SESSION['user_name'];
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
-
-if (!in_array($userPerfil, ['ADMIN', 'USUARIO_ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC'])) {
-    die("Acesso negado.");
-}
+$idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+$idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 
 $nomeFiltro = trim($_GET['nome'] ?? '');
 $raFiltro = trim($_GET['ra'] ?? '');
@@ -34,7 +32,7 @@ if ($cpfFiltro !== '') {
     $where[] = "a.cpf LIKE '%$cpfBusca%'";
 }
 
-if ($escolaFiltro !== '' && $userPerfil !== 'USUARIO_ESCOLA') {
+if ($escolaFiltro !== '' && !in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $escolaBusca = mysqli_real_escape_string($conexao, $escolaFiltro);
     $where[] = "e.nome LIKE '%$escolaBusca%'";
 }
@@ -44,9 +42,30 @@ if ($statusFiltro !== '') {
     $where[] = "a.status_aprovacao = '$statusBusca'";
 }
 
-if ($userPerfil == 'USUARIO_ESCOLA') {
+// Filtros por Perfil e Hierarquia
+if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $idEscola = idEscolaUsuario($conexao, $userId);
-    $where[] = "a.id_escola = $idEscola";
+    $where[] = "a.id_ue = $idEscola";
+} elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL'])) {
+    if ($idUreUsuario <= 0) {
+        $idUreUsuario = idUreUsuario($conexao, $userId);
+    }
+    if ($idUreUsuario > 0) {
+        $where[] = "e.id_ure = $idUreUsuario";
+    }
+} elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    if ($idEmpresaUsuario <= 0) {
+        $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
+    }
+    $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresaUsuario);
+    if (!empty($uresAtendidas)) {
+        $uresList = implode(',', $uresAtendidas);
+        $where[] = "e.id_ure IN ($uresList)";
+    } else {
+        $where[] = "1=0"; // Empresa sem UREs vinculadas
+    }
+} elseif ($userPerfil === 'PAE') {
+    $where[] = "a.id_aluno IN (SELECT id_aluno FROM associacoes WHERE id_pae = $userId AND ativo = 1)";
 }
 
 $whereSql = '';
@@ -59,11 +78,11 @@ $sql = "
            a.status_aprovacao, a.data_cadastro,
            e.nome AS escola_nome,
            (SELECT p.nome FROM associacoes ass
-            JOIN paes p ON ass.id_pae = p.id_pae
+            JOIN usuarios_pae p ON ass.id_pae = p.id_pae
             WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
             LIMIT 1) AS pae_nome
     FROM alunos a
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     $whereSql
     ORDER BY a.data_cadastro DESC
 ";

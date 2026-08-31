@@ -1,33 +1,60 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas PAE pode acessar
-exigirPerfil(array('PAE'));
+exigirPerfil(array('PAE', 'SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN', 'SEDUC'));
 
 $userName = $_SESSION['user_name'];
-$id_pae = $_SESSION['user_id'];
+$userPerfil = $_SESSION['user_perfil'];
+$userId = (int) $_SESSION['user_id'];
+$idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 
-// Alunos associados ao PAE
-$sqlAlunos = "
-    SELECT a.id_aluno, a.nome FROM associacoes ass
-    JOIN alunos a ON ass.id_aluno = a.id_aluno
-    WHERE ass.id_pae = $id_pae AND ass.ativo = 1
-    ORDER BY a.nome
-";
-$resultAlunos = mysqli_query($conexao, $sqlAlunos);
-$alunos = mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC);
+$alunos = [];
+$relatorios = [];
 
-// Relatórios do PAE logado
-$sqlRelatorios = "
-    SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome
-    FROM relatorios r
-    JOIN associacoes ass ON r.id_associacao = ass.id_associacao
-    JOIN alunos a ON ass.id_aluno = a.id_aluno
-    WHERE ass.id_pae = $id_pae
-    ORDER BY r.data_cadastro DESC
-";
+if ($userPerfil === 'PAE') {
+    // Alunos associados ao PAE
+    $sqlAlunos = "
+        SELECT a.id_aluno, a.nome FROM associacoes ass
+        JOIN alunos a ON ass.id_aluno = a.id_aluno
+        WHERE ass.id_pae = $userId AND ass.ativo = 1
+        ORDER BY a.nome
+    ";
+    $resultAlunos = mysqli_query($conexao, $sqlAlunos);
+    $alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
+
+    // Relatórios do PAE logado
+    $sqlRelatorios = "
+        SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome
+        FROM relatorios r
+        JOIN associacoes ass ON r.id_associacao = ass.id_associacao
+        JOIN alunos a ON ass.id_aluno = a.id_aluno
+        JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+        WHERE ass.id_pae = $userId
+        ORDER BY r.data_cadastro DESC
+    ";
+} else {
+    $where = "";
+    if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+        if ($idEmpresaUsuario <= 0) {
+            $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
+        }
+        $where = "WHERE p.id_empresa = $idEmpresaUsuario";
+    }
+
+    $sqlRelatorios = "
+        SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome, e.nome AS empresa_nome
+        FROM relatorios r
+        JOIN associacoes ass ON r.id_associacao = ass.id_associacao
+        JOIN alunos a ON ass.id_aluno = a.id_aluno
+        JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+        LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
+        $where
+        ORDER BY r.data_cadastro DESC
+    ";
+}
+
 $resultRelatorios = mysqli_query($conexao, $sqlRelatorios);
-$relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
+$relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +62,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios</title>
+    <title>Relatórios dos PAEs</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
@@ -47,8 +74,8 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Meus Relatórios</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — registre relatórios dos seus alunos.</p>
+            <h2 class="mb-1"><?php echo ($userPerfil === 'PAE') ? 'Meus Relatórios' : 'Relatórios dos Cuidadores (PAEs)'; ?></h2>
+            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — <?php echo ($userPerfil === 'PAE') ? 'registre e acompanhe seus relatórios.' : 'acompanhe os atendimentos realizados pelos PAEs.'; ?></p>
         </div>
     </div>
 
@@ -56,40 +83,46 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
         <div class="alert alert-success">Relatório salvo com sucesso!</div>
     <?php endif; ?>
 
-    <!-- Formulário de novo relatório -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Novo Relatório</h5>
-            <form action="../controllers/relatorios_salvar.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Aluno</label>
-                        <select name="id_aluno" class="form-select" required>
-                            <option value="">Selecione...</option>
-                            <?php foreach ($alunos as $aluno): ?>
-                                <option value="<?php echo $aluno['id_aluno']; ?>"><?php echo htmlspecialchars($aluno['nome']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+    <?php if (isset($_GET['erro'])): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro']); ?></div>
+    <?php endif; ?>
 
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tipo</label>
-                        <select name="tipo" class="form-select" required>
-                            <option value="DIARIO">Diário</option>
-                            <option value="MENSAL">Mensal</option>
-                        </select>
-                    </div>
+    <!-- Formulário de novo relatório (apenas PAE) -->
+    <?php if ($userPerfil === 'PAE'): ?>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Novo Relatório de Atendimento</h5>
+                <form action="../controllers/relatorios_salvar.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Aluno Atendido</label>
+                            <select name="id_aluno" class="form-select" required>
+                                <option value="">Selecione o aluno...</option>
+                                <?php foreach ($alunos as $aluno): ?>
+                                    <option value="<?php echo $aluno['id_aluno']; ?>"><?php echo htmlspecialchars($aluno['nome']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Descrição</label>
-                        <textarea name="descricao" rows="4" class="form-control" required></textarea>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tipo de Relatório</label>
+                            <select name="tipo" class="form-select" required>
+                                <option value="DIARIO">Diário (Atividades do Dia)</option>
+                                <option value="MENSAL">Mensal (Evolução / Fechamento)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Descrição do Atendimento / Observações</label>
+                            <textarea name="descricao" rows="4" class="form-control" placeholder="Descreva as atividades, alimentação, suporte e interação do aluno..." required></textarea>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-dark">Registrar</button>
-            </form>
+                    <button type="submit" class="btn btn-dark">Registrar Relatório</button>
+                </form>
+            </div>
         </div>
-    </div>
+    <?php endif; ?>
 
     <!-- Lista de relatórios -->
     <div class="card border-0 shadow-sm">
@@ -99,25 +132,37 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
+                            <?php if ($userPerfil !== 'PAE'): ?>
+                                <th>PAE</th>
+                            <?php endif; ?>
                             <th>Aluno</th>
                             <th>Tipo</th>
                             <th>Descrição</th>
-                            <th>Data</th>
+                            <th>Data de Envio</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (count($relatorios) > 0): ?>
                             <?php foreach ($relatorios as $relatorio): ?>
                                 <tr>
+                                    <?php if ($userPerfil !== 'PAE'): ?>
+                                        <td><strong><?php echo htmlspecialchars($relatorio['pae_nome'] ?? '-'); ?></strong></td>
+                                    <?php endif; ?>
                                     <td><?php echo htmlspecialchars($relatorio['aluno_nome']); ?></td>
-                                    <td><?php echo $relatorio['tipo'] == 'DIARIO' ? 'Diário' : 'Mensal'; ?></td>
-                                    <td><?php echo htmlspecialchars($relatorio['descricao']); ?></td>
+                                    <td>
+                                        <?php if ($relatorio['tipo'] == 'DIARIO'): ?>
+                                            <span class="badge bg-info text-dark">Diário</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-primary">Mensal</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo nl2br(htmlspecialchars($relatorio['descricao'])); ?></td>
                                     <td><?php echo date('d/m/Y H:i', strtotime($relatorio['data_cadastro'])); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Nenhum relatório registrado.</td>
+                                <td colspan="<?php echo ($userPerfil !== 'PAE') ? '5' : '4'; ?>" class="text-center text-muted">Nenhum relatório registrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

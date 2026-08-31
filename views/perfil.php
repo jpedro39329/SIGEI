@@ -12,12 +12,17 @@ $userPerfil = $_SESSION['user_perfil'];
 
 // Escolhe a tabela correta conforme o perfil
 $tabelasPerfil = array(
-    'ADMIN'                    => array('admin',                     'id_admin'),
-    'USUARIO_ESCOLA'           => array('usuarios_escola',           'id_usuario_escola'),
-    'USUARIO_EMPRESA'          => array('usuarios_empresa',          'id_usuario_empresa'),
-    'PAE'                      => array('paes',                      'id_pae'),
-    'USUARIO_SEFISC'           => array('usuarios_sefisc',           'id_usuario_sefisc'),
-    'USUARIO_EDUCACAO_ESPECIAL'=> array('usuarios_educacao_especial','id_usuario_edu')
+    'ADMIN'                     => array('admin',               'id_admin'),
+    'SEDUC'                     => array('seduc',               'id_seduc'),
+    'DIRIGENTE'                 => array('usuarios_ure',        'id_usuario_ure'),
+    'USUARIO_SEFISC'            => array('usuarios_ure',        'id_usuario_ure'),
+    'USUARIO_EDUCACAO_ESPECIAL' => array('usuarios_ure',        'id_usuario_ure'),
+    'SUPERVISOR'                => array('usuarios_supervisor', 'id_usuario_supervisor'),
+    'USUARIO_EMPRESA'           => array('usuarios_supervisor', 'id_usuario_supervisor'),
+    'USUARIO_ESCOLA'            => array('usuarios_ue',         'id_usuario_ue'),
+    'USUARIO_UE'                => array('usuarios_ue',         'id_usuario_ue'),
+    'ESCOLA'                    => array('usuarios_ue',         'id_usuario_ue'),
+    'PAE'                       => array('usuarios_pae',        'id_pae')
 );
 
 $tabela = $tabelasPerfil[$userPerfil][0] ?? 'admin';

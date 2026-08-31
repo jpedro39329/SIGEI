@@ -19,7 +19,7 @@ if ($id_aluno <= 0 || $id_escola <= 0) {
 }
 
 // Verifica se o aluno pertence à escola do usuário
-$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_escola = ?");
+$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_ue = ?");
 $stmtAluno->bind_param("ii", $id_aluno, $id_escola);
 $stmtAluno->execute();
 $resultAluno = $stmtAluno->get_result();
@@ -87,7 +87,7 @@ $query = "UPDATE alunos SET
     cpf_responsavel = ?" .
     ($fotoArquivo !== null ? ", foto_arquivo = ?" : "") .
     ($termoArquivo !== null ? ", termo_responsabilidade_arquivo = ?" : "") .
-    " WHERE id_aluno = ? AND id_escola = ?";
+    " WHERE id_aluno = ? AND id_ue = ?";
 
 $stmt = $conexao->prepare($query);
 

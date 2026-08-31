@@ -1,43 +1,69 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN pode acessar
-exigirPerfil(array('ADMIN'));
+exigirPerfil(array('ADMIN', 'SEDUC'));
 
 $userName = $_SESSION['user_name'];
 
-// Reúne todos os usuários de todas as tabelas
-$perfis = array(
-    'admin' => array('tabela' => 'admin', 'campo' => 'id_admin', 'perfil' => 'ADMIN'),
-    'usuarios_escola' => array('tabela' => 'usuarios_escola', 'campo' => 'id_usuario_escola', 'perfil' => 'USUARIO_ESCOLA'),
-    'usuarios_empresa' => array('tabela' => 'usuarios_empresa', 'campo' => 'id_usuario_empresa', 'perfil' => 'USUARIO_EMPRESA'),
-    'paes' => array('tabela' => 'paes', 'campo' => 'id_pae', 'perfil' => 'PAE'),
-    'usuarios_sefisc' => array('tabela' => 'usuarios_sefisc', 'campo' => 'id_usuario_sefisc', 'perfil' => 'USUARIO_SEFISC'),
-    'usuarios_educacao_especial' => array('tabela' => 'usuarios_educacao_especial', 'campo' => 'id_usuario_edu', 'perfil' => 'USUARIO_EDUCACAO_ESPECIAL')
-);
-
 $usuarios = array();
 
-foreach ($perfis as $info) {
-    $tabela = $info['tabela'];
-    $campo = $info['campo'];
-    $perfil = $info['perfil'];
+// 1. Admin
+$res = mysqli_query($conexao, "SELECT nome, cpf, 1 AS ativo, data_cadastro, 'ADMIN' AS perfil, 'Administração Geral' AS vinculo FROM admin");
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) $usuarios[] = $r;
+}
 
-    // A tabela `admin` não possui a coluna `ativo`
-    if ($tabela === 'admin') {
-        $sql = "SELECT nome, cpf, data_cadastro FROM `$tabela`";
-    } else {
-        $sql = "SELECT nome, cpf, ativo, data_cadastro FROM `$tabela`";
-    }
+// 2. SEDUC
+$res = mysqli_query($conexao, "SELECT nome, cpf, ativo, data_cadastro, 'SEDUC' AS perfil, CONCAT(setor, ' - ', cargo) AS vinculo FROM seduc");
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) $usuarios[] = $r;
+}
 
-    $result = mysqli_query($conexao, $sql);
+// 3. Usuarios URE
+$res = mysqli_query($conexao, "
+    SELECT uu.nome, uu.cpf, uu.ativo, uu.data_cadastro,
+           CASE
+               WHEN uu.setor = 'GABINETE' THEN 'DIRIGENTE'
+               WHEN uu.setor = 'SEFISC' THEN 'USUARIO_SEFISC'
+               WHEN uu.setor = 'EDU_ESPECIAL' THEN 'USUARIO_EDUCACAO_ESPECIAL'
+               ELSE 'DIRIGENTE'
+           END AS perfil,
+           CONCAT(u.nome, ' (', uu.cargo, ')') AS vinculo
+    FROM usuarios_ure uu
+    JOIN unidades_regionais u ON uu.id_ure = u.id_ure
+");
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) $usuarios[] = $r;
+}
 
-    if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $row['perfil'] = $perfil;
-            $usuarios[] = $row;
-        }
-    }
+// 4. Supervisores
+$res = mysqli_query($conexao, "
+    SELECT us.nome, us.cpf, us.ativo, us.data_cadastro, 'SUPERVISOR' AS perfil, e.nome AS vinculo
+    FROM usuarios_supervisor us
+    JOIN empresas e ON us.id_empresa = e.id_empresa
+");
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) $usuarios[] = $r;
+}
+
+// 5. Usuarios UE
+$res = mysqli_query($conexao, "
+    SELECT uue.nome, uue.cpf, uue.ativo, uue.data_cadastro, 'USUARIO_ESCOLA' AS perfil, ue.nome AS vinculo
+    FROM usuarios_ue uue
+    JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
+");
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) $usuarios[] = $r;
+}
+
+// 6. PAEs
+$res = mysqli_query($conexao, "
+    SELECT p.nome, p.cpf, p.ativo, p.data_cadastro, 'PAE' AS perfil, e.nome AS vinculo
+    FROM usuarios_pae p
+    JOIN empresas e ON p.id_empresa = e.id_empresa
+");
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) $usuarios[] = $r;
 }
 ?>
 
@@ -72,6 +98,7 @@ foreach ($perfis as $info) {
                             <th>Nome</th>
                             <th>CPF</th>
                             <th>Perfil</th>
+                            <th>Vínculo / Lotação</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -79,9 +106,10 @@ foreach ($perfis as $info) {
                         <?php if (count($usuarios) > 0): ?>
                             <?php foreach ($usuarios as $usuario): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($usuario['nome']); ?></td>
+                                    <td><strong><?php echo htmlspecialchars($usuario['nome']); ?></strong></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($usuario['cpf'] ?? '')); ?></td>
-                                    <td><?php echo htmlspecialchars(nomePerfil($usuario['perfil'])); ?></td>
+                                    <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars(nomePerfil($usuario['perfil'])); ?></span></td>
+                                    <td><small class="text-muted"><?php echo htmlspecialchars($usuario['vinculo'] ?? '-'); ?></small></td>
                                     <td>
                                         <?php if (($usuario['ativo'] ?? 1) == 1): ?>
                                             <span class="badge bg-success">Ativo</span>
@@ -93,7 +121,7 @@ foreach ($perfis as $info) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Nenhum usuário cadastrado.</td>
+                                <td colspan="5" class="text-center text-muted">Nenhum usuário cadastrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

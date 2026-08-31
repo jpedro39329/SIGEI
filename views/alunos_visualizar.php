@@ -4,37 +4,54 @@ require_once "../config/init.php";
 exigirLogin();
 
 $userPerfil = $_SESSION['user_perfil'];
-$userId = $_SESSION['user_id'];
+$userId = (int) $_SESSION['user_id'];
 $id_aluno = (int) ($_GET['id'] ?? 0);
-
-if (!in_array($userPerfil, ['ADMIN', 'USUARIO_ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'PAE'])) {
-    die("Acesso negado.");
-}
 
 // Busca os dados do aluno
 $sql = "
-    SELECT a.*, e.nome AS escola_nome
+    SELECT a.*, e.nome AS escola_nome, e.id_ure
     FROM alunos a
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     WHERE a.id_aluno = $id_aluno
 ";
 $result = mysqli_query($conexao, $sql);
-$aluno = mysqli_fetch_assoc($result);
+$aluno = $result ? mysqli_fetch_assoc($result) : null;
 
 if (!$aluno) {
     die("Aluno não encontrado.");
 }
 
 // Verifica permissão de acesso
-if ($userPerfil == 'USUARIO_ESCOLA') {
+if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $idEscola = idEscolaUsuario($conexao, $userId);
-    if ($aluno['id_escola'] != $idEscola) {
+    if ((int) $aluno['id_ue'] !== $idEscola) {
+        die("Acesso negado.");
+    }
+}
+
+if (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL'])) {
+    $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+    if ($idUreUsuario <= 0) {
+        $idUreUsuario = idUreUsuario($conexao, $userId);
+    }
+    if ($idUreUsuario > 0 && (int) $aluno['id_ure'] !== $idUreUsuario) {
+        die("Acesso negado.");
+    }
+}
+
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    $idEmpresa = (int) ($_SESSION['id_empresa'] ?? 0);
+    if ($idEmpresa <= 0) {
+        $idEmpresa = idEmpresaSupervisor($conexao, $userId);
+    }
+    $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresa);
+    if (!in_array((int) $aluno['id_ure'], $uresAtendidas)) {
         die("Acesso negado.");
     }
 }
 
 if ($userPerfil == 'PAE') {
-    $idPae = (int) $userId;
+    $idPae = $userId;
     $sqlPermissaoPae = "
         SELECT id_associacao
         FROM associacoes
@@ -54,7 +71,7 @@ if ($userPerfil == 'PAE') {
 $sqlPae = "
     SELECT p.nome, p.cpf, p.telefone, p.email
     FROM associacoes ass
-    JOIN paes p ON ass.id_pae = p.id_pae
+    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
     WHERE ass.id_aluno = $id_aluno AND ass.ativo = 1
     LIMIT 1
 ";
@@ -71,7 +88,7 @@ $sqlRelatorios = "
     SELECT r.*, p.nome AS pae_nome
     FROM relatorios r
     JOIN associacoes ass ON r.id_associacao = ass.id_associacao
-    JOIN paes p ON ass.id_pae = p.id_pae
+    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
     WHERE ass.id_aluno = $id_aluno
     ORDER BY r.data_cadastro DESC
 ";

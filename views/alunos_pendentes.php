@@ -12,7 +12,7 @@ $sql = "
     SELECT id_aluno, nome, cpf, ra, descricao_deficiencia,
            status_aprovacao, motivo_reprovacao, data_cadastro
     FROM alunos
-    WHERE id_escola = $idEscola
+    WHERE id_ue = $idEscola
       AND status_aprovacao IN ('PENDENTE', 'REPROVADO')
     ORDER BY data_cadastro DESC
 ";

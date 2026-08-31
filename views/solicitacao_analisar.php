@@ -14,7 +14,7 @@ if ($id_aluno <= 0) {
 $sql = "
     SELECT a.*, e.nome AS escola_nome
     FROM alunos a
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     WHERE a.id_aluno = $id_aluno
 ";
 $result = mysqli_query($conexao, $sql);

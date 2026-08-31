@@ -1,5 +1,5 @@
 -- ============================================================
--- SIGEI - BANCO DE DADOS
+-- SIGEI - BANCO DE DADOS ATUALIZADO
 -- MariaDB / MySQL
 -- ============================================================
 
@@ -15,389 +15,33 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 START TRANSACTION;
-
--- ============================================================
--- TABELA: unidades_gestoras
--- ============================================================
-
-CREATE TABLE `unidades_gestoras` (
-  `id_uge` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(150) NOT NULL,
-  `endereco` varchar(255) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_uge`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `unidades_gestoras`
-(`id_uge`, `nome`, `endereco`, `telefone`, `email`)
-VALUES
-(1, 'Unidade Regional de Ensino de Bragança Paulista', NULL, NULL, NULL);
-
-
--- ============================================================
--- TABELA: admin
--- ============================================================
+--
+-- Estrutura para tabela `admin`
+--
 
 CREATE TABLE `admin` (
-  `id_admin` int(11) NOT NULL AUTO_INCREMENT,
+  `id_admin` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
   `cpf` char(11) NOT NULL,
   `senha` varchar(255) NOT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_admin`),
-  UNIQUE KEY `cpf` (`cpf`)
+  `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `admin`
-(`id_admin`, `nome`, `cpf`, `senha`)
-VALUES
-(1, 'Administrador Geral', '00000000001',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+--
+-- Despejando dados para a tabela `admin`
+--
 
+INSERT INTO `admin` (`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`) VALUES
+(1, 'Administrador do Sistema', '00000000000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-08-31 11:24:26');
 
--- ============================================================
--- TABELA: sefisc
--- ============================================================
+-- --------------------------------------------------------
 
-CREATE TABLE `sefisc` (
-  `id_sefisc` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(150) NOT NULL DEFAULT 'Seção de Fiscalização',
-  `id_uge` int(11) NOT NULL DEFAULT 1,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_sefisc`),
-  KEY `fk_sefisc_uge` (`id_uge`),
-  CONSTRAINT `fk_sefisc_uge`
-    FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `sefisc`
-(`id_sefisc`, `nome`, `id_uge`)
-VALUES
-(1, 'Seção de Fiscalização', 1);
-
-
--- ============================================================
--- TABELA: educacao_especial
--- ============================================================
-
-CREATE TABLE `educacao_especial` (
-  `id_edu` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(150) NOT NULL DEFAULT 'Educação Especial',
-  `id_uge` int(11) NOT NULL DEFAULT 1,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_edu`),
-  KEY `fk_edu_uge` (`id_uge`),
-  CONSTRAINT `fk_edu_uge`
-    FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `educacao_especial`
-(`id_edu`, `nome`, `id_uge`)
-VALUES
-(1, 'Educação Especial', 1);
-
-
--- ============================================================
--- TABELA: empresas
--- ============================================================
-
-CREATE TABLE `empresas` (
-  `id_empresa` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(150) NOT NULL,
-  `cnpj` char(14) NOT NULL,
-  `rua` varchar(150) DEFAULT NULL,
-  `numero` varchar(10) DEFAULT NULL,
-  `bairro` varchar(100) DEFAULT NULL,
-  `cidade` varchar(100) DEFAULT NULL,
-  `cep` char(8) DEFAULT NULL,
-  `numero_contrato` varchar(50) DEFAULT NULL,
-  `contrato_arquivo` varchar(255) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_empresa`),
-  UNIQUE KEY `cnpj` (`cnpj`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `empresas`
-(`id_empresa`, `nome`, `cnpj`, `rua`, `numero`, `bairro`, `cidade`,
- `cep`, `numero_contrato`, `contrato_arquivo`, `telefone`, `email`)
-VALUES
-(1, 'Apoio Inclusivo Ltda', '12345678000199',
- 'Rua dos Cuidadores', '100', 'Centro', 'Bragança Paulista',
- '12900100', 'CT-2024-001', 'uploads/contratos/apoiocontrato.pdf',
- '(11) 9999-2000', 'contato@apoioinclusivo.com'),
-
-(2, 'Inclusão Total S/A', '98765432000188',
- 'Av. Inclusão', '500', 'Jardim América', 'Bragança Paulista',
- '12900110', 'CT-2024-002', 'uploads/contratos/inclusaocontrato.pdf',
- '(11) 9999-2001', 'contato@inclusaototal.com'),
-
-(3, 'Educa Mais Terceirizados', '45678912000177',
- 'Rua Educacional', '200', 'Vila Nova', 'Bragança Paulista',
- '12900120', 'CT-2024-003', 'uploads/contratos/educamaiscontrato.pdf',
- '(11) 9999-2002', 'contato@educamais.com');
-
-
--- ============================================================
--- TABELA: escolas
--- ============================================================
-
-CREATE TABLE `escolas` (
-  `id_escola` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(150) NOT NULL,
-  `cie` char(6) NOT NULL,
-  `rua` varchar(150) DEFAULT NULL,
-  `numero` varchar(10) DEFAULT NULL,
-  `bairro` varchar(100) DEFAULT NULL,
-  `cidade` varchar(100) DEFAULT NULL,
-  `cep` char(8) DEFAULT NULL,
-  `modalidade` enum('PEI','REGULAR') NOT NULL,
-  `id_uge` int(11) NOT NULL DEFAULT 1,
-  `horario_funcionamento` varchar(100) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_escola`),
-  UNIQUE KEY `cie` (`cie`),
-  KEY `fk_escola_uge` (`id_uge`),
-  CONSTRAINT `fk_escola_uge`
-    FOREIGN KEY (`id_uge`) REFERENCES `unidades_gestoras` (`id_uge`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `escolas`
-(`id_escola`, `nome`, `cie`, `rua`, `numero`, `bairro`, `cidade`,
- `cep`, `modalidade`, `id_uge`, `horario_funcionamento`,
- `telefone`, `email`)
-VALUES
-(1, 'EE Professor José Alves', '123456',
- 'Rua das Flores', '100', 'Centro', 'Bragança Paulista',
- '12900000', 'REGULAR', 1, '07:00 às 17:00',
- '(11) 9999-1112', 'ee.josealves@email.com'),
-
-(2, 'EE Maria de Lourdes', '234567',
- 'Av. Brasil', '250', 'Jardim América', 'Bragança Paulista',
- '12900010', 'PEI', 1, '07:00 às 17:00',
- '(11) 9999-1113', 'ee.marialourdes@email.com'),
-
-(3, 'EE São Francisco', '345678',
- 'Rua dos Estudantes', '450', 'Vila Nova', 'Bragança Paulista',
- '12900020', 'REGULAR', 1, '07:00 às 17:00',
- '(11) 9999-1114', 'ee.saofrancisco@email.com'),
-
-(4, 'EE Padre Anchieta', '456789',
- 'Rua Anchieta', '789', 'Centro', 'Bragança Paulista',
- '12900030', 'PEI', 1, '07:00 às 17:00',
- '(11) 9999-1115', 'ee.padreanchieta@email.com');
-
-
--- ============================================================
--- TABELA: usuarios_escola
--- ============================================================
-
-CREATE TABLE `usuarios_escola` (
-  `id_usuario_escola` int(11) NOT NULL AUTO_INCREMENT,
-  `id_escola` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_usuario_escola`),
-  UNIQUE KEY `cpf` (`cpf`),
-  KEY `fk_userescola_escola` (`id_escola`),
-  CONSTRAINT `fk_userescola_escola`
-    FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `usuarios_escola`
-(`id_usuario_escola`, `id_escola`, `nome`, `cpf`, `senha`,
- `email`, `telefone`, `ativo`)
-VALUES
-(1, 1, 'Carlos Silva', '11111111111',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'carlos.silva@escola1.com', '(11) 9999-1122', 1),
-
-(2, 1, 'Mariana Santos', '11111111112',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'mariana.santos@escola1.com', '(11) 9999-1123', 1),
-
-(3, 2, 'José Oliveira', '11111111113',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'jose.oliveira@escola2.com', '(11) 9999-1124', 1),
-
-(4, 3, 'Pedro Costa', '11111111115',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'pedro.costa@escola3.com', '(11) 9999-1126', 1);
-
-
--- ============================================================
--- TABELA: usuarios_sefisc
--- ============================================================
-
-CREATE TABLE `usuarios_sefisc` (
-  `id_usuario_sefisc` int(11) NOT NULL AUTO_INCREMENT,
-  `id_sefisc` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_usuario_sefisc`),
-  UNIQUE KEY `cpf` (`cpf`),
-  KEY `fk_usersefisc_sefisc` (`id_sefisc`),
-  CONSTRAINT `fk_usersefisc_sefisc`
-    FOREIGN KEY (`id_sefisc`) REFERENCES `sefisc` (`id_sefisc`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `usuarios_sefisc`
-(`id_usuario_sefisc`, `id_sefisc`, `nome`, `cpf`, `senha`,
- `email`, `telefone`, `ativo`)
-VALUES
-(1, 1, 'Fiscal José', '44444444441',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'fiscal.jose@sefisc.sp.gov.br', '(11) 9999-4001', 1),
-
-(2, 1, 'Fiscal Maria', '44444444442',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'fiscal.maria@sefisc.sp.gov.br', '(11) 9999-4002', 1);
-
-
--- ============================================================
--- TABELA: usuarios_educacao_especial
--- ============================================================
-
-CREATE TABLE `usuarios_educacao_especial` (
-  `id_usuario_edu` int(11) NOT NULL AUTO_INCREMENT,
-  `id_edu` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_usuario_edu`),
-  UNIQUE KEY `cpf` (`cpf`),
-  KEY `fk_useredu_edu` (`id_edu`),
-  CONSTRAINT `fk_useredu_edu`
-    FOREIGN KEY (`id_edu`) REFERENCES `educacao_especial` (`id_edu`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `usuarios_educacao_especial`
-(`id_usuario_edu`, `id_edu`, `nome`, `cpf`, `senha`,
- `email`, `telefone`, `ativo`)
-VALUES
-(1, 1, 'Especialista Ana', '55555555551',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'ana.especial@edu.sp.gov.br', '(11) 9999-5001', 1),
-
-(2, 1, 'Especialista Paulo', '55555555552',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'paulo.especial@edu.sp.gov.br', '(11) 9999-5002', 1);
-
-
--- ============================================================
--- TABELA: usuarios_empresa
--- ============================================================
-
-CREATE TABLE `usuarios_empresa` (
-  `id_usuario_empresa` int(11) NOT NULL AUTO_INCREMENT,
-  `id_empresa` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_usuario_empresa`),
-  UNIQUE KEY `cpf` (`cpf`),
-  KEY `fk_userempresa_empresa` (`id_empresa`),
-  CONSTRAINT `fk_userempresa_empresa`
-    FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `usuarios_empresa`
-(`id_usuario_empresa`, `id_empresa`, `nome`, `cpf`, `senha`,
- `email`, `telefone`, `ativo`)
-VALUES
-(1, 1, 'Roberto Gerente', '22222222222',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'roberto@apoioinclusivo.com', '(11) 9999-2005', 1),
-
-(2, 1, 'Carla Recursos', '22222222223',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'carla@apoioinclusivo.com', '(11) 9999-2006', 1),
-
-(3, 2, 'Marcos Diretor', '22222222224',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- 'marcos@inclusaototal.com', '(11) 9999-2007', 1);
-
-
--- ============================================================
--- TABELA: paes
--- ============================================================
-
-CREATE TABLE `paes` (
-  `id_pae` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(150) NOT NULL,
-  `cpf` char(11) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `contrato_arquivo` varchar(255) DEFAULT NULL,
-  `id_empresa` int(11) NOT NULL,
-  `ativo` tinyint(1) DEFAULT 1,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_pae`),
-  UNIQUE KEY `cpf` (`cpf`),
-  KEY `fk_pae_empresa` (`id_empresa`),
-  CONSTRAINT `fk_pae_empresa`
-    FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `paes`
-(`id_pae`, `nome`, `cpf`, `senha`, `telefone`, `email`,
- `contrato_arquivo`, `id_empresa`, `ativo`)
-VALUES
-(1, 'Ana Paula Silva', '33333333331',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- '(11) 9999-3001', 'ana.silva@pae.com',
- 'uploads/contratos/pae_ana.pdf', 1, 1),
-
-(2, 'Beatriz Santos', '33333333332',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- '(11) 9999-3002', 'beatriz.santos@pae.com',
- 'uploads/contratos/pae_beatriz.pdf', 1, 1),
-
-(3, 'Carlos Eduardo', '33333333333',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- '(11) 9999-3003', 'carlos.eduardo@pae.com',
- 'uploads/contratos/pae_carlos.pdf', 1, 1),
-
-(4, 'Daniela Oliveira', '33333333334',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
- '(11) 9999-3004', 'daniela.oliveira@pae.com',
- 'uploads/contratos/pae_daniela.pdf', 2, 1);
-
-
--- ============================================================
--- TABELA: alunos
--- ============================================================
+--
+-- Estrutura para tabela `alunos`
+--
 
 CREATE TABLE `alunos` (
-  `id_aluno` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
   `cpf` char(11) DEFAULT NULL,
   `ra` varchar(20) DEFAULT NULL,
@@ -413,252 +57,124 @@ CREATE TABLE `alunos` (
   `cpf_responsavel` char(11) DEFAULT NULL,
   `foto_arquivo` varchar(255) DEFAULT NULL,
   `termo_responsabilidade_arquivo` varchar(255) DEFAULT NULL,
-  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','ARQUIVADO')
-    DEFAULT 'PENDENTE',
+  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','ARQUIVADO') DEFAULT 'PENDENTE',
   `motivo_reprovacao` text DEFAULT NULL,
-  `id_escola` int(11) NOT NULL,
-  `id_usuario_escola` int(11) NOT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_aluno`),
-  UNIQUE KEY `cpf` (`cpf`),
-  KEY `fk_aluno_escola` (`id_escola`),
-  KEY `fk_aluno_userescola` (`id_usuario_escola`),
-  CONSTRAINT `fk_aluno_escola`
-    FOREIGN KEY (`id_escola`) REFERENCES `escolas` (`id_escola`),
-  CONSTRAINT `fk_aluno_userescola`
-    FOREIGN KEY (`id_usuario_escola`)
-    REFERENCES `usuarios_escola` (`id_usuario_escola`)
+  `id_ue` int(11) NOT NULL,
+  `id_usuario_ue` int(11) NOT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `alunos`
-(`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`,
- `municipio_nascimento`, `serie`, `data_nascimento`,
- `descricao_deficiencia`, `descricao_cuidados`,
- `nome_responsavel`, `cpf_responsavel`,
- `foto_arquivo`, `termo_responsabilidade_arquivo`,
- `status_aprovacao`, `motivo_reprovacao`,
- `id_escola`, `id_usuario_escola`)
-VALUES
+--
+-- Despejando dados para a tabela `alunos`
+--
 
-(1, 'João Pedro Santos', '66666666661', '2024001',
- 'MANHÃ', 'Masculino', NULL, 'Bragança Paulista', '5º Ano',
- '2015-05-15',
- 'TEA - Transtorno do Espectro Autista',
- 'Necessita de acompanhamento em sala de aula',
- 'Ana Maria Santos', '77777777771',
- 'uploads/fotos/joao_pedro.jpg', NULL,
- 'APROVADO', NULL, 1, 1),
+INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`, `municipio_nascimento`, `serie`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `termo_responsabilidade_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `id_ue`, `id_usuario_ue`, `data_cadastro`) VALUES
+(1, 'João Pedro Santos', '66666666661', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PENDENTE', NULL, 1, 1, '2026-08-31 11:24:26');
 
-(2, 'Mariana Oliveira', '66666666662', '2024002',
- 'TARDE', 'Feminino', NULL, 'Bragança Paulista', '4º Ano',
- '2016-08-22',
- 'Síndrome de Down',
- 'Precisa de auxílio para alimentação e higiene',
- 'José Oliveira', '77777777772',
- 'uploads/fotos/mariana_oliveira.jpg', NULL,
- 'APROVADO', NULL, 1, 1),
+-- --------------------------------------------------------
 
-(3, 'Lucas Pereira', '66666666663', '2024003',
- 'MANHÃ', 'Masculino', NULL, 'Atibaia', '3º Ano',
- '2017-03-10',
- 'TEA - Nível 2 de suporte',
- 'Necessita de suporte visual',
- 'Maria Pereira', '77777777773',
- 'uploads/fotos/lucas_pereira.jpg', NULL,
- 'PENDENTE', NULL, 2, 3),
-
-(4, 'Sofia Almeida', '66666666664', '2024004',
- 'TARDE', 'Feminino', NULL, 'Bragança Paulista', '5º Ano',
- '2015-11-30',
- 'Deficiência Física - Cadeirante',
- 'Necessita de acessibilidade física',
- 'Carlos Almeida', '77777777774',
- 'uploads/fotos/sofia_almeida.jpg', NULL,
- 'APROVADO', NULL, 2, 3),
-
-(5, 'Pedro Henrique Costa', '66666666665', '2024005',
- 'MANHÃ', 'Masculino', NULL, 'Bragança Paulista', '4º Ano',
- '2016-07-18',
- 'TEA - Transtorno do Espectro Autista',
- 'Comportamento seletivo com alimentos',
- 'Fernanda Costa', '77777777775',
- 'uploads/fotos/pedro_henrique.jpg', NULL,
- 'APROVADO', NULL, 3, 4),
-
-(6, 'Laura Rodrigues', '66666666666', '2024006',
- 'TARDE', 'Feminino', NULL, 'Bragança Paulista', '3º Ano',
- '2018-02-25',
- 'Síndrome de Asperger',
- 'Dificuldade de interação social',
- 'Ricardo Rodrigues', '77777777776',
- 'uploads/fotos/laura_rodrigues.jpg', NULL,
- 'PENDENTE', NULL, 3, 4);
-
-
--- ============================================================
--- TABELA: associacoes
--- ============================================================
+--
+-- Estrutura para tabela `associacoes`
+--
 
 CREATE TABLE `associacoes` (
-  `id_associacao` int(11) NOT NULL AUTO_INCREMENT,
+  `id_associacao` int(11) NOT NULL,
   `id_aluno` int(11) NOT NULL,
   `id_pae` int(11) NOT NULL,
   `ativo` tinyint(1) DEFAULT 1,
-  `data_inicio` date DEFAULT NULL,
-  PRIMARY KEY (`id_associacao`),
-  KEY `fk_assoc_aluno` (`id_aluno`),
-  KEY `fk_assoc_pae` (`id_pae`),
-  CONSTRAINT `fk_assoc_aluno`
-    FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`),
-  CONSTRAINT `fk_assoc_pae`
-    FOREIGN KEY (`id_pae`) REFERENCES `paes` (`id_pae`)
+  `data_inicio` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
--- ============================================================
--- TRIGGER: limite de 3 alunos por PAE
--- ============================================================
-
+--
+-- Acionadores `associacoes`
+--
 DELIMITER $$
-
-CREATE TRIGGER `trg_limite_pae`
-BEFORE INSERT ON `associacoes`
-FOR EACH ROW
-BEGIN
+CREATE TRIGGER `trg_limite_pae` BEFORE INSERT ON `associacoes` FOR EACH ROW BEGIN
     DECLARE total INT;
-
     IF NEW.ativo = 1 THEN
-
-        SELECT COUNT(*)
-        INTO total
-        FROM associacoes
-        WHERE id_pae = NEW.id_pae
-          AND ativo = 1;
-
+        SELECT COUNT(*) INTO total FROM associacoes WHERE id_pae = NEW.id_pae AND ativo = 1;
         IF total >= 3 THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT =
-            'PAE já possui 3 alunos ativos associados';
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'PAE já possui 3 alunos ativos associados';
         END IF;
-
     END IF;
-END$$
-
+END
+$$
 DELIMITER ;
 
+-- --------------------------------------------------------
 
-INSERT INTO `associacoes`
-(`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`)
-VALUES
-(1, 1, 1, 1, '2025-01-15'),
-(2, 2, 1, 1, '2025-01-15'),
-(3, 3, 2, 1, '2025-01-20'),
-(4, 4, 2, 1, '2025-02-01'),
-(5, 5, 3, 1, '2025-01-25'),
-(6, 6, 4, 1, '2025-02-01');
+--
+-- Estrutura para tabela `empresas`
+--
 
+CREATE TABLE `empresas` (
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cnpj` char(14) NOT NULL,
+  `rua` varchar(150) DEFAULT NULL,
+  `numero` varchar(10) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `cep` char(8) DEFAULT NULL,
+  `numero_contrato` varchar(50) DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ============================================================
--- TABELA: laudos
--- ============================================================
+--
+-- Despejando dados para a tabela `empresas`
+--
+
+INSERT INTO `empresas` (`id_empresa`, `nome`, `cnpj`, `rua`, `numero`, `bairro`, `cidade`, `cep`, `numero_contrato`, `contrato_arquivo`, `telefone`, `email`, `ativo`, `data_cadastro`) VALUES
+(1, 'Apoio Inclusivo Ltda', '12345678000199', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2026-08-31 11:24:26'),
+(2, 'Serviços Antigos S/A', '98765432000188', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `empresa_ure`
+--
+
+CREATE TABLE `empresa_ure` (
+  `id_empresa` int(11) NOT NULL,
+  `id_ure` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `empresa_ure`
+--
+
+INSERT INTO `empresa_ure` (`id_empresa`, `id_ure`) VALUES
+(1, 1),
+(1, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `laudos`
+--
 
 CREATE TABLE `laudos` (
-  `id_laudo` int(11) NOT NULL AUTO_INCREMENT,
+  `id_laudo` int(11) NOT NULL,
   `id_aluno` int(11) NOT NULL,
   `nome_arquivo` varchar(255) DEFAULT NULL,
   `caminho_arquivo` varchar(255) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
-  `data_envio` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_laudo`),
-  KEY `fk_laudo_aluno` (`id_aluno`),
-  CONSTRAINT `fk_laudo_aluno`
-    FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`)
+  `data_envio` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `laudos`
-(`id_laudo`, `id_aluno`, `nome_arquivo`,
- `caminho_arquivo`, `descricao`)
-VALUES
-(1, 1, 'laudo_joao_tea.pdf',
- 'uploads/laudos/laudo_joao_tea.pdf',
- 'Laudo médico - TEA'),
+-- --------------------------------------------------------
 
-(2, 1, 'relatorio_joao_psicologico.pdf',
- 'uploads/laudos/relatorio_joao_psicologico.pdf',
- 'Relatório psicológico'),
-
-(3, 2, 'laudo_mariana_down.pdf',
- 'uploads/laudos/laudo_mariana_down.pdf',
- 'Laudo médico - Síndrome de Down'),
-
-(4, 4, 'laudo_sofia_fisica.pdf',
- 'uploads/laudos/laudo_sofia_fisica.pdf',
- 'Laudo médico - Deficiência Física'),
-
-(5, 5, 'laudo_pedro_tea.pdf',
- 'uploads/laudos/laudo_pedro_tea.pdf',
- 'Laudo médico - TEA');
-
-
--- ============================================================
--- TABELA: relatorios
--- ============================================================
-
-CREATE TABLE `relatorios` (
-  `id_relatorio` int(11) NOT NULL AUTO_INCREMENT,
-  `id_associacao` int(11) NOT NULL,
-  `tipo` enum('DIARIO','MENSAL') DEFAULT 'DIARIO',
-  `descricao` text DEFAULT NULL,
-  `data_cadastro` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_relatorio`),
-  KEY `fk_relatorio_assoc` (`id_associacao`),
-  CONSTRAINT `fk_relatorio_assoc`
-    FOREIGN KEY (`id_associacao`)
-    REFERENCES `associacoes` (`id_associacao`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `relatorios`
-(`id_relatorio`, `id_associacao`, `tipo`, `descricao`, `data_cadastro`)
-VALUES
-(1, 1, 'DIARIO',
- 'João Pedro participou bem das atividades.',
- '2025-03-10 14:30:00'),
-
-(2, 1, 'MENSAL',
- 'João Pedro apresentou evolução significativa.',
- '2025-03-31 17:00:00'),
-
-(3, 2, 'DIARIO',
- 'Mariana precisou de auxílio na alimentação.',
- '2025-03-10 12:00:00'),
-
-(4, 2, 'MENSAL',
- 'Mariana tem se adaptado bem.',
- '2025-03-31 16:00:00'),
-
-(5, 3, 'DIARIO',
- 'Lucas apresentou dificuldade de comunicação.',
- '2025-03-11 10:00:00'),
-
-(6, 4, 'DIARIO',
- 'Sofia participou das atividades com adaptações.',
- '2025-03-12 10:00:00');
-
-
--- ============================================================
--- TABELA: recuperacao_senha
--- ============================================================
+--
+-- Estrutura para tabela `recuperacao_senha`
+--
 
 CREATE TABLE `recuperacao_senha` (
-  `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT,
-  `tipo_perfil` enum(
-    'ADMIN',
-    'USUARIO_SEFISC',
-    'USUARIO_EDUCACAO_ESPECIAL',
-    'USUARIO_ESCOLA',
-    'USUARIO_EMPRESA',
-    'PAE'
-  ) NOT NULL,
+  `id_recuperacao` int(11) NOT NULL,
+  `tipo_perfil` enum('ADMIN','SEDUC','URE','SUPERVISOR','ESCOLA','PAE') NOT NULL,
   `id_referencia` int(11) NOT NULL,
   `token` varchar(64) NOT NULL,
   `codigo` varchar(6) NOT NULL,
@@ -666,67 +182,483 @@ CREATE TABLE `recuperacao_senha` (
   `contato` varchar(100) NOT NULL,
   `expira_em` datetime NOT NULL,
   `usado` tinyint(1) DEFAULT 0,
-  `data_criacao` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_recuperacao`),
-  UNIQUE KEY `token` (`token`)
+  `data_criacao` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
 
--- ============================================================
--- AUTO_INCREMENT
--- ============================================================
+--
+-- Estrutura para tabela `relatorios`
+--
 
+CREATE TABLE `relatorios` (
+  `id_relatorio` int(11) NOT NULL,
+  `id_associacao` int(11) NOT NULL,
+  `tipo` enum('DIARIO','MENSAL') DEFAULT 'DIARIO',
+  `descricao` text DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `seduc`
+--
+
+CREATE TABLE `seduc` (
+  `id_seduc` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `setor` varchar(100) DEFAULT 'DISPA',
+  `cargo` varchar(100) DEFAULT 'Assistente III',
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `seduc`
+--
+
+INSERT INTO `seduc` (`id_seduc`, `nome`, `cpf`, `senha`, `setor`, `cargo`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 'Servidor SEDUC', '00000000001', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'DISPA', 'Assistente III', 'dispa@educacao.sp.gov.br', NULL, 1, '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `unidades_escolares`
+--
+
+CREATE TABLE `unidades_escolares` (
+  `id_ue` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cie` char(6) NOT NULL,
+  `rua` varchar(150) DEFAULT NULL,
+  `numero` varchar(10) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `cep` char(8) DEFAULT NULL,
+  `modalidade` enum('PEI','REGULAR') NOT NULL,
+  `id_ure` int(11) NOT NULL,
+  `horario_funcionamento` varchar(100) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `unidades_escolares`
+--
+
+INSERT INTO `unidades_escolares` (`id_ue`, `nome`, `cie`, `rua`, `numero`, `bairro`, `cidade`, `cep`, `modalidade`, `id_ure`, `horario_funcionamento`, `telefone`, `email`, `data_cadastro`) VALUES
+(1, 'EE Professor José Alves', '123456', NULL, NULL, NULL, NULL, NULL, 'REGULAR', 1, NULL, NULL, NULL, '2026-08-31 11:24:26'),
+(2, 'EE Major Juvenal Alvim', '456789', NULL, NULL, NULL, NULL, NULL, 'PEI', 2, NULL, NULL, NULL, '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `unidades_regionais`
+--
+
+CREATE TABLE `unidades_regionais` (
+  `id_ure` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `unidades_regionais`
+--
+
+INSERT INTO `unidades_regionais` (`id_ure`, `nome`, `endereco`, `telefone`, `email`, `data_cadastro`) VALUES
+(1, 'Unidade Regional de Ensino de Bragança Paulista', 'Rua Cel. Teófilo Leme, 100', '(11) 4034-0001', 'ure.braganca@educacao.sp.gov.br', '2026-08-31 11:24:26'),
+(2, 'Unidade Regional de Ensino de Atibaia', 'Av. da Saudade, 200', '(11) 4414-0001', 'ure.atibaia@educacao.sp.gov.br', '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_pae`
+--
+
+CREATE TABLE `usuarios_pae` (
+  `id_pae` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_pae`
+--
+
+INSERT INTO `usuarios_pae` (`id_pae`, `nome`, `cpf`, `senha`, `telefone`, `email`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`) VALUES
+(1, 'Ana Paula Silva', '33333333331', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, NULL, NULL, 1, 1, '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_supervisor`
+--
+
+CREATE TABLE `usuarios_supervisor` (
+  `id_usuario_supervisor` int(11) NOT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_supervisor`
+--
+
+INSERT INTO `usuarios_supervisor` (`id_usuario_supervisor`, `id_empresa`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Roberto Supervisor', '22222222222', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'supervisor@apoioinclusivo.com', NULL, 1, '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_ue`
+--
+
+CREATE TABLE `usuarios_ue` (
+  `id_usuario_ue` int(11) NOT NULL,
+  `id_ue` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_ue`
+--
+
+INSERT INTO `usuarios_ue` (`id_usuario_ue`, `id_ue`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Diretor Carlos', '11111111111', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, NULL, 1, '2026-08-31 11:24:26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_ure`
+--
+
+CREATE TABLE `usuarios_ure` (
+  `id_usuario_ure` int(11) NOT NULL,
+  `id_ure` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `setor` enum('GABINETE','SEFISC','EDU_ESPECIAL') NOT NULL,
+  `cargo` varchar(100) NOT NULL,
+  `nivel_acesso` tinyint(4) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_ure`
+--
+
+INSERT INTO `usuarios_ure` (`id_usuario_ure`, `id_ure`, `nome`, `cpf`, `senha`, `setor`, `cargo`, `nivel_acesso`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Roberto Alves Figueiredo', '10101010101', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'GABINETE', 'Coordenador Dirigente Regional de Ensino', 1, 'dirigente.ficticio@educacao.sp.gov.br', NULL, 1, '2026-08-31 09:19:18'),
+(2, 1, 'Juliana Castro e Silva', '20202020202', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SEFISC', 'Chefe de Seção', 2, 'sefisc.ficticio@educacao.sp.gov.br', NULL, 1, '2026-08-31 09:19:18'),
+(3, 1, 'Marcos Vinicius Mendes', '30303030303', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SEFISC', 'Subordinado', 2, 'sefisc.sub@educacao.sp.gov.br', NULL, 1, '2026-08-31 09:19:18'),
+(4, 1, 'Paulo Henrique Santos', '40404040404', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'EDU_ESPECIAL', 'Professor Especialista em Currículo (PEC)', 3, 'pec.ficticio@educacao.sp.gov.br', NULL, 1, '2026-08-31 09:19:18'),
+(5, 1, 'Fernanda Lima Souza', '50505050505', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'EDU_ESPECIAL', 'Subordinado', 3, 'edu.subordinado@educacao.sp.gov.br', NULL, 1, '2026-08-31 09:19:18');
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `admin`
+--
 ALTER TABLE `admin`
-  AUTO_INCREMENT = 2;
+  ADD PRIMARY KEY (`id_admin`),
+  ADD UNIQUE KEY `cpf` (`cpf`);
 
+--
+-- Índices de tabela `alunos`
+--
 ALTER TABLE `alunos`
-  AUTO_INCREMENT = 7;
+  ADD PRIMARY KEY (`id_aluno`),
+  ADD UNIQUE KEY `cpf` (`cpf`),
+  ADD KEY `fk_aluno_ue` (`id_ue`),
+  ADD KEY `fk_aluno_userue` (`id_usuario_ue`);
 
+--
+-- Índices de tabela `associacoes`
+--
 ALTER TABLE `associacoes`
-  AUTO_INCREMENT = 7;
+  ADD PRIMARY KEY (`id_associacao`),
+  ADD KEY `fk_assoc_aluno` (`id_aluno`),
+  ADD KEY `fk_assoc_pae` (`id_pae`);
 
-ALTER TABLE `educacao_especial`
-  AUTO_INCREMENT = 2;
-
+--
+-- Índices de tabela `empresas`
+--
 ALTER TABLE `empresas`
-  AUTO_INCREMENT = 4;
+  ADD PRIMARY KEY (`id_empresa`),
+  ADD UNIQUE KEY `cnpj` (`cnpj`);
 
-ALTER TABLE `escolas`
-  AUTO_INCREMENT = 5;
+--
+-- Índices de tabela `empresa_ure`
+--
+ALTER TABLE `empresa_ure`
+  ADD PRIMARY KEY (`id_empresa`,`id_ure`),
+  ADD KEY `fk_empure_ure` (`id_ure`);
 
+--
+-- Índices de tabela `laudos`
+--
 ALTER TABLE `laudos`
-  AUTO_INCREMENT = 6;
+  ADD PRIMARY KEY (`id_laudo`),
+  ADD KEY `fk_laudo_aluno` (`id_aluno`);
 
-ALTER TABLE `paes`
-  AUTO_INCREMENT = 5;
-
+--
+-- Índices de tabela `recuperacao_senha`
+--
 ALTER TABLE `recuperacao_senha`
-  AUTO_INCREMENT = 1;
+  ADD PRIMARY KEY (`id_recuperacao`),
+  ADD UNIQUE KEY `token` (`token`);
 
+--
+-- Índices de tabela `relatorios`
+--
 ALTER TABLE `relatorios`
-  AUTO_INCREMENT = 7;
+  ADD PRIMARY KEY (`id_relatorio`),
+  ADD KEY `fk_relatorio_assoc` (`id_associacao`);
 
-ALTER TABLE `sefisc`
-  AUTO_INCREMENT = 2;
+--
+-- Índices de tabela `seduc`
+--
+ALTER TABLE `seduc`
+  ADD PRIMARY KEY (`id_seduc`),
+  ADD UNIQUE KEY `cpf` (`cpf`);
 
-ALTER TABLE `unidades_gestoras`
-  AUTO_INCREMENT = 2;
+--
+-- Índices de tabela `unidades_escolares`
+--
+ALTER TABLE `unidades_escolares`
+  ADD PRIMARY KEY (`id_ue`),
+  ADD UNIQUE KEY `cie` (`cie`),
+  ADD KEY `fk_ue_ure` (`id_ure`);
 
-ALTER TABLE `usuarios_educacao_especial`
-  AUTO_INCREMENT = 3;
+--
+-- Índices de tabela `unidades_regionais`
+--
+ALTER TABLE `unidades_regionais`
+  ADD PRIMARY KEY (`id_ure`);
 
-ALTER TABLE `usuarios_empresa`
-  AUTO_INCREMENT = 4;
+--
+-- Índices de tabela `usuarios_pae`
+--
+ALTER TABLE `usuarios_pae`
+  ADD PRIMARY KEY (`id_pae`),
+  ADD UNIQUE KEY `cpf` (`cpf`),
+  ADD KEY `fk_pae_empresa` (`id_empresa`);
 
-ALTER TABLE `usuarios_escola`
-  AUTO_INCREMENT = 5;
+--
+-- Índices de tabela `usuarios_supervisor`
+--
+ALTER TABLE `usuarios_supervisor`
+  ADD PRIMARY KEY (`id_usuario_supervisor`),
+  ADD UNIQUE KEY `cpf` (`cpf`),
+  ADD KEY `fk_usersup_empresa` (`id_empresa`);
 
-ALTER TABLE `usuarios_sefisc`
-  AUTO_INCREMENT = 3;
+--
+-- Índices de tabela `usuarios_ue`
+--
+ALTER TABLE `usuarios_ue`
+  ADD PRIMARY KEY (`id_usuario_ue`),
+  ADD UNIQUE KEY `cpf` (`cpf`),
+  ADD KEY `fk_userue_ue` (`id_ue`);
 
+--
+-- Índices de tabela `usuarios_ure`
+--
+ALTER TABLE `usuarios_ure`
+  ADD PRIMARY KEY (`id_usuario_ure`),
+  ADD UNIQUE KEY `cpf` (`cpf`),
+  ADD KEY `fk_userure_ure` (`id_ure`);
 
--- ============================================================
--- FINAL
--- ============================================================
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
 
+--
+-- AUTO_INCREMENT de tabela `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `alunos`
+--
+ALTER TABLE `alunos`
+  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `associacoes`
+--
+ALTER TABLE `associacoes`
+  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `empresas`
+--
+ALTER TABLE `empresas`
+  MODIFY `id_empresa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `laudos`
+--
+ALTER TABLE `laudos`
+  MODIFY `id_laudo` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `recuperacao_senha`
+--
+ALTER TABLE `recuperacao_senha`
+  MODIFY `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `relatorios`
+--
+ALTER TABLE `relatorios`
+  MODIFY `id_relatorio` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `seduc`
+--
+ALTER TABLE `seduc`
+  MODIFY `id_seduc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `unidades_escolares`
+--
+ALTER TABLE `unidades_escolares`
+  MODIFY `id_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `unidades_regionais`
+--
+ALTER TABLE `unidades_regionais`
+  MODIFY `id_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_pae`
+--
+ALTER TABLE `usuarios_pae`
+  MODIFY `id_pae` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_supervisor`
+--
+ALTER TABLE `usuarios_supervisor`
+  MODIFY `id_usuario_supervisor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_ue`
+--
+ALTER TABLE `usuarios_ue`
+  MODIFY `id_usuario_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_ure`
+--
+ALTER TABLE `usuarios_ure`
+  MODIFY `id_usuario_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `alunos`
+--
+ALTER TABLE `alunos`
+  ADD CONSTRAINT `fk_aluno_ue` FOREIGN KEY (`id_ue`) REFERENCES `unidades_escolares` (`id_ue`),
+  ADD CONSTRAINT `fk_aluno_userue` FOREIGN KEY (`id_usuario_ue`) REFERENCES `usuarios_ue` (`id_usuario_ue`);
+
+--
+-- Restrições para tabelas `associacoes`
+--
+ALTER TABLE `associacoes`
+  ADD CONSTRAINT `fk_assoc_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`),
+  ADD CONSTRAINT `fk_assoc_pae` FOREIGN KEY (`id_pae`) REFERENCES `usuarios_pae` (`id_pae`);
+
+--
+-- Restrições para tabelas `empresa_ure`
+--
+ALTER TABLE `empresa_ure`
+  ADD CONSTRAINT `fk_empure_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_empure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `laudos`
+--
+ALTER TABLE `laudos`
+  ADD CONSTRAINT `fk_laudo_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`);
+
+--
+-- Restrições para tabelas `relatorios`
+--
+ALTER TABLE `relatorios`
+  ADD CONSTRAINT `fk_relatorio_assoc` FOREIGN KEY (`id_associacao`) REFERENCES `associacoes` (`id_associacao`);
+
+--
+-- Restrições para tabelas `unidades_escolares`
+--
+ALTER TABLE `unidades_escolares`
+  ADD CONSTRAINT `fk_ue_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
+
+--
+-- Restrições para tabelas `usuarios_pae`
+--
+ALTER TABLE `usuarios_pae`
+  ADD CONSTRAINT `fk_pae_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`);
+
+--
+-- Restrições para tabelas `usuarios_supervisor`
+--
+ALTER TABLE `usuarios_supervisor`
+  ADD CONSTRAINT `fk_usersup_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`);
+
+--
+-- Restrições para tabelas `usuarios_ue`
+--
+ALTER TABLE `usuarios_ue`
+  ADD CONSTRAINT `fk_userue_ue` FOREIGN KEY (`id_ue`) REFERENCES `unidades_escolares` (`id_ue`);
+
+--
+-- Restrições para tabelas `usuarios_ure`
+--
+ALTER TABLE `usuarios_ure`
+  ADD CONSTRAINT `fk_userure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

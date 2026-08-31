@@ -1,19 +1,24 @@
 <?php
 require_once "../config/init.php";
 
-exigirPerfil(array('USUARIO_EMPRESA'));
+exigirPerfil(array('SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN', 'SEDUC'));
 
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
 $id_pae = (int) ($_GET['id'] ?? 0);
-$idEmpresa = idEmpresaUsuario($conexao, $userId);
 
-$sql = "SELECT * FROM paes WHERE id_pae = $id_pae AND id_empresa = $idEmpresa";
+if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
+    $sql = "SELECT * FROM usuarios_pae WHERE id_pae = $id_pae";
+} else {
+    $idEmpresa = idEmpresaSupervisor($conexao, $userId);
+    $sql = "SELECT * FROM usuarios_pae WHERE id_pae = $id_pae AND id_empresa = $idEmpresa";
+}
+
 $result = mysqli_query($conexao, $sql);
-$pae = mysqli_fetch_assoc($result);
+$pae = $result ? mysqli_fetch_assoc($result) : null;
 
 if (!$pae) {
-    die("PAE nao encontrado ou nao pertence a sua empresa.");
+    die("PAE não encontrado ou não pertence à sua empresa.");
 }
 ?>
 

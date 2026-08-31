@@ -11,7 +11,20 @@ function estaLogado() {
 
 // Verifica se o usuário tem um dos perfis permitidos
 function temPermissao($perfil, $perfisPermitidos) {
-    return in_array($perfil, $perfisPermitidos);
+    if (in_array($perfil, $perfisPermitidos)) {
+        return true;
+    }
+    // Compatibilidade entre sinônimos de perfil
+    if (in_array('USUARIO_ESCOLA', $perfisPermitidos) && in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
+        return true;
+    }
+    if (in_array('SUPERVISOR', $perfisPermitidos) && in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+        return true;
+    }
+    if (in_array('USUARIO_EMPRESA', $perfisPermitidos) && in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+        return true;
+    }
+    return false;
 }
 
 // Retorna o caminho correto da página de login (views/ ou controllers/)
@@ -73,7 +86,7 @@ function exigirPerfil($perfisPermitidos) {
 
 // Formata CPF para exibição (000.000.000-00)
 function formatarCPF($cpf) {
-    $cpf = preg_replace('/\D/', '', $cpf);
+    $cpf = preg_replace('/\D/', '', $cpf ?? '');
     if (strlen($cpf) === 11) {
         return substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2);
     }
@@ -82,7 +95,7 @@ function formatarCPF($cpf) {
 
 // Formata CNPJ para exibição (00.000.000/0000-00)
 function formatarCNPJ($cnpj) {
-    $cnpj = preg_replace('/\D/', '', $cnpj);
+    $cnpj = preg_replace('/\D/', '', $cnpj ?? '');
     if (strlen($cnpj) === 14) {
         return substr($cnpj, 0, 2) . '.' . substr($cnpj, 2, 3) . '.' . substr($cnpj, 5, 3) . '/' . substr($cnpj, 8, 4) . '-' . substr($cnpj, 12, 2);
     }
@@ -91,7 +104,7 @@ function formatarCNPJ($cnpj) {
 
 // Formata CEP para exibição (00000-000)
 function formatarCEP($cep) {
-    $cep = preg_replace('/\D/', '', $cep);
+    $cep = preg_replace('/\D/', '', $cep ?? '');
     if (strlen($cep) === 8) {
         return substr($cep, 0, 5) . '-' . substr($cep, 5, 3);
     }
@@ -101,76 +114,140 @@ function formatarCEP($cep) {
 // Retorna o nome amigável do perfil
 function nomePerfil($perfil) {
     $nomes = array(
-        'ADMIN'                    => 'Administrador',
-        'USUARIO_ESCOLA'           => 'Unidade Escolar',
-        'USUARIO_EMPRESA'          => 'Empresa Terceirizada',
-        'PAE'                      => 'Profissional de Apoio Escolar',
-        'USUARIO_SEFISC'           => 'Seção de Fiscalização',
-        'USUARIO_EDUCACAO_ESPECIAL'=> 'Educação Especial'
+        'ADMIN'                     => 'Administrador do Sistema',
+        'SEDUC'                     => 'SEDUC-SP (Administração Geral)',
+        'DIRIGENTE'                 => 'Coordenador Dirigente Regional de Ensino (URE)',
+        'USUARIO_SEFISC'            => 'Seção de Fiscalização (SEFISC - URE)',
+        'USUARIO_EDUCACAO_ESPECIAL' => 'Educação Especial (URE)',
+        'SUPERVISOR'                => 'Supervisor da Empresa Contratada',
+        'USUARIO_EMPRESA'           => 'Supervisor da Empresa Contratada',
+        'USUARIO_ESCOLA'            => 'Unidade Escolar',
+        'USUARIO_UE'                => 'Unidade Escolar',
+        'ESCOLA'                    => 'Unidade Escolar',
+        'PAE'                       => 'Profissional de Apoio Escolar'
     );
     return $nomes[$perfil] ?? $perfil;
 }
 
+// Retorna o id_ue do usuário logado (perfil USUARIO_ESCOLA)
+function idUeUsuario($conexao, $userId) {
+    $userId = (int) $userId;
+    $query = "SELECT id_ue FROM usuarios_ue WHERE id_usuario_ue = $userId";
+    $result = mysqli_query($conexao, $query);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
+    return (int) ($row['id_ue'] ?? 0);
+}
+
 // Retorna o nome da escola do usuário logado (perfil USUARIO_ESCOLA)
-function nomeEscolaUsuario($conexao, $userId) {
-    $query = "SELECT e.nome FROM usuarios_escola ue
-              JOIN escolas e ON ue.id_escola = e.id_escola
-              WHERE ue.id_usuario_escola = $userId";
+function nomeUeUsuario($conexao, $userId) {
+    $userId = (int) $userId;
+    $query = "SELECT ue.nome FROM usuarios_ue u
+              JOIN unidades_escolares ue ON u.id_ue = ue.id_ue
+              WHERE u.id_usuario_ue = $userId";
     $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
     return $row['nome'] ?? '';
 }
 
-// Retorna o nome da empresa do usuário logado (perfil USUARIO_EMPRESA)
-function nomeEmpresaUsuario($conexao, $userId) {
-    $query = "SELECT e.nome FROM usuarios_empresa ue
-              JOIN empresas e ON ue.id_empresa = e.id_empresa
-              WHERE ue.id_usuario_empresa = $userId";
-    $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
-    return $row['nome'] ?? '';
-}
-
-// Retorna o id_escola do usuário logado (perfil USUARIO_ESCOLA)
+// Alias para compatibilidade
 function idEscolaUsuario($conexao, $userId) {
-    $query = "SELECT id_escola FROM usuarios_escola WHERE id_usuario_escola = $userId";
-    $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
-    return $row['id_escola'] ?? 0;
+    return idUeUsuario($conexao, $userId);
 }
 
-// Retorna o id_empresa do usuário logado (perfil USUARIO_EMPRESA)
-function idEmpresaUsuario($conexao, $userId) {
-    $query = "SELECT id_empresa FROM usuarios_empresa WHERE id_usuario_empresa = $userId";
+function nomeEscolaUsuario($conexao, $userId) {
+    return nomeUeUsuario($conexao, $userId);
+}
+
+// Retorna o id_empresa do supervisor logado (perfil SUPERVISOR)
+function idEmpresaSupervisor($conexao, $userId) {
+    $userId = (int) $userId;
+    $query = "SELECT id_empresa FROM usuarios_supervisor WHERE id_usuario_supervisor = $userId";
     $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
-    return $row['id_empresa'] ?? 0;
+    $row = $result ? mysqli_fetch_assoc($result) : null;
+    return (int) ($row['id_empresa'] ?? 0);
+}
+
+// Retorna o nome da empresa do supervisor logado
+function nomeEmpresaSupervisor($conexao, $userId) {
+    $userId = (int) $userId;
+    $query = "SELECT e.nome FROM usuarios_supervisor u
+              JOIN empresas e ON u.id_empresa = e.id_empresa
+              WHERE u.id_usuario_supervisor = $userId";
+    $result = mysqli_query($conexao, $query);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
+    return $row['nome'] ?? '';
+}
+
+// Alias para compatibilidade
+function idEmpresaUsuario($conexao, $userId) {
+    return idEmpresaSupervisor($conexao, $userId);
+}
+
+function nomeEmpresaUsuario($conexao, $userId) {
+    return nomeEmpresaSupervisor($conexao, $userId);
+}
+
+// Retorna o id_ure do usuário URE logado
+function idUreUsuario($conexao, $userId) {
+    $userId = (int) $userId;
+    $query = "SELECT id_ure FROM usuarios_ure WHERE id_usuario_ure = $userId";
+    $result = mysqli_query($conexao, $query);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
+    return (int) ($row['id_ure'] ?? 0);
+}
+
+// Retorna o nome da URE do usuário logado
+function nomeUreUsuario($conexao, $userId) {
+    $userId = (int) $userId;
+    $query = "SELECT u.nome FROM usuarios_ure uu
+              JOIN unidades_regionais u ON uu.id_ure = u.id_ure
+              WHERE uu.id_usuario_ure = $userId";
+    $result = mysqli_query($conexao, $query);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
+    return $row['nome'] ?? '';
+}
+
+// Retorna as UREs atendidas por uma empresa (array de ids)
+function uresAtendidasEmpresa($conexao, $idEmpresa) {
+    $idEmpresa = (int) $idEmpresa;
+    $query = "SELECT id_ure FROM empresa_ure WHERE id_empresa = $idEmpresa";
+    $result = mysqli_query($conexao, $query);
+    $ures = [];
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $ures[] = (int) $row['id_ure'];
+        }
+    }
+    return $ures;
 }
 
 // Conta quantos alunos ativos um PAE possui
 function contarAlunosPAE($conexao, $idPae) {
+    $idPae = (int) $idPae;
     $query = "SELECT COUNT(*) AS total FROM associacoes WHERE id_pae = $idPae AND ativo = 1";
     $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
     return (int) ($row['total'] ?? 0);
 }
 
 // Conta quantos PAEs ativos um aluno possui
 function contarPAEsAluno($conexao, $idAluno) {
+    $idAluno = (int) $idAluno;
     $query = "SELECT COUNT(*) AS total FROM associacoes WHERE id_aluno = $idAluno AND ativo = 1";
     $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
     return (int) ($row['total'] ?? 0);
 }
 
 // Busca o PAE associado a um aluno (nome)
 function nomePAEAluno($conexao, $idAluno) {
+    $idAluno = (int) $idAluno;
     $query = "SELECT p.nome FROM associacoes ass
-              JOIN paes p ON ass.id_pae = p.id_pae
+              JOIN usuarios_pae p ON ass.id_pae = p.id_pae
               WHERE ass.id_aluno = $idAluno AND ass.ativo = 1
               LIMIT 1";
     $result = mysqli_query($conexao, $query);
-    $row = mysqli_fetch_assoc($result);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
     return $row['nome'] ?? 'Sem PAE';
 }
 

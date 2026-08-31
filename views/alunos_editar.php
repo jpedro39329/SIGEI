@@ -12,8 +12,8 @@ $id_aluno = (int) ($_GET['id'] ?? 0);
 $sql = "
     SELECT a.*, e.nome AS escola_nome
     FROM alunos a
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
-    WHERE a.id_aluno = $id_aluno AND a.id_escola = $idEscola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
+    WHERE a.id_aluno = $id_aluno AND a.id_ue = $idEscola
 ";
 $result = mysqli_query($conexao, $sql);
 $aluno = mysqli_fetch_assoc($result);

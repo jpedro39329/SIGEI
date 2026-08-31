@@ -21,7 +21,7 @@ $stmtVerifica = $conexao->prepare(
     "SELECT id_aluno
      FROM alunos
      WHERE id_aluno = ?
-       AND id_escola = ?
+       AND id_ue = ?
        AND status_aprovacao = 'REPROVADO'"
 );
 $stmtVerifica->bind_param("ii", $id_aluno, $id_escola);
@@ -38,7 +38,7 @@ $stmt = $conexao->prepare(
      SET status_aprovacao = 'PENDENTE',
          motivo_reprovacao = ''
      WHERE id_aluno = ?
-       AND id_escola = ?"
+       AND id_ue = ?"
 );
 $stmt->bind_param("ii", $id_aluno, $id_escola);
 

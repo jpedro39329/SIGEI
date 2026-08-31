@@ -1,39 +1,58 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN e USUARIO_EMPRESA podem associar PAE a aluno
-exigirPerfil(array('ADMIN', 'USUARIO_EMPRESA'));
+exigirPerfil(array('ADMIN', 'SEDUC', 'SUPERVISOR', 'USUARIO_EMPRESA'));
 exigirTokenCSRF();
 
 $id_aluno = (int) ($_POST['id_aluno'] ?? 0);
 $id_pae = (int) ($_POST['id_pae'] ?? 0);
 $data_inicio = $_POST['data_inicio'] ?? date('Y-m-d');
+$userPerfil = $_SESSION['user_perfil'];
+$userId = (int) $_SESSION['user_id'];
 
 if ($id_aluno <= 0 || $id_pae <= 0) {
     die("Dados inválidos.");
 }
 
 // Verifica se o aluno existe e está APROVADO
-$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND status_aprovacao = 'APROVADO'");
+$stmtAluno = $conexao->prepare(
+    "SELECT a.id_aluno, ue.id_ure FROM alunos a
+     JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+     WHERE a.id_aluno = ? AND a.status_aprovacao = 'APROVADO'"
+);
 $stmtAluno->bind_param("i", $id_aluno);
 $stmtAluno->execute();
+$resAluno = $stmtAluno->get_result();
 
-if ($stmtAluno->get_result()->num_rows == 0) {
+if ($resAluno->num_rows == 0) {
     die("Aluno não encontrado ou não está aprovado.");
 }
-
+$alunoData = $resAluno->fetch_assoc();
 $stmtAluno->close();
 
 // Verifica se o PAE existe e está ativo
-$stmtPae = $conexao->prepare("SELECT id_pae FROM paes WHERE id_pae = ? AND ativo = 1");
+$stmtPae = $conexao->prepare("SELECT id_pae, id_empresa FROM usuarios_pae WHERE id_pae = ? AND ativo = 1");
 $stmtPae->bind_param("i", $id_pae);
 $stmtPae->execute();
+$resPae = $stmtPae->get_result();
 
-if ($stmtPae->get_result()->num_rows == 0) {
+if ($resPae->num_rows == 0) {
     die("PAE não encontrado ou está inativo.");
 }
-
+$paeData = $resPae->fetch_assoc();
 $stmtPae->close();
+
+// Se for supervisor, valida se o PAE é de sua empresa e se o aluno está em uma URE atendida por ela
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    $idEmpresa = idEmpresaSupervisor($conexao, $userId);
+    if ((int) $paeData['id_empresa'] !== $idEmpresa) {
+        die("Você só pode associar PAEs da sua empresa.");
+    }
+    $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresa);
+    if (!in_array((int) $alunoData['id_ure'], $uresAtendidas)) {
+        die("Você só pode associar alunos de UREs atendidas pela sua empresa.");
+    }
+}
 
 // RN01: PAE não pode ter mais de 3 alunos ativos
 $totalAlunosPae = contarAlunosPAE($conexao, $id_pae);

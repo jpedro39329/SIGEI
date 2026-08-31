@@ -1,30 +1,53 @@
 <?php
 require_once "../config/init.php";
 
-// Apenas ADMIN e USUARIO_EMPRESA podem acessar
-exigirPerfil(array('ADMIN', 'USUARIO_EMPRESA'));
+exigirPerfil(array('ADMIN', 'SEDUC', 'SUPERVISOR', 'USUARIO_EMPRESA'));
 
 $userName = $_SESSION['user_name'];
+$userPerfil = $_SESSION['user_perfil'];
+$userId = (int) $_SESSION['user_id'];
+$idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
+
+$whereAlunoUre = "";
+$wherePaeEmpresa = "";
+$whereAssocEmpresa = "";
+
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    if ($idEmpresaUsuario <= 0) {
+        $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
+    }
+    $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresaUsuario);
+    if (!empty($uresAtendidas)) {
+        $uresList = implode(',', $uresAtendidas);
+        $whereAlunoUre = "AND e.id_ure IN ($uresList)";
+    } else {
+        $whereAlunoUre = "AND 1=0";
+    }
+    $wherePaeEmpresa = "AND p.id_empresa = $idEmpresaUsuario";
+    $whereAssocEmpresa = "AND p.id_empresa = $idEmpresaUsuario";
+}
 
 // Lista alunos APROVADOS que ainda podem receber PAE (menos de 3)
 $sqlAlunos = "
     SELECT a.id_aluno, a.nome, e.nome AS escola_nome,
            (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1) AS qtd_paes
     FROM alunos a
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     WHERE a.status_aprovacao = 'APROVADO'
+    $whereAlunoUre
     ORDER BY a.nome
 ";
 $resultAlunos = mysqli_query($conexao, $sqlAlunos);
-$alunos = mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC);
+$alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
 
 // Lista PAEs ativos com menos de 3 alunos
 $sqlPAEs = "
     SELECT p.id_pae, p.nome, e.nome AS empresa_nome,
            (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_pae = p.id_pae AND ass.ativo = 1) AS qtd_alunos
-    FROM paes p
+    FROM usuarios_pae p
     LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
     WHERE p.ativo = 1
+    $wherePaeEmpresa
     ORDER BY p.nome
 ";
 $resultPAEs = mysqli_query($conexao, $sqlPAEs);
@@ -36,9 +59,10 @@ $sqlAssociacoes = "
            ass.data_inicio, e.nome AS escola_nome
     FROM associacoes ass
     JOIN alunos a ON ass.id_aluno = a.id_aluno
-    JOIN paes p ON ass.id_pae = p.id_pae
-    LEFT JOIN escolas e ON a.id_escola = e.id_escola
+    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     WHERE ass.ativo = 1
+    $whereAssocEmpresa
     ORDER BY ass.data_inicio DESC
 ";
 $resultAssociacoes = mysqli_query($conexao, $sqlAssociacoes);
