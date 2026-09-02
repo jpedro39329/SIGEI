@@ -142,4 +142,5 @@ echo "\xEF\xBB\xBF";
         <?php endif; ?>
     </tbody>
 </table>
-<?php exit; ?>
+<?php exit; ?>>
+
