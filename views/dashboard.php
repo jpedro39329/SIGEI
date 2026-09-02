@@ -28,7 +28,7 @@ function totalDashboard($conexao, $sql) {
 </head>
 <body class="page-dashboard">
 
-<?php require("navbar.php"); ?>
+<?php require("../includes/navbar.php"); ?>
 
 <div class="content">
 
@@ -95,7 +95,7 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Alunos da minha escola</h5>
-                    <a href="alunos_cadastrar.php" class="btn btn-primary btn-sm">Nova Solicitação</a>
+                    <a href="alunos/cadastrar.php" class="btn btn-primary btn-sm">Nova Solicitação</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -161,9 +161,9 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <h5 class="mb-3">Ações da Diretoria Regional</h5>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="escolas_cadastrar.php" class="btn btn-outline-primary">Cadastrar Escolas</a>
-                    <a href="setores_ure_cadastrar.php" class="btn btn-outline-primary">Cadastrar SEFISC / Educação Especial</a>
-                    <a href="alunos_listar.php" class="btn btn-outline-secondary">Ver Alunos da Regional</a>
+                    <a href="escolas/cadastrar.php" class="btn btn-outline-primary">Cadastrar Escolas</a>
+                    <a href="setores/cadastrar.php" class="btn btn-outline-primary">Cadastrar SEFISC / Educação Especial</a>
+                    <a href="alunos/listar.php" class="btn btn-outline-secondary">Ver Alunos da Regional</a>
                 </div>
             </div>
         </div>
@@ -205,7 +205,7 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Análise de Solicitações da URE</h5>
-                    <a href="solicitacoes.php" class="btn btn-warning btn-sm">Ver Solicitações Pendentes</a>
+                    <a href="solicitacoes/listar.php" class="btn btn-warning btn-sm">Ver Solicitações Pendentes</a>
                 </div>
                 <canvas id="graficoEducacao" height="100"></canvas>
             </div>
@@ -252,9 +252,9 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <h5 class="mb-3">Ações Rápidas da Empresa</h5>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="paes_cadastrar.php" class="btn btn-outline-primary">Cadastrar Novo PAE</a>
-                    <a href="associacoes.php" class="btn btn-outline-primary">Associar PAE a Aluno</a>
-                    <a href="relatorios.php" class="btn btn-outline-secondary">Visualizar Relatórios</a>
+                    <a href="paes/cadastrar.php" class="btn btn-outline-primary">Cadastrar Novo PAE</a>
+                    <a href="associacoes/gerenciar.php" class="btn btn-outline-primary">Associar PAE a Aluno</a>
+                    <a href="relatorios/listar.php" class="btn btn-outline-secondary">Visualizar Relatórios</a>
                 </div>
             </div>
         </div>
@@ -285,7 +285,7 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Meus Alunos Vinculados</h5>
-                    <a href="relatorios.php" class="btn btn-primary btn-sm">Registrar Relatório</a>
+                    <a href="relatorios/listar.php" class="btn btn-primary btn-sm">Registrar Relatório</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -341,9 +341,9 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <h5 class="mb-3">Fiscalização e Gestão de Usuários Escolares</h5>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="usuarios_ue_cadastrar.php" class="btn btn-outline-primary">Cadastrar Usuários de Escolas</a>
-                    <a href="alunos_listar.php" class="btn btn-outline-secondary">Consultar Alunos da Regional</a>
-                    <a href="paes_listar.php" class="btn btn-outline-secondary">Consultar PAEs</a>
+                    <a href="usuarios_ue/cadastrar.php" class="btn btn-outline-primary">Cadastrar Usuários de Escolas</a>
+                    <a href="alunos/listar.php" class="btn btn-outline-secondary">Consultar Alunos da Regional</a>
+                    <a href="paes/listar.php" class="btn btn-outline-secondary">Consultar PAEs</a>
                 </div>
             </div>
         </div>
@@ -379,12 +379,12 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <h5 class="mb-3">Ações de Gestão Central (SEDUC-SP / Administrador Geral)</h5>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="ures_cadastrar.php" class="btn btn-outline-primary">Cadastrar URE</a>
-                    <a href="empresas_cadastrar.php" class="btn btn-outline-primary">Cadastrar Empresa Licitada</a>
-                    <a href="supervisores_cadastrar.php" class="btn btn-outline-primary">Cadastrar Supervisor</a>
-                    <a href="dirigentes_cadastrar.php" class="btn btn-outline-primary">Cadastrar Dirigente Regional</a>
-                    <a href="escolas_cadastrar.php" class="btn btn-outline-secondary">Cadastrar Escola</a>
-                    <a href="usuarios.php" class="btn btn-outline-secondary">Todos os Usuários</a>
+                    <a href="ures/cadastrar.php" class="btn btn-outline-primary">Cadastrar URE</a>
+                    <a href="empresas/cadastrar.php" class="btn btn-outline-primary">Cadastrar Empresa Licitada</a>
+                    <a href="supervisores/cadastrar.php" class="btn btn-outline-primary">Cadastrar Supervisor</a>
+                    <a href="dirigentes/cadastrar.php" class="btn btn-outline-primary">Cadastrar Dirigente Regional</a>
+                    <a href="escolas/cadastrar.php" class="btn btn-outline-secondary">Cadastrar Escola</a>
+                    <a href="usuarios/listar.php" class="btn btn-outline-secondary">Todos os Usuários</a>
                 </div>
             </div>
         </div>

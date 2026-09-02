@@ -55,7 +55,7 @@ $homePage = 'dashboard.php';
 </head>
 <body class="page-perfil">
 
-<?php require("navbar.php"); ?>
+<?php require("../includes/navbar.php"); ?>
 
 <div class="content">
 
@@ -89,7 +89,7 @@ $homePage = 'dashboard.php';
 
             <div class="d-grid gap-2 mt-4">
                 <a href="<?php echo $homePage; ?>" class="btn btn-secondary">Voltar ao painel</a>
-                <a href="../controllers/logout.php" class="btn btn-danger">Sair</a>
+                <a href="../controllers/auth/logout.php" class="btn btn-danger">Sair</a>
             </div>
 
         </div>
