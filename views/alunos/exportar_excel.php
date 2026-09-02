@@ -1,24 +1,24 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Desativa exibição de erros na tela para não sujar o arquivo Excel
+ini_set('display_errors', 0);
+error_reporting(0);
 
 require_once "../../config/init.php";
 
 exigirLogin();
 
-$userName = $_SESSION['user_name'];
-$userPerfil = $_SESSION['user_perfil'];
-$userId = (int) $_SESSION['user_id'];
+$userName = $_SESSION['user_name'] ?? '';
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
 $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
 
-// Trava de segurança: apenas USUARIO_SEFISC acessa este script
+// Validação de acesso para o perfil SEFISC
 if ($userPerfil !== 'USUARIO_SEFISC') {
     http_response_code(403);
-    die("Acesso negado. Perfil não autorizado.");
+    die("Acesso negado.");
 }
 
-// Recebe os filtros atuais da tela
+// Filtros recebidos via URL (GET)
 $nomeFiltro = trim($_GET['nome'] ?? '');
 $raFiltro = trim($_GET['ra'] ?? '');
 $cpfFiltro = preg_replace('/\D/', '', $_GET['cpf'] ?? '');
@@ -52,8 +52,8 @@ if ($statusFiltro !== '') {
     $where[] = "a.status_aprovacao = '$statusBusca'";
 }
 
-// Filtra os alunos de acordo com a URE do usuário SEFISC
-if ($idUreUsuario <= 0) {
+// Filtro por URE para o perfil SEFISC
+if ($idUreUsuario <= 0 && function_exists('idUreUsuario')) {
     $idUreUsuario = idUreUsuario($conexao, $userId);
 }
 if ($idUreUsuario > 0) {
@@ -65,7 +65,7 @@ if (count($where) > 0) {
     $whereSql = 'WHERE ' . implode(' AND ', $where);
 }
 
-// Busca os alunos no banco de dados
+// Consulta no banco de dados
 $sql = "
     SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia,
            a.status_aprovacao, a.data_cadastro,
@@ -83,7 +83,12 @@ $sql = "
 $result = mysqli_query($conexao, $sql);
 $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
-// Força o navegador a baixar como um arquivo do Excel
+// Função auxiliar para evitar erros com valores nulos no PHP 8.1+
+function tratarTexto($valor) {
+    return htmlspecialchars((string) ($valor ?? ''));
+}
+
+// Configuração de cabeçalhos do Excel
 $fileName = "relatorio_alunos_sefisc_" . date('Ymd_His') . ".xls";
 
 header("Content-Type: application/vnd.ms-excel; charset=utf-8");
@@ -91,7 +96,7 @@ header("Content-Disposition: attachment; filename=\"$fileName\"");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Garante a acentuação correta no Excel
+// UTF-8 BOM para os caracteres acentuados
 echo "\xEF\xBB\xBF";
 ?>
 <table border="1">
@@ -108,16 +113,25 @@ echo "\xEF\xBB\xBF";
         </tr>
     </thead>
     <tbody>
-        <?php if (count($alunos) > 0): ?>
+        <?php if (!empty($alunos)): ?>
             <?php foreach ($alunos as $aluno): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($aluno['nome']); ?></td>
-                    <td><?php echo htmlspecialchars($aluno['ra']); ?></td>
-                    <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
-                    <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
-                    <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
-                    <td><?php echo htmlspecialchars($aluno['status_aprovacao']); ?></td>
-                    <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem PAE'); ?></td>
+                    <td><?php echo tratarTexto($aluno['nome']); ?></td>
+                    <td><?php echo tratarTexto($aluno['ra']); ?></td>
+                    <td>
+                        <?php 
+                            $cpf = $aluno['cpf'] ?? '';
+                            if (function_exists('formatarCPF')) {
+                                echo tratarTexto(formatarCPF($cpf));
+                            } else {
+                                echo tratarTexto($cpf);
+                            }
+                        ?>
+                    </td>
+                    <td><?php echo tratarTexto($aluno['escola_nome'] ?? '-'); ?></td>
+                    <td><?php echo tratarTexto($aluno['descricao_deficiencia']); ?></td>
+                    <td><?php echo tratarTexto($aluno['status_aprovacao']); ?></td>
+                    <td><?php echo tratarTexto($aluno['pae_nome'] ?? 'Sem PAE'); ?></td>
                     <td><?php echo !empty($aluno['data_cadastro']) ? date('d/m/Y H:i', strtotime($aluno['data_cadastro'])) : '-'; ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -128,7 +142,4 @@ echo "\xEF\xBB\xBF";
         <?php endif; ?>
     </tbody>
 </table>
-
-
-// ... restante do código
 <?php exit; ?>
