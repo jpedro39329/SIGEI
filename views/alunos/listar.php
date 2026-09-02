@@ -112,9 +112,22 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <p class="text-muted">Ola, <?php echo htmlspecialchars($userName); ?> - lista de alunos cadastrados.</p>
         </div>
 
-        <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
-            <a href="cadastrar.php" class="btn btn-primary">Cadastrar aluno</a>
-        <?php endif; ?>
+        <div class="d-flex gap-2">
+            <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
+                <a href="cadastrar.php" class="btn btn-primary">Cadastrar aluno</a>
+            <?php endif; ?>
+
+            <!-- Botão de exportação visível para o perfil SEFISC -->
+            <?php if ($userPerfil === 'USUARIO_SEFISC'): ?>
+                <?php 
+                    $queryParams = $_GET;
+                    $queryString = http_build_query($queryParams);
+                ?>
+                <a href="exportar_excel.php?<?php echo $queryString; ?>" class="btn btn-success">
+                    Exportar Excel
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'sucesso'): ?>
