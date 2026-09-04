@@ -1,66 +1,44 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../config/database.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
+$token = $_GET['token'] ?? '';
 
-    if (empty($email)) {
-        die("Por favor, informe seu e-mail.");
-    }
+$stmt = $pdo->prepare("SELECT * FROM recuperacao_senha WHERE token = ? AND data_expiracao > NOW()");
+$stmt->execute([$token]);
+$solicitacao = $stmt->fetch();
 
-    // Mapeamento das tabelas e suas respectivas chaves primárias/campos
-    $tabelas = [
-        'admin'               => 'id_admin',
-        'seduc'               => 'id_seduc',
-        'usuarios_pae'        => 'id_pae',
-        'usuarios_supervisor' => 'id_usuario_supervisor',
-        'usuarios_ue'         => 'id_usuario_ue',
-        'usuarios_ure'        => 'id_usuario_ure'
-    ];
-
-    $usuarioEncontrado = false;
-    $tipoUsuario = null;
-
-    // Procura o e-mail entre as 6 tabelas de usuários do SIGEI
-    foreach ($tabelas as $tabela => $campoId) {
-        $stmt = $pdo->prepare("SELECT $campoId, email FROM $tabela WHERE email = ? LIMIT 1");
-        $stmt->execute([$email]);
-        $res = $stmt->fetch();
-
-        if ($res && !empty($res['email'])) {
-            $usuarioEncontrado = true;
-            $tipoUsuario = $tabela;
-            break;
-        }
-    }
-
-    if ($usuarioEncontrado) {
-        // Gera um token seguro de 64 caracteres hexadecimais
-        $token = bin2hex(random_bytes(32));
-        $dataExpiracao = date('Y-m-d H:i:s', strtotime('+30 minutes'));
-
-        // Limpa tokens antigos do mesmo e-mail
-        $stmtDel = $pdo->prepare("DELETE FROM recuperacao_senha WHERE email = ?");
-        $stmtDel->execute([$email]);
-
-        // Insere a nova solicitação de redefinição
-        $stmtIns = $pdo->prepare("INSERT INTO recuperacao_senha (email, token, tipo_usuario, data_expiracao) VALUES (?, ?, ?, ?)");
-        $stmtIns->execute([$email, $token, $tipoUsuario, $dataExpiracao]);
-
-        // Monta o link para redefinição
-        $link = "http://" . $_SERVER['HTTP_HOST'] . "/index.php?control=auth&action=redefinir_senha&token=" . $token;
-
-        // Envio do e-mail
-        $assunto = "Redefinição de Senha - SIGEI";
-        $mensagem = "Olá!\n\nVocê solicitou a redefinição de sua senha no sistema SIGEI.\n";
-        $mensagem .= "Clique no link a seguir para cadastrar uma nova senha (válido por 30 minutos):\n\n";
-        $mensagem .= $link . "\n\nSe você não solicitou este e-mail, desconsidere-o.";
-        $headers = "From: no-reply@" . $_SERVER['HTTP_HOST'];
-
-        @mail($email, $assunto, $mensagem, $headers);
-    }
-
-    // Mensagem padronizada por questão de segurança (evitar enumeração de usuários)
-    echo "<script>alert('Se o e-mail estiver cadastrado no sistema, você receberá o link para redefinição de senha.'); window.location.href='index.php';</script>";
-    exit;
+if (!$solicitacao) {
+    die("Token inválido ou expirado. <a href='index.php'>Voltar</a>");
 }
+?>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>SIGEI — Nova Senha</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito', sans-serif; background-color: #ddeeff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    h2 { color: #0d47a1; margin-top: 0; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; color: #0d47a1; font-weight: bold; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #0d47a1; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Criar Nova Senha</h2>
+    <form action="index.php?control=auth&action=salvar_nova_senha" method="POST">
+      <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+      <div class="form-group">
+        <label for="nova_senha">Digite a Nova Senha:</label>
+        <input type="password" name="nova_senha" id="nova_senha" required minlength="6">
+      </div>
+      <button type="submit">Salvar Senha</button>
+    </form>
+  </div>
+</body>
+</html>
