@@ -448,11 +448,11 @@ if ($control === 'auth') {
 
         // 1. Exibe a tela de solicitação "Esqueci minha senha" ou processa o formulário enviado
         case 'esqueci_senha':
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                require_once __DIR__ . '/controllers/auth/esqueci_senha.php';
-            } else {
-                require_once __DIR__ . '/views/esqueci_senha.php';
-            }
+          if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once __DIR__ . '/controllers/esqueci_senha.php';
+          } else {
+            require_once __DIR__ . '/views/esqueci_senha.php';
+          }
             break;
 
         // 2. Exibe a tela de criação da nova senha através do token recebido por e-mail
@@ -462,7 +462,7 @@ if ($control === 'auth') {
 
         // 3. Processa e salva a nova senha no banco de dados
         case 'salvar_nova_senha':
-            require_once __DIR__ . '/controllers/auth/salvar_nova_senha.php';
+          require_once __DIR__ . '/controllers/salvarnova_senha.php';
             break;
 
         // Ações padrão de login
@@ -476,6 +476,6 @@ if ($control === 'auth') {
             break;
     }
 }
-
+/php>
 </body>
 </html>
