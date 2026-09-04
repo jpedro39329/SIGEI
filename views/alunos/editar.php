@@ -283,7 +283,7 @@ if (!$aluno) {
                                 <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                                     <div class="mb-2">
                                         <a href="../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                             Ver termo atual
+                                            📄 Ver termo atual
                                         </a>
                                     </div>
                                 <?php endif; ?>

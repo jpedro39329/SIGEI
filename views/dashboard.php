@@ -430,5 +430,8 @@ new Chart(document.getElementById('graficoEducacao'), {
 <?php endif; ?>
 </script>
 
+<!-- Sistema de Termos de Uso -->
+<script src="../assets/js/termos.js"></script>
+
 </body>
 </html>

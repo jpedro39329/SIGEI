@@ -1,306 +1,383 @@
-/* ===== dashboard.php ===== */
-.page-dashboard {
-    background-color: #f1f5f9;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+/* ===== TEMA UNIFICADO SIGEI =====
+   Paleta consistente com login e seleção de perfis */
+:root {
+    --sigei-blue-900: #0d47a1;
+    --sigei-blue-700: #1565c0;
+    --sigei-blue-50: #f4f8ff;
+    --sigei-teal-600: #1a9e85;
+    --sigei-teal-400: #40d9b8;
+    --sigei-ink: #1e293b;
+    --sigei-muted: #52637a;
+    --sigei-border: #d9e4f2;
+    --sigei-focus: rgba(13, 71, 161, 0.24);
 }
 
-.page-dashboard .sidebar {
-    width: 260px;
-    background: #1e293b;
-    color: #e2e8f0;
+*, *::before, *::after { box-sizing: border-box; }
+
+html { min-width: 320px; overflow-x: hidden; }
+
+body[class*="page-"] {
+    min-width: 320px;
     min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(circle at 100% 0, rgba(64, 217, 184, 0.16), transparent 27rem),
+        linear-gradient(180deg, #edf5ff 0%, var(--sigei-blue-50) 100%);
+    color: var(--sigei-ink);
+    font-family: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
 }
 
-.page-dashboard .sidebar .nav-link {
-    color: #cbd5e1;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    transition: all 0.2s;
+/* Barra de navegação */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    min-width: 0;
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.97) !important;
+    border-bottom: 1px solid var(--sigei-border);
+    box-shadow: 0 2px 14px rgba(13, 71, 161, 0.08) !important;
 }
 
-.page-dashboard .sidebar .nav-link:hover {
-    background: #334155;
-    color: white;
-}
-
-.page-dashboard .sidebar .nav-link.active {
-    background: #0f172a;
-    color: white;
-}
-
-.page-dashboard .content {
-    flex: 1;
-    padding: 2rem;
-}
-
-.page-dashboard .table-custom th {
-    background-color: #f8fafc;
-    font-weight: 600;
-    border-bottom-width: 1px;
-}
-
-.page-dashboard .btn-ver-mais {
-    border: 1px solid #cbd5e1;
-    color: #1e293b;
-    background: white;
-    padding: 0.25rem 1rem;
-    font-size: 0.875rem;
-    border-radius: 20px;
-    transition: 0.2s;
-    pointer-events: none;
-    opacity: 0.7;
-}
-
-.page-dashboard .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.page-dashboard footer {
-    margin-top: 2rem;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #64748b;
-}
-
-@media (max-width: 768px) {
-    .page-dashboard .sidebar {
-        width: 100%;
-        min-height: auto;
-    }
-
-    .page-dashboard .d-flex {
-        flex-direction: column;
-    }
-}
-
-/* ===== alunos_listar.php ===== */
-.page-alunos-listar {
-    background: #f1f5f9;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-}
-
-.page-alunos-listar .sidebar {
-    width: 260px;
-    min-height: 100vh;
-    background: #1e293b;
-    color: #fff;
-}
-
-.page-alunos-listar .sidebar .nav-link {
-    color: #cbd5e1;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: .2s;
-}
-
-.page-alunos-listar .sidebar .nav-link:hover {
-    background: #334155;
-    color: white;
-}
-
-.page-alunos-listar .content {
-    flex: 1;
-    padding: 2rem;
-}
-
-.page-alunos-listar .table thead {
-    background: #f8fafc;
-}
-
-.page-alunos-listar .badge {
-    font-size: 0.8rem;
-}
-
-/* ===== alunos_cadastrar.php ===== */
-.page-alunos-cadastrar {
-    background: #f1f5f9;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-}
-
-.page-alunos-cadastrar .sidebar {
-    width: 260px;
-    min-height: 100vh;
-    background: #1e293b;
-    color: #fff;
-}
-
-.page-alunos-cadastrar .sidebar .nav-link {
-    color: #cbd5e1;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: .2s;
-}
-
-.page-alunos-cadastrar .sidebar .nav-link:hover {
-    background: #334155;
-    color: white;
-}
-
-.page-alunos-cadastrar .content {
-    flex: 1;
-    padding: 2rem;
-}
-
-.page-alunos-cadastrar .card-form {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-/* ===== login.php ===== */
-.page-login .login-card {
-    width: 100%;
-    max-width: 400px;
-}
-/* ===== Navbar responsiva (navbar.php) ===== */
 .logo-nav {
     height: 50px;
     width: auto;
 }
 
 .navbar .nav-link {
-    border-radius: 6px;
+    color: #52637a;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 0.65rem;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.navbar .nav-link:hover {
-    background-color: rgba(15, 23, 42, 0.06);
+.navbar .nav-link:hover { color: var(--sigei-blue-900); background-color: #e8f1ff; }
+.navbar .nav-link.active { color: var(--sigei-blue-900); background-color: #dcecff; }
+.navbar-toggler { border-color: #b7cce9; }
+
+.navbar-user {
+    padding: 0.2rem 0;
 }
 
-.navbar .nav-link.active {
-    color: #0d47a1;
-    font-weight: 600;
+.navbar-user-info {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.75rem;
+    background: #f3f8ff;
 }
 
-/* ===== perfil.php ===== */
-.page-perfil {
-    background: #f1f5f9;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+.navbar-user-avatar {
+    display: grid;
+    width: 2.15rem;
+    height: 2.15rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: linear-gradient(135deg, var(--sigei-blue-700), var(--sigei-teal-600));
+    font-size: 0.85rem;
+    font-weight: 800;
 }
 
-.page-perfil .content {
-    width: 100%;
-    padding: 2rem;
+.navbar-user-copy {
+    display: grid;
+    min-width: 0;
+    line-height: 1.15;
 }
 
-.page-perfil .profile-card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+.navbar-user-copy strong,
+.navbar-user-copy small {
+    overflow: hidden;
+    max-width: 12rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* ===== PÁGINAS GERAIS ===== */
-/* Aplicado em: associacoes, relatorios, alunos_visualizar, alunos_editar,
-   alunos_pendentes, escolas_cadastrar, empresas_cadastrar, usuarios,
-   paes_listar, paes_cadastrar, paes_visualizar, paes_editar,
-   solicitacoes, solicitacao_analisar */
-.page-alunos-pendentes,
-.page-associacoes,
-.page-relatorios,
-.page-alunos-visualizar,
-.page-alunos-editar,
-.page-escolas,
-.page-empresas,
-.page-ures,
-.page-supervisores,
-.page-dirigentes,
-.page-setores-ure,
-.page-usuarios-ue,
-.page-usuarios,
-.page-paes-listar,
-.page-paes-cadastrar,
-.page-paes-visualizar,
-.page-paes-editar,
-.page-solicitacoes,
-.page-solicitacao-analisar {
-    background: #f1f5f9;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+.navbar-user-copy strong { color: var(--sigei-ink); font-size: 0.82rem; }
+.navbar-user-copy small { margin-top: 0.15rem; color: var(--sigei-muted); font-size: 0.7rem; }
+.navbar-logout { min-height: 2.35rem !important; }
+
+/* Área principal compartilhada por todas as telas internas */
+body[class*="page-"] .content {
+    width: min(100%, 1440px);
+    min-width: 0;
+    margin: 0 auto;
+    padding: clamp(1.25rem, 3vw, 2.5rem);
 }
 
-.page-alunos-pendentes .content,
-.page-associacoes .content,
-.page-relatorios .content,
-.page-alunos-visualizar .content,
-.page-alunos-editar .content,
-.page-escolas .content,
-.page-empresas .content,
-.page-ures .content,
-.page-supervisores .content,
-.page-dirigentes .content,
-.page-setores-ure .content,
-.page-usuarios-ue .content,
-.page-usuarios .content,
-.page-paes-listar .content,
-.page-paes-cadastrar .content,
-.page-paes-visualizar .content,
-.page-paes-editar .content,
-.page-solicitacoes .content,
-.page-solicitacao-analisar .content {
-    flex: 1;
-    padding: 2rem;
+.content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+    color: var(--sigei-blue-900);
+    font-weight: 800;
 }
 
-/* Cards de resumo (usado em dashboards e páginas com contadores) */
+.content .text-muted { color: var(--sigei-muted) !important; }
+
+/* Cartões e painéis */
+.content .card {
+    min-width: 0;
+    border: 1px solid var(--sigei-border) !important;
+    border-radius: 1rem;
+    background-color: #fff;
+    box-shadow: 0 8px 24px rgba(13, 71, 161, 0.08) !important;
+}
+
+.content .card-body { min-width: 0; }
+
+.content .card-form, .page-perfil .profile-card {
+    width: min(100%, 1000px);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.page-perfil .profile-card { max-width: 720px; }
+
 .cards {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 1rem;
 }
 
 .cards .card {
-    border: 0;
-    border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
-    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    padding: 1.3rem;
+    border: 0 !important;
+}
+
+.cards .card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 0.3rem;
+    content: "";
+    background: linear-gradient(90deg, var(--sigei-blue-700), var(--sigei-teal-400));
 }
 
 .cards .card strong {
-    color: #0f172a;
     display: block;
-    font-size: 2rem;
-    line-height: 1;
-    margin-top: 0.5rem;
+    margin-top: 0.45rem;
+    color: var(--sigei-blue-900);
+    font-size: clamp(1.8rem, 4vw, 2.3rem);
+    font-weight: 800;
+    line-height: 1.1;
 }
 
-@media (max-width: 992px) {
-    .cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+/* Formulários */
+.content .form-label, .content label { color: #24466f; font-weight: 700; }
+
+.content .form-control, .content .form-select {
+    min-height: 2.8rem;
+    border: 2px solid #d2deed;
+    border-radius: 0.7rem;
+    color: var(--sigei-ink);
+    background-color: #fbfdff;
 }
 
-@media (max-width: 576px) {
-    .cards {
-        grid-template-columns: 1fr;
-    }
-    .page-alunos-pendentes .content,
-    .page-associacoes .content,
-    .page-relatorios .content,
-    .page-alunos-visualizar .content,
-    .page-alunos-editar .content,
-    .page-escolas .content,
-    .page-empresas .content,
-    .page-ures .content,
-    .page-supervisores .content,
-    .page-dirigentes .content,
-    .page-setores-ure .content,
-    .page-usuarios-ue .content,
-    .page-usuarios .content,
-    .page-paes-listar .content,
-    .page-paes-cadastrar .content,
-    .page-paes-visualizar .content,
-    .page-paes-editar .content,
-    .page-solicitacoes .content,
-    .page-solicitacao-analisar .content {
-        padding: 1rem;
-    }
+.content textarea.form-control { min-height: 7rem; }
+
+.content .form-control:focus, .content .form-select:focus {
+    border-color: var(--sigei-blue-700);
+    box-shadow: 0 0 0 0.25rem var(--sigei-focus);
+    background-color: #fff;
 }
 
-@media (max-width: 576px) {
-    .page-perfil .content {
-        padding: 1rem;
-    }
+.content .form-control[readonly] { color: #52637a; background-color: #edf3fb; }
+
+/* Ações com alvo de toque confortável e contraste consistente */
+.content .btn {
+    min-height: 2.75rem;
+    padding: 0.55rem 1rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+}
+
+.content .btn-sm { min-height: 2.25rem; padding: 0.35rem 0.7rem; }
+
+.content .btn-primary, .content .btn-dark {
+    border-color: var(--sigei-blue-900);
+    background-color: var(--sigei-blue-900);
+}
+
+.content .btn-primary:hover, .content .btn-dark:hover {
+    border-color: #0a3a87;
+    background-color: #0a3a87;
+}
+
+.content .btn-secondary {
+    border-color: #a9bdd7;
+    color: #24466f;
+    background-color: #fff;
+}
+
+.content .btn-secondary:hover {
+    border-color: #7d9fc6;
+    color: var(--sigei-blue-900);
+    background-color: #edf5ff;
+}
+
+/* Tabelas: rolagem horizontal somente dentro do painel quando necessária */
+.content .table-responsive {
+    max-width: 100%;
+    border: 1px solid var(--sigei-border);
+    border-radius: 0.75rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.content .table { margin-bottom: 0; color: var(--sigei-ink); }
+
+.content .table thead th {
+    color: #24466f;
+    background-color: #edf5ff;
+    border-bottom: 2px solid #c8d9ef;
+    font-weight: 800;
+}
+
+.content .table th, .content .table td {
+    padding: 0.8rem 1rem;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.content .table tbody tr:last-child > * { border-bottom: 0; }
+.content .table-hover > tbody > tr:hover > * { color: inherit; background-color: #f4f9ff; }
+.content .badge { padding: 0.5em 0.7em; font-weight: 700; }
+.content canvas, .content img { max-width: 100%; }
+
+/* Mensagens de retorno ficam fáceis de localizar sem destoar do restante da interface. */
+.content .alert {
+    border-width: 1px;
+    border-radius: 0.85rem;
+    box-shadow: 0 4px 14px rgba(13, 71, 161, 0.06);
+}
+
+.content .list-group-item {
+    border-color: var(--sigei-border);
+    background-color: transparent;
+}
+
+/* Modal de Termos de Uso: bloqueio sem navegação paralela até haver confirmação. */
+.terms-modal .modal-content {
+    overflow: hidden;
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 20px 56px rgba(13, 71, 161, 0.28);
+}
+
+.terms-modal .modal-header {
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid var(--sigei-border);
+    background: linear-gradient(135deg, #edf5ff, #e3faf4);
+}
+
+.terms-modal-kicker {
+    color: var(--sigei-teal-600);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.terms-modal .modal-body { padding: 1.5rem; }
+
+.terms-modal-content {
+    min-height: 13rem;
+    margin: 1rem 0 1.25rem;
+    border: 2px dashed #c6d7ec;
+    border-radius: 0.8rem;
+    background: #fbfdff;
+}
+
+.terms-modal-check {
+    padding: 0.9rem 1rem 0.9rem 2.35rem;
+    border: 1px solid var(--sigei-border);
+    border-radius: 0.75rem;
+    background: #f7fbff;
+}
+
+.terms-modal-check .form-check-input { margin-top: 0.28rem; }
+.terms-modal-check .form-check-label { color: #24466f; font-weight: 700; }
+
+/* Acessibilidade: todo elemento interativo mostra claramente onde está o foco */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--sigei-teal-600);
+    outline-offset: 3px;
+}
+
+/* Página de termos: conteúdo propositalmente reservado para preenchimento futuro */
+.page-termos {
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+}
+
+.terms-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 520px);
+    width: min(100%, 1180px);
+    overflow: hidden;
+    border: 1px solid rgba(13, 71, 161, 0.12);
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 18px 48px rgba(13, 71, 161, 0.15);
+}
+
+.terms-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 480px;
+    padding: clamp(2rem, 6vw, 5rem);
+    background: linear-gradient(145deg, #e7f1ff 0%, #d7ecff 65%, #bff4e8 100%);
+}
+
+.terms-brand img { width: min(100%, 250px); height: auto; margin-bottom: 1.5rem; }
+.terms-brand h1, .terms-content h2 { color: var(--sigei-blue-900); font-weight: 800; }
+
+.terms-brand p {
+    max-width: 32rem;
+    color: var(--sigei-blue-700);
+    font-size: 1.1rem;
+    line-height: 1.65;
+}
+
+.terms-content { display: flex; flex-direction: column; padding: clamp(1.5rem, 4vw, 3.5rem); }
+
+.terms-blank {
+    min-height: 240px;
+    margin: 1.5rem 0;
+    border: 2px dashed #c6d7ec;
+    border-radius: 0.85rem;
+    background: #fbfdff;
+}
+
+.terms-back { align-self: flex-start; color: var(--sigei-blue-900); font-weight: 700; }
+
+@media (max-width: 767.98px) {
+    .navbar { padding: 0.55rem 0.75rem; }
+    .navbar .nav-link { padding: 0.7rem 0.75rem; }
+    body[class*="page-"] .content { padding: 1rem; }
+    .content .card { border-radius: 0.85rem; }
+    .content .card-body.p-4 { padding: 1.1rem !important; }
+    .content > .d-flex.justify-content-between, .content .d-flex.justify-content-between { flex-wrap: wrap; gap: 0.75rem; }
+    .content .d-flex.gap-2 { flex-wrap: wrap; }
+    .content .table-responsive .table { min-width: 620px; }
+    .page-perfil .list-group-item { flex-wrap: wrap; gap: 0.35rem; }
+    .navbar-user { align-items: stretch !important; }
+    .navbar-user-info { width: 100%; }
+    .navbar-logout { width: 100%; }
+    .terms-layout { grid-template-columns: 1fr; }
+    .terms-brand { min-height: auto; }
+}
+
+@media (max-width: 420px) {
+    .content .btn:not(.btn-sm), .content .d-flex.gap-2 > .btn,
+    .content .d-flex.gap-2 > a.btn { width: 100%; }
 }
