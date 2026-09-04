@@ -15,36 +15,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Mapeamento das 6 tabelas de usuários do SIGEI
-    $tabelas = [
-        'admin'               => 'id_admin',
+    // Mapeamento exato das tabelas que possuem a coluna 'email' no seu banco de dados sigei
+    $tabelasComEmail = [
         'seduc'               => 'id_seduc',
-        'usuarios_pae'        => 'id_pae',
         'usuarios_supervisor' => 'id_usuario_supervisor',
-        'usuarios_ue'         => 'id_usuario_ue',
-        'usuarios_ure'        => 'id_usuario_ure'
+        'usuarios_ure'        => 'id_usuario_ure',
+        'usuarios_pae'        => 'id_pae',
+        'usuarios_ue'         => 'id_usuario_ue'
     ];
 
     $usuarioEncontrado = false;
     $tipoUsuario = null;
 
-    // Busca em qual tabela o e-mail está cadastrado usando MySQLi
-    foreach ($tabelas as $tabela => $campoId) {
-        $stmt = $conexao->prepare("SELECT $campoId, email FROM $tabela WHERE email = ? LIMIT 1");
-        if ($stmt) {
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
+    // Busca o e-mail apenas nas tabelas que contêm o campo email
+    foreach ($tabelasComEmail as $tabela => $campoId) {
+        // Verifica se a coluna 'email' existe na tabela antes de fazer o SELECT
+        $checkCol = $conexao->query("SHOW COLUMNS FROM `$tabela` LIKE 'email'");
+        
+        if ($checkCol && $checkCol->num_rows > 0) {
+            $stmt = $conexao->prepare("SELECT $campoId, email FROM `$tabela` WHERE email = ? LIMIT 1");
+            if ($stmt) {
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-            if ($row = $result->fetch_assoc()) {
-                if (!empty($row['email'])) {
-                    $usuarioEncontrado = true;
-                    $tipoUsuario = $tabela;
-                    $stmt->close();
-                    break;
+                if ($row = $result->fetch_assoc()) {
+                    if (!empty($row['email'])) {
+                        $usuarioEncontrado = true;
+                        $tipoUsuario = $tabela;
+                        $stmt->close();
+                        break;
+                    }
                 }
+                $stmt->close();
             }
-            $stmt->close();
         }
     }
 
@@ -69,12 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $link = "http://" . $_SERVER['HTTP_HOST'] . "/SIGEI/views/redefinir_senha.php?token=" . $token;
 
         $assunto = "Redefinicao de Senha - SIGEI";
-        $mensagem = "Acesse o link a seguir para cadastrar sua nova senha (válido por 30 minutos):\n\n" . $link;
+        $mensagem = "Acesse o link a seguir para cadastrar sua nova senha (valido por 30 minutos):\n\n" . $link;
         $headers = "From: no-reply@" . $_SERVER['HTTP_HOST'];
 
         @mail($email, $assunto, $mensagem, $headers);
     }
 
+    // Mensagem de retorno genérica para segurança do sistema
     echo "<script>alert('Se o e-mail estiver cadastrado no sistema, você receberá as instruções para redefinição.'); window.location.href='../views/esqueci_senha.php';</script>";
     exit;
 }
