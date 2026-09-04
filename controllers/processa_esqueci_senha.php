@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-
+require_once "../config/init.php";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
 
