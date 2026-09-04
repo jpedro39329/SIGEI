@@ -59,13 +59,15 @@
       <h2 class="section-label">Recuperar Senha</h2>
       <p class="section-sub">Informe o e-mail cadastrado para receber o link.</p>
 
-      <form action="index.php?control=auth&action=esqueci_senha" method="POST">
-        <div class="form-group">
-          <label for="email">E-mail Cadastrado:</label>
-          <input type="email" name="email" id="email" class="form-control" placeholder="seuemail@exemplo.com" required>
-        </div>
+      <form action="../controllers/auth/processa_esqueci_senha.php" method="POST">
+  <div class="form-group">
+    <label for="email">E-mail Cadastrado:</label>
+    <input type="email" name="email" id="email" class="form-control" placeholder="seuemail@exemplo.com" required>
+  </div>
 
-        <button type="submit" class="btn-submit">Enviar Link de Recuperação</button>
+  <button type="submit" class="btn-submit">Enviar Link de Recuperação</button>
+</form>
+        
       </form>
 
       <a href="index.php" class="back-link">&#8592; Voltar para a Seleção de Perfil</a>
