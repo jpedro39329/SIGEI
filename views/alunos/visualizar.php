@@ -121,7 +121,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                     <?php if (!empty($aluno['foto_arquivo'])): ?>
                         <img src="../../<?php echo $aluno['foto_arquivo']; ?>" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="Foto do aluno">
                     <?php else: ?>
-                        <div class="display-1 mb-3">👤</div>
+                        <div class="display-1 mb-3"></div>
                     <?php endif; ?>
                     <h4><?php echo htmlspecialchars($aluno['nome']); ?></h4>
                     <p class="text-muted mb-1"><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></p>
