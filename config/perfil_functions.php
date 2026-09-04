@@ -251,4 +251,73 @@ function nomePAEAluno($conexao, $idAluno) {
     return $row['nome'] ?? 'Sem PAE';
 }
 
+// ============================================================
+// GESTÃO DE TERMOS DE USO (LGPD)
+// ============================================================
+
+// Garante a existência da tabela termos_aceite e verifica se o usuário aceitou os termos
+function verificarTermoAceito($conexao, $idUsuario, $perfil) {
+    $idUsuario = (int) $idUsuario;
+    $perfil = trim((string) $perfil);
+    if ($idUsuario <= 0 || $perfil === '') {
+        return false;
+    }
+
+    $tabelaQuery = "CREATE TABLE IF NOT EXISTS `termos_aceite` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `id_usuario` int(11) NOT NULL,
+        `perfil` varchar(50) NOT NULL,
+        `data_aceite` datetime DEFAULT current_timestamp(),
+        `ip` varchar(45) DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_usuario_perfil` (`id_usuario`, `perfil`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    $conexao->query($tabelaQuery);
+
+    $stmt = $conexao->prepare("SELECT id FROM termos_aceite WHERE id_usuario = ? AND perfil = ? LIMIT 1");
+    if (!$stmt) {
+        return false;
+    }
+    $stmt->bind_param("is", $idUsuario, $perfil);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $aceito = ($res && $res->num_rows > 0);
+    $stmt->close();
+
+    return $aceito;
+}
+
+// Registra o aceite do termo de uso para o usuário logado
+function registrarAceiteTermo($conexao, $idUsuario, $perfil) {
+    $idUsuario = (int) $idUsuario;
+    $perfil = trim((string) $perfil);
+    if ($idUsuario <= 0 || $perfil === '') {
+        return false;
+    }
+
+    $tabelaQuery = "CREATE TABLE IF NOT EXISTS `termos_aceite` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `id_usuario` int(11) NOT NULL,
+        `perfil` varchar(50) NOT NULL,
+        `data_aceite` datetime DEFAULT current_timestamp(),
+        `ip` varchar(45) DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_usuario_perfil` (`id_usuario`, `perfil`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    $conexao->query($tabelaQuery);
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $stmt = $conexao->prepare("INSERT INTO termos_aceite (id_usuario, perfil, ip, data_aceite)
+                               VALUES (?, ?, ?, NOW())
+                               ON DUPLICATE KEY UPDATE data_aceite = NOW(), ip = ?");
+    if (!$stmt) {
+        return false;
+    }
+    $stmt->bind_param("isss", $idUsuario, $perfil, $ip, $ip);
+    $ok = $stmt->execute();
+    $stmt->close();
+
+    return $ok;
+}
+
 ?>

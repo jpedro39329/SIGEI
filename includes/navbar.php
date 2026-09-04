@@ -151,3 +151,20 @@ $homePage = $baseUrl . 'views/dashboard.php';
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<?php
+$currentUserId = (int) ($_SESSION['user_id'] ?? 0);
+$currentUserPerfil = $_SESSION['user_perfil'] ?? '';
+if ($currentUserId > 0 && !isset($_SESSION['termos_aceitos']) && isset($conexao)) {
+    $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $currentUserId, $currentUserPerfil);
+}
+$termoAceito = !empty($_SESSION['termos_aceitos']);
+?>
+<script>
+window.SIGEI_CONFIG = {
+    userId: <?php echo json_encode($currentUserId); ?>,
+    userPerfil: <?php echo json_encode($currentUserPerfil); ?>,
+    termoAceito: <?php echo json_encode($termoAceito); ?>,
+    baseUrl: <?php echo json_encode($baseUrl); ?>
+};
+</script>
+<script src="<?php echo $baseUrl; ?>assets/js/termos.js"></script>

@@ -126,6 +126,8 @@ foreach ($tabelas as $tabela => $info) {
                 $_SESSION['user_perfil'] = $perfilBase;
             }
 
+            $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $_SESSION['user_id'], $_SESSION['user_perfil']);
+
             $stmt->close();
             header("Location: ../../views/dashboard.php");
             exit();

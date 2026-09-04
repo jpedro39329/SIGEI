@@ -657,6 +657,23 @@ ALTER TABLE `usuarios_ue`
 --
 ALTER TABLE `usuarios_ure`
   ADD CONSTRAINT `fk_userure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `termos_aceite`
+--
+
+CREATE TABLE IF NOT EXISTS `termos_aceite` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `perfil` varchar(50) NOT NULL,
+  `data_aceite` datetime DEFAULT current_timestamp(),
+  `ip` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_usuario_perfil` (`id_usuario`, `perfil`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

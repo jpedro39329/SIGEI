@@ -1,26 +1,71 @@
 /**
  * Sistema de Termos de Uso - SIGEI
- * Gerencia a exibição e aceitação de termos na primeira visita
+ * Gerencia a exibição e aceitação de termos na primeira visita de cada usuário
  */
 
 class TermosDeUso {
     constructor() {
-        this.chaveLocal = 'sigei_termos_aceitos';
+        const config = window.SIGEI_CONFIG || {};
+        this.baseUrl = config.baseUrl || '../';
+        this.userId = config.userId || 0;
+        this.userPerfil = config.userPerfil || '';
+        this.termoAceitoBackend = (config.termoAceito === true);
+
+        // Limpa chave legada global que impedia novos usuários de ver os termos
+        try {
+            localStorage.removeItem('sigei_termos_aceitos');
+        } catch (e) {}
+
+        // Chave local individualizada por ID de usuário e perfil
+        this.chaveLocal = 'sigei_termos_aceitos_' + this.userId + '_' + this.userPerfil;
         this.termosNaoAceitos = !this.verificarAceite();
     }
 
     /**
-     * Verifica se o usuário já aceitou os termos
+     * Verifica se este usuário específico já aceitou os termos
      */
     verificarAceite() {
-        return localStorage.getItem(this.chaveLocal) === 'true';
+        // Se não há usuário logado identificado, não exibe
+        if (!this.userId) {
+            return true;
+        }
+
+        // Se o backend já confirmou aceite no banco de dados para este usuário
+        if (this.termoAceitoBackend) {
+            try {
+                localStorage.setItem(this.chaveLocal, 'true');
+            } catch (e) {}
+            return true;
+        }
+
+        // Se o backend informou false, este usuário ainda não aceitou os termos
+        return false;
     }
 
     /**
-     * Marca os termos como aceitos
+     * Marca os termos como aceitos tanto no banco quanto no localStorage
      */
-    marcarComoAceito() {
-        localStorage.setItem(this.chaveLocal, 'true');
+    async marcarComoAceito() {
+        try {
+            localStorage.setItem(this.chaveLocal, 'true');
+        } catch (e) {}
+
+        try {
+            const resposta = await fetch(this.baseUrl + 'controllers/auth/aceitar_termos.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+            const dados = await resposta.json();
+            if (dados && dados.sucesso) {
+                if (window.SIGEI_CONFIG) {
+                    window.SIGEI_CONFIG.termoAceito = true;
+                }
+            }
+        } catch (e) {
+            console.error('Erro ao sincronizar aceite dos termos com o servidor:', e);
+        }
     }
 
     /**
@@ -28,7 +73,11 @@ class TermosDeUso {
      */
     exibirModal() {
         if (this.termosNaoAceitos) {
-            // Aguarda o DOM estar completamente carregado
+            // Evita criar múltiplos modais
+            if (document.getElementById('termos-modal')) {
+                return;
+            }
+
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => this.mostrarModal());
             } else {
@@ -41,6 +90,10 @@ class TermosDeUso {
      * Cria e exibe o modal
      */
     mostrarModal() {
+        if (document.getElementById('termos-modal')) {
+            return;
+        }
+
         const modal = document.createElement('div');
         modal.className = 'modal fade terms-modal';
         modal.id = 'termos-modal';
@@ -59,7 +112,7 @@ class TermosDeUso {
                         <!-- Sem botão de fechar - usuário deve aceitar ou rejeitar -->
                     </div>
                     <div class="modal-body">
-                        <div class="terms-modal-content" style="max-height: 350px; overflow-y: auto; padding-right: 10px;">
+                        <div class="terms-modal-content" style="max-height: 350px; overflow-y: auto; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: #fff;">
                             <h6>1. SOBRE O TRATAMENTO DOS DADOS</h6>
                             <p>Ao utilizar o sistema, o usuário declara estar ciente de que poderão ser tratados dados pessoais e dados pessoais sensíveis relacionados aos alunos cadastrados, nos termos da Lei nº 13.709/2018 – Lei Geral de Proteção de Dados Pessoais (LGPD).</p>
                             <p>O tratamento das informações será realizado exclusivamente para fins educacionais, administrativos e de acompanhamento dos alunos com necessidades educacionais especiais.</p>
@@ -106,7 +159,7 @@ class TermosDeUso {
                                 <li>compromete-se a utilizar os dados exclusivamente para as atividades relacionadas à sua função;</li>
                                 <li>compromete-se a manter sigilo sobre as informações às quais tiver acesso.</li>
                             </ul>
-                            <p class="text-muted small">O usuário poderá consultar este termo novamente a qualquer momento por meio do sistema.</p>
+                            <p class="text-muted small mb-0">O usuário poderá consultar este termo novamente a qualquer momento por meio do sistema.</p>
                         </div>
 
                         <div class="terms-modal-check form-check mt-3 pt-3 border-top">
@@ -130,9 +183,36 @@ class TermosDeUso {
 
         document.body.appendChild(modal);
 
-        // Inicializar modal do Bootstrap
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
+        let bsModal = null;
+        let backdropFallback = null;
+
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            bsModal = new bootstrap.Modal(modal, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            bsModal.show();
+        } else {
+            // Fallback caso Bootstrap JS não esteja carregado
+            modal.classList.add('show');
+            modal.style.display = 'block';
+            document.body.classList.add('modal-open');
+            backdropFallback = document.createElement('div');
+            backdropFallback.className = 'modal-backdrop fade show';
+            document.body.appendChild(backdropFallback);
+        }
+
+        const fecharModal = () => {
+            if (bsModal) {
+                bsModal.hide();
+            } else {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                if (backdropFallback) backdropFallback.remove();
+            }
+            setTimeout(() => modal.remove(), 300);
+        };
 
         // Event listeners
         const checkboxAceitar = document.getElementById('aceitar-termos');
@@ -145,26 +225,33 @@ class TermosDeUso {
         });
 
         // Aceitar termos
-        btnAceitar.addEventListener('click', () => {
-            this.marcarComoAceito();
-            bsModal.hide();
-            // Modal se fecha e o usuário continua navegando
+        btnAceitar.addEventListener('click', async () => {
+            btnAceitar.disabled = true;
+            btnAceitar.innerHTML = 'Processando...';
+            await this.marcarComoAceito();
+            fecharModal();
         });
 
         // Rejeitar termos
         btnRejeitar.addEventListener('click', () => {
             alert('Você não pode continuar sem aceitar os termos de uso.');
-            // Redirecionar para login ou página inicial
-            window.location.href = '../controllers/auth/logout.php';
+            window.location.href = this.baseUrl + 'controllers/auth/logout.php';
         });
     }
 }
 
 // Inicializar termos de uso quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-    // Apenas executar em páginas internas (não no login)
-    if (!document.body.classList.contains('page-login')) {
-        const termos = new TermosDeUso();
-        termos.exibirModal();
+(function() {
+    function iniciarTermos() {
+        if (!document.body.classList.contains('page-login')) {
+            const termos = new TermosDeUso();
+            termos.exibirModal();
+        }
     }
-});
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciarTermos);
+    } else {
+        iniciarTermos();
+    }
+})();
