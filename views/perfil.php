@@ -62,7 +62,7 @@ $homePage = 'dashboard.php';
     <div class="card profile-card">
         <div class="card-body p-4">
 
-            <h2 class="mb-4">👤 Meu Perfil</h2>
+            <h2 class="mb-4">Meu Perfil</h2>
 
             <p class="text-muted">
                 Olá, <?php echo htmlspecialchars($userName); ?> — estas são as informações do seu usuário.

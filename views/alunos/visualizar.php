@@ -147,7 +147,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
         <div class="col-md-8 mb-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">📋 Dados do Aluno</h5>
+                    <h5 class="mb-3">Dados do Aluno</h5>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">CPF</span>
@@ -201,7 +201,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="text-muted">Termo de Responsabilidade</span>
                             <a href="../../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                📄 Visualizar Termo
+                                Visualizar Termo
                             </a>
                         </li>
                         <?php endif; ?>
@@ -220,7 +220,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
     <!-- PAE associado -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">👨‍🏫 PAE Associado</h5>
+            <h5 class="mb-3">PAE Associado</h5>
             <?php if ($pae): ?>
                 <p><strong>Nome:</strong> <?php echo htmlspecialchars($pae['nome']); ?></p>
                 <?php if ($userPerfil == 'ADMIN' || $userPerfil == 'USUARIO_ESCOLA'): ?>
@@ -235,7 +235,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
     <!-- Laudos -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">📄 Laudos</h5>
+            <h5 class="mb-3">Laudos</h5>
             <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
                 <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="mb-4">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
@@ -278,7 +278,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
     <!-- Relatórios -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">📝 Relatórios</h5>
+            <h5 class="mb-3"> Relatórios</h5>
             <?php if (count($relatorios) > 0): ?>
                 <div class="table-responsive">
                     <table class="table table-hover">
