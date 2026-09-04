@@ -59,7 +59,7 @@
       <h2 class="section-label">Recuperar Senha</h2>
       <p class="section-sub">Informe o e-mail cadastrado para receber o link.</p>
 
-      <form action="../controllers/auth/processa_esqueci_senha.php" method="POST">
+      <form action="../controllers/processa_esqueci_senha.php" method="POST">
   <div class="form-group">
     <label for="email">E-mail Cadastrado:</label>
     <input type="email" name="email" id="email" class="form-control" placeholder="seuemail@exemplo.com" required>
