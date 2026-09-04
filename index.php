@@ -39,7 +39,7 @@ if ($control === 'auth') {
             break;
     }
 }
-/php>
+php>
 
 
 <!DOCTYPE html>
