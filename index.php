@@ -1,3 +1,47 @@
+  <?php
+// Configurações e conexões iniciais
+require_once __DIR__ . '/config/database.php';
+
+// Captura o controller e ação da URL (Padrão: control=auth & action=login)
+$control = $_GET['control'] ?? 'auth';
+$action  = $_GET['action']  ?? 'login';
+
+if ($control === 'auth') {
+    switch ($action) {
+
+        // 1. Exibe a tela de solicitação "Esqueci minha senha" ou processa o formulário enviado
+        case 'esqueci_senha':
+          if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once __DIR__ . '/controllers/esqueci_senha.php';
+          } else {
+            require_once __DIR__ . '/views/esqueci_senha.php';
+          }
+            break;
+
+        // 2. Exibe a tela de criação da nova senha através do token recebido por e-mail
+        case 'redefinir_senha':
+            require_once __DIR__ . '/views/redefinir_senha.php';
+            break;
+
+        // 3. Processa e salva a nova senha no banco de dados
+        case 'salvar_nova_senha':
+          require_once __DIR__ . '/controllers/salvarnova_senha.php';
+            break;
+
+        // Ações padrão de login
+        case 'login':
+        default:
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                require_once __DIR__ . '/controllers/auth/login.php';
+            } else {
+                require_once __DIR__ . '/views/login.php';
+            }
+            break;
+    }
+}
+/php>
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -434,48 +478,5 @@
     </div>
 
   </section>
-
-  <?php
-// Configurações e conexões iniciais
-require_once __DIR__ . '/config/database.php';
-
-// Captura o controller e ação da URL (Padrão: control=auth & action=login)
-$control = $_GET['control'] ?? 'auth';
-$action  = $_GET['action']  ?? 'login';
-
-if ($control === 'auth') {
-    switch ($action) {
-
-        // 1. Exibe a tela de solicitação "Esqueci minha senha" ou processa o formulário enviado
-        case 'esqueci_senha':
-          if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once __DIR__ . '/controllers/esqueci_senha.php';
-          } else {
-            require_once __DIR__ . '/views/esqueci_senha.php';
-          }
-            break;
-
-        // 2. Exibe a tela de criação da nova senha através do token recebido por e-mail
-        case 'redefinir_senha':
-            require_once __DIR__ . '/views/redefinir_senha.php';
-            break;
-
-        // 3. Processa e salva a nova senha no banco de dados
-        case 'salvar_nova_senha':
-          require_once __DIR__ . '/controllers/salvarnova_senha.php';
-            break;
-
-        // Ações padrão de login
-        case 'login':
-        default:
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                require_once __DIR__ . '/controllers/auth/login.php';
-            } else {
-                require_once __DIR__ . '/views/login.php';
-            }
-            break;
-    }
-}
-/php>
 </body>
 </html>
