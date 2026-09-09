@@ -67,13 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             // Configurações do Servidor SMTP (Exemplo com Gmail)
-            $mail->isSMTP();
+           $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'seu_email@gmail.com'; // SEU E-MAIL REAL
-            $mail->Password   = 'sua_senha_de_app';    // SUA SENHA DE APLICATIVO DO GMAIL
-         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Em vez de STARTTLS
-            $mail->Port       = 465;                        // Porta 465
+            $mail->Username   = 'seu_email@gmail.com'; // Seu e-mail do Gmail
+            $mail->Password   = 'sua_senha_de_aplicativo'; // A senha de 16 dígitos gerada no Google
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Alterado para SMTPS
+            $mail->Port       = 465;                        // Alterado para a porta 465
+            $mail->CharSet    = 'UTF-8';                   // Porta 465
 
             // Remetente e Destinatário
             $mail->setFrom('seu_email@gmail.com', 'Sistema SIGEI');
