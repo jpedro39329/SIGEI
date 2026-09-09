@@ -4,12 +4,12 @@ require_once '../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['token'];
+    $codigoInformado = trim($_POST['codigo']);
     $novaSenha = password_hash($_POST['nova_senha'], PASSWORD_DEFAULT);
 
-    // Valida o token
-    $sql = "SELECT * FROM recuperacao_senha WHERE token = ? AND usado = 0 AND expira_em >= NOW()";
+    $sql = "SELECT * FROM recuperacao_senha WHERE token = ? AND codigo = ? AND usado = 0 AND expira_em >= NOW()";
     $stmt = $conexao->prepare($sql);
-    $stmt->bind_param("s", $token);
+    $stmt->bind_param("ss", $token, $codigoInformado);
     $stmt->execute();
     $recuperacao = $stmt->get_result()->fetch_assoc();
 
@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $idReferencia = $recuperacao['id_referencia'];
 
         $tabelasPerfis = [
-            'ADMIN'      => ['tabela' => 'admin', 'id' => 'id_admin'],
             'SEDUC'      => ['tabela' => 'seduc', 'id' => 'id_seduc'],
             'URE'        => ['tabela' => 'usuarios_ure', 'id' => 'id_usuario_ure'],
             'SUPERVISOR' => ['tabela' => 'usuarios_supervisor', 'id' => 'id_usuario_supervisor'],
@@ -29,13 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($tabelasPerfis[$tipoPerfil])) {
             $info = $tabelasPerfis[$tipoPerfil];
             
-            // Atualiza a senha
             $updateSenha = "UPDATE {$info['tabela']} SET senha = ? WHERE {$info['id']} = ?";
             $stmtUpdate = $conexao->prepare($updateSenha);
             $stmtUpdate->bind_param("si", $novaSenha, $idReferencia);
             $stmtUpdate->execute();
 
-            // Marca token como usado
             $updateToken = "UPDATE recuperacao_senha SET usado = 1 WHERE token = ?";
             $stmtToken = $conexao->prepare($updateToken);
             $stmtToken->bind_param("s", $token);
@@ -46,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Erro: Perfil desconhecido.";
         }
     } else {
-        echo "Erro: Token inválido ou expirado.";
+        echo "Erro: Código de verificação incorreto, token inválido ou expirado.";
     }
 }
 ?>

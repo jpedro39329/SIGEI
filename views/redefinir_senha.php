@@ -8,7 +8,6 @@ if (!$token) {
     die("Token inválido.");
 }
 
-// Verifica se o token existe, não foi usado e está dentro da validade
 $sql = "SELECT * FROM recuperacao_senha WHERE token = ? AND usado = 0 AND expira_em >= NOW()";
 $stmt = $conexao->prepare($sql);
 $stmt->bind_param("s", $token);
@@ -32,6 +31,9 @@ if (!$recuperacao) {
         <form action="../controllers/processa_redefinir_senha.php" method="POST">
             <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
             
+            <label for="codigo">Código de Verificação (6 dígitos):</label>
+            <input type="text" name="codigo" id="codigo" maxlength="6" required placeholder="Digite o código recebido">
+
             <label for="nova_senha">Nova Senha:</label>
             <input type="password" name="nova_senha" id="nova_senha" required>
             
