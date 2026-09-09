@@ -36,7 +36,7 @@ Os dados não serão utilizados para fins comerciais, publicitários ou para fin
 
 O acesso aos dados será limitado conforme o perfil e as atribuições do usuário.
 
-Dessa forma, gestores, professores e profissionais do AEE poderão visualizar somente as informações necessárias ao desempenho de suas respectivas funções, conforme as permissões definidas no sistema.
+Dessa forma, gestores, professores e profissionais do EEC poderão visualizar somente as informações necessárias ao desempenho de suas respectivas funções, conforme as permissões definidas no sistema.
 
 O usuário é responsável por manter suas credenciais de acesso em sigilo e por utilizar as informações exclusivamente para as finalidades relacionadas às suas atividades.
 
