@@ -413,7 +413,7 @@ require_once "../config/init.php";
         <button type="submit" class="btn-login">Entrar</button>
 
       <div class="login-links">
-    <a href="../views/esqueci_senha.php" class="link-btn" style="text-decoration: none; display: inline-block; text-align: center;">Esqueci minha senha</a>
+    <a href="../viewsviews/esqueciminha_senha.php" class="link-btn" style="text-decoration: none; display: inline-block; text-align: center;">Esqueci minha senha</a>
     <button type="button" class="link-btn voltar" onclick="window.location.href='../index.html';">← Voltar</button>
 </div>
 
