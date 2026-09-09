@@ -2,6 +2,14 @@
 // controllers/processa_esqueci_senha.php
 require_once '../config/database.php';
 
+// Caminhos corretos para a estrutura manual do PHPMailer
+require_once '../phpmailer/src/Exception.php';
+require_once '../phpmailer/src/PHPMailer.php';
+require_once '../phpmailer/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $usuarioEncontrado = null;
@@ -55,20 +63,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $link = "http://localhost/sigei/views/redefinir_senha.php?token=" . $token;
 
-        $para = $email;
-        $assunto = "SIGEI - Recuperação de Senha";
-        $mensagem = "Olá,\n\nRecebemos uma solicitação para redefinir sua senha no SIGEI[cite: 3].\n";
-        $mensagem .= "Seu código de verificação de 6 dígitos é: " . $codigo . "\n\n";
-        $mensagem .= "Ou acesse o link abaixo para redefinir sua senha:\n" . $link . "\n\n";
-        $mensagem .= "Se você não solicitou isso, ignore este e-mail.";
-        
-        $headers = "From: no-reply@sigei.com\r\n" .
-                   "X-Mailer: PHP/" . phpversion();
+        $mail = new PHPMailer(true);
 
-        if (mail($para, $assunto, $mensagem, $headers)) {
+        try {
+            // Configurações do Servidor SMTP (Exemplo com Gmail)
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'seu_email@gmail.com'; // SEU E-MAIL REAL
+            $mail->Password   = 'sua_senha_de_app';    // SUA SENHA DE APLICATIVO DO GMAIL
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->CharSet    = 'UTF-8';
+
+            // Remetente e Destinatário
+            $mail->setFrom('seu_email@gmail.com', 'Sistema SIGEI');
+            $mail->addAddress($email);
+
+            // Conteúdo
+            $mail->isHTML(true);
+            $mail->Subject = 'SIGEI - Código de Recuperação de Senha';
+            $mail->Body    = "Olá,<br><br>Recebemos uma solicitação para redefinir sua senha no SIGEI.<br>" .
+                             "Seu código de verificação de 6 dígitos é: <b>{$codigo}</b><br><br>" .
+                             "Ou clique no link abaixo para redefinir:<br><a href='{$link}'>{$link}</a><br><br>" .
+                             "Se você não solicitou isso, ignore este e-mail.";
+
+            $mail->send();
             echo "E-mail de recuperação enviado com sucesso para: " . htmlspecialchars($email);
-        } else {
-            echo "Erro ao enviar e-mail nativo. Código de verificação para testes: <strong>{$codigo}</strong><br>";
+        } catch (Exception $e) {
+            echo "Erro ao enviar o e-mail: {$mail->ErrorInfo}. <br>";
+            echo "Código de verificação para testes: <strong>{$codigo}</strong><br>";
             echo "Link: <a href='{$link}'>{$link}</a>";
         }
     } else {
