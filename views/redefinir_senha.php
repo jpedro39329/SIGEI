@@ -8,11 +8,12 @@ if (!$token) {
     die("Token inválido.");
 }
 
-// Verifica se o token existe, não foi usado e está dentro da validade[cite: 3]
-$sql = "SELECT * FROM recuperacao_senha WHERE token = :token AND usado = 0 AND expira_em >= NOW()";
-$stmt = $pdo->prepare($sql);
-$stmt->execute(['token' => $token]);
-$recuperacao = $stmt->fetch(PDO::FETCH_ASSOC);
+// Verifica se o token existe, não foi usado e está dentro da validade
+$sql = "SELECT * FROM recuperacao_senha WHERE token = ? AND usado = 0 AND expira_em >= NOW()";
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("s", $token);
+$stmt->execute();
+$recuperacao = $stmt->get_result()->fetch_assoc();
 
 if (!$recuperacao) {
     die("Este link de recuperação é inválido ou já expirou.");
