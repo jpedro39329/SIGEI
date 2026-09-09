@@ -1,5 +1,5 @@
 <?php
-
+// Inclua sua sessão ou gerador de token CSRF se necessário aqui
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -91,7 +91,7 @@
       margin: 0;
     }
 
-    /* ===== LADO DIREITO (LOGIN) ===== */
+    /* ===== LADO DIREITO (RECUPERAÇÃO) ===== */
     .caixa.direita {
       flex: 0 0 33.333vw;
       display: flex;
@@ -204,72 +204,27 @@
       text-decoration: underline;
     }
 
-    .login-links .link-btn.voltar {
-      color: #777;
-      font-weight: 400;
-    }
-
-    .login-links .link-btn.voltar:hover {
-      color: #555;
-    }
-
-    .footer-note {
-      color: #757575;
-      font-size: 0.82rem;
-      text-align: center;
-      margin-top: 24px;
-      margin-bottom: 0;
-    }
-
     /* ===== RESPONSIVO ===== */
     @media (max-width: 1024px) {
       .caixa.esquerda {
         padding: 40px 48px 80px 80px;
       }
-
-      .logo {
-        width: 260px;
-      }
-
-      .logo-texto h1 {
-        font-size: 3.8rem;
-      }
+      .logo { width: 260px; }
+      .logo-texto h1 { font-size: 3.8rem; }
     }
 
     @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-
+      .container { flex-direction: column; }
       .caixa.esquerda {
         padding: 40px 24px 60px 24px;
         margin-top: 0;
         align-items: center;
         text-align: center;
       }
-
-      .caixa.esquerda p {
-        max-width: 100%;
-      }
-
-      .logo-bloco {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-
-      .logo {
-        width: 200px;
-      }
-
-      .logo-texto h1 {
-        font-size: 3rem;
-      }
-
-      .logo-texto span {
-        font-size: 1.1rem;
-      }
-
+      .caixa.esquerda p { max-width: 100%; }
+      .logo-bloco { flex-direction: column; align-items: center; text-align: center; }
+      .logo { width: 200px; }
+      .logo-texto h1 { font-size: 3rem; }
       .caixa.direita {
         flex: none;
         width: 100%;
@@ -277,44 +232,12 @@
         box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.06);
       }
     }
-
-    @media (max-width: 480px) {
-      .caixa.esquerda {
-        padding: 24px 16px 40px 16px;
-      }
-
-      .logo {
-        width: 160px;
-      }
-
-      .logo-texto h1 {
-        font-size: 2.5rem;
-      }
-
-      .caixa.direita {
-        padding: 28px 20px;
-      }
-
-      .login-header .section-label {
-        font-size: 1.5rem;
-      }
-
-      .login-form .form-control {
-        padding: 10px 14px;
-        font-size: 0.95rem;
-      }
-
-      .btn-login {
-        padding: 12px;
-        font-size: 1rem;
-      }
-    }
   </style>
 </head>
 
 <body>
 
-  <!-- ===== SVG DE FUNDO (mesmo da tela inicial) ===== -->
+  <!-- ===== SVG DE FUNDO ===== -->
   <svg class="bg-svg" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
     <rect width="1440" height="900" fill="#ddeeff"/>
     <ellipse cx="200" cy="820" rx="280" ry="110" fill="#40d9b8"/>
@@ -357,40 +280,30 @@
       <p>Gestão eficiente para uma educação inclusiva.<br>O SIGEI centraliza informações, auxilia no acompanhamento de alunos elegíveis à educação especial e apoia a distribuição de Profissionais de Apoio Escolar.</p>
     </div>
 
-    <!-- LADO DIREITO (LOGIN) -->
+    <!-- LADO DIREITO (RECUPERAÇÃO DE SENHA) -->
     <div class="caixa direita">
       
       <div class="login-header">
-        <h2 class="section-label">Acessar o sistema</h2>
-        <p class="section-sub">Informe seu CPF e senha para continuar</p>
+        <h2 class="section-label">Recuperar Senha</h2>
+        <p class="section-sub">Informe seu e-mail cadastrado para receber as instruções</p>
       </div>
 
-      <form class="login-form" action="../controllers/auth/login.php" method="post">
-
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-          <?php if (isset($_GET['perfil'])): ?>
-              <input type="hidden" name="perfil" value="<?php echo htmlspecialchars($_GET['perfil']); ?>">
-          <?php endif; ?>
-</head>
-<body class="page-recuperacao">
-    <div class="recuperacao-card">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold" style="color: var(--sigei-blue-900);">Recuperar Senha</h2>
-            <p class="text-muted small">Informe seu e-mail cadastrado para receber as instruções de redefinição.</p>
+      <form class="login-form" action="../controllers/processa_esqueci_senha.php" method="POST">
+        <div class="form-group">
+          <label for="email">E-mail Cadastrado</label>
+          <input type="email" name="email" id="email" class="form-control" required placeholder="seu.email@exemplo.com">
         </div>
+        
+        <button type="submit" class="btn-login">Enviar Instruções</button>
+        
+        <div class="login-links">
+          <a href="login.php" class="link-btn">← Voltar para o Login</a>
+        </div>
+      </form>
 
-        <form action="../controllers/processa_esqueci_senha.php" method="POST">
-            <div class="mb-3">
-                <label for="email" class="form-label">E-mail Cadastrado</label>
-                <input type="email" name="email" id="email" class="form-control" required placeholder="seu.email@exemplo.com">
-            </div>
-            
-            <button type="submit" class="btn btn-primary w-100 mb-3">Enviar Instruções</button>
-            
-            <div class="text-center">
-                <a href="login.php" class="text-decoration-none fw-bold" style="color: var(--sigei-blue-700);">← Voltar para o Login</a>
-            </div>
-        </form>
     </div>
+
+  </section>
+
 </body>
 </html>
