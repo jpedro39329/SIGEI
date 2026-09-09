@@ -6,9 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $usuarioEncontrado = null;
 
-    // Tabelas e colunas de ID correspondentes no banco
+    // Apenas tabelas que possuem a coluna 'email' no esquema do banco
     $tabelasPerfis = [
-        'ADMIN'      => ['tabela' => 'admin', 'id' => 'id_admin'],
         'SEDUC'      => ['tabela' => 'seduc', 'id' => 'id_seduc'],
         'URE'        => ['tabela' => 'usuarios_ure', 'id' => 'id_usuario_ure'],
         'SUPERVISOR' => ['tabela' => 'usuarios_supervisor', 'id' => 'id_usuario_supervisor'],
@@ -18,11 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Busca em qual tabela o e-mail está cadastrado
     foreach ($tabelasPerfis as $tipoPerfil => $info) {
-        if ($tipoPerfil === 'ADMIN') {
-            $sql = "SELECT id_admin AS id_ref FROM admin WHERE email = ?";
-        } else {
-            $sql = "SELECT {$info['id']} AS id_ref FROM {$info['tabela']} WHERE email = ? AND ativo = 1";
-        }
+        $sql = "SELECT {$info['id']} AS id_ref FROM {$info['tabela']} WHERE email = ? AND ativo = 1";
 
         $stmt = $conexao->prepare($sql);
         $stmt->bind_param("s", $email);
