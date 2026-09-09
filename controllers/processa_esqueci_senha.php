@@ -72,9 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->SMTPAuth   = true;
             $mail->Username   = 'seu_email@gmail.com'; // SEU E-MAIL REAL
             $mail->Password   = 'sua_senha_de_app';    // SUA SENHA DE APLICATIVO DO GMAIL
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->CharSet    = 'UTF-8';
+         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Em vez de STARTTLS
+            $mail->Port       = 465;                        // Porta 465
 
             // Remetente e Destinatário
             $mail->setFrom('seu_email@gmail.com', 'Sistema SIGEI');
