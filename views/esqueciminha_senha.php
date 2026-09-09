@@ -285,7 +285,7 @@
       
       <div class="login-header">
         <h2 class="section-label">Recuperar Senha</h2>
-        <p class="section-sub">Informe seu e-mail cadastrado para receber as instruções</p>
+        <p class="section-sub">Informe seu e-mail cadastrado para redefinir sua senha</p>
       </div>
 
       <form class="login-form" action="../controllers/processa_esqueci_senha.php" method="POST">
@@ -294,7 +294,7 @@
           <input type="email" name="email" id="email" class="form-control" required placeholder="seu.email@exemplo.com">
         </div>
         
-        <button type="submit" class="btn-login">Enviar Instruções</button>
+        <button type="submit" class="btn-login">Redefinir Senha</button>
         
         <div class="login-links">
           <a href="login.php" class="link-btn">← Voltar para o Login</a>
