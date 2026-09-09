@@ -143,7 +143,7 @@ class TermosDeUso {
 
                             <h6>4. ACESSO ÀS INFORMAÇÕES</h6>
                             <p>O acesso aos dados será limitado conforme o perfil e as atribuições do usuário.</p>
-                            <p>Dessa forma, gestores, professores e profissionais do AEE poderão visualizar somente as informações necessárias ao desempenho de suas respectivas funções, conforme as permissões definidas no sistema.</p>
+                            <p>Dessa forma, gestores, professores e profissionais do EEC poderão visualizar somente as informações necessárias ao desempenho de suas respectivas funções, conforme as permissões definidas no sistema.</p>
                             <p>O usuário é responsável por manter suas credenciais de acesso em sigilo e por utilizar as informações exclusivamente para as finalidades relacionadas às suas atividades.</p>
 
                             <h6>5. SEGURANÇA E CONFIDENCIALIDADE</h6>
