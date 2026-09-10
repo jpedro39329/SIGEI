@@ -9,27 +9,21 @@ $userId = (int) $_SESSION['user_id'];
 $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
 $idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 
-$nomeFiltro = trim($_GET['nome'] ?? '');
-$raFiltro = trim($_GET['ra'] ?? '');
-$cpfFiltro = preg_replace('/\D/', '', $_GET['cpf'] ?? '');
+$busca = trim($_GET['busca'] ?? '');
 $escolaFiltro = trim($_GET['escola'] ?? '');
 $statusFiltro = trim($_GET['status'] ?? '');
+$deficienciaFiltro = trim($_GET['deficiencia'] ?? '');
 
 $where = array();
 
-if ($nomeFiltro !== '') {
-    $nomeBusca = mysqli_real_escape_string($conexao, $nomeFiltro);
-    $where[] = "a.nome LIKE '%$nomeBusca%'";
-}
-
-if ($raFiltro !== '') {
-    $raBusca = mysqli_real_escape_string($conexao, $raFiltro);
-    $where[] = "a.ra LIKE '%$raBusca%'";
-}
-
-if ($cpfFiltro !== '') {
-    $cpfBusca = mysqli_real_escape_string($conexao, $cpfFiltro);
-    $where[] = "a.cpf LIKE '%$cpfBusca%'";
+if ($busca !== '') {
+    $termo = mysqli_real_escape_string($conexao, $busca);
+    $cpfLimpo = preg_replace('/\D/', '', $busca);
+    if (!empty($cpfLimpo)) {
+        $where[] = "(a.nome LIKE '%$termo%' OR a.ra LIKE '%$termo%' OR a.cpf LIKE '%$cpfLimpo%')";
+    } else {
+        $where[] = "(a.nome LIKE '%$termo%' OR a.ra LIKE '%$termo%')";
+    }
 }
 
 if ($escolaFiltro !== '' && !in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
@@ -37,7 +31,15 @@ if ($escolaFiltro !== '' && !in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_U
     $where[] = "e.nome LIKE '%$escolaBusca%'";
 }
 
-if ($statusFiltro !== '') {
+if ($deficienciaFiltro !== '') {
+    $defBusca = mysqli_real_escape_string($conexao, $deficienciaFiltro);
+    $where[] = "a.descricao_deficiencia LIKE '%$defBusca%'";
+}
+
+// Para empresa, não deve mostrar alunos que ainda não foram aprovados
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    $where[] = "a.status_aprovacao = 'APROVADO'";
+} elseif ($statusFiltro !== '') {
     $statusBusca = mysqli_real_escape_string($conexao, $statusFiltro);
     $where[] = "a.status_aprovacao = '$statusBusca'";
 }
@@ -74,7 +76,8 @@ if (count($where) > 0) {
 }
 
 $sql = "
-    SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia,
+    SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, a.data_nascimento,
+           TIMESTAMPDIFF(YEAR, a.data_nascimento, CURDATE()) AS idade,
            a.status_aprovacao, a.data_cadastro,
            e.nome AS escola_nome,
            (SELECT p.nome FROM associacoes ass
@@ -109,56 +112,78 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1">Alunos</h2>
-            <p class="text-muted">Ola, <?php echo htmlspecialchars($userName); ?> - lista de alunos cadastrados.</p>
+            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — consulta e acompanhamento de alunos.</p>
         </div>
 
-        <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
+        <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
             <a href="cadastrar.php" class="btn btn-primary">Cadastrar aluno</a>
         <?php endif; ?>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'sucesso'): ?>
-        <div class="alert alert-success">Solicitacao enviada com sucesso!</div>
+        <div class="alert alert-success">Solicitação enviada com sucesso!</div>
     <?php endif; ?>
 
+    <!-- Barra de pesquisa com lupa e dropdown de filtros -->
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <form method="GET" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Nome</label>
-                    <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($nomeFiltro); ?>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">RA</label>
-                    <input type="text" name="ra" class="form-control" value="<?php echo htmlspecialchars($raFiltro); ?>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">CPF</label>
-                    <input type="text" name="cpf" class="form-control" value="<?php echo htmlspecialchars($_GET['cpf'] ?? ''); ?>">
-                </div>
-                <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
-                    <div class="col-md-3">
-                        <label class="form-label">Escola</label>
-                        <input type="text" name="escola" class="form-control" value="<?php echo htmlspecialchars($escolaFiltro); ?>">
+        <div class="card-body p-3">
+            <form method="GET" action="listar.php">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-7 col-12">
+                        <div class="input-group">
+                            <input type="text" name="busca" class="form-control form-control-sm" placeholder="Pesquisar por nome, RA ou CPF..." value="<?php echo htmlspecialchars($busca); ?>">
+                            <button class="btn btn-dark btn-sm" type="submit" title="Pesquisar">
+                                Pesquisar
+                            </button>
+                        </div>
                     </div>
-                <?php endif; ?>
-                <div class="col-md-2">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="PENDENTE" <?php echo $statusFiltro == 'PENDENTE' ? 'selected' : ''; ?>>Pendente</option>
-                        <option value="APROVADO" <?php echo $statusFiltro == 'APROVADO' ? 'selected' : ''; ?>>Aprovado</option>
-                        <option value="REPROVADO" <?php echo $statusFiltro == 'REPROVADO' ? 'selected' : ''; ?>>Reprovado</option>
-                    </select>
-                </div>
-                <div class="col-12 d-flex gap-2">
-                    <button type="submit" class="btn btn-dark">Filtrar</button>
-                    <a href="listar.php" class="btn btn-outline-secondary">Limpar</a>
+
+                    <div class="col-md-5 col-12 d-flex gap-2">
+                        <div class="dropdown flex-grow-1">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" type="button" id="dropdownFiltrosAlunos" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span>Filtros <?php echo ($statusFiltro !== '' || $escolaFiltro !== '' || $deficienciaFiltro !== '') ? '<span class="badge bg-primary ms-1">Ativo</span>' : ''; ?></span>
+                            </button>
+                            <div class="dropdown-menu p-3 shadow-sm" style="min-width: 290px;" aria-labelledby="dropdownFiltrosAlunos">
+                                <?php if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold mb-1">Escola</label>
+                                        <input type="text" name="escola" class="form-control form-control-sm" placeholder="Nome da escola..." value="<?php echo htmlspecialchars($escolaFiltro); ?>">
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold mb-1">Status</label>
+                                        <select name="status" class="form-select form-select-sm">
+                                            <option value="">Todos</option>
+                                            <option value="PENDENTE" <?php echo $statusFiltro == 'PENDENTE' ? 'selected' : ''; ?>>Pendente</option>
+                                            <option value="APROVADO" <?php echo $statusFiltro == 'APROVADO' ? 'selected' : ''; ?>>Aprovado</option>
+                                            <option value="REPROVADO" <?php echo $statusFiltro == 'REPROVADO' ? 'selected' : ''; ?>>Reprovado</option>
+                                        </select>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold mb-1">Deficiência</label>
+                                    <input type="text" name="deficiencia" class="form-control form-control-sm" placeholder="Ex: Autismo, Física..." value="<?php echo htmlspecialchars($deficienciaFiltro); ?>">
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-dark btn-sm w-100">Aplicar</button>
+                                    <a href="listar.php" class="btn btn-outline-secondary btn-sm w-100">Limpar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if ($busca !== '' || $statusFiltro !== '' || $escolaFiltro !== '' || $deficienciaFiltro !== ''): ?>
+                            <a href="listar.php" class="btn btn-outline-secondary btn-sm">Limpar</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Tabela de Alunos -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
             <div class="table-responsive">
@@ -182,7 +207,7 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <?php foreach ($alunos as $aluno): ?>
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($aluno['nome']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($aluno['ra']); ?></td>
+                                    <td><?php echo htmlspecialchars($aluno['ra'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
                                     <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
                                         <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
@@ -205,7 +230,7 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
 
-                                        <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
+                                        <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
                                             <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Editar</a>
                                         <?php endif; ?>
 
@@ -228,5 +253,6 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

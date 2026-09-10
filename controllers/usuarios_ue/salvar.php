@@ -52,7 +52,7 @@ if (!$stmt) {
 $stmt->bind_param("isssssi", $idUe, $nome, $cpf, $senhaHash, $email, $telefone, $ativo);
 
 if ($stmt->execute()) {
-    header("Location: ../../views/usuarios_ue/cadastrar.php?msg=ok");
+    header("Location: ../../views/usuarios_ue/listar.php?msg=ok");
     exit();
 }
 

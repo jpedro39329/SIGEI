@@ -54,9 +54,10 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Usuários das Unidades Escolares</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro de usuários e vinculação às escolas (SEFISC).</p>
+            <h2 class="mb-1">Cadastrar Usuário da Escola</h2>
+            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro de novos usuários e vinculação às escolas (SEFISC).</p>
         </div>
+        <a href="listar.php" class="btn btn-secondary">Voltar para a lista</a>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'ok'): ?>
@@ -70,7 +71,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Formulário de cadastro de Usuário da UE -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">Novo Usuário de Escola</h5>
+            <h5 class="mb-3">Dados do Usuário</h5>
             <form action="../../controllers/usuarios_ue/salvar.php" method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                 <div class="row">
@@ -117,62 +118,17 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" required>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-dark">Cadastrar Usuário da Escola</button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-dark">Cadastrar Usuário da Escola</button>
+                    <a href="listar.php" class="btn btn-secondary">Cancelar</a>
+                </div>
             </form>
-        </div>
-    </div>
-
-    <!-- Lista de Usuários das Escolas -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Usuários de Escolas Cadastrados</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>CPF</th>
-                            <th>Escola</th>
-                            <th>CIE</th>
-                            <th>URE</th>
-                            <th>Contato</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($usuariosEscola) > 0): ?>
-                            <?php foreach ($usuariosEscola as $u): ?>
-                                <tr>
-                                    <td><strong><?php echo htmlspecialchars($u['nome']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars(formatarCPF($u['cpf'])); ?></td>
-                                    <td><?php echo htmlspecialchars($u['escola_nome']); ?></td>
-                                    <td><code><?php echo htmlspecialchars($u['cie']); ?></code></td>
-                                    <td><?php echo htmlspecialchars($u['ure_nome']); ?></td>
-                                    <td>
-                                        <small><?php echo htmlspecialchars($u['email'] ?? '-'); ?><br><?php echo htmlspecialchars($u['telefone'] ?? ''); ?></small>
-                                    </td>
-                                    <td>
-                                        <?php if ($u['ativo'] == 1): ?>
-                                            <span class="badge bg-success">Ativo</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Inativo</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="7" class="text-center text-muted">Nenhum usuário de escola cadastrado.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const cpfInput = document.getElementById('cpf');
     if (cpfInput) {

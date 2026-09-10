@@ -78,12 +78,6 @@ function totalDashboard($conexao, $sql) {
         $alunos = $resultadoAlunos ? mysqli_fetch_all($resultadoAlunos, MYSQLI_ASSOC) : [];
         ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">Em atendimento</span><strong><?php echo $alunosEmAtendimento; ?></strong></div>
-            <div class="card"><span class="text-muted">Sem atendimento</span><strong><?php echo $alunosSemAtendimento; ?></strong></div>
-            <div class="card"><span class="text-muted">Pendentes</span><strong><?php echo $alunosPendentes; ?></strong></div>
-        </div>
-
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <h5 class="mb-3">Resumo dos alunos da escola</h5>
@@ -95,7 +89,7 @@ function totalDashboard($conexao, $sql) {
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Alunos da minha escola</h5>
-                    <a href="alunos/cadastrar.php" class="btn btn-primary btn-sm">Nova Solicitação</a>
+                    <a href="alunos/pendentes.php" class="btn btn-primary btn-sm">Ver Solicitações</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -193,21 +187,58 @@ function totalDashboard($conexao, $sql) {
             FROM alunos a
             " . (($idUreUsuario > 0) ? "JOIN unidades_escolares ue ON a.id_ue = ue.id_ue WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'" : "WHERE a.status_aprovacao = 'APROVADO'") . "
         ");
-        ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">Solicitações Pendentes</span><strong><?php echo $alunosPendentes; ?></strong></div>
-            <div class="card"><span class="text-muted">Alunos Aprovados</span><strong><?php echo $alunosAprovados; ?></strong></div>
-            <div class="card"><span class="text-muted">Em atendimento c/ PAE</span><strong><?php echo $alunosEmAtendimento; ?></strong></div>
-        </div>
+        $sqlSolicitacoesRecentes = "
+            SELECT a.id_aluno, a.nome, a.descricao_deficiencia, a.data_cadastro, ue.nome AS escola_nome
+            FROM alunos a
+            LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE a.status_aprovacao = 'PENDENTE'
+            " . (($idUreUsuario > 0) ? "AND ue.id_ure = $idUreUsuario" : "") . "
+            ORDER BY a.data_cadastro ASC
+            LIMIT 10
+        ";
+        $resSol = mysqli_query($conexao, $sqlSolicitacoesRecentes);
+        $solicitacoesPendentesLista = $resSol ? mysqli_fetch_all($resSol, MYSQLI_ASSOC) : [];
+        ?>
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Análise de Solicitações da URE</h5>
-                    <a href="solicitacoes/listar.php" class="btn btn-warning btn-sm">Ver Solicitações Pendentes</a>
+                    <a href="solicitacoes/listar.php" class="btn btn-warning btn-sm">Ver Todas as Solicitações</a>
                 </div>
                 <canvas id="graficoEducacao" height="100"></canvas>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Solicitações Aguardando Análise</h5>
+                    <a href="solicitacoes/listar.php" class="btn btn-outline-primary btn-sm">Ver Fila Completa</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead><tr><th>Aluno</th><th>Escola</th><th>Deficiência</th><th>Data</th><th>Ação</th></tr></thead>
+                        <tbody>
+                            <?php if (count($solicitacoesPendentesLista) > 0): ?>
+                                <?php foreach ($solicitacoesPendentesLista as $sol): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($sol['nome']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($sol['escola_nome'] ?? '-'); ?></td>
+                                        <td><?php echo htmlspecialchars($sol['descricao_deficiencia']); ?></td>
+                                        <td><?php echo !empty($sol['data_cadastro']) ? date('d/m/Y', strtotime($sol['data_cadastro'])) : '-'; ?></td>
+                                        <td>
+                                            <a href="solicitacoes/analisar.php?id=<?php echo $sol['id_aluno']; ?>" class="btn btn-sm btn-info">Analisar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="5" class="text-center text-muted">Nenhuma solicitação pendente no momento.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -329,21 +360,73 @@ function totalDashboard($conexao, $sql) {
             JOIN empresa_ure eu ON p.id_empresa = eu.id_empresa
             WHERE eu.id_ure = $idUreUsuario AND p.ativo = 1
         ");
+
+        // Alunos aprovados e pendentes da URE para o gráfico SEFISC
+        $alunosAprovadosUre = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'
+        ");
+        $alunosPendentesUre = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'PENDENTE'
+        ");
+
+        // Lista relevante: Usuários de escolas recém cadastrados na URE
+        $sqlUltimosUsuariosUe = "
+            SELECT uue.nome, uue.cpf, ue.nome AS escola_nome, uue.data_cadastro, uue.ativo
+            FROM usuarios_ue uue
+            JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario
+            ORDER BY uue.data_cadastro DESC
+            LIMIT 8
+        ";
+        $resUe = mysqli_query($conexao, $sqlUltimosUsuariosUe);
+        $ultimosUsuariosUe = $resUe ? mysqli_fetch_all($resUe, MYSQLI_ASSOC) : [];
         ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">Escolas na URE</span><strong><?php echo $totalEscolasUre; ?></strong></div>
-            <div class="card"><span class="text-muted">Usuários de Escolas</span><strong><?php echo $totalUsuariosEscola; ?></strong></div>
-            <div class="card"><span class="text-muted">PAEs nas Empresas da URE</span><strong><?php echo $totalPaesUre; ?></strong></div>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Panorama Geral da URE (Fiscalização)</h5>
+                    <a href="usuarios_ue/listar.php" class="btn btn-outline-primary btn-sm">Gerenciar Usuários</a>
+                </div>
+                <canvas id="graficoSefisc" height="100"></canvas>
+            </div>
         </div>
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Fiscalização e Gestão de Usuários Escolares</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="usuarios_ue/cadastrar.php" class="btn btn-outline-primary">Cadastrar Usuários de Escolas</a>
-                    <a href="alunos/listar.php" class="btn btn-outline-secondary">Consultar Alunos da Regional</a>
-                    <a href="paes/listar.php" class="btn btn-outline-secondary">Consultar PAEs</a>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Usuários de Escolas Cadastrados na Regional</h5>
+                    <a href="usuarios_ue/cadastrar.php" class="btn btn-primary btn-sm">Novo Usuário</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead><tr><th>Nome</th><th>CPF</th><th>Escola</th><th>Status</th><th>Data Cadastro</th></tr></thead>
+                        <tbody>
+                            <?php if (count($ultimosUsuariosUe) > 0): ?>
+                                <?php foreach ($ultimosUsuariosUe as $uu): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($uu['nome']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars(formatarCPF($uu['cpf'])); ?></td>
+                                        <td><?php echo htmlspecialchars($uu['escola_nome']); ?></td>
+                                        <td>
+                                            <?php if ($uu['ativo'] == 1): ?>
+                                                <span class="badge bg-success">Ativo</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">Inativo</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo !empty($uu['data_cadastro']) ? date('d/m/Y', strtotime($uu['data_cadastro'])) : '-'; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="5" class="text-center text-muted">Nenhum usuário de escola cadastrado na URE.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -423,6 +506,21 @@ new Chart(document.getElementById('graficoEducacao'), {
             label: 'Alunos',
             data: [<?php echo $alunosPendentes; ?>, <?php echo $alunosAprovados; ?>, <?php echo $alunosEmAtendimento; ?>],
             backgroundColor: ['#ffc107', '#198754', '#0d6efd']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+<?php endif; ?>
+
+<?php if ($userPerfil === 'USUARIO_SEFISC'): ?>
+new Chart(document.getElementById('graficoSefisc'), {
+    type: 'bar',
+    data: {
+        labels: ['Alunos Aprovados', 'Solicitações Pendentes', 'Usuários de UE', 'PAEs na URE'],
+        datasets: [{
+            label: 'Total',
+            data: [<?php echo $alunosAprovadosUre; ?>, <?php echo $alunosPendentesUre; ?>, <?php echo $totalUsuariosEscola; ?>, <?php echo $totalPaesUre; ?>],
+            backgroundColor: ['#198754', '#ffc107', '#0d6efd', '#0dcaf0']
         }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }
