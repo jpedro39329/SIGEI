@@ -262,7 +262,7 @@ if (!$aluno) {
                                 <label class="form-label">Foto do Aluno</label>
                                 <?php if (!empty($aluno['foto_arquivo'])): ?>
                                     <div class="mb-2">
-                                        <img src="../<?php echo htmlspecialchars($aluno['foto_arquivo']); ?>" alt="Foto atual" style="max-height: 80px;" class="rounded border p-1">
+                                        <img src="../../<?php echo htmlspecialchars($aluno['foto_arquivo']); ?>" alt="Foto atual" style="max-height: 80px;" class="rounded border p-1">
                                         <span class="text-muted small ms-2">Foto atual</span>
                                     </div>
                                 <?php endif; ?>
@@ -282,7 +282,7 @@ if (!$aluno) {
                                 <label class="form-label">Termo de Responsabilidade</label>
                                 <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                                     <div class="mb-2">
-                                        <a href="../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <a href="../../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                             📄 Ver termo atual
                                         </a>
                                     </div>

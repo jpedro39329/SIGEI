@@ -19,6 +19,15 @@ function uploadArquivo($arquivo, $pasta) {
         return false;
     }
 
+    // Diretório raiz absoluto do projeto
+    $raizProjeto = dirname(__DIR__);
+    $caminhoPasta = $raizProjeto . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $pasta . DIRECTORY_SEPARATOR;
+
+    // A estrutura é fixa: se a pasta obrigatória não existir, aborta com erro claro
+    if (!is_dir($caminhoPasta)) {
+        die("Erro: O diretório de destino obrigatório 'uploads/" . htmlspecialchars($pasta) . "/' não existe no sistema.");
+    }
+
     // Tipos de arquivo permitidos (MIME -> extensão)
     $tiposPermitidos = array(
         'image/jpeg' => 'jpg',
@@ -56,15 +65,7 @@ function uploadArquivo($arquivo, $pasta) {
     $extensao = $tiposPermitidos[$mimeReal];
     $nomeArquivo = date('YmdHis') . '_' . bin2hex(random_bytes(6)) . '.' . $extensao;
 
-    // Caminho completo da pasta
-    $caminhoPasta = "../uploads/" . $pasta . "/";
-
-    // Cria a pasta se não existir
-    if (!is_dir($caminhoPasta)) {
-        mkdir($caminhoPasta, 0777, true);
-    }
-
-    // Move o arquivo para a pasta
+    // Move o arquivo para a pasta de destino
     $caminhoFinal = $caminhoPasta . $nomeArquivo;
     if (move_uploaded_file($arquivo['tmp_name'], $caminhoFinal)) {
         // Retorna o caminho relativo para salvar no banco
