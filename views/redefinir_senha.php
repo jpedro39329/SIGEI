@@ -39,6 +39,10 @@ if (!$recuperacao) {
       overflow-x: hidden;
     }
 
+
+
+
+    
     .bg-svg {
       position: fixed;
       bottom: 0;
