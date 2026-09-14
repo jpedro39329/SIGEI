@@ -9,7 +9,7 @@ session_destroy();
 
 
 // volta para login
-header("Location: ../../views/login.php");
+header("Location: ../../index.html");
 exit();
 
 ?>
