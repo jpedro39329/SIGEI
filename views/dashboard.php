@@ -272,23 +272,63 @@ function totalDashboard($conexao, $sql) {
         ");
         ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">Total de PAEs</span><strong><?php echo $totalPAEs; ?></strong></div>
-            <div class="card"><span class="text-muted">PAEs em Atendimento</span><strong><?php echo $paesAtendendo; ?></strong></div>
-            <div class="card"><span class="text-muted">Associações Ativas</span><strong><?php echo $totalAssocAtivas; ?></strong></div>
-            <div class="card"><span class="text-muted">Relatórios Enviados</span><strong><?php echo $totalRelatorios; ?></strong></div>
+        <?php
+        // Lista dos últimos PAEs da empresa para a tabela
+        $sqlUltimosPaes = "
+            SELECT p.id_pae, p.nome, p.cpf, p.email, p.telefone, p.ativo, p.data_cadastro
+            FROM usuarios_pae p
+            WHERE p.id_empresa = $idEmpresaUsuario
+            ORDER BY p.data_cadastro DESC
+            LIMIT 8
+        ";
+        $resPaes = mysqli_query($conexao, $sqlUltimosPaes);
+        $ultimosPaes = $resPaes ? mysqli_fetch_all($resPaes, MYSQLI_ASSOC) : [];
+        ?>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Panorama Geral da Empresa</h5>
+                    <a href="paes/listar.php" class="btn btn-outline-primary btn-sm">Gerenciar PAEs</a>
+                </div>
+                <canvas id="graficoSupervisor" height="100"></canvas>
+            </div>
         </div>
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Ações Rápidas da Empresa</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="paes/cadastrar.php" class="btn btn-outline-primary">Cadastrar Novo PAE</a>
-                    <a href="associacoes/gerenciar.php" class="btn btn-outline-primary">Associar PAE a Aluno</a>
-                    <a href="relatorios/listar.php" class="btn btn-outline-secondary">Visualizar Relatórios</a>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Profissionais de Apoio Escolar (PAEs) Cadastrados</h5>
+                    <a href="paes/cadastrar.php" class="btn btn-primary btn-sm">Novo PAE</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead><tr><th>Nome</th><th>CPF</th><th>E-mail</th><th>Status</th><th>Data Cadastro</th></tr></thead>
+                        <tbody>
+                            <?php if (count($ultimosPaes) > 0): ?>
+                                <?php foreach ($ultimosPaes as $pae): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($pae['nome']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></td>
+                                        <td><?php echo htmlspecialchars($pae['email'] ?? '-'); ?></td>
+                                        <td>
+                                            <?php if ($pae['ativo'] == 1): ?>
+                                                <span class="badge bg-success">Ativo</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">Inativo</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo !empty($pae['data_cadastro']) ? date('d/m/Y', strtotime($pae['data_cadastro'])) : '-'; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="5" class="text-center text-muted">Nenhum PAE cadastrado na empresa.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+        </div>        
 
     <!-- ============================================================ -->
     <!-- 5. PAE (CUIDADOR) -->
@@ -373,24 +413,28 @@ function totalDashboard($conexao, $sql) {
             WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'PENDENTE'
         ");
 
-        // Lista relevante: Usuários de escolas recém cadastrados na URE
-        $sqlUltimosUsuariosUe = "
-            SELECT uue.nome, uue.cpf, ue.nome AS escola_nome, uue.data_cadastro, uue.ativo
-            FROM usuarios_ue uue
-            JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
+        // Lista de alunos da URE com dados do PAE vinculado
+        $sqlAlunosSefisc = "
+            SELECT a.id_aluno, a.nome, a.ra, a.descricao_deficiencia, a.status_aprovacao,
+                   (SELECT p.nome FROM associacoes ass
+                    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+                    WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+                    LIMIT 1) AS pae_nome
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
             WHERE ue.id_ure = $idUreUsuario
-            ORDER BY uue.data_cadastro DESC
-            LIMIT 8
+            ORDER BY a.data_cadastro DESC
+            LIMIT 10
         ";
-        $resUe = mysqli_query($conexao, $sqlUltimosUsuariosUe);
-        $ultimosUsuariosUe = $resUe ? mysqli_fetch_all($resUe, MYSQLI_ASSOC) : [];
+        $resAlunosSefisc = mysqli_query($conexao, $sqlAlunosSefisc);
+        $alunosSefisc = $resAlunosSefisc ? mysqli_fetch_all($resAlunosSefisc, MYSQLI_ASSOC) : [];
         ?>
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Panorama Geral da URE (Fiscalização)</h5>
-                    <a href="usuarios_ue/listar.php" class="btn btn-outline-primary btn-sm">Gerenciar Usuários</a>
+                    <a href="alunos/listar.php" class="btn btn-outline-primary btn-sm">Ver Todos os Alunos</a>
                 </div>
                 <canvas id="graficoSefisc" height="100"></canvas>
             </div>
@@ -399,31 +443,54 @@ function totalDashboard($conexao, $sql) {
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Usuários de Escolas Cadastrados na Regional</h5>
-                    <a href="usuarios_ue/cadastrar.php" class="btn btn-primary btn-sm">Novo Usuário</a>
+                    <h5 class="mb-0">Alunos da Unidade Regional</h5>
+                    <a href="alunos/listar.php" class="btn btn-primary btn-sm">Gerenciar Alunos</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead><tr><th>Nome</th><th>CPF</th><th>Escola</th><th>Status</th><th>Data Cadastro</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>RA</th>
+                                <th>Deficiência</th>
+                                <th>Status</th>
+                                <th>PAE Vinculado</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            <?php if (count($ultimosUsuariosUe) > 0): ?>
-                                <?php foreach ($ultimosUsuariosUe as $uu): ?>
+                            <?php if (count($alunosSefisc) > 0): ?>
+                                <?php foreach ($alunosSefisc as $aluno): ?>
                                     <tr>
-                                        <td><strong><?php echo htmlspecialchars($uu['nome']); ?></strong></td>
-                                        <td><?php echo htmlspecialchars(formatarCPF($uu['cpf'])); ?></td>
-                                        <td><?php echo htmlspecialchars($uu['escola_nome']); ?></td>
+                                        <td><strong><?php echo htmlspecialchars($aluno['nome']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($aluno['ra'] ?? '-'); ?></td>
+                                        <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
                                         <td>
-                                            <?php if ($uu['ativo'] == 1): ?>
-                                                <span class="badge bg-success">Ativo</span>
+                                            <?php
+                                                $st = $aluno['status_aprovacao'];
+                                                if ($st == 'PENDENTE') {
+                                                    echo '<span class="badge bg-warning text-dark">Pendente</span>';
+                                                } elseif ($st == 'APROVADO') {
+                                                    echo '<span class="badge bg-success">Aprovado</span>';
+                                                } elseif ($st == 'REPROVADO') {
+                                                    echo '<span class="badge bg-danger">Reprovado</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-secondary">Arquivado</span>';
+                                                }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($aluno['pae_nome'])): ?>
+                                                <span class="badge bg-info text-dark"><?php echo htmlspecialchars($aluno['pae_nome']); ?></span>
                                             <?php else: ?>
-                                                <span class="badge bg-secondary">Inativo</span>
+                                                <span class="text-muted">Sem PAE</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?php echo !empty($uu['data_cadastro']) ? date('d/m/Y', strtotime($uu['data_cadastro'])) : '-'; ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr><td colspan="5" class="text-center text-muted">Nenhum usuário de escola cadastrado na URE.</td></tr>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Nenhum aluno encontrado na regional.</td>
+                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -521,6 +588,21 @@ new Chart(document.getElementById('graficoSefisc'), {
             label: 'Total',
             data: [<?php echo $alunosAprovadosUre; ?>, <?php echo $alunosPendentesUre; ?>, <?php echo $totalUsuariosEscola; ?>, <?php echo $totalPaesUre; ?>],
             backgroundColor: ['#198754', '#ffc107', '#0d6efd', '#0dcaf0']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+<?php endif; ?>
+
+<?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+new Chart(document.getElementById('graficoSupervisor'), {
+    type: 'bar',
+    data: {
+        labels: ['Total de PAEs', 'PAEs em Atendimento', 'Associações Ativas', 'Relatórios Enviados'],
+        datasets: [{
+            label: 'Total',
+            data: [<?php echo $totalPAEs; ?>, <?php echo $paesAtendendo; ?>, <?php echo $totalAssocAtivas; ?>, <?php echo $totalRelatorios; ?>],
+            backgroundColor: ['#0d6efd', '#198754', '#0dcaf0', '#ffc107']
         }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }

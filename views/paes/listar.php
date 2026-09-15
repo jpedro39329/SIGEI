@@ -10,8 +10,8 @@ $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
 $idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 
 $busca = trim($_GET['busca'] ?? '');
-$statusFiltro = trim($_GET['status'] ?? '');
-$empresaFiltro = trim($_GET['empresa'] ?? '');
+$tipoFiltro = trim($_GET['tp_filtro'] ?? '1'); // 0 = Igual a, 1 = Contém
+$campoFiltro = trim($_GET['campo_filtro'] ?? '0'); // 0 = Todos, 1 = Nome, 2 = CPF, 3 = E-mail, 4 = Empresa, 5 = Status
 
 $where = array();
 
@@ -32,21 +32,36 @@ if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
 if ($busca !== '') {
     $termo = mysqli_real_escape_string($conexao, $busca);
     $cpfLimpo = preg_replace('/\D/', '', $busca);
-    if (!empty($cpfLimpo)) {
-        $where[] = "(p.nome LIKE '%$termo%' OR p.cpf LIKE '%$cpfLimpo%' OR p.email LIKE '%$termo%')";
-    } else {
-        $where[] = "(p.nome LIKE '%$termo%' OR p.email LIKE '%$termo%')";
+    $isIgual = ($tipoFiltro === '0');
+
+    if ($campoFiltro === '1') { // Nome
+        $where[] = $isIgual ? "p.nome = '$termo'" : "p.nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '2') { // CPF
+        $valCpf = !empty($cpfLimpo) ? $cpfLimpo : $termo;
+        $where[] = $isIgual ? "p.cpf = '$valCpf'" : "p.cpf LIKE '%$valCpf%'";
+    } elseif ($campoFiltro === '3') { // E-mail
+        $where[] = $isIgual ? "p.email = '$termo'" : "p.email LIKE '%$termo%'";
+    } elseif ($campoFiltro === '4' && !in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) { // Empresa
+        $where[] = $isIgual ? "e.nome = '$termo'" : "e.nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '5') { // Status
+        if (in_array(strtolower($termo), ['ativo', '1'])) {
+            $where[] = "p.ativo = 1";
+        } elseif (in_array(strtolower($termo), ['inativo', '0'])) {
+            $where[] = "p.ativo = 0";
+        }
+    } else { // 0 = Todos os campos
+        if ($isIgual) {
+            $conds = ["p.nome = '$termo'", "p.email = '$termo'"];
+            if (!empty($cpfLimpo)) $conds[] = "p.cpf = '$cpfLimpo'";
+            if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) $conds[] = "e.nome = '$termo'";
+            $where[] = "(" . implode(' OR ', $conds) . ")";
+        } else {
+            $conds = ["p.nome LIKE '%$termo%'", "p.email LIKE '%$termo%'"];
+            if (!empty($cpfLimpo)) $conds[] = "p.cpf LIKE '%$cpfLimpo%'";
+            if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) $conds[] = "e.nome LIKE '%$empBusca%'";
+            $where[] = "(" . implode(' OR ', $conds) . ")";
+        }
     }
-}
-
-if ($statusFiltro !== '') {
-    $stVal = (int) $statusFiltro;
-    $where[] = "p.ativo = $stVal";
-}
-
-if ($empresaFiltro !== '' && !in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
-    $empBusca = mysqli_real_escape_string($conexao, $empresaFiltro);
-    $where[] = "e.nome LIKE '%$empBusca%'";
 }
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -91,48 +106,49 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         <div class="alert alert-success">PAE salvo com sucesso.</div>
     <?php endif; ?>
 
-    <!-- Barra de pesquisa com lupa e dropdown de filtros -->
+    <!-- Barra de pesquisa e filtros -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
-                    <div class="col-md-7 col-12">
-                        <div class="input-group">
-                            <input type="text" name="busca" class="form-control form-control-sm" placeholder="Pesquisar por nome, CPF ou e-mail..." value="<?php echo htmlspecialchars($busca); ?>">
-                            <button class="btn btn-dark btn-sm" type="submit" title="Pesquisar">
-                                Pesquisar
-                            </button>
+                    <!-- 1. Campo para digitar -->
+                    <div class="col-md-5 col-sm-12 col-12">
+                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                    </div>
+
+                    <!-- 2. Tipo (Contém / Igual a) -->
+                    <div class="col-md-2 col-sm-6 col-12">
+                        <div class="form-group" id="tpFiltro">
+                            <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
+                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="col-md-5 col-12 d-flex gap-2">
-                        <div class="dropdown flex-grow-1">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" type="button" id="dropdownFiltrosPaes" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                <span>Filtros <?php echo ($statusFiltro !== '' || $empresaFiltro !== '') ? '<span class="badge bg-primary ms-1">Ativo</span>' : ''; ?></span>
-                            </button>
-                            <div class="dropdown-menu p-3 shadow-sm" style="min-width: 280px;" aria-labelledby="dropdownFiltrosPaes">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold mb-1">Status</label>
-                                    <select name="status" class="form-select form-select-sm">
-                                        <option value="">Todos</option>
-                                        <option value="1" <?php echo $statusFiltro === '1' ? 'selected' : ''; ?>>Ativo</option>
-                                        <option value="0" <?php echo $statusFiltro === '0' ? 'selected' : ''; ?>>Inativo</option>
-                                    </select>
-                                </div>
+                    <!-- 3. Campo de filtro -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="form-group">
+                            <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
+                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
+                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CPF</option>
+                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>E-mail</option>
                                 <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold mb-1">Empresa</label>
-                                        <input type="text" name="empresa" class="form-control form-control-sm" placeholder="Nome da empresa..." value="<?php echo htmlspecialchars($empresaFiltro); ?>">
-                                    </div>
+                                    <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Empresa</option>
                                 <?php endif; ?>
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-dark btn-sm w-100">Aplicar</button>
-                                    <a href="listar.php" class="btn btn-outline-secondary btn-sm w-100">Limpar</a>
-                                </div>
-                            </div>
+                                <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status</option>
+                            </select>
                         </div>
-                        <?php if ($busca !== '' || $statusFiltro !== '' || $empresaFiltro !== ''): ?>
-                            <a href="listar.php" class="btn btn-outline-secondary btn-sm">Limpar</a>
+                    </div>
+
+                    <!-- 4. Botões de ação -->
+                    <div class="col-md-2 col-12 d-flex gap-2">
+                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
+                            Filtrar
+                        </button>
+                        <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
+                            <a href="listar.php" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
                         <?php endif; ?>
                     </div>
                 </div>
