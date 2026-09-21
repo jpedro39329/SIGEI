@@ -400,8 +400,8 @@ if ($perfil !== '') {
       }
     }
   </style>
+    <link rel="icon" type="image/png" href="../assets/imgs/favicon.png">
 </head>
-
 <body>
 
   <!-- ===== SVG DE FUNDO ===== -->
@@ -453,7 +453,7 @@ if ($perfil !== '') {
       <?php if ($perfil === ''): ?>
         <!-- ETAPA 1: ESCOLHER PERFIL -->
         <div style="text-align: center;">
-          <span class="badge-dev">⚡ Modo Desenvolvimento</span>
+          <span class="badge-dev">Acesso rápido</span>
         </div>
         <h2 class="section-label">Acesso Administrativo</h2>
         <p class="section-sub">Selecione o perfil para entrar diretamente.</p>
@@ -476,7 +476,7 @@ if ($perfil !== '') {
       <?php else: ?>
         <!-- ETAPA 2: ESCOLHER USUÁRIO DENTRO DO PERFIL -->
         <div style="text-align: center;">
-          <span class="badge-dev">⚡ <?php echo htmlspecialchars($perfilConfig['nome']); ?></span>
+          <span class="badge-dev"> <?php echo htmlspecialchars($perfilConfig['nome']); ?></span>
         </div>
         <h2 class="section-label">Selecione o Usuário</h2>
         <p class="section-sub">Escolha a conta que deseja utilizar neste perfil.</p>

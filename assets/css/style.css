@@ -34,74 +34,217 @@ body[class*="page-"] {
     top: 0;
     z-index: 1030;
     min-width: 0;
-    padding: 0.7rem 1rem;
-    background: rgba(255, 255, 255, 0.97) !important;
+    padding: 0.65rem 1.25rem;
+    background: rgba(255, 255, 255, 0.98) !important;
     border-bottom: 1px solid var(--sigei-border);
-    box-shadow: 0 2px 14px rgba(13, 71, 161, 0.08) !important;
+    box-shadow: 0 2px 14px rgba(13, 71, 161, 0.06) !important;
+    backdrop-filter: blur(8px);
 }
 
 .logo-nav {
-    height: 50px;
+    height: 48px;
     width: auto;
+    object-fit: contain;
 }
 
 .navbar .nav-link {
     color: #52637a;
-    padding: 0.65rem 1rem;
-    font-size: 0.95rem;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.92rem;
     font-weight: 700;
     border-radius: 0.65rem;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.navbar .nav-link:hover { color: var(--sigei-blue-900); background-color: #e8f1ff; }
-.navbar .nav-link.active { color: var(--sigei-blue-900); background-color: #dcecff; }
-.navbar-toggler { border-color: #b7cce9; }
-
-.navbar-user {
-    padding: 0.2rem 0;
+.navbar .nav-link:hover {
+    color: var(--sigei-blue-900);
+    background-color: #e8f1ff;
 }
 
-.navbar-user-info {
-    display: flex;
-    min-width: 0;
-    align-items: center;
-    gap: 0.55rem;
+.navbar .nav-link.active {
+    color: var(--sigei-blue-900);
+    background-color: #dcecff;
+}
+
+.navbar-toggler {
+    border-color: #b7cce9;
     padding: 0.35rem 0.6rem;
-    border-radius: 0.75rem;
-    background: #f3f8ff;
+    border-radius: 0.6rem;
 }
 
-.navbar-user-avatar {
-    display: grid;
-    width: 2.15rem;
-    height: 2.15rem;
-    flex: 0 0 auto;
-    place-items: center;
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem var(--sigei-focus);
+}
+
+/* Ações à direita da Navbar (Notificações e Avatar) */
+.navbar-right-actions {
+    display: flex;
+    align-items: center;
+}
+
+/* Botão de Sino de Notificações */
+.navbar-bell-btn {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #1e293b;
     border-radius: 50%;
-    color: #fff;
-    background: linear-gradient(135deg, var(--sigei-blue-700), var(--sigei-teal-600));
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-bell-btn:hover,
+.navbar-bell-btn:focus,
+.navbar-bell-btn[aria-expanded="true"] {
+    background-color: #f1f5f9;
+    color: var(--sigei-blue-900);
+}
+
+.navbar-bell-icon {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.navbar-bell-badge {
+    top: 2px;
+    right: 3px;
+    background-color: #dc3545;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+}
+
+/* Botão do Usuário (Avatar + Chevron) */
+.navbar-user-trigger {
+    background: transparent;
+    padding: 2px 4px;
+    border-radius: 999px;
+    transition: opacity 0.15s ease;
+    cursor: pointer;
+}
+
+.navbar-user-trigger:hover {
+    opacity: 0.9;
+}
+
+/* Avatar Circular Escuro (estilo referência) */
+.navbar-avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #2b3e50; /* Tom azul marinho escuro / ardósia fiel à referência */
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-avatar-img {
+    object-fit: cover;
+    background-color: #2b3e50;
+}
+
+/* Ícone de seta ao lado do avatar */
+.navbar-arrow-icon {
+    color: #4b5563;
     font-size: 0.85rem;
-    font-weight: 800;
+    margin-left: 2px;
 }
 
-.navbar-user-copy {
-    display: grid;
-    min-width: 0;
-    line-height: 1.15;
+/* Dropdown Personalizado no estilo do Mockup */
+.navbar-custom-dropdown {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+    background-color: #ffffff !important;
+    position: absolute;
+    margin-top: 12px !important;
+    animation: navbarMenuPop 0.16s ease-out;
 }
 
-.navbar-user-copy strong,
-.navbar-user-copy small {
-    overflow: hidden;
-    max-width: 12rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+/* Setinha triangular superior apontando para o avatar (Popover Pointer) */
+.navbar-custom-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    width: 14px;
+    height: 14px;
+    background-color: #ffffff;
+    border-left: 1px solid #e5e7eb;
+    border-top: 1px solid #e5e7eb;
+    transform: rotate(45deg);
+    z-index: 1;
 }
 
-.navbar-user-copy strong { color: var(--sigei-ink); font-size: 0.82rem; }
-.navbar-user-copy small { margin-top: 0.15rem; color: var(--sigei-muted); font-size: 0.7rem; }
-.navbar-logout { min-height: 2.35rem !important; }
+@keyframes navbarMenuPop {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar-menu-link {
+    font-size: 0.95rem;
+    color: #1f2937 !important;
+    padding: 0.65rem 1.25rem !important;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    border-radius: 0 !important;
+}
+
+.navbar-menu-link:hover {
+    background-color: #f8fafc !important;
+}
+
+.navbar-menu-link.text-danger {
+    color: #ef4444 !important;
+}
+
+.navbar-menu-link.text-danger:hover {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+/* Itens de Notificação */
+.navbar-notification-item {
+    transition: background-color 0.15s ease;
+    border-radius: 0 !important;
+}
+
+.navbar-notification-item:hover {
+    background-color: #f8fafc !important;
+}
+
+.navbar-notif-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
 
 /* Área principal compartilhada por todas as telas internas */
 body[class*="page-"] .content {
@@ -360,6 +503,15 @@ textarea:focus-visible, [tabindex]:focus-visible {
 
 .terms-back { align-self: flex-start; color: var(--sigei-blue-900); font-weight: 700; }
 
+@media (max-width: 991.98px) {
+    .navbar-right-actions {
+        padding-top: 0.5rem;
+        border-top: 1px solid #e7eff8;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
 @media (max-width: 767.98px) {
     .navbar { padding: 0.55rem 0.75rem; }
     .navbar .nav-link { padding: 0.7rem 0.75rem; }
@@ -370,9 +522,6 @@ textarea:focus-visible, [tabindex]:focus-visible {
     .content .d-flex.gap-2 { flex-wrap: wrap; }
     .content .table-responsive .table { min-width: 620px; }
     .page-perfil .list-group-item { flex-wrap: wrap; gap: 0.35rem; }
-    .navbar-user { align-items: stretch !important; }
-    .navbar-user-info { width: 100%; }
-    .navbar-logout { width: 100%; }
     .terms-layout { grid-template-columns: 1fr; }
     .terms-brand { min-height: auto; }
 }
@@ -380,4 +529,36 @@ textarea:focus-visible, [tabindex]:focus-visible {
 @media (max-width: 420px) {
     .content .btn:not(.btn-sm), .content .d-flex.gap-2 > .btn,
     .content .d-flex.gap-2 > a.btn { width: 100%; }
+    .navbar-right-actions .dropdown-menu {
+        max-width: calc(100vw - 2rem) !important;
+    }
 }
+
+/* Modal de Confirmação Unificado - SIGEI */
+.sigei-confirm-modal .modal-content {
+    border-radius: 1.1rem !important;
+    border: 1px solid rgba(13, 71, 161, 0.08) !important;
+    box-shadow: 0 20px 45px rgba(13, 71, 161, 0.18) !important;
+}
+
+.sigei-confirm-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 0.2s ease;
+}
+
+.sigei-confirm-modal.show .sigei-confirm-icon-wrapper {
+    transform: scale(1.05);
+}
+
+.sigei-confirm-message {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #4b5563 !important;
+}
+

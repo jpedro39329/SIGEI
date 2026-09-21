@@ -320,4 +320,284 @@ function registrarAceiteTermo($conexao, $idUsuario, $perfil) {
     return $ok;
 }
 
+// ============================================================
+// NOTIFICAÇÕES INTELIGENTES POR PERFIL
+// ============================================================
+
+/**
+ * Retorna as notificações reais calculadas para o usuário logado
+ * @param mysqli $conexao
+ * @param string $perfil
+ * @param int $userId
+ * @param string $baseUrl
+ * @return array
+ */
+function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') {
+    $notificacoes = [];
+    $userId = (int) $userId;
+
+    if (!$conexao || $userId <= 0) {
+        return $notificacoes;
+    }
+
+    // 1. EDUCAÇÃO ESPECIAL (URE)
+    if ($perfil === 'USUARIO_EDUCACAO_ESPECIAL') {
+        $idUre = idUreUsuario($conexao, $userId);
+        $whereUre = ($idUre > 0) ? "AND ue.id_ure = $idUre" : "";
+
+        // Solicitações pendentes há mais de 3 dias (urgentes)
+        $sqlUrgentes = "
+            SELECT a.id_aluno, a.nome, DATEDIFF(NOW(), a.data_cadastro) AS dias_pendente
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE a.status_aprovacao = 'PENDENTE' AND DATEDIFF(NOW(), a.data_cadastro) >= 3 $whereUre
+            ORDER BY a.data_cadastro ASC LIMIT 3
+        ";
+        $resUrgentes = mysqli_query($conexao, $sqlUrgentes);
+        if ($resUrgentes) {
+            while ($row = mysqli_fetch_assoc($resUrgentes)) {
+                $dias = (int) $row['dias_pendente'];
+                $notificacoes[] = [
+                    'tipo' => 'danger',
+                    'icone' => 'bi-clock-history',
+                    'titulo' => 'Solicitação Pendente Crítica',
+                    'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise há {$dias} dias.",
+                    'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
+                    'tempo' => "Há {$dias} dias"
+                ];
+            }
+        }
+
+        // Novas solicitações recentes (menos de 3 dias)
+        $sqlRecentes = "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE a.status_aprovacao = 'PENDENTE' AND DATEDIFF(NOW(), a.data_cadastro) < 3 $whereUre
+        ";
+        $resRec = mysqli_query($conexao, $sqlRecentes);
+        $totalRec = $resRec ? (int) mysqli_fetch_assoc($resRec)['total'] : 0;
+        if ($totalRec > 0) {
+            $notificacoes[] = [
+                'tipo' => 'warning',
+                'icone' => 'bi-inbox-fill',
+                'titulo' => 'Novas Solicitações',
+                'mensagem' => "Você possui <strong>{$totalRec}</strong> solicitação(ões) recente(s) para analisar.",
+                'link' => $baseUrl . "views/solicitacoes/listar.php",
+                'tempo' => "Fila da URE"
+            ];
+        }
+    }
+
+    // 2. UNIDADE ESCOLAR (USUARIO_ESCOLA / UE)
+    elseif (in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
+        $idEscola = idEscolaUsuario($conexao, $userId);
+
+        // Alunos aprovados recentemente pela Educação Especial
+        $sqlAprovados = "
+            SELECT id_aluno, nome
+            FROM alunos
+            WHERE id_ue = $idEscola AND status_aprovacao = 'APROVADO'
+            ORDER BY data_cadastro DESC LIMIT 2
+        ";
+        $resApr = mysqli_query($conexao, $sqlAprovados);
+        if ($resApr) {
+            while ($row = mysqli_fetch_assoc($resApr)) {
+                $notificacoes[] = [
+                    'tipo' => 'success',
+                    'icone' => 'bi-check-circle-fill',
+                    'titulo' => 'Solicitação Aprovada',
+                    'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi aprovado pela Educação Especial.",
+                    'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
+                    'tempo' => "Aprovado"
+                ];
+            }
+        }
+
+        // Alunos reprovados que precisam de atenção/ajuste
+        $sqlReprovados = "
+            SELECT id_aluno, nome, motivo_reprovacao
+            FROM alunos
+            WHERE id_ue = $idEscola AND status_aprovacao = 'REPROVADO'
+            ORDER BY data_cadastro DESC LIMIT 2
+        ";
+        $resRep = mysqli_query($conexao, $sqlReprovados);
+        if ($resRep) {
+            while ($row = mysqli_fetch_assoc($resRep)) {
+                $notificacoes[] = [
+                    'tipo' => 'danger',
+                    'icone' => 'bi-x-circle-fill',
+                    'titulo' => 'Solicitação Reprovada',
+                    'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi reprovado. Verifique os motivos.",
+                    'link' => $baseUrl . "views/alunos/pendentes.php?aba=reprovados",
+                    'tempo' => "Atenção"
+                ];
+            }
+        }
+
+        // Alunos aprovados mas que ainda não têm PAE associado
+        $sqlSemPae = "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            WHERE a.id_ue = $idEscola AND a.status_aprovacao = 'APROVADO'
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+              )
+        ";
+        $resSemPae = mysqli_query($conexao, $sqlSemPae);
+        $totalSemPae = $resSemPae ? (int) mysqli_fetch_assoc($resSemPae)['total'] : 0;
+        if ($totalSemPae > 0) {
+            $notificacoes[] = [
+                'tipo' => 'warning',
+                'icone' => 'bi-person-exclamation',
+                'titulo' => 'Aguardando PAE',
+                'mensagem' => "<strong>{$totalSemPae}</strong> aluno(s) aprovado(s) ainda aguardam vinculação de PAE.",
+                'link' => $baseUrl . "views/alunos/listar.php",
+                'tempo' => "Sem Cuidador"
+            ];
+        }
+    }
+
+    // 3. SUPERVISOR DA EMPRESA
+    elseif (in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+        $idEmpresa = idEmpresaSupervisor($conexao, $userId);
+        $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresa);
+
+        if (!empty($uresAtendidas)) {
+            $uresList = implode(',', $uresAtendidas);
+
+            // Alunos aprovados que estão sem PAE nas UREs da empresa
+            $sqlAlunosSemPae = "
+                SELECT COUNT(*) AS total
+                FROM alunos a
+                JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+                WHERE ue.id_ure IN ($uresList) AND a.status_aprovacao = 'APROVADO'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+                  )
+            ";
+            $resAlSemPae = mysqli_query($conexao, $sqlAlunosSemPae);
+            $totalAlSemPae = $resAlSemPae ? (int) mysqli_fetch_assoc($resAlSemPae)['total'] : 0;
+            if ($totalAlSemPae > 0) {
+                $notificacoes[] = [
+                    'tipo' => 'warning',
+                    'icone' => 'bi-person-plus-fill',
+                    'titulo' => 'Alunos Aguardando PAE',
+                    'mensagem' => "Há <strong>{$totalAlSemPae}</strong> aluno(s) aprovado(s) pronto(s) para vinculação de cuidador.",
+                    'link' => $baseUrl . "views/associacoes/gerenciar.php",
+                    'tempo' => "Alocação"
+                ];
+            }
+        }
+
+        // PAEs inativos cadastrados
+        $sqlPaesInativos = "SELECT COUNT(*) AS total FROM usuarios_pae WHERE id_empresa = $idEmpresa AND ativo = 0";
+        $resInat = mysqli_query($conexao, $sqlPaesInativos);
+        $totalInat = $resInat ? (int) mysqli_fetch_assoc($resInat)['total'] : 0;
+        if ($totalInat > 0) {
+            $notificacoes[] = [
+                'tipo' => 'info',
+                'icone' => 'bi-people-fill',
+                'titulo' => 'PAEs Inativos',
+                'mensagem' => "Você possui <strong>{$totalInat}</strong> PAE(s) inativo(s) cadastrado(s).",
+                'link' => $baseUrl . "views/paes/listar.php",
+                'tempo' => "Cadastro"
+            ];
+        }
+    }
+
+    // 4. ADMIN & SEDUC
+    elseif (in_array($perfil, ['ADMIN', 'SEDUC'])) {
+        // Alunos pendentes há mais de 5 dias em toda a rede
+        $sqlPendentesCriticos = "
+            SELECT COUNT(*) AS total
+            FROM alunos
+            WHERE status_aprovacao = 'PENDENTE' AND DATEDIFF(NOW(), data_cadastro) >= 5
+        ";
+        $resCrit = mysqli_query($conexao, $sqlPendentesCriticos);
+        $totCrit = $resCrit ? (int) mysqli_fetch_assoc($resCrit)['total'] : 0;
+        if ($totCrit > 0) {
+            $notificacoes[] = [
+                'tipo' => 'danger',
+                'icone' => 'bi-exclamation-triangle-fill',
+                'titulo' => 'Fila de Análise Lenta',
+                'mensagem' => "Existem <strong>{$totCrit}</strong> aluno(s) pendente(s) há mais de 5 dias na rede.",
+                'link' => $baseUrl . "views/alunos/listar.php?campo_filtro=6&busca=PENDENTE",
+                'tempo' => "Alerta Geral"
+            ];
+        }
+
+        // Alunos aprovados sem atendimento de PAE
+        $sqlSemAtend = "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            WHERE a.status_aprovacao = 'APROVADO'
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+              )
+        ";
+        $resSemAt = mysqli_query($conexao, $sqlSemAtend);
+        $totSemAt = $resSemAt ? (int) mysqli_fetch_assoc($resSemAt)['total'] : 0;
+        if ($totSemAt > 0) {
+            $notificacoes[] = [
+                'tipo' => 'warning',
+                'icone' => 'bi-person-x-fill',
+                'titulo' => 'Alunos Aprovados sem PAE',
+                'mensagem' => "Total de <strong>{$totSemAt}</strong> aluno(s) aprovado(s) sem cuidador alocado.",
+                'link' => $baseUrl . "views/alunos/listar.php",
+                'tempo' => "Rede Estadual"
+            ];
+        }
+    }
+
+    // 5. DIRIGENTE REGIONAL / SEFISC
+    elseif (in_array($perfil, ['DIRIGENTE', 'USUARIO_SEFISC'])) {
+        $idUre = idUreUsuario($conexao, $userId);
+        if ($idUre > 0) {
+            $sqlPendentesUre = "
+                SELECT COUNT(*) AS total
+                FROM alunos a
+                JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+                WHERE ue.id_ure = $idUre AND a.status_aprovacao = 'PENDENTE'
+            ";
+            $resPUre = mysqli_query($conexao, $sqlPendentesUre);
+            $totPUre = $resPUre ? (int) mysqli_fetch_assoc($resPUre)['total'] : 0;
+            if ($totPUre > 0) {
+                $notificacoes[] = [
+                    'tipo' => 'warning',
+                    'icone' => 'bi-hourglass-split',
+                    'titulo' => 'Solicitações na Regional',
+                    'mensagem' => "Há <strong>{$totPUre}</strong> solicitação(ões) em tramitação na sua Diretoria de Ensino.",
+                    'link' => $baseUrl . "views/alunos/listar.php",
+                    'tempo' => "Regional"
+                ];
+            }
+        }
+    }
+
+    // 6. PAE (CUIDADOR)
+    elseif ($perfil === 'PAE') {
+        // Alunos em atendimento
+        $sqlMeusAlunos = "
+            SELECT COUNT(*) AS total
+            FROM associacoes ass
+            WHERE ass.id_pae = $userId AND ass.ativo = 1
+        ";
+        $resMeus = mysqli_query($conexao, $sqlMeusAlunos);
+        $totMeus = $resMeus ? (int) mysqli_fetch_assoc($resMeus)['total'] : 0;
+        if ($totMeus > 0) {
+            $notificacoes[] = [
+                'tipo' => 'info',
+                'icone' => 'bi-journal-check',
+                'titulo' => 'Relatórios Mensais',
+                'mensagem' => "Você possui <strong>{$totMeus}</strong> aluno(s) ativo(s). Mantenha seus relatórios pedagógicos em dia.",
+                'link' => $baseUrl . "views/relatorios/listar.php",
+                'tempo' => "Acompanhamento"
+            ];
+        }
+    }
+
+    return $notificacoes;
+}
+
 ?>

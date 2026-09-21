@@ -87,6 +87,7 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
     <title>Associações — SIGEI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body class="page-associacoes">
 
@@ -207,7 +208,12 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
                                     <td><?php echo date('d/m/Y', strtotime($associacao['data_inicio'])); ?></td>
                                     <td><span class="badge bg-success">Em Atendimento</span></td>
                                     <td>
-                                        <form action="../../controllers/associacoes/desassociar.php" method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente desassociar este PAE do aluno?');">
+                                        <form action="../../controllers/associacoes/desassociar.php" method="POST" style="display:inline;"
+                                              data-confirm="true"
+                                              data-confirm-type="danger"
+                                              data-confirm-title="Desassociar PAE"
+                                              data-confirm-message="Tem certeza de que deseja desassociar este PAE do aluno?<br><small class='text-muted'>O atendimento atual será finalizado.</small>"
+                                              data-confirm-action="Desassociar">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                             <input type="hidden" name="id_associacao" value="<?php echo $associacao['id_associacao']; ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger">Desassociar</button>
@@ -228,6 +234,5 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

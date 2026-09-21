@@ -311,8 +311,8 @@ require_once "../config/init.php";
       }
     }
   </style>
+    <link rel="icon" type="image/png" href="../assets/imgs/favicon.png">
 </head>
-
 <body>
 
   <!-- ===== SVG DE FUNDO (mesmo da tela inicial) ===== -->

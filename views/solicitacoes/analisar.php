@@ -45,6 +45,7 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
     <title>Analisar Solicitação</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body class="page-solicitacao-analisar">
 
@@ -199,12 +200,19 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function aprovar(id) {
-        if (!confirm('Deseja realmente aprovar esta solicitação?')) return;
-        document.getElementById('aprovar_id').value = id;
-        document.getElementById('formAprovar').submit();
+    async function aprovar(id) {
+        const confirmado = await confirmarAcao({
+            type: 'success',
+            title: 'Aprovar Solicitação',
+            message: 'Tem certeza de que deseja aprovar o cadastro deste aluno?<br><small class="text-muted">O aluno ficará disponível para atendimento na rede escolar.</small>',
+            actionText: 'Aprovar Solicitação'
+        });
+
+        if (confirmado) {
+            document.getElementById('aprovar_id').value = id;
+            document.getElementById('formAprovar').submit();
+        }
     }
 
     function reprovar(id) {

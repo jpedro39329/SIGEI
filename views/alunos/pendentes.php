@@ -63,6 +63,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
     <title>Solicitações de Alunos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body class="page-alunos-pendentes">
 
@@ -237,6 +238,5 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
