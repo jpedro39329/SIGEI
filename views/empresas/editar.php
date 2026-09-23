@@ -3,11 +3,37 @@ require_once "../../config/init.php";
 
 exigirPerfil(array('ADMIN', 'SEDUC'));
 
-$userName = $_SESSION['user_name'];
+$id = (int) ($_GET['id'] ?? 0);
+if ($id <= 0) {
+    header("Location: listar.php?erro=" . urlencode("Empresa não informada."));
+    exit();
+}
 
+// 1. Dados da empresa
+$stmt = $conexao->prepare("SELECT * FROM empresas WHERE id_empresa = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$empresa = $stmt->get_result()->fetch_assoc();
+
+if (!$empresa) {
+    header("Location: listar.php?erro=" . urlencode("Empresa não encontrada."));
+    exit();
+}
+
+// 2. Lista todas as UREs
 $sqlUres = "SELECT * FROM unidades_regionais ORDER BY nome ASC";
 $resultUres = mysqli_query($conexao, $sqlUres);
 $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
+
+// 3. UREs já vinculadas a esta empresa
+$sqlVinculadas = "
+    SELECT u.id_ure, u.nome, u.uge
+    FROM empresa_ure eu
+    JOIN unidades_regionais u ON eu.id_ure = u.id_ure
+    WHERE eu.id_empresa = $id
+";
+$resVinculadas = mysqli_query($conexao, $sqlVinculadas);
+$uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +41,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Empresa</title>
+    <title>Editar Empresa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
@@ -47,7 +73,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
         }
     </style>
 </head>
-<body class="page-empresas-cadastrar">
+<body class="page-empresas-editar">
 
 <?php require("../../includes/navbar.php"); ?>
 
@@ -57,14 +83,15 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
         <div class="col-lg-9">
             <div class="card card-form">
                 <div class="card-body p-4">
-                    <h2 class="mb-4">Cadastrar Empresa Prestadora de Serviços</h2>
+                    <h2 class="mb-4">Editar Empresa Contratada</h2>
 
                     <?php if (isset($_GET['erro'])): ?>
                         <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_GET['erro']); ?></div>
                     <?php endif; ?>
 
-                    <form action="../../controllers/empresas/salvar.php" method="POST" id="formEmpresa">
+                    <form action="../../controllers/empresas/editar_salvar.php" method="POST" id="formEmpresa">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                        <input type="hidden" name="id_empresa" value="<?php echo $empresa['id_empresa']; ?>">
                         
                         <div class="row">
                             <div class="col-12">
@@ -73,37 +100,45 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Razão Social / Nome Fantasia <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" placeholder="Ex.: Apoio Inclusivo Serviços Educacionais Ltda." required>
+                                <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($empresa['nome']); ?>" required>
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">CNPJ <span class="text-danger">*</span></label>
-                                <input type="text" name="cnpj" id="cnpj" class="form-control" maxlength="18" placeholder="00.000.000/0000-00" required>
+                                <input type="text" name="cnpj" id="cnpj" class="form-control" maxlength="18" value="<?php echo htmlspecialchars(formatarCNPJ($empresa['cnpj'])); ?>" required>
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Número do Contrato / Edital</label>
-                                <input type="text" name="numero_contrato" class="form-control" placeholder="Ex.: CTR-001/2026">
+                                <input type="text" name="numero_contrato" class="form-control" value="<?php echo htmlspecialchars($empresa['numero_contrato'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Início do Contrato</label>
-                                <input type="date" name="data_inicio_contrato" class="form-control">
+                                <input type="date" name="data_inicio_contrato" class="form-control" value="<?php echo htmlspecialchars($empresa['data_inicio_contrato'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Fim do Contrato (Vigência)</label>
-                                <input type="date" name="data_fim_contrato" class="form-control">
+                                <input type="date" name="data_fim_contrato" class="form-control" value="<?php echo htmlspecialchars($empresa['data_fim_contrato'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" placeholder="(11) 4034-2001">
+                                <input type="text" name="telefone" class="form-control" value="<?php echo htmlspecialchars($empresa['telefone'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="contato@empresa.com.br">
+                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($empresa['email'] ?? ''); ?>">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status da Empresa</label>
+                                <select name="ativo" class="form-select">
+                                    <option value="1" <?php echo $empresa['ativo'] == 1 ? 'selected' : ''; ?>>Ativa (Contrato Vigente)</option>
+                                    <option value="0" <?php echo $empresa['ativo'] == 0 ? 'selected' : ''; ?>>Inativa (Histórico / Encerrado)</option>
+                                </select>
                             </div>
 
                             <div class="col-12 mt-3">
@@ -112,32 +147,32 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Logradouro / Rua</label>
-                                <input type="text" name="endereco" class="form-control" placeholder="Ex.: Rua Comercial">
+                                <input type="text" name="endereco" class="form-control" value="<?php echo htmlspecialchars($empresa['endereco'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">Número</label>
-                                <input type="text" name="numero" class="form-control" placeholder="100">
+                                <input type="text" name="numero" class="form-control" value="<?php echo htmlspecialchars($empresa['numero'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Bairro</label>
-                                <input type="text" name="bairro" class="form-control" placeholder="Centro">
+                                <input type="text" name="bairro" class="form-control" value="<?php echo htmlspecialchars($empresa['bairro'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">CEP</label>
-                                <input type="text" name="cep" class="form-control" maxlength="9" placeholder="00000-000">
+                                <input type="text" name="cep" class="form-control" maxlength="9" value="<?php echo htmlspecialchars($empresa['cep'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Cidade</label>
-                                <input type="text" name="municipio" class="form-control" placeholder="Ex.: Bragança Paulista">
+                                <input type="text" name="municipio" class="form-control" value="<?php echo htmlspecialchars($empresa['municipio'] ?? ''); ?>">
                             </div>
 
                             <div class="col-12 mt-3">
                                 <h5 class="mb-2">UREs Atendidas pelo Contrato</h5>
-                                <p class="text-muted small mb-3">Selecione as Unidades Regionais atendidas por esta empresa:</p>
+                                <p class="text-muted small mb-3">Selecione ou desmarque as Unidades Regionais atendidas:</p>
                                 
                                 <div class="p-3 border rounded bg-light mb-3">
                                     <div class="mb-3">
@@ -176,7 +211,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-dark">Cadastrar Empresa</button>
+                            <button type="submit" class="btn btn-dark">Salvar Alterações</button>
                             <a href="listar.php" class="btn btn-secondary">Voltar</a>
                         </div>
                     </form>
@@ -194,6 +229,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputsOcultos = document.getElementById('inputsOcultosUres');
     const msgNenhuma = document.getElementById('nenhumaUreSelecionada');
     const filtroInput = document.getElementById('filtroUre');
+
+    const preSelected = <?php echo json_encode($uresVinculadas); ?>;
+    preSelected.forEach(item => {
+        selectedUres.set(String(item.id_ure), {
+            id: String(item.id_ure),
+            nome: item.nome,
+            uge: item.uge || ''
+        });
+    });
 
     function renderTags() {
         containerTags.innerHTML = '';
@@ -235,6 +279,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    renderTags();
 
     document.querySelectorAll('.card-ure-selectable').forEach(card => {
         card.addEventListener('click', function() {

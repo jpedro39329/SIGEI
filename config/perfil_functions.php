@@ -67,6 +67,11 @@ function validarTokenCSRF($token) {
         && hash_equals($_SESSION['csrf_token'], $token);
 }
 
+// Alias para compatibilidade
+function verificarTokenCSRF($token) {
+    return validarTokenCSRF($token);
+}
+
 // Exige que a requisição POST contenha um token CSRF válido
 function exigirTokenCSRF() {
     $token = $_POST['csrf_token'] ?? '';

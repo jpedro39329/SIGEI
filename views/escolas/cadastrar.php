@@ -82,7 +82,11 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">CIE (Código da Escola)</label>
-                        <input type="text" name="cie" class="form-control" maxlength="6" placeholder="123456" required>
+                        <input type="text" name="cie" class="form-control" maxlength="20" placeholder="Ex.: 123456" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Código UA</label>
+                        <input type="text" name="ua" class="form-control font-monospace" maxlength="20" placeholder="Ex.: 42962">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Modalidade de Ensino</label>

@@ -5,7 +5,7 @@ exigirPerfil(array('DIRIGENTE', 'ADMIN', 'SEDUC'));
 exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: ../../views/escolas/cadastrar.php");
+    header("Location: ../../views/escolas/listar.php");
     exit();
 }
 
@@ -23,11 +23,12 @@ if ($userPerfil === 'DIRIGENTE') {
 
 $nome = trim($_POST['nome'] ?? '');
 $cie = trim($_POST['cie'] ?? '');
+$ua = trim($_POST['ua'] ?? '');
 $modalidade = $_POST['modalidade'] ?? 'REGULAR';
-$rua = trim($_POST['rua'] ?? '');
+$endereco = trim($_POST['endereco'] ?? ($_POST['rua'] ?? ''));
 $numero = trim($_POST['numero'] ?? '');
 $bairro = trim($_POST['bairro'] ?? '');
-$cidade = trim($_POST['cidade'] ?? '');
+$municipio = trim($_POST['municipio'] ?? ($_POST['cidade'] ?? ''));
 $cep = preg_replace('/\D/', '', $_POST['cep'] ?? '');
 $horario = trim($_POST['horario_funcionamento'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
@@ -50,26 +51,26 @@ $stmtVerifica->close();
 
 $stmt = $conexao->prepare(
     "INSERT INTO unidades_escolares (
-        nome, cie, rua, numero, bairro, cidade, cep,
+        nome, cie, ua, endereco, numero, bairro, municipio, cep,
         modalidade, id_ure, horario_funcionamento, telefone, email
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 
 if (!$stmt) {
-    die("Erro ao preparar consulta: " . $conexao->error);
+    header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("Erro ao preparar consulta: " . $conexao->error));
+    exit();
 }
 
 $stmt->bind_param(
-    "ssssssssisss",
-    $nome, $cie, $rua, $numero, $bairro, $cidade, $cep,
+    "sssssssssisss",
+    $nome, $cie, $ua, $endereco, $numero, $bairro, $municipio, $cep,
     $modalidade, $idUre, $horario, $telefone, $email
 );
 
 if ($stmt->execute()) {
-    header("Location: ../../views/escolas/cadastrar.php?msg=ok");
+    header("Location: ../../views/escolas/listar.php?msg=ok");
     exit();
 }
 
 header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("Erro ao cadastrar escola: " . $stmt->error));
 exit();
-?>

@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+$id_empresa = (int) ($_POST['id_empresa'] ?? 0);
 $nome = trim($_POST['nome'] ?? '');
 $cnpj = preg_replace('/\D/', '', $_POST['cnpj'] ?? '');
 $numeroContrato = trim($_POST['numero_contrato'] ?? '');
@@ -21,46 +22,52 @@ $municipio = trim($_POST['municipio'] ?? '');
 $cep = preg_replace('/\D/', '', $_POST['cep'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $email = trim($_POST['email'] ?? '');
-$ativo = 1; // Cadastro sempre automaticamente ATIVO conforme solicitado
+$ativo = (int) ($_POST['ativo'] ?? 1);
 $uresSelecionadas = $_POST['ures'] ?? [];
 
-if ($nome === '' || $cnpj === '') {
-    header("Location: ../../views/empresas/cadastrar.php?erro=" . urlencode("Preencha a razão social e o CNPJ da empresa."));
+if ($id_empresa <= 0) {
+    header("Location: ../../views/empresas/listar.php?erro=" . urlencode("Empresa inválida."));
     exit();
 }
 
-// Verifica duplicidade de CNPJ
-$stmtVerifica = $conexao->prepare("SELECT id_empresa FROM empresas WHERE cnpj = ?");
-$stmtVerifica->bind_param("s", $cnpj);
+if ($nome === '' || $cnpj === '') {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Preencha a razão social e o CNPJ da empresa."));
+    exit();
+}
+
+// Verifica duplicidade de CNPJ em outras empresas
+$stmtVerifica = $conexao->prepare("SELECT id_empresa FROM empresas WHERE cnpj = ? AND id_empresa != ?");
+$stmtVerifica->bind_param("si", $cnpj, $id_empresa);
 $stmtVerifica->execute();
 if ($stmtVerifica->get_result()->num_rows > 0) {
-    header("Location: ../../views/empresas/cadastrar.php?erro=" . urlencode("Já existe uma empresa cadastrada com este CNPJ."));
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Já existe outra empresa cadastrada com este CNPJ."));
     exit();
 }
 $stmtVerifica->close();
 
 $stmt = $conexao->prepare(
-    "INSERT INTO empresas (
-        nome, cnpj, endereco, numero, bairro, municipio, cep,
-        telefone, email, numero_contrato, data_inicio_contrato, data_fim_contrato, ativo
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "UPDATE empresas SET
+        nome = ?, cnpj = ?, endereco = ?, numero = ?, bairro = ?, municipio = ?, cep = ?,
+        telefone = ?, email = ?, numero_contrato = ?, data_inicio_contrato = ?, data_fim_contrato = ?, ativo = ?
+     WHERE id_empresa = ?"
 );
 
 if (!$stmt) {
-    header("Location: ../../views/empresas/cadastrar.php?erro=" . urlencode("Erro ao preparar consulta: " . $conexao->error));
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Erro ao preparar consulta: " . $conexao->error));
     exit();
 }
 
 $stmt->bind_param(
-    "ssssssssssssi",
+    "ssssssssssssii",
     $nome, $cnpj, $endereco, $numero, $bairro, $municipio, $cep,
-    $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $ativo
+    $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $ativo,
+    $id_empresa
 );
 
 if ($stmt->execute()) {
-    $idEmpresa = $stmt->insert_id;
+    // Atualiza vínculos com UREs
+    $conexao->query("DELETE FROM empresa_ure WHERE id_empresa = $id_empresa");
 
-    // Associa as UREs selecionadas
     if (!empty($uresSelecionadas) && is_array($uresSelecionadas)) {
         $stmtUre = $conexao->prepare("INSERT INTO empresa_ure (id_empresa, id_ure) VALUES (?, ?)");
         if ($stmtUre) {
@@ -75,9 +82,10 @@ if ($stmt->execute()) {
         }
     }
 
-    header("Location: ../../views/empresas/listar.php?msg=cadastrado");
+    header("Location: ../../views/empresas/listar.php?msg=atualizado");
     exit();
 }
 
-header("Location: ../../views/empresas/cadastrar.php?erro=" . urlencode("Erro ao cadastrar empresa: " . $stmt->error));
+header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Erro ao atualizar empresa: " . $stmt->error));
 exit();
+

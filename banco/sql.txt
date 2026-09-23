@@ -41,6 +41,7 @@ VALUES
 
 CREATE TABLE unidades_regionais (
     id_ure INT NOT NULL AUTO_INCREMENT,
+    uge VARCHAR(20),
     nome VARCHAR(150) NOT NULL,
     endereco VARCHAR(255),
     telefone VARCHAR(30),
@@ -50,29 +51,29 @@ CREATE TABLE unidades_regionais (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO unidades_regionais
-(id_ure, nome, endereco, telefone, email)
+(id_ure, uge, nome, endereco, telefone, email)
 VALUES
-(1, 'URE de Bragança Paulista',
+(1, '080300', 'URE de Bragança Paulista',
  'Rua José Domingues, 100 - Centro - Bragança Paulista/SP',
  '(11) 4034-0001',
  'ure.braganca@educacao.sp.gov.br'),
 
-(2, 'URE de Atibaia',
+(2, '080301', 'URE de Atibaia',
  'Rua São João, 250 - Centro - Atibaia/SP',
  '(11) 4411-0002',
  'ure.atibaia@educacao.sp.gov.br'),
 
-(3, 'URE Campinas Leste',
+(3, '080302', 'URE Campinas Leste',
  'Rua das Palmeiras, 500 - Campinas/SP',
  '(19) 3234-0003',
  'ure.campinasleste@educacao.sp.gov.br'),
 
-(4, 'URE de Jundiaí',
+(4, '080303', 'URE de Jundiaí',
  'Avenida Nove de Julho, 850 - Jundiaí/SP',
  '(11) 4521-0004',
  'ure.jundiai@educacao.sp.gov.br'),
 
-(5, 'URE de Mogi das Cruzes',
+(5, '080304', 'URE de Mogi das Cruzes',
  'Rua Doutor Deodato Wertheimer, 300 - Mogi das Cruzes/SP',
  '(11) 4728-0005',
  'ure.mogidascruzes@educacao.sp.gov.br');
@@ -86,6 +87,7 @@ CREATE TABLE unidades_escolares (
     id_ue INT NOT NULL AUTO_INCREMENT,
     nome VARCHAR(200) NOT NULL,
     cie VARCHAR(30) NOT NULL,
+    ua VARCHAR(20),
     endereco VARCHAR(255),
     numero VARCHAR(20),
     bairro VARCHAR(100),
@@ -106,46 +108,46 @@ CREATE TABLE unidades_escolares (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO unidades_escolares
-(id_ue, nome, cie, endereco, numero, bairro, municipio, cep,
+(id_ue, nome, cie, ua, endereco, numero, bairro, municipio, cep,
  modalidade, id_ure, horario_funcionamento, telefone, email)
 VALUES
-(1, 'E.E. Professor José Alves', 'CIE000001',
+(1, 'E.E. Professor José Alves', 'CIE000001', '42962',
  'Rua das Flores', '100', 'Centro', 'Bragança Paulista', '12900-000',
  'REGULAR', 1, '07:00 - 23:00', '(11) 4034-1001', 'ee.josealves@educacao.sp.gov.br'),
 
-(2, 'E.E. Major Juvenal Alvim', 'CIE000002',
+(2, 'E.E. Major Juvenal Alvim', 'CIE000002', '42963',
  'Avenida dos Estudantes', '250', 'Jardim América', 'Bragança Paulista', '12900-100',
  'PEI', 1, '07:00 - 18:00', '(11) 4034-1002', 'ee.juvenalalvim@educacao.sp.gov.br'),
 
-(3, 'E.E. Professora Maria Aparecida de Souza', 'CIE000003',
+(3, 'E.E. Professora Maria Aparecida de Souza', 'CIE000003', '42964',
  'Rua das Acácias', '300', 'Centro', 'Atibaia', '12940-000',
  'REGULAR', 2, '07:00 - 22:00', '(11) 4411-1003', 'ee.mariaaparecida@educacao.sp.gov.br'),
 
-(4, 'E.E. Doutor Carlos Augusto de Almeida', 'CIE000004',
+(4, 'E.E. Doutor Carlos Augusto de Almeida', 'CIE000004', '42965',
  'Rua São Paulo', '450', 'Alvinópolis', 'Atibaia', '12942-000',
  'PEI', 2, '07:00 - 18:00', '(11) 4411-1004', 'ee.carlosaugusto@educacao.sp.gov.br'),
 
-(5, 'E.E. Professora Helena Ribeiro', 'CIE000005',
+(5, 'E.E. Professora Helena Ribeiro', 'CIE000005', '42966',
  'Rua Campinas', '120', 'Centro', 'Campinas', '13010-000',
  'REGULAR', 3, '07:00 - 23:00', '(19) 3234-1005', 'ee.helenaribeiro@educacao.sp.gov.br'),
 
-(6, 'E.E. João Batista de Oliveira', 'CIE000006',
+(6, 'E.E. João Batista de Oliveira', 'CIE000006', '42967',
  'Avenida Brasil', '800', 'Jardim Brasil', 'Campinas', '13050-000',
  'PEI', 3, '07:00 - 18:00', '(19) 3234-1006', 'ee.joaobatista@educacao.sp.gov.br'),
 
-(7, 'E.E. Professora Ana Lúcia Ferreira', 'CIE000007',
+(7, 'E.E. Professora Ana Lúcia Ferreira', 'CIE000007', '42968',
  'Rua Minas Gerais', '150', 'Vila Nova', 'Jundiaí', '13200-000',
  'REGULAR', 4, '07:00 - 22:00', '(11) 4521-1007', 'ee.analucia@educacao.sp.gov.br'),
 
-(8, 'E.E. Paulo Freire', 'CIE000008',
+(8, 'E.E. Paulo Freire', 'CIE000008', '42969',
  'Rua Educação', '900', 'Centro', 'Jundiaí', '13201-000',
  'PEI', 4, '07:00 - 18:00', '(11) 4521-1008', 'ee.paulofreire@educacao.sp.gov.br'),
 
-(9, 'E.E. Professor Carlos Mendes', 'CIE000009',
+(9, 'E.E. Professor Carlos Mendes', 'CIE000009', '42970',
  'Rua São José', '210', 'Centro', 'Mogi das Cruzes', '08700-000',
  'REGULAR', 5, '07:00 - 22:00', '(11) 4728-1009', 'ee.carlosmendes@educacao.sp.gov.br'),
 
-(10, 'E.E. Maria de Lourdes Silva', 'CIE000010',
+(10, 'E.E. Maria de Lourdes Silva', 'CIE000010', '42971',
  'Avenida Central', '500', 'Vila Industrial', 'Mogi das Cruzes', '08710-000',
  'PEI', 5, '07:00 - 18:00', '(11) 4728-1010', 'ee.marialourdes@educacao.sp.gov.br');
 

@@ -40,25 +40,19 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 <!-- SEDUC / ADMIN -->
                 <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) { ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'ures/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/ures/cadastrar.php">UREs</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'ures/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/ures/listar.php">UREs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'empresas/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/empresas/cadastrar.php">Empresas</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'empresas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/empresas/listar.php">Empresas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'supervisores/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/supervisores/cadastrar.php">Supervisores</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'supervisores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/supervisores/listar.php">Supervisores</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'dirigentes/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/dirigentes/cadastrar.php">Dirigentes URE</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'dirigentes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/dirigentes/listar.php">Dirigentes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/cadastrar.php">Escolas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Alunos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'usuarios/listar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/usuarios/listar.php">Usuários</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Escolas</a>
                     </li>
                 <?php } ?>
 

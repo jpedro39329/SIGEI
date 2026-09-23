@@ -505,37 +505,108 @@ function totalDashboard($conexao, $sql) {
     <?php elseif (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
 
         <?php
-        $totalUres = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM unidades_regionais");
-        $totalEscolas = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM unidades_escolares");
-        $totalEmpresas = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM empresas");
-        $totalSupervisores = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM usuarios_supervisor WHERE ativo = 1");
-        $totalPAEs = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM usuarios_pae WHERE ativo = 1");
-        $totalAlunos = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos");
-        $totalPendentes = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE status_aprovacao = 'PENDENTE'");
-        $totalAssociacoes = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM associacoes WHERE ativo = 1");
+        // 1. Escolas por URE
+        $sqlEscolasPorUre = "
+            SELECT u.nome, u.uge, COUNT(ue.id_ue) AS total_escolas
+            FROM unidades_regionais u
+            LEFT JOIN unidades_escolares ue ON u.id_ure = ue.id_ure
+            GROUP BY u.id_ure
+            ORDER BY u.nome ASC
+        ";
+        $resEscolasPorUre = mysqli_query($conexao, $sqlEscolasPorUre);
+        $dadosEscolasUre = $resEscolasPorUre ? mysqli_fetch_all($resEscolasPorUre, MYSQLI_ASSOC) : [];
+        $labelsUres = array_map(function($item) {
+            return ($item['uge'] ? '[' . $item['uge'] . '] ' : '') . $item['nome'];
+        }, $dadosEscolasUre);
+        $valoresEscolasUre = array_map(function($item) { return (int) $item['total_escolas']; }, $dadosEscolasUre);
+
+        // 2. Alunos em Atendimento x Sem Atendimento x Pendentes (Geral)
+        $alunosEmAtendimentoGeral = totalDashboard($conexao, "
+            SELECT COUNT(DISTINCT a.id_aluno) AS total
+            FROM alunos a
+            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
+            WHERE a.status_aprovacao = 'APROVADO'
+        ");
+        $alunosSemAtendimentoGeral = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            WHERE a.status_aprovacao = 'APROVADO'
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass
+                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+              )
+        ");
+        $alunosPendentesGeral = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE status_aprovacao = 'PENDENTE'");
+
+        // 3. PAEs por URE (calculado pelas empresas contratadas atendendo as UREs)
+        $sqlPaesPorUre = "
+            SELECT u.nome, u.uge, COUNT(DISTINCT p.id_pae) AS total_paes
+            FROM unidades_regionais u
+            LEFT JOIN empresa_ure eu ON u.id_ure = eu.id_ure
+            LEFT JOIN usuarios_pae p ON eu.id_empresa = p.id_empresa AND p.ativo = 1
+            GROUP BY u.id_ure
+            ORDER BY u.nome ASC
+        ";
+        $resPaesPorUre = mysqli_query($conexao, $sqlPaesPorUre);
+        $dadosPaesUre = $resPaesPorUre ? mysqli_fetch_all($resPaesPorUre, MYSQLI_ASSOC) : [];
+        $valoresPaesUre = array_map(function($item) { return (int) $item['total_paes']; }, $dadosPaesUre);
+
+        // 4. Indicadores de Atendimentos / Associações recentes
+        $sqlHistorico = "
+            SELECT DATE_FORMAT(data_cadastro, '%m/%Y') as mes_ano, COUNT(*) as total
+            FROM alunos
+            GROUP BY mes_ano
+            ORDER BY MIN(data_cadastro) ASC
+            LIMIT 6
+        ";
+        $resHistorico = mysqli_query($conexao, $sqlHistorico);
+        $dadosHistorico = $resHistorico ? mysqli_fetch_all($resHistorico, MYSQLI_ASSOC) : [];
+        if (empty($dadosHistorico)) {
+            $dadosHistorico = [['mes_ano' => date('m/Y'), 'total' => ($alunosEmAtendimentoGeral + $alunosSemAtendimentoGeral + $alunosPendentesGeral)]];
+        }
+        $labelsHistorico = array_map(function($item) { return $item['mes_ano']; }, $dadosHistorico);
+        $valoresHistorico = array_map(function($item) { return (int) $item['total']; }, $dadosHistorico);
         ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">UREs</span><strong><?php echo $totalUres; ?></strong></div>
-            <div class="card"><span class="text-muted">Escolas</span><strong><?php echo $totalEscolas; ?></strong></div>
-            <div class="card"><span class="text-muted">Empresas</span><strong><?php echo $totalEmpresas; ?></strong></div>
-            <div class="card"><span class="text-muted">Supervisores</span><strong><?php echo $totalSupervisores; ?></strong></div>
-            <div class="card"><span class="text-muted">PAEs Ativos</span><strong><?php echo $totalPAEs; ?></strong></div>
-            <div class="card"><span class="text-muted">Total Alunos</span><strong><?php echo $totalAlunos; ?></strong></div>
-            <div class="card"><span class="text-muted">Pendentes</span><strong><?php echo $totalPendentes; ?></strong></div>
-            <div class="card"><span class="text-muted">Associações Ativas</span><strong><?php echo $totalAssociacoes; ?></strong></div>
-        </div>
+        <!-- Painel Geral SEDUC -->
+        <div class="row g-4 mb-4">
+            <!-- Gráfico 1: Status de Atendimento dos Alunos (Barras) -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Status de Atendimento dos Alunos</h5>
+                        <canvas id="graficoStatusAlunos" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
 
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <h5 class="mb-3">Ações de Gestão Central (SEDUC-SP / Administrador Geral)</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="ures/cadastrar.php" class="btn btn-outline-primary">Cadastrar URE</a>
-                    <a href="empresas/cadastrar.php" class="btn btn-outline-primary">Cadastrar Empresa Licitada</a>
-                    <a href="supervisores/cadastrar.php" class="btn btn-outline-primary">Cadastrar Supervisor</a>
-                    <a href="dirigentes/cadastrar.php" class="btn btn-outline-primary">Cadastrar Dirigente Regional</a>
-                    <a href="escolas/cadastrar.php" class="btn btn-outline-secondary">Cadastrar Escola</a>
-                    <a href="usuarios/listar.php" class="btn btn-outline-secondary">Todos os Usuários</a>
+            <!-- Gráfico 2: Escolas por UGE (Barras) -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Número de Escolas por UGE</h5>
+                        <canvas id="graficoEscolasUre" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 3: Quantidade de PAEs Ativos por URE (Barras) -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Número de PAEs Ativos por Regional</h5>
+                        <canvas id="graficoPaesUre" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 4: Evolução de Alunos Cadastrados (Barras) -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Evolução de Alunos Cadastrados</h5>
+                        <canvas id="graficoEvolucao" height="120"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -550,6 +621,80 @@ function totalDashboard($conexao, $sql) {
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+<?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
+// 1. Status de Atendimento dos Alunos (Barras)
+new Chart(document.getElementById('graficoStatusAlunos'), {
+    type: 'bar',
+    data: {
+        labels: ['Em Atendimento', 'Sem Atendimento', 'Pendentes'],
+        datasets: [{
+            label: 'Alunos',
+            data: [<?php echo $alunosEmAtendimentoGeral; ?>, <?php echo $alunosSemAtendimentoGeral; ?>, <?php echo $alunosPendentesGeral; ?>],
+            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+
+// 2. Escolas por UGE (Barras)
+new Chart(document.getElementById('graficoEscolasUre'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($labelsUres); ?>,
+        datasets: [{
+            label: 'Escolas',
+            data: <?php echo json_encode($valoresEscolasUre); ?>,
+            backgroundColor: ['#0d6efd', '#1565c0', '#0d47a1', '#1a9e85', '#40d9b8']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+
+// 3. PAEs por URE (Barras)
+new Chart(document.getElementById('graficoPaesUre'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($labelsUres); ?>,
+        datasets: [{
+            label: 'PAEs Ativos',
+            data: <?php echo json_encode($valoresPaesUre); ?>,
+            backgroundColor: ['#6f42c1', '#0d6efd', '#198754', '#0dcaf0', '#ffc107']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+
+// 4. Evolução de Alunos Cadastrados (Barras)
+new Chart(document.getElementById('graficoEvolucao'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($labelsHistorico); ?>,
+        datasets: [{
+            label: 'Alunos Cadastrados',
+            data: <?php echo json_encode($valoresHistorico); ?>,
+            backgroundColor: '#0d6efd'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+<?php endif; ?>
+
 <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
 new Chart(document.getElementById('graficoEscola'), {
     type: 'bar',
