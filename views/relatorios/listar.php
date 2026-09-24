@@ -116,7 +116,7 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1"><?php echo ($userPerfil === 'PAE') ? 'Meus Relatórios' : 'Relatórios dos Cuidadores (PAEs)'; ?></h2>
+            <h2 class="mb-1"><?php echo ($userPerfil === 'PAE') ? 'Meus Relatórios' : 'Relatórios dos Profissionais de Apoio'; ?></h2>
             <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — <?php echo ($userPerfil === 'PAE') ? 'registre e acompanhe seus relatórios.' : 'acompanhe os atendimentos realizados pelos PAEs.'; ?></p>
         </div>
     </div>
