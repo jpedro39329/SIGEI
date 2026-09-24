@@ -86,7 +86,7 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
 
             <div class="row">
                 <div class="col-md-6 mb-2"><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></div>
-                <div class="col-md-6 mb-2"><strong>Telefone:</strong> <?php echo htmlspecialchars($pae['telefone'] ?? '-'); ?></div>
+                <div class="col-md-6 mb-2"><strong>Telefone:</strong> <?php echo htmlspecialchars(formatarTelefone($pae['telefone']) ?: '-'); ?></div>
                 <div class="col-md-6 mb-2"><strong>Email:</strong> <?php echo htmlspecialchars($pae['email'] ?? '-'); ?></div>
                 <div class="col-md-6 mb-2">
                     <strong>Contrato:</strong>

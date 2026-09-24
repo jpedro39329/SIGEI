@@ -93,7 +93,7 @@ $paes = $resPaes ? mysqli_fetch_all($resPaes, MYSQLI_ASSOC) : [];
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone</span>
-                            <strong><?php echo htmlspecialchars($supervisor['telefone'] ?: 'Não informado'); ?></strong>
+                            <strong><?php echo htmlspecialchars(formatarTelefone($supervisor['telefone']) ?: 'Não informado'); ?></strong>
                         </li>
                     </ul>
                 </div>
@@ -154,7 +154,7 @@ $paes = $resPaes ? mysqli_fetch_all($resPaes, MYSQLI_ASSOC) : [];
                                             <td><strong><?php echo htmlspecialchars($p['nome']); ?></strong></td>
                                             <td><?php echo htmlspecialchars(formatarCPF($p['cpf'])); ?></td>
                                             <td><?php echo htmlspecialchars($p['email'] ?: '-'); ?></td>
-                                            <td><?php echo htmlspecialchars($p['telefone'] ?: '-'); ?></td>
+                                            <td><?php echo htmlspecialchars(formatarTelefone($p['telefone']) ?: '-'); ?></td>
                                             <td>
                                                 <?php if ($p['ativo'] == 1): ?>
                                                     <span class="badge bg-success">Ativo</span>

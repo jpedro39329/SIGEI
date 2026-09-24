@@ -16,7 +16,7 @@ if ($id <= 0) {
     exit();
 }
 
-$stmt = $conexao->prepare("DELETE FROM usuarios_ure WHERE id_usuario_ure = ? AND setor = 'GABINETE'");
+$stmt = $conexao->prepare("DELETE FROM usuarios_ure WHERE id_usuario_ure = ? AND setor IN ('ASURE', 'GABINETE')");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {

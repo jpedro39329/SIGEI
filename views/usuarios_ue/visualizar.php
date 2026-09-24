@@ -84,7 +84,7 @@ if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0 && (int)$usuario['id_u
                     <strong>E-mail Institucional:</strong> <?php echo htmlspecialchars($usuario['email'] ?? '-'); ?>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <strong>Telefone:</strong> <?php echo htmlspecialchars($usuario['telefone'] ?? '-'); ?>
+                    <strong>Telefone:</strong> <?php echo htmlspecialchars(formatarTelefone($usuario['telefone']) ?: '-'); ?>
                 </div>
                 <div class="col-md-6 mb-3">
                     <strong>Data de Cadastro:</strong> <?php echo !empty($usuario['data_cadastro']) ? date('d/m/Y H:i', strtotime($usuario['data_cadastro'])) : '-'; ?>

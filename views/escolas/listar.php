@@ -81,7 +81,7 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Unidades Escolares (Escolas Estaduais)</h2>
+            <h2 class="mb-1">Unidades Escolares</h2>
             <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhamento das unidades escolares da rede.</p>
         </div>
 
@@ -164,14 +164,8 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($esc['nome']); ?></strong></td>
                                     <td><code><?php echo htmlspecialchars($esc['cie']); ?></code></td>
-                                    <td><span class="badge bg-secondary"><?php echo htmlspecialchars($esc['ua'] ?: '-'); ?></span></td>
-                                    <td>
-                                        <?php if ($esc['modalidade'] === 'PEI'): ?>
-                                            <span class="badge bg-primary">PEI</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Regular</span>
-                                        <?php endif; ?>
-                                    </td>
+                                    <td><?php echo htmlspecialchars($esc['ua'] ?: '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($esc['modalidade'] ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars($esc['ure_nome']); ?></td>
                                     <td><?php echo htmlspecialchars($esc['municipio'] ?: '-'); ?></td>
                                     <td>

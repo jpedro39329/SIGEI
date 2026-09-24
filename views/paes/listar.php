@@ -94,7 +94,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <div class="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Profissionais de Apoio Escolar (PAEs)</h2>
+            <h2 class="mb-1">Profissionais de Apoio Escolar</h2>
             <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe os PAEs cadastrados.</p>
         </div>
 

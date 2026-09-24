@@ -40,8 +40,10 @@ switch ($perfil) {
         $tabelas['usuarios_ure'] = ['id_usuario_ure', true, 'USUARIO_SEFISC', 'SEFISC'];
         break;
 
+    case 'asure':
     case 'dirigente':
-        $tabelas['usuarios_ure'] = ['id_usuario_ure', true, 'DIRIGENTE', 'GABINETE'];
+    case 'gabinete':
+        $tabelas['usuarios_ure'] = ['id_usuario_ure', true, 'DIRIGENTE', ['ASURE', 'GABINETE']];
         break;
 
     case 'seduc':
@@ -66,10 +68,21 @@ foreach ($tabelas as $tabela => $info) {
     list($campoId, $temColunaAtivo, $perfilBase, $filtroSetor) = $info;
 
     if ($tabela === 'usuarios_ure' && $filtroSetor !== null) {
-        $query = "SELECT * FROM `$tabela` WHERE cpf = ? AND setor = ? AND ativo = 1 LIMIT 1";
-        $stmt = $conexao->prepare($query);
-        if (!$stmt) continue;
-        $stmt->bind_param("ss", $cpf, $filtroSetor);
+        if (is_array($filtroSetor)) {
+            $setoresEscaped = array_map(function($s) use ($conexao) {
+                return "'" . $conexao->real_escape_string($s) . "'";
+            }, $filtroSetor);
+            $inClause = implode(',', $setoresEscaped);
+            $query = "SELECT * FROM `$tabela` WHERE cpf = ? AND setor IN ($inClause) AND ativo = 1 LIMIT 1";
+            $stmt = $conexao->prepare($query);
+            if (!$stmt) continue;
+            $stmt->bind_param("s", $cpf);
+        } else {
+            $query = "SELECT * FROM `$tabela` WHERE cpf = ? AND setor = ? AND ativo = 1 LIMIT 1";
+            $stmt = $conexao->prepare($query);
+            if (!$stmt) continue;
+            $stmt->bind_param("ss", $cpf, $filtroSetor);
+        }
     } elseif ($temColunaAtivo) {
         $query = "SELECT * FROM `$tabela` WHERE cpf = ? AND ativo = 1 LIMIT 1";
         $stmt = $conexao->prepare($query);
@@ -96,7 +109,7 @@ foreach ($tabelas as $tabela => $info) {
 
             if ($tabela === 'usuarios_ure') {
                 $setor = $user['setor'] ?? '';
-                if ($setor === 'GABINETE') {
+                if ($setor === 'ASURE' || $setor === 'GABINETE') {
                     $_SESSION['user_perfil'] = 'DIRIGENTE';
                 } elseif ($setor === 'SEFISC') {
                     $_SESSION['user_perfil'] = 'USUARIO_SEFISC';

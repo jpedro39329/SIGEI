@@ -5,7 +5,7 @@ exigirPerfil(array('DIRIGENTE', 'ADMIN', 'SEDUC'));
 exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: ../../views/setores/cadastrar.php");
+    header("Location: ../../views/setores/listar.php");
     exit();
 }
 
@@ -36,13 +36,18 @@ if ($nome === '' || $cpf === '' || $idUre <= 0 || $setor === '' || $cargo === ''
     exit();
 }
 
-if (!in_array($setor, ['SEFISC', 'EDU_ESPECIAL'])) {
+if (!in_array($setor, ['SEFISC', 'EDU_ESPECIAL', 'ASURE', 'GABINETE'])) {
     header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("Setor inválido."));
     exit();
 }
 
 if ($senha !== $confirmarSenha) {
     header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("As senhas não coincidem."));
+    exit();
+}
+
+if (strlen($senha) < 6) {
+    header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("A senha deve ter pelo menos 6 caracteres."));
     exit();
 }
 
@@ -56,7 +61,7 @@ if ($stmtVerifica->get_result()->num_rows > 0) {
 }
 $stmtVerifica->close();
 
-$nivelAcesso = ($setor === 'SEFISC') ? 2 : 3;
+$nivelAcesso = ($setor === 'SEFISC') ? 2 : (($setor === 'ASURE' || $setor === 'GABINETE') ? 3 : 2);
 $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
 $stmt = $conexao->prepare(
@@ -65,13 +70,14 @@ $stmt = $conexao->prepare(
 );
 
 if (!$stmt) {
-    die("Erro ao preparar consulta: " . $conexao->error);
+    header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("Erro ao preparar consulta: " . $conexao->error));
+    exit();
 }
 
 $stmt->bind_param("isssssissi", $idUre, $nome, $cpf, $senhaHash, $setor, $cargo, $nivelAcesso, $email, $telefone, $ativo);
 
 if ($stmt->execute()) {
-    header("Location: ../../views/setores/cadastrar.php?msg=ok");
+    header("Location: ../../views/setores/listar.php?msg=cadastrado");
     exit();
 }
 

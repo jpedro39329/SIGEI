@@ -40,7 +40,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 <!-- SEDUC / ADMIN -->
                 <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) { ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'ures/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/ures/listar.php">UREs</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'ures/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/ures/listar.php">Unidades Regionais</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'empresas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/empresas/listar.php">Empresas</a>
@@ -52,17 +52,17 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <a class="nav-link <?php echo (strpos($scriptPath, 'dirigentes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/dirigentes/listar.php">Dirigentes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Escolas</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Unidades Escolares</a>
                     </li>
                 <?php } ?>
 
-                <!-- DIRIGENTE URE -->
+                <!-- DIRIGENTE / ASURE URE -->
                 <?php if ($userPerfil === 'DIRIGENTE') { ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/cadastrar.php">Escolas (UEs)</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Unidades Escolares</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'setores/cadastrar.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/setores/cadastrar.php">Setores da URE</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'setores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/setores/listar.php">Servidores</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Alunos</a>
@@ -315,4 +315,5 @@ window.SIGEI_CONFIG = {
 </script>
 <script src="<?php echo $baseUrl; ?>assets/js/termos.js"></script>
 <script src="<?php echo $baseUrl; ?>assets/js/confirmacao.js"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/mascaras.js"></script>
 

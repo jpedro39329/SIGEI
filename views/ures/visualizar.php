@@ -157,7 +157,7 @@ $escolasUre = $resListaEscolas ? $resListaEscolas->fetch_all(MYSQLI_ASSOC) : [];
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Código UGE</span>
-                            <strong><span class="badge bg-secondary"><?php echo htmlspecialchars($ure['uge'] ?: 'N/D'); ?></span></strong>
+                            <strong><?php echo htmlspecialchars($ure['uge'] ?: 'N/D'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Denominação</span>
@@ -169,7 +169,7 @@ $escolasUre = $resListaEscolas ? $resListaEscolas->fetch_all(MYSQLI_ASSOC) : [];
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone</span>
-                            <strong><?php echo htmlspecialchars($ure['telefone'] ?: 'Não informado'); ?></strong>
+                            <strong><?php echo htmlspecialchars(formatarTelefone($ure['telefone']) ?: 'Não informado'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">E-mail</span>

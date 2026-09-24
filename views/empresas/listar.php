@@ -75,7 +75,7 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Empresas Contratadas (Licitações)</h2>
+            <h2 class="mb-1">Empresas Contratadas</h2>
             <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe as empresas prestadoras e seus contratos.</p>
         </div>
         <a href="cadastrar.php" class="btn btn-primary">Nova Empresa</a>
@@ -162,7 +162,7 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars(formatarCNPJ($emp['cnpj'])); ?></td>
                                     <td><?php echo htmlspecialchars($emp['numero_contrato'] ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars($emp['municipio'] ?: '-'); ?></td>
-                                    <td><?php echo htmlspecialchars($emp['telefone'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars(formatarTelefone($emp['telefone']) ?: '-'); ?></td>
                                     <td>
                                         <?php if ($emp['ativo'] == 1): ?>
                                             <span class="badge bg-success">Ativa</span>

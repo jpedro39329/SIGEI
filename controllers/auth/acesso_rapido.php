@@ -73,7 +73,7 @@ if ($result && $result->num_rows === 1) {
 
     if ($tabela === 'usuarios_ure') {
         $setor = $user['setor'] ?? '';
-        if ($setor === 'GABINETE') {
+        if ($setor === 'ASURE' || $setor === 'GABINETE') {
             $_SESSION['user_perfil'] = 'DIRIGENTE';
         } elseif ($setor === 'SEFISC') {
             $_SESSION['user_perfil'] = 'USUARIO_SEFISC';

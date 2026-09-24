@@ -16,7 +16,7 @@ require_once "../config/init.php";
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Times New Roman', Times, serif;
       background-color: #ddeeff;
       min-height: 100vh;
       position: relative;

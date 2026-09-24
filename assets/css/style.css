@@ -12,9 +12,37 @@
     --sigei-focus: rgba(13, 71, 161, 0.24);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after, html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video,
+input, button, select, textarea, .btn, .navbar, .card, .modal, .badge, .form-control, .form-select {
+    font-family: "Times New Roman", Times, serif !important;
+}
 
-html { min-width: 320px; overflow-x: hidden; }
+html { min-width: 320px; overflow-x: hidden; font-family: "Times New Roman", Times, serif !important; }
+
+body,
+body[class*="page-"],
+input,
+button,
+select,
+textarea,
+.btn,
+.navbar,
+.card,
+.modal {
+    font-family: "Times New Roman", Times, serif !important;
+}
 
 body[class*="page-"] {
     min-width: 320px;
@@ -24,7 +52,7 @@ body[class*="page-"] {
         radial-gradient(circle at 100% 0, rgba(64, 217, 184, 0.16), transparent 27rem),
         linear-gradient(180deg, #edf5ff 0%, var(--sigei-blue-50) 100%);
     color: var(--sigei-ink);
-    font-family: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family: "Times New Roman", Times, serif !important;
     overflow-x: hidden;
 }
 

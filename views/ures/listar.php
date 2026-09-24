@@ -51,7 +51,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unidades Regionais de Ensino (UREs)</title>
+    <title>Unidades Regionais de Ensino</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
@@ -64,7 +64,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Unidades Regionais de Ensino (UREs)</h2>
+            <h2 class="mb-1">Unidades Regionais de Ensino</h2>
             <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe e gerencie as UREs cadastradas.</p>
         </div>
     </div>
@@ -140,13 +140,13 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($ures) > 0): ?>
                             <?php foreach ($ures as $ure): ?>
                                 <tr>
-                                    <td><span class="badge bg-secondary"><?php echo htmlspecialchars($ure['uge'] ?: 'N/D'); ?></span></td>
+                                    <td><?php echo htmlspecialchars($ure['uge'] ?: 'N/D'); ?></td>
                                     <td><strong><?php echo htmlspecialchars($ure['nome']); ?></strong></td>
                                     <td><?php echo htmlspecialchars($ure['endereco'] ?? '-'); ?></td>
-                                    <td><?php echo htmlspecialchars($ure['telefone'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars(formatarTelefone($ure['telefone']) ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars($ure['email'] ?? '-'); ?></td>
-                                    <td><span class="badge bg-primary"><?php echo $ure['total_escolas']; ?></span></td>
-                                    <td><span class="badge bg-secondary"><?php echo $ure['total_usuarios']; ?></span></td>
+                                    <td><?php echo $ure['total_escolas']; ?></td>
+                                    <td><?php echo $ure['total_usuarios']; ?></td>
                                     <td>
                                         <div class="d-flex gap-1">
                                             <a href="visualizar.php?id=<?php echo $ure['id_ure']; ?>" class="btn btn-sm btn-info">Ver</a>

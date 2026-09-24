@@ -16,7 +16,7 @@ $sql = "
            (SELECT COUNT(*) FROM unidades_escolares ue WHERE ue.id_ure = u.id_ure) AS total_escolas
     FROM usuarios_ure uu
     JOIN unidades_regionais u ON uu.id_ure = u.id_ure
-    WHERE uu.id_usuario_ure = $id AND uu.setor = 'GABINETE'
+    WHERE uu.id_usuario_ure = $id AND uu.setor IN ('ASURE', 'GABINETE')
 ";
 $result = mysqli_query($conexao, $sql);
 $dirigente = $result ? mysqli_fetch_assoc($result) : null;
@@ -82,7 +82,7 @@ if (!$dirigente) {
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone</span>
-                            <strong><?php echo htmlspecialchars($dirigente['telefone'] ?: 'Não informado'); ?></strong>
+                            <strong><?php echo htmlspecialchars(formatarTelefone($dirigente['telefone']) ?: 'Não informado'); ?></strong>
                         </li>
                     </ul>
                 </div>
@@ -97,7 +97,7 @@ if (!$dirigente) {
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Código UGE</span>
-                            <strong><span class="badge bg-secondary"><?php echo htmlspecialchars($dirigente['ure_uge'] ?: 'N/D'); ?></span></strong>
+                            <strong><?php echo htmlspecialchars($dirigente['ure_uge'] ?: 'N/D'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Regional</span>
@@ -113,11 +113,11 @@ if (!$dirigente) {
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone URE</span>
-                            <strong><?php echo htmlspecialchars($dirigente['ure_telefone'] ?: 'Não informado'); ?></strong>
+                            <strong><?php echo htmlspecialchars(formatarTelefone($dirigente['ure_telefone']) ?: 'Não informado'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Escolas na Rede</span>
-                            <span class="badge bg-primary"><?php echo (int) $dirigente['total_escolas']; ?> escolas</span>
+                            <strong><?php echo (int) $dirigente['total_escolas']; ?> escola(s)</strong>
                         </li>
                     </ul>
                 </div>

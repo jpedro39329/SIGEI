@@ -23,12 +23,12 @@ if ($res) {
 $res = mysqli_query($conexao, "
     SELECT uu.nome, uu.cpf, uu.ativo, uu.data_cadastro,
            CASE
-               WHEN uu.setor = 'GABINETE' THEN 'DIRIGENTE'
+               WHEN uu.setor IN ('ASURE', 'GABINETE') THEN 'DIRIGENTE'
                WHEN uu.setor = 'SEFISC' THEN 'USUARIO_SEFISC'
                WHEN uu.setor = 'EDU_ESPECIAL' THEN 'USUARIO_EDUCACAO_ESPECIAL'
                ELSE 'DIRIGENTE'
            END AS perfil,
-           CONCAT(u.nome, ' (', uu.cargo, ')') AS vinculo
+           CONCAT(u.nome, ' (', COALESCE(uu.cargo, 'Assistência Técnica'), ')') AS vinculo
     FROM usuarios_ure uu
     JOIN unidades_regionais u ON uu.id_ure = u.id_ure
 ");
@@ -109,7 +109,7 @@ if ($res) {
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($usuario['nome']); ?></strong></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($usuario['cpf'] ?? '')); ?></td>
-                                    <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars(nomePerfil($usuario['perfil'])); ?></span></td>
+                                    <td><?php echo htmlspecialchars(nomePerfil($usuario['perfil'])); ?></td>
                                     <td><small class="text-muted"><?php echo htmlspecialchars($usuario['vinculo'] ?? '-'); ?></small></td>
                                     <td>
                                         <?php if (($usuario['ativo'] ?? 1) == 1): ?>

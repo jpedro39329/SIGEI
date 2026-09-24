@@ -162,7 +162,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><code><?php echo htmlspecialchars($u['cie']); ?></code></td>
                                     <td><?php echo htmlspecialchars($u['ure_nome']); ?></td>
                                     <td>
-                                        <small><?php echo htmlspecialchars($u['email'] ?? '-'); ?><br><?php echo htmlspecialchars($u['telefone'] ?? ''); ?></small>
+                                        <small><?php echo htmlspecialchars($u['email'] ?? '-'); ?><br><?php echo htmlspecialchars(formatarTelefone($u['telefone']) ?: ''); ?></small>
                                     </td>
                                     <td>
                                         <?php if ($u['ativo'] == 1): ?>

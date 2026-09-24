@@ -116,16 +116,35 @@ function formatarCEP($cep) {
     return $cep;
 }
 
+// Formata Telefone para exibição ((00) 9 0000-0000 ou (00) 0000-0000)
+function formatarTelefone($tel) {
+    $tel = preg_replace('/\D/', '', $tel ?? '');
+    $len = strlen($tel);
+    if ($len === 11) {
+        // Formato com 9 dígitos no celular: (DD) 9 XXXX-XXXX
+        return '(' . substr($tel, 0, 2) . ') ' . substr($tel, 2, 1) . ' ' . substr($tel, 3, 4) . '-' . substr($tel, 7, 4);
+    } elseif ($len === 10) {
+        // Formato fixo ou celular antigo: (DD) XXXX-XXXX
+        return '(' . substr($tel, 0, 2) . ') ' . substr($tel, 2, 4) . '-' . substr($tel, 6, 4);
+    } elseif ($len === 9) {
+        return substr($tel, 0, 1) . ' ' . substr($tel, 1, 4) . '-' . substr($tel, 5, 4);
+    } elseif ($len === 8) {
+        return substr($tel, 0, 4) . '-' . substr($tel, 4, 4);
+    }
+    return $tel;
+}
+
 // Retorna o nome amigável do perfil
 function nomePerfil($perfil) {
     $nomes = array(
-        'ADMIN'                     => 'Administrador do Sistema',
-        'SEDUC'                     => 'SEDUC-SP (Administração Geral)',
-        'DIRIGENTE'                 => 'Coordenador Dirigente Regional de Ensino (URE)',
-        'USUARIO_SEFISC'            => 'Seção de Fiscalização (SEFISC - URE)',
-        'USUARIO_EDUCACAO_ESPECIAL' => 'Educação Especial (URE)',
-        'SUPERVISOR'                => 'Supervisor da Empresa Contratada',
-        'USUARIO_EMPRESA'           => 'Supervisor da Empresa Contratada',
+        'ADMIN'                     => 'Administrador',
+        'SEDUC'                     => 'Secretaria de Educação do Estado de São Paulo',
+        'DIRIGENTE'                 => 'Assistência Técnica - ASURE',
+        'ASURE'                     => 'Assistência Técnica - ASURE',
+        'USUARIO_SEFISC'            => 'Seção de Fiscalização',
+        'USUARIO_EDUCACAO_ESPECIAL' => 'Educação Especial',
+        'SUPERVISOR'                => 'Supervisor de Licitações e Contratos',
+        'USUARIO_EMPRESA'           => 'Supervisor de Licitações e Contratos',
         'USUARIO_ESCOLA'            => 'Unidade Escolar',
         'USUARIO_UE'                => 'Unidade Escolar',
         'ESCOLA'                    => 'Unidade Escolar',

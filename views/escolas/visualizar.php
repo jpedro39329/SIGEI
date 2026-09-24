@@ -156,20 +156,17 @@ $alunosEscola = $resAlunos ? mysqli_fetch_all($resAlunos, MYSQLI_ASSOC) : [];
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Código UA</span>
-                            <strong><span class="badge bg-secondary"><?php echo htmlspecialchars($escola['ua'] ?: 'Não informado'); ?></span></strong>
+                            <strong><?php echo htmlspecialchars($escola['ua'] ?: 'Não informado'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Modalidade</span>
-                            <span class="badge <?php echo $escola['modalidade'] === 'PEI' ? 'bg-primary' : 'bg-secondary'; ?>">
-                                <?php echo htmlspecialchars($escola['modalidade']); ?>
-                            </span>
+                            <strong><?php echo htmlspecialchars($escola['modalidade']); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Unidade Regional</span>
                             <strong>
                                 <a href="../ures/visualizar.php?id=<?php echo $escola['id_ure']; ?>" class="text-decoration-none">
-                                    <span class="badge bg-secondary"><?php echo htmlspecialchars($escola['ure_uge'] ?: 'S/ UGE'); ?></span>
-                                    <?php echo htmlspecialchars($escola['ure_nome']); ?>
+                                    <?php echo ($escola['ure_uge'] ? htmlspecialchars($escola['ure_uge']) . ' - ' : '') . htmlspecialchars($escola['ure_nome']); ?>
                                 </a>
                             </strong>
                         </li>
@@ -194,7 +191,7 @@ $alunosEscola = $resAlunos ? mysqli_fetch_all($resAlunos, MYSQLI_ASSOC) : [];
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Contatos</span>
-                            <span><?php echo htmlspecialchars($escola['telefone'] ?: ($escola['email'] ?: 'Não informado')); ?></span>
+                            <span><?php echo htmlspecialchars(formatarTelefone($escola['telefone']) ?: ($escola['email'] ?: 'Não informado')); ?></span>
                         </li>
                     </ul>
                 </div>

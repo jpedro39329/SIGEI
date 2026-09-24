@@ -18,12 +18,12 @@ $perfisDisponiveis = [
         'campo_id' => 'id_seduc',
         'filtro_setor' => null
     ],
-    'dirigente' => [
-        'nome' => 'URE / DIRIGENTE',
-        'desc' => 'Gabinete e Dirigência Regional de Ensino',
+    'asure' => [
+        'nome' => 'ASSISTÊNCIA TÉCNICA (ASURE)',
+        'desc' => 'Assistência Técnica - ASURE',
         'tabela' => 'usuarios_ure',
         'campo_id' => 'id_usuario_ure',
-        'filtro_setor' => 'GABINETE'
+        'filtro_setor' => ['ASURE', 'GABINETE']
     ],
     'educacao_especial' => [
         'nome' => 'EDUCAÇÃO ESPECIAL',
@@ -66,6 +66,10 @@ $usuarios = [];
 $perfilConfig = null;
 
 if ($perfil !== '') {
+    if ($perfil === 'dirigente') {
+        $perfil = 'asure';
+    }
+
     if (!isset($perfisDisponiveis[$perfil])) {
         header("Location: acesso_rapido.php?erro=perfil_invalido");
         exit();
@@ -82,10 +86,21 @@ if ($perfil !== '') {
         $sql = "SELECT id_seduc, nome, 'Órgão Central' AS vinculo_nome, setor, cargo, '' AS extra FROM `seduc` WHERE ativo = 1";
     } elseif ($tabela === 'usuarios_ure') {
         if ($filtroSetor !== null) {
-            $sql = "SELECT uu.id_usuario_ure, uu.nome, u.nome AS vinculo_nome, uu.setor, uu.cargo, '' AS extra 
-                    FROM usuarios_ure uu
-                    LEFT JOIN unidades_regionais u ON uu.id_ure = u.id_ure
-                    WHERE uu.setor = '" . $conexao->real_escape_string($filtroSetor) . "' AND uu.ativo = 1";
+            if (is_array($filtroSetor)) {
+                $setoresEscaped = array_map(function($s) use ($conexao) {
+                    return "'" . $conexao->real_escape_string($s) . "'";
+                }, $filtroSetor);
+                $inSetor = implode(',', $setoresEscaped);
+                $sql = "SELECT uu.id_usuario_ure, uu.nome, u.nome AS vinculo_nome, uu.setor, uu.cargo, '' AS extra 
+                        FROM usuarios_ure uu
+                        LEFT JOIN unidades_regionais u ON uu.id_ure = u.id_ure
+                        WHERE uu.setor IN ($inSetor) AND uu.ativo = 1";
+            } else {
+                $sql = "SELECT uu.id_usuario_ure, uu.nome, u.nome AS vinculo_nome, uu.setor, uu.cargo, '' AS extra 
+                        FROM usuarios_ure uu
+                        LEFT JOIN unidades_regionais u ON uu.id_ure = u.id_ure
+                        WHERE uu.setor = '" . $conexao->real_escape_string($filtroSetor) . "' AND uu.ativo = 1";
+            }
         } else {
             $sql = "SELECT uu.id_usuario_ure, uu.nome, u.nome AS vinculo_nome, uu.setor, uu.cargo, '' AS extra 
                     FROM usuarios_ure uu
@@ -139,7 +154,7 @@ if ($perfil !== '') {
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Times New Roman', Times, serif;
       background-color: #ddeeff;
       min-height: 100vh;
       position: relative;

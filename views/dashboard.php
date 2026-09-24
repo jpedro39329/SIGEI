@@ -122,43 +122,193 @@ function totalDashboard($conexao, $sql) {
         </div>
 
     <!-- ============================================================ -->
-    <!-- 2. DIRIGENTE REGIONAL (URE GABINETE) -->
+    <!-- 2. DIRIGENTE REGIONAL (URE ASURE) -->
     <!-- ============================================================ -->
     <?php elseif ($userPerfil === 'DIRIGENTE'): ?>
 
         <?php
         if ($idUreUsuario <= 0) $idUreUsuario = idUreUsuario($conexao, $userId);
 
-        $totalEscolasUre = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM unidades_escolares WHERE id_ure = $idUreUsuario");
-        $totalServidoresUre = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM usuarios_ure WHERE id_ure = $idUreUsuario AND ativo = 1");
-        $totalAlunosUre = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total FROM alunos a
-            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE ue.id_ure = $idUreUsuario
-        ");
-        $alunosAtendidosUre = totalDashboard($conexao, "
+        // 1. Status de Atendimento dos Alunos na Regional
+        $alunosEmAtendimentoUre = totalDashboard($conexao, "
             SELECT COUNT(DISTINCT a.id_aluno) AS total
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
             JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
             WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'
         ");
+        $alunosSemAtendimentoUre = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario
+              AND a.status_aprovacao = 'APROVADO'
+              AND NOT EXISTS (
+                  SELECT 1 FROM associacoes ass
+                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+              )
+        ");
+        $alunosPendentesUre = totalDashboard($conexao, "
+            SELECT COUNT(*) AS total
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'PENDENTE'
+        ");
+
+        // 2. Alunos por Escola na Regional
+        $sqlEscolasUre = "
+            SELECT ue.nome, COUNT(a.id_aluno) AS total_alunos
+            FROM unidades_escolares ue
+            LEFT JOIN alunos a ON ue.id_ue = a.id_ue
+            WHERE ue.id_ure = $idUreUsuario
+            GROUP BY ue.id_ue
+            ORDER BY total_alunos DESC, ue.nome ASC
+            LIMIT 6
+        ";
+        $resEscolasUre = mysqli_query($conexao, $sqlEscolasUre);
+        $dadosEscolasUre = $resEscolasUre ? mysqli_fetch_all($resEscolasUre, MYSQLI_ASSOC) : [];
+        $labelsEscolasUre = array_map(function($e) { return mb_strimwidth($e['nome'], 0, 20, '...'); }, $dadosEscolasUre);
+        $valoresEscolasUre = array_map(function($e) { return (int) $e['total_alunos']; }, $dadosEscolasUre);
+
+        // 3. Distribuição de Deficiências na Regional
+        $sqlDeficiencias = "
+            SELECT a.descricao_deficiencia, COUNT(*) AS total
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario AND a.descricao_deficiencia IS NOT NULL AND a.descricao_deficiencia != ''
+            GROUP BY a.descricao_deficiencia
+            ORDER BY total DESC
+            LIMIT 5
+        ";
+        $resDef = mysqli_query($conexao, $sqlDeficiencias);
+        $dadosDef = $resDef ? mysqli_fetch_all($resDef, MYSQLI_ASSOC) : [];
+        $labelsDef = array_map(function($d) { return mb_strimwidth($d['descricao_deficiencia'], 0, 20, '...'); }, $dadosDef);
+        $valoresDef = array_map(function($d) { return (int) $d['total']; }, $dadosDef);
+
+        // 4. Histórico / Evolução de Alunos na Regional
+        $sqlHistUre = "
+            SELECT DATE_FORMAT(a.data_cadastro, '%m/%Y') AS mes_ano, COUNT(*) AS total
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario
+            GROUP BY mes_ano
+            ORDER BY MIN(a.data_cadastro) ASC
+            LIMIT 6
+        ";
+        $resHistUre = mysqli_query($conexao, $sqlHistUre);
+        $dadosHistUre = $resHistUre ? mysqli_fetch_all($resHistUre, MYSQLI_ASSOC) : [];
+        if (empty($dadosHistUre)) {
+            $dadosHistUre = [['mes_ano' => date('m/Y'), 'total' => ($alunosEmAtendimentoUre + $alunosSemAtendimentoUre + $alunosPendentesUre)]];
+        }
+        $labelsHistUre = array_map(function($h) { return $h['mes_ano']; }, $dadosHistUre);
+        $valoresHistUre = array_map(function($h) { return (int) $h['total']; }, $dadosHistUre);
+
+        // 5. Lista de Alunos Recentes da Regional
+        $sqlAlunosUre = "
+            SELECT a.id_aluno, a.nome, a.ra, a.descricao_deficiencia, a.status_aprovacao, ue.nome AS escola_nome,
+                   (SELECT p.nome FROM associacoes ass
+                    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+                    WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
+                    LIMIT 1) AS pae_nome
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario
+            ORDER BY a.data_cadastro DESC
+            LIMIT 8
+        ";
+        $resAlunosUre = mysqli_query($conexao, $sqlAlunosUre);
+        $alunosRecentesUre = $resAlunosUre ? mysqli_fetch_all($resAlunosUre, MYSQLI_ASSOC) : [];
         ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">Escolas na Regional</span><strong><?php echo $totalEscolasUre; ?></strong></div>
-            <div class="card"><span class="text-muted">Servidores (URE)</span><strong><?php echo $totalServidoresUre; ?></strong></div>
-            <div class="card"><span class="text-muted">Alunos Cadastrados</span><strong><?php echo $totalAlunosUre; ?></strong></div>
-            <div class="card"><span class="text-muted">Alunos c/ PAE Ativo</span><strong><?php echo $alunosAtendidosUre; ?></strong></div>
+        <!-- Painel de Gráficos da Regional (ASURE) -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Status de Atendimento dos Alunos na Regional</h5>
+                        <canvas id="graficoDirigenteStatus" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Alunos por Escola na Regional</h5>
+                        <canvas id="graficoDirigenteEscolas" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Principais Necessidades / Deficiências</h5>
+                        <canvas id="graficoDirigenteDeficiencias" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">Evolução de Alunos na Regional</h5>
+                        <canvas id="graficoDirigenteEvolucao" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- Tabela de Alunos da Regional -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Ações da Diretoria Regional</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="escolas/cadastrar.php" class="btn btn-outline-primary">Cadastrar Escolas</a>
-                    <a href="setores/cadastrar.php" class="btn btn-outline-primary">Cadastrar SEFISC / Educação Especial</a>
-                    <a href="alunos/listar.php" class="btn btn-outline-secondary">Ver Alunos da Regional</a>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Alunos Registrados na Regional</h5>
+                    <a href="alunos/listar.php" class="btn btn-primary btn-sm">Ver Todos os Alunos</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Escola</th>
+                                <th>Deficiência</th>
+                                <th>Status</th>
+                                <th>PAE Vinculado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (count($alunosRecentesUre) > 0): ?>
+                                <?php foreach ($alunosRecentesUre as $a): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($a['nome']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($a['escola_nome']); ?></td>
+                                        <td><?php echo htmlspecialchars($a['descricao_deficiencia'] ?: '-'); ?></td>
+                                        <td>
+                                            <?php
+                                            $st = $a['status_aprovacao'];
+                                            if ($st === 'APROVADO') echo '<span class="badge bg-success">Aprovado</span>';
+                                            elseif ($st === 'PENDENTE') echo '<span class="badge bg-warning text-dark">Pendente</span>';
+                                            elseif ($st === 'REPROVADO') echo '<span class="badge bg-danger">Reprovado</span>';
+                                            else echo '<span class="badge bg-secondary">Arquivado</span>';
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($a['pae_nome'])): ?>
+                                                <span class="badge bg-info text-dark"><?php echo htmlspecialchars($a['pae_nome']); ?></span>
+                                            <?php else: ?>
+                                                <span class="text-muted small">Sem PAE</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Nenhum aluno cadastrado na regional.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -684,6 +834,80 @@ new Chart(document.getElementById('graficoEvolucao'), {
         datasets: [{
             label: 'Alunos Cadastrados',
             data: <?php echo json_encode($valoresHistorico); ?>,
+            backgroundColor: '#0d6efd'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+<?php endif; ?>
+
+<?php if ($userPerfil === 'DIRIGENTE'): ?>
+// 1. Status de Atendimento dos Alunos na Regional (Barras)
+new Chart(document.getElementById('graficoDirigenteStatus'), {
+    type: 'bar',
+    data: {
+        labels: ['Em Atendimento', 'Sem Atendimento', 'Pendentes'],
+        datasets: [{
+            label: 'Alunos',
+            data: [<?php echo $alunosEmAtendimentoUre; ?>, <?php echo $alunosSemAtendimentoUre; ?>, <?php echo $alunosPendentesUre; ?>],
+            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+
+// 2. Alunos por Escola na Regional (Barras)
+new Chart(document.getElementById('graficoDirigenteEscolas'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($labelsEscolasUre); ?>,
+        datasets: [{
+            label: 'Alunos',
+            data: <?php echo json_encode($valoresEscolasUre); ?>,
+            backgroundColor: ['#0d6efd', '#1565c0', '#0d47a1', '#1a9e85', '#40d9b8', '#2ebfa0']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+
+// 3. Distribuição de Deficiências na Regional (Barras)
+new Chart(document.getElementById('graficoDirigenteDeficiencias'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($labelsDef); ?>,
+        datasets: [{
+            label: 'Alunos',
+            data: <?php echo json_encode($valoresDef); ?>,
+            backgroundColor: ['#6f42c1', '#0d6efd', '#198754', '#0dcaf0', '#ffc107']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+});
+
+// 4. Evolução de Alunos na Regional (Barras)
+new Chart(document.getElementById('graficoDirigenteEvolucao'), {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($labelsHistUre); ?>,
+        datasets: [{
+            label: 'Alunos',
+            data: <?php echo json_encode($valoresHistUre); ?>,
             backgroundColor: '#0d6efd'
         }]
     },

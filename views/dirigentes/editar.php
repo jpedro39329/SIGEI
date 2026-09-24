@@ -14,7 +14,7 @@ $stmt = $conexao->prepare("
     SELECT uu.*, u.nome AS ure_nome, u.uge AS ure_uge
     FROM usuarios_ure uu
     JOIN unidades_regionais u ON uu.id_ure = u.id_ure
-    WHERE uu.id_usuario_ure = ? AND uu.setor = 'GABINETE'
+    WHERE uu.id_usuario_ure = ? AND uu.setor IN ('ASURE', 'GABINETE')
 ");
 $stmt->bind_param("i", $id);
 $stmt->execute();

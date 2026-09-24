@@ -118,7 +118,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone</span>
-                            <strong><?php echo htmlspecialchars($empresa['telefone'] ?: 'Não informado'); ?></strong>
+                            <strong><?php echo htmlspecialchars(formatarTelefone($empresa['telefone']) ?: 'Não informado'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">E-mail</span>
@@ -154,7 +154,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">PAEs Ativos</span>
-                            <span class="badge bg-primary"><?php echo $totalPaesAtivos; ?></span>
+                            <strong><?php echo $totalPaesAtivos; ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Total de UREs Atendidas</span>
@@ -174,11 +174,8 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                     <div class="d-flex flex-wrap gap-2">
                         <?php if (count($uresAtendidas) > 0): ?>
                             <?php foreach ($uresAtendidas as $u): ?>
-                                <a href="../ures/visualizar.php?id=<?php echo $u['id_ure']; ?>" class="text-decoration-none">
-                                    <span class="badge bg-light text-dark border p-2">
-                                        <span class="badge bg-secondary"><?php echo htmlspecialchars($u['uge'] ?: 'S/ UGE'); ?></span>
-                                        <?php echo htmlspecialchars($u['nome']); ?>
-                                    </span>
+                                <a href="../ures/visualizar.php?id=<?php echo $u['id_ure']; ?>" class="btn btn-sm btn-outline-secondary">
+                                    <?php echo ($u['uge'] ? htmlspecialchars($u['uge']) . ' - ' : '') . htmlspecialchars($u['nome']); ?>
                                 </a>
                             <?php endforeach; ?>
                         <?php else: ?>

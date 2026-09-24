@@ -44,8 +44,8 @@ if ($stmtVerifica->get_result()->num_rows > 0) {
 $stmtVerifica->close();
 
 $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
-$setor = 'GABINETE';
-$cargo = 'Dirigente Regional';
+$setor = 'ASURE';
+$cargo = 'Assistente Técnico';
 $nivelAcesso = 3;
 
 $stmt = $conexao->prepare(
