@@ -60,10 +60,10 @@ if ($totalAlunosPae >= 3) {
     die("Este PAE já possui 3 alunos ativos associados.");
 }
 
-// RN02: Aluno não pode ter mais de 3 PAEs ativos
+// RN02: Aluno que já possui PAE ativo não pode ser associado a outro
 $totalPaesAluno = contarPAEsAluno($conexao, $id_aluno);
-if ($totalPaesAluno >= 3) {
-    die("Este aluno já possui 3 PAEs ativos associados.");
+if ($totalPaesAluno >= 1) {
+    die("Este aluno já possui um Profissional de Apoio Escolar (PAE) ativo associado.");
 }
 
 // Verifica se o aluno já está associado a este PAE

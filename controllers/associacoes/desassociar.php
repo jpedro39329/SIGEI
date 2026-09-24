@@ -14,8 +14,14 @@ if ($id_associacao <= 0) {
 $stmt = $conexao->prepare("UPDATE associacoes SET ativo = 0 WHERE id_associacao = ?");
 $stmt->bind_param("i", $id_associacao);
 
+$redirectPae = (int) ($_POST['redirect_pae'] ?? 0);
+
 if ($stmt->execute()) {
-    header("Location: ../../views/associacoes/gerenciar.php?msg=removido");
+    if ($redirectPae > 0) {
+        header("Location: ../../views/associacoes/visualizar.php?id=" . $redirectPae . "&msg=removido");
+    } else {
+        header("Location: ../../views/associacoes/gerenciar.php?msg=removido");
+    }
     exit();
 }
 

@@ -9,76 +9,68 @@ $userId = (int) $_SESSION['user_id'];
 $idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 
 $busca = trim($_GET['busca'] ?? '');
+$tipoFiltro = trim($_GET['tp_filtro'] ?? '1'); // 1 = Contém, 0 = Igual a
+$campoFiltro = trim($_GET['campo_filtro'] ?? '0'); // 0 = Todos, 1 = PAE, 2 = Escola, 3 = Alunos
 
-$whereAlunoUre = "";
-$wherePaeEmpresa = "";
 $whereAssocEmpresa = "";
 
 if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     if ($idEmpresaUsuario <= 0) {
         $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
     }
-    $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresaUsuario);
-    if (!empty($uresAtendidas)) {
-        $uresList = implode(',', $uresAtendidas);
-        $whereAlunoUre = "AND e.id_ure IN ($uresList)";
-    } else {
-        $whereAlunoUre = "AND 1=0";
-    }
-    $wherePaeEmpresa = "AND p.id_empresa = $idEmpresaUsuario";
     $whereAssocEmpresa = "AND p.id_empresa = $idEmpresaUsuario";
 }
 
-// Filtro de busca na tabela de associações
-$whereAssocBusca = "";
+// Montagem do filtro dinâmico padrão das listagens
+$having = [];
 if ($busca !== '') {
     $termo = mysqli_real_escape_string($conexao, $busca);
-    $whereAssocBusca = "AND (a.nome LIKE '%$termo%' OR p.nome LIKE '%$termo%' OR e.nome LIKE '%$termo%')";
+    $isIgual = ($tipoFiltro === '0');
+
+    if ($campoFiltro === '1') { // Profissional de Apoio (PAE)
+        $having[] = $isIgual ? "pae_nome = '$termo'" : "pae_nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '2') { // Escola
+        $having[] = $isIgual ? "escola_nome = '$termo'" : "escola_nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '3') { // Alunos
+        $having[] = $isIgual ? "alunos_nomes = '$termo'" : "alunos_nomes LIKE '%$termo%'";
+    } else { // Todos os campos
+        if ($isIgual) {
+            $having[] = "(pae_nome = '$termo' OR escola_nome = '$termo' OR alunos_nomes = '$termo')";
+        } else {
+            $having[] = "(pae_nome LIKE '%$termo%' OR escola_nome LIKE '%$termo%' OR alunos_nomes LIKE '%$termo%')";
+        }
+    }
 }
 
-// Lista alunos APROVADOS que ainda podem receber PAE (menos de 3)
-$sqlAlunos = "
-    SELECT a.id_aluno, a.nome, e.nome AS escola_nome,
-           (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1) AS qtd_paes
-    FROM alunos a
-    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
-    WHERE a.status_aprovacao = 'APROVADO'
-    $whereAlunoUre
-    ORDER BY a.nome
-";
-$resultAlunos = mysqli_query($conexao, $sqlAlunos);
-$alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
+$havingSql = !empty($having) ? 'HAVING ' . implode(' AND ', $having) : '';
 
-// Lista PAEs ativos com menos de 3 alunos
-$sqlPAEs = "
-    SELECT p.id_pae, p.nome, e.nome AS empresa_nome,
-           (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_pae = p.id_pae AND ass.ativo = 1) AS qtd_alunos
+// Consulta agrupada por PAE para listar 1 linha por Profissional de Apoio com suas escolas e alunos
+$sqlPaesAssociados = "
+    SELECT 
+        p.id_pae,
+        p.nome AS pae_nome,
+        p.cpf AS pae_cpf,
+        p.telefone AS pae_telefone,
+        p.email AS pae_email,
+        emp.nome AS empresa_nome,
+        COUNT(ass.id_associacao) AS total_alunos,
+        GROUP_CONCAT(DISTINCT a.nome ORDER BY a.nome SEPARATOR ', ') AS alunos_nomes,
+        GROUP_CONCAT(DISTINCT COALESCE(ue.nome, 'Sem escola') ORDER BY ue.nome SEPARATOR ', ') AS escola_nome
     FROM usuarios_pae p
-    LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
-    WHERE p.ativo = 1
-    $wherePaeEmpresa
-    ORDER BY p.nome
-";
-$resultPAEs = mysqli_query($conexao, $sqlPAEs);
-$paes = $resultPAEs ? mysqli_fetch_all($resultPAEs, MYSQLI_ASSOC) : [];
-
-// Lista associações ativas
-$sqlAssociacoes = "
-    SELECT ass.id_associacao, a.nome AS aluno_nome, p.nome AS pae_nome,
-           ass.data_inicio, e.nome AS escola_nome
-    FROM associacoes ass
+    JOIN associacoes ass ON p.id_pae = ass.id_pae AND ass.ativo = 1
     JOIN alunos a ON ass.id_aluno = a.id_aluno
-    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
-    WHERE ass.ativo = 1
+    LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+    LEFT JOIN empresas emp ON p.id_empresa = emp.id_empresa
+    WHERE p.ativo = 1
     $whereAssocEmpresa
-    $whereAssocBusca
-    ORDER BY ass.data_inicio DESC
+    GROUP BY p.id_pae, p.nome, p.cpf, p.telefone, p.email, emp.nome
+    $havingSql
+    ORDER BY p.nome ASC
 ";
-$resultAssociacoes = mysqli_query($conexao, $sqlAssociacoes);
-$associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_ASSOC) : [];
-?>
 
+$resultAssociacoes = mysqli_query($conexao, $sqlPaesAssociados);
+$listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_ASSOC) : [];
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -98,80 +90,51 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1">Associações PAE ↔ Aluno</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — associe PAEs a alunos aprovados (limite de até 3 alunos por cuidador).</p>
+            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe os atendimentos e vincule profissionais aos alunos.</p>
         </div>
+
+        <a href="cadastrar.php" class="btn btn-primary">Nova Associação</a>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'ok'): ?>
-        <div class="alert alert-success">Associação criada com sucesso!</div>
+        <div class="alert alert-success">Associação realizada com sucesso!</div>
     <?php endif; ?>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'removido'): ?>
         <div class="alert alert-warning">Associação desativada com sucesso.</div>
     <?php endif; ?>
 
-    <!-- Formulário simples e direto de Nova Associação -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Vincular Cuidador (PAE) a Aluno</h5>
-            <form action="../../controllers/associacoes/associar.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                <div class="row">
-                    <div class="col-md-5 mb-3">
-                        <label class="form-label fw-bold small">Aluno (Aprovado)</label>
-                        <select name="id_aluno" class="form-select" required>
-                            <option value="">Selecione o aluno...</option>
-                            <?php foreach ($alunos as $aluno): ?>
-                                <?php if ($aluno['qtd_paes'] < 3): ?>
-                                    <option value="<?php echo $aluno['id_aluno']; ?>">
-                                        <?php echo htmlspecialchars($aluno['nome']); ?> — <?php echo htmlspecialchars($aluno['escola_nome'] ?? 'Sem escola'); ?> (<?php echo $aluno['qtd_paes']; ?>/3 PAEs)
-                                    </option>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold small">Cuidador (PAE Ativo)</label>
-                        <select name="id_pae" class="form-select" required>
-                            <option value="">Selecione o PAE...</option>
-                            <?php foreach ($paes as $pae): ?>
-                                <?php if ($pae['qtd_alunos'] < 3): ?>
-                                    <option value="<?php echo $pae['id_pae']; ?>">
-                                        <?php echo htmlspecialchars($pae['nome']); ?> (<?php echo $pae['qtd_alunos']; ?>/3 alunos vinculados)
-                                    </option>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-bold small">Data de Início</label>
-                        <input type="date" name="data_inicio" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-dark">Confirmar Associação</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Barra de busca nas associações -->
+    <!-- Barra de Filtros Padrão do Sistema -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="gerenciar.php">
                 <div class="row g-2 align-items-center">
-                    <div class="col-md-10 col-12">
-                        <div class="input-group">
-                            <input type="text" name="busca" class="form-control form-control-sm" placeholder="Pesquisar vinculações ativas por aluno, cuidador (PAE) ou escola..." value="<?php echo htmlspecialchars($busca); ?>">
-                            <button class="btn btn-dark btn-sm" type="submit" title="Pesquisar">
-                                Pesquisar
-                            </button>
-                        </div>
+                    <div class="col-md-5 col-sm-12 col-12">
+                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
-                    <div class="col-md-2 col-12">
-                        <?php if ($busca !== ''): ?>
-                            <a href="gerenciar.php" class="btn btn-outline-secondary btn-sm w-100">Limpar</a>
+
+                    <div class="col-md-2 col-sm-6 col-12">
+                        <select class="form-select form-select-sm" name="tp_filtro">
+                            <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                            <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <select class="form-select form-select-sm" name="campo_filtro">
+                            <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Profissional de Apoio (PAE)</option>
+                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>Escola</option>
+                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Alunos</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 col-12 d-flex gap-2">
+                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
+                            Filtrar
+                        </button>
+                        <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
+                            <a href="gerenciar.php" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -179,51 +142,39 @@ $associacoes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_
         </div>
     </div>
 
-    <!-- Tabela de Associações Ativas -->
+    <!-- Tabela de Associações por Profissional de Apoio -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Vínculos Ativos Atuais</h5>
-                <span class="badge bg-light text-dark border"><?php echo count($associacoes); ?> vínculo(s) encontrado(s)</span>
-            </div>
+            <h5 class="mb-3">Profissionais com Alunos Vinculados</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Aluno</th>
+                            <th>Profissional de Apoio (PAE)</th>
                             <th>Escola</th>
-                            <th>Cuidador (PAE)</th>
-                            <th>Data de Início</th>
-                            <th>Status</th>
+                            <th>Alunos Atendidos</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (count($associacoes) > 0): ?>
-                            <?php foreach ($associacoes as $associacao): ?>
+                        <?php if (count($listaPaes) > 0): ?>
+                            <?php foreach ($listaPaes as $item): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($associacao['aluno_nome']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($associacao['escola_nome'] ?? '-'); ?></td>
-                                    <td><span class="text-primary fw-bold"><?php echo htmlspecialchars($associacao['pae_nome']); ?></span></td>
-                                    <td><?php echo date('d/m/Y', strtotime($associacao['data_inicio'])); ?></td>
-                                    <td><span class="badge bg-success">Em Atendimento</span></td>
                                     <td>
-                                        <form action="../../controllers/associacoes/desassociar.php" method="POST" style="display:inline;"
-                                              data-confirm="true"
-                                              data-confirm-type="danger"
-                                              data-confirm-title="Desassociar PAE"
-                                              data-confirm-message="Tem certeza de que deseja desassociar este PAE do aluno?<br><small class='text-muted'>O atendimento atual será finalizado.</small>"
-                                              data-confirm-action="Desassociar">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                                            <input type="hidden" name="id_associacao" value="<?php echo $associacao['id_associacao']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Desassociar</button>
-                                        </form>
+                                        <strong><?php echo htmlspecialchars($item['pae_nome']); ?></strong>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($item['escola_nome'] ?: '-'); ?></td>
+                                    <td>
+                                        <span><?php echo htmlspecialchars($item['alunos_nomes'] ?: '-'); ?></span>
+                                    </td>
+                                    <td>
+                                        <a href="visualizar.php?id=<?php echo $item['id_pae']; ?>" class="btn btn-sm btn-info">Visualizar</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Nenhuma associação ativa encontrada.</td>
+                                <td colspan="4" class="text-center text-muted">Nenhuma associação ativa encontrada.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

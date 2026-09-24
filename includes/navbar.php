@@ -78,7 +78,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <a class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Alunos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'paes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/paes/listar.php">PAEs</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'paes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/paes/listar.php">Profissionais de Apoio</a>
                     </li>
                 <?php } ?>
 
@@ -98,7 +98,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <a class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Alunos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'paes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/paes/listar.php">PAEs</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'paes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/paes/listar.php">Profissionais de Apoio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'associacoes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/associacoes/gerenciar.php">Associações</a>
