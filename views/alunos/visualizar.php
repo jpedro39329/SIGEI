@@ -130,7 +130,9 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                         <?php
                             $status = $aluno['status_aprovacao'];
                             if ($status == 'PENDENTE') {
-                                echo '<span class="badge bg-warning text-dark">Pendente</span>';
+                                echo '<span class="badge bg-info text-dark">Pendente</span>';
+                            } elseif ($status == 'PENDENTE_CORRECAO') {
+                                echo '<span class="badge bg-warning text-dark">Ajuste Solicitado</span>';
                             } elseif ($status == 'APROVADO') {
                                 echo '<span class="badge bg-success">Aprovado</span>';
                             } elseif ($status == 'REPROVADO') {
@@ -201,15 +203,15 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                         <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="text-muted">Termo de Responsabilidade</span>
-                            <a href="../../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <button type="button" onclick="visualizarDocumento('<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
                                 📄 Visualizar Termo
-                            </a>
+                            </button>
                         </li>
                         <?php endif; ?>
                         <?php if (!empty($aluno['motivo_reprovacao'])): ?>
                         <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Motivo da Reprovação</span>
-                            <strong class="text-danger"><?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?></strong>
+                            <span class="text-muted"><?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO') ? 'Ajustes Solicitados' : 'Motivo da Reprovação'; ?></span>
+                            <strong class="<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO') ? 'text-warning text-dark' : 'text-danger'; ?>"><?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?></strong>
                         </li>
                         <?php endif; ?>
                     </ul>
@@ -262,11 +264,20 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                 <ul class="list-group">
                     <?php foreach ($laudos as $laudo): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Laudo'); ?></span>
-                            <span class="text-muted small"><?php echo date('d/m/Y', strtotime($laudo['data_envio'])); ?></span>
-                            <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                <a href="../../<?php echo $laudo['caminho_arquivo']; ?>" target="_blank" class="btn btn-sm btn-info">Baixar</a>
-                            <?php endif; ?>
+                            <div>
+                                <span class="fw-semibold"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Laudo'); ?></span>
+                                <?php if (!empty($laudo['descricao'])): ?>
+                                    <small class="text-muted d-block"><?php echo htmlspecialchars($laudo['descricao']); ?></small>
+                                <?php endif; ?>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted small"><?php echo date('d/m/Y', strtotime($laudo['data_envio'])); ?></span>
+                                <?php if (!empty($laudo['caminho_arquivo'])): ?>
+                                    <button type="button" onclick="visualizarDocumento('<?php echo htmlspecialchars($laudo['caminho_arquivo']); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Laudo')); ?>')" class="btn btn-sm btn-info">
+                                        Visualizar
+                                    </button>
+                                <?php endif; ?>
+                            </div>
                         </li>
                     <?php endforeach; ?>
                 </ul>

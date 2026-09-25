@@ -43,6 +43,17 @@ $sqlPendentes = "
 $resultPendentes = mysqli_query($conexao, $sqlPendentes);
 $alunosPendentes = $resultPendentes ? mysqli_fetch_all($resultPendentes, MYSQLI_ASSOC) : [];
 
+// Consulta para alunos com ajustes solicitados (PENDENTE_CORRECAO)
+$sqlCorrecao = "
+    SELECT id_aluno, nome, cpf, ra, descricao_deficiencia,
+           status_aprovacao, motivo_reprovacao, data_cadastro
+    FROM alunos
+    WHERE $whereBase AND status_aprovacao = 'PENDENTE_CORRECAO'
+    ORDER BY data_cadastro DESC
+";
+$resultCorrecao = mysqli_query($conexao, $sqlCorrecao);
+$alunosCorrecao = $resultCorrecao ? mysqli_fetch_all($resultCorrecao, MYSQLI_ASSOC) : [];
+
 // Consulta para alunos reprovados (REPROVADO)
 $sqlReprovados = "
     SELECT id_aluno, nome, cpf, ra, descricao_deficiencia,
@@ -126,11 +137,16 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
         </div>
     </div>
 
-    <!-- Abas de Separação: Em Análise e Reprovados -->
+    <!-- Abas de Separação: Em Análise, Ajustes Solicitados e Reprovados -->
     <ul class="nav nav-tabs mb-3" id="solicitacoesTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold <?php echo ($abaAtiva !== 'reprovados') ? 'active' : ''; ?>" id="analise-tab" data-bs-toggle="tab" data-bs-target="#analise" type="button" role="tab" aria-controls="analise" aria-selected="<?php echo ($abaAtiva !== 'reprovados') ? 'true' : 'false'; ?>">
-                Alunos em Análise <span class="badge bg-warning text-dark ms-1"><?php echo count($alunosPendentes); ?></span>
+            <button class="nav-link fw-bold <?php echo ($abaAtiva === 'analise' || !in_array($abaAtiva, ['correcao', 'reprovados'])) ? 'active' : ''; ?>" id="analise-tab" data-bs-toggle="tab" data-bs-target="#analise" type="button" role="tab" aria-controls="analise" aria-selected="<?php echo ($abaAtiva === 'analise' || !in_array($abaAtiva, ['correcao', 'reprovados'])) ? 'true' : 'false'; ?>">
+                Em Análise <span class="badge bg-primary ms-1"><?php echo count($alunosPendentes); ?></span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold <?php echo ($abaAtiva === 'correcao') ? 'active' : ''; ?>" id="correcao-tab" data-bs-toggle="tab" data-bs-target="#correcao" type="button" role="tab" aria-controls="correcao" aria-selected="<?php echo ($abaAtiva === 'correcao') ? 'true' : 'false'; ?>">
+                Ajustes Solicitados <span class="badge bg-warning text-dark ms-1"><?php echo count($alunosCorrecao); ?></span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -142,7 +158,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
 
     <div class="tab-content" id="solicitacoesTabsContent">
         <!-- Aba: Em Análise -->
-        <div class="tab-pane fade <?php echo ($abaAtiva !== 'reprovados') ? 'show active' : ''; ?>" id="analise" role="tabpanel" aria-labelledby="analise-tab">
+        <div class="tab-pane fade <?php echo ($abaAtiva === 'analise' || !in_array($abaAtiva, ['correcao', 'reprovados'])) ? 'show active' : ''; ?>" id="analise" role="tabpanel" aria-labelledby="analise-tab">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <div class="table-responsive">
@@ -166,7 +182,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
                                             <td><?php echo htmlspecialchars($aluno['ra'] ?? '-'); ?></td>
                                             <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
-                                            <td><span class="badge bg-warning text-dark">Pendente</span></td>
+                                            <td><span class="badge bg-info text-dark">Em Análise</span></td>
                                             <td><?php echo !empty($aluno['data_cadastro']) ? date('d/m/Y', strtotime($aluno['data_cadastro'])) : '-'; ?></td>
                                             <td>
                                                 <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
@@ -176,6 +192,53 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                 <?php else: ?>
                                     <tr>
                                         <td colspan="7" class="text-center text-muted">Nenhuma solicitação em análise no momento.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba: Ajustes Solicitados -->
+        <div class="tab-pane fade <?php echo ($abaAtiva === 'correcao') ? 'show active' : ''; ?>" id="correcao" role="tabpanel" aria-labelledby="correcao-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>RA</th>
+                                    <th>Deficiência</th>
+                                    <th>Status</th>
+                                    <th>Orientação / Ajustes Solicitados</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (count($alunosCorrecao) > 0): ?>
+                                    <?php foreach ($alunosCorrecao as $aluno): ?>
+                                        <tr>
+                                            <td><strong><?php echo htmlspecialchars($aluno['nome']); ?></strong></td>
+                                            <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
+                                            <td><?php echo htmlspecialchars($aluno['ra'] ?? '-'); ?></td>
+                                            <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
+                                            <td><span class="badge bg-warning text-dark">Ajuste Solicitado</span></td>
+                                            <td><span class="text-warning-emphasis"><?php echo htmlspecialchars($aluno['motivo_reprovacao'] ?? '-'); ?></span></td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Ajustar</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">Nenhum aluno com ajustes solicitados.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

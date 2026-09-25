@@ -22,13 +22,13 @@ $stmtVerifica = $conexao->prepare(
      FROM alunos
      WHERE id_aluno = ?
        AND id_ue = ?
-       AND status_aprovacao = 'REPROVADO'"
+       AND status_aprovacao IN ('REPROVADO', 'PENDENTE_CORRECAO')"
 );
 $stmtVerifica->bind_param("ii", $id_aluno, $id_escola);
 $stmtVerifica->execute();
 
 if ($stmtVerifica->get_result()->num_rows == 0) {
-    die("Aluno não encontrado, não pertence à sua escola ou não está reprovado.");
+    die("Aluno não encontrado, não pertence à sua escola ou não está pendente de reenvio.");
 }
 
 $stmtVerifica->close();

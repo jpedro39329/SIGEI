@@ -283,9 +283,9 @@ if (!$aluno) {
                                 <label class="form-label">Termo de Responsabilidade</label>
                                 <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                                     <div class="mb-2">
-                                        <a href="../../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
                                             📄 Ver termo atual
-                                        </a>
+                                        </button>
                                     </div>
                                 <?php endif; ?>
                                 <input

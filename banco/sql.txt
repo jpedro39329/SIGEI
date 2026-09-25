@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 24/09/2026 às 15:21
+-- Tempo de geração: 25/09/2026 às 16:29
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -18,461 +18,8 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `phpmyadmin`
---
-CREATE DATABASE IF NOT EXISTS `phpmyadmin` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-USE `phpmyadmin`;
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__bookmark`
---
-
-CREATE TABLE `pma__bookmark` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `dbase` varchar(255) NOT NULL DEFAULT '',
-  `user` varchar(255) NOT NULL DEFAULT '',
-  `label` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `query` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__central_columns`
---
-
-CREATE TABLE `pma__central_columns` (
-  `db_name` varchar(64) NOT NULL,
-  `col_name` varchar(64) NOT NULL,
-  `col_type` varchar(64) NOT NULL,
-  `col_length` text DEFAULT NULL,
-  `col_collation` varchar(64) NOT NULL,
-  `col_isNull` tinyint(1) NOT NULL,
-  `col_extra` varchar(255) DEFAULT '',
-  `col_default` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Central list of columns';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__column_info`
---
-
-CREATE TABLE `pma__column_info` (
-  `id` int(5) UNSIGNED NOT NULL,
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `table_name` varchar(64) NOT NULL DEFAULT '',
-  `column_name` varchar(64) NOT NULL DEFAULT '',
-  `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `mimetype` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `transformation` varchar(255) NOT NULL DEFAULT '',
-  `transformation_options` varchar(255) NOT NULL DEFAULT '',
-  `input_transformation` varchar(255) NOT NULL DEFAULT '',
-  `input_transformation_options` varchar(255) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Column information for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__designer_settings`
---
-
-CREATE TABLE `pma__designer_settings` (
-  `username` varchar(64) NOT NULL,
-  `settings_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Settings related to Designer';
-
---
--- Despejando dados para a tabela `pma__designer_settings`
---
-
-INSERT INTO `pma__designer_settings` (`username`, `settings_data`) VALUES
-('root', '{\"snap_to_grid\":\"off\",\"angular_direct\":\"angular\",\"relation_lines\":\"true\",\"small_big_all\":\">\",\"full_screen\":\"off\"}');
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__export_templates`
---
-
-CREATE TABLE `pma__export_templates` (
-  `id` int(5) UNSIGNED NOT NULL,
-  `username` varchar(64) NOT NULL,
-  `export_type` varchar(10) NOT NULL,
-  `template_name` varchar(64) NOT NULL,
-  `template_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved export templates';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__favorite`
---
-
-CREATE TABLE `pma__favorite` (
-  `username` varchar(64) NOT NULL,
-  `tables` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Favorite tables';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__history`
---
-
-CREATE TABLE `pma__history` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `username` varchar(64) NOT NULL DEFAULT '',
-  `db` varchar(64) NOT NULL DEFAULT '',
-  `table` varchar(64) NOT NULL DEFAULT '',
-  `timevalue` timestamp NOT NULL DEFAULT current_timestamp(),
-  `sqlquery` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='SQL history for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__navigationhiding`
---
-
-CREATE TABLE `pma__navigationhiding` (
-  `username` varchar(64) NOT NULL,
-  `item_name` varchar(64) NOT NULL,
-  `item_type` varchar(64) NOT NULL,
-  `db_name` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Hidden items of navigation tree';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__pdf_pages`
---
-
-CREATE TABLE `pma__pdf_pages` (
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `page_nr` int(10) UNSIGNED NOT NULL,
-  `page_descr` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PDF relation pages for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__recent`
---
-
-CREATE TABLE `pma__recent` (
-  `username` varchar(64) NOT NULL,
-  `tables` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Recently accessed tables';
-
---
--- Despejando dados para a tabela `pma__recent`
---
-
-INSERT INTO `pma__recent` (`username`, `tables`) VALUES
-('root', '[{\"db\":\"sigei\",\"table\":\"usuarios_ure\"},{\"db\":\"sigei\",\"table\":\"alunos\"},{\"db\":\"sigei\",\"table\":\"unidades_escolares\"},{\"db\":\"sigei\",\"table\":\"usuarios_pae\"},{\"db\":\"sigei\",\"table\":\"usuarios_supervisor\"},{\"db\":\"sigei\",\"table\":\"usuarios_ue\"},{\"db\":\"sigei\",\"table\":\"recuperacao_senha\"},{\"db\":\"\",\"table\":\"unidades_regionais\"},{\"db\":\"sigei\",\"table\":\"admin\"},{\"db\":\"sigei\",\"table\":\"seduc\"}]');
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__relation`
---
-
-CREATE TABLE `pma__relation` (
-  `master_db` varchar(64) NOT NULL DEFAULT '',
-  `master_table` varchar(64) NOT NULL DEFAULT '',
-  `master_field` varchar(64) NOT NULL DEFAULT '',
-  `foreign_db` varchar(64) NOT NULL DEFAULT '',
-  `foreign_table` varchar(64) NOT NULL DEFAULT '',
-  `foreign_field` varchar(64) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Relation table';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__savedsearches`
---
-
-CREATE TABLE `pma__savedsearches` (
-  `id` int(5) UNSIGNED NOT NULL,
-  `username` varchar(64) NOT NULL DEFAULT '',
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `search_name` varchar(64) NOT NULL DEFAULT '',
-  `search_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved searches';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__table_coords`
---
-
-CREATE TABLE `pma__table_coords` (
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `table_name` varchar(64) NOT NULL DEFAULT '',
-  `pdf_page_number` int(11) NOT NULL DEFAULT 0,
-  `x` float UNSIGNED NOT NULL DEFAULT 0,
-  `y` float UNSIGNED NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__table_info`
---
-
-CREATE TABLE `pma__table_info` (
-  `db_name` varchar(64) NOT NULL DEFAULT '',
-  `table_name` varchar(64) NOT NULL DEFAULT '',
-  `display_field` varchar(64) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table information for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__table_uiprefs`
---
-
-CREATE TABLE `pma__table_uiprefs` (
-  `username` varchar(64) NOT NULL,
-  `db_name` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL,
-  `prefs` text NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Tables'' UI preferences';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__tracking`
---
-
-CREATE TABLE `pma__tracking` (
-  `db_name` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL,
-  `version` int(10) UNSIGNED NOT NULL,
-  `date_created` datetime NOT NULL,
-  `date_updated` datetime NOT NULL,
-  `schema_snapshot` text NOT NULL,
-  `schema_sql` text DEFAULT NULL,
-  `data_sql` longtext DEFAULT NULL,
-  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') DEFAULT NULL,
-  `tracking_active` int(1) UNSIGNED NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Database changes tracking for phpMyAdmin';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__userconfig`
---
-
-CREATE TABLE `pma__userconfig` (
-  `username` varchar(64) NOT NULL,
-  `timevalue` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `config_data` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User preferences storage for phpMyAdmin';
-
---
--- Despejando dados para a tabela `pma__userconfig`
---
-
-INSERT INTO `pma__userconfig` (`username`, `timevalue`, `config_data`) VALUES
-('root', '2026-09-24 12:31:03', '{\"Console\\/Mode\":\"collapse\",\"lang\":\"pt_BR\"}');
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__usergroups`
---
-
-CREATE TABLE `pma__usergroups` (
-  `usergroup` varchar(64) NOT NULL,
-  `tab` varchar(64) NOT NULL,
-  `allowed` enum('Y','N') NOT NULL DEFAULT 'N'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User groups with configured menu items';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `pma__users`
---
-
-CREATE TABLE `pma__users` (
-  `username` varchar(64) NOT NULL,
-  `usergroup` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users and their assignments to user groups';
-
---
--- Índices para tabelas despejadas
---
-
---
--- Índices de tabela `pma__bookmark`
---
-ALTER TABLE `pma__bookmark`
-  ADD PRIMARY KEY (`id`);
-
---
--- Índices de tabela `pma__central_columns`
---
-ALTER TABLE `pma__central_columns`
-  ADD PRIMARY KEY (`db_name`,`col_name`);
-
---
--- Índices de tabela `pma__column_info`
---
-ALTER TABLE `pma__column_info`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`);
-
---
--- Índices de tabela `pma__designer_settings`
---
-ALTER TABLE `pma__designer_settings`
-  ADD PRIMARY KEY (`username`);
-
---
--- Índices de tabela `pma__export_templates`
---
-ALTER TABLE `pma__export_templates`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `u_user_type_template` (`username`,`export_type`,`template_name`);
-
---
--- Índices de tabela `pma__favorite`
---
-ALTER TABLE `pma__favorite`
-  ADD PRIMARY KEY (`username`);
-
---
--- Índices de tabela `pma__history`
---
-ALTER TABLE `pma__history`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `username` (`username`,`db`,`table`,`timevalue`);
-
---
--- Índices de tabela `pma__navigationhiding`
---
-ALTER TABLE `pma__navigationhiding`
-  ADD PRIMARY KEY (`username`,`item_name`,`item_type`,`db_name`,`table_name`);
-
---
--- Índices de tabela `pma__pdf_pages`
---
-ALTER TABLE `pma__pdf_pages`
-  ADD PRIMARY KEY (`page_nr`),
-  ADD KEY `db_name` (`db_name`);
-
---
--- Índices de tabela `pma__recent`
---
-ALTER TABLE `pma__recent`
-  ADD PRIMARY KEY (`username`);
-
---
--- Índices de tabela `pma__relation`
---
-ALTER TABLE `pma__relation`
-  ADD PRIMARY KEY (`master_db`,`master_table`,`master_field`),
-  ADD KEY `foreign_field` (`foreign_db`,`foreign_table`);
-
---
--- Índices de tabela `pma__savedsearches`
---
-ALTER TABLE `pma__savedsearches`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `u_savedsearches_username_dbname` (`username`,`db_name`,`search_name`);
-
---
--- Índices de tabela `pma__table_coords`
---
-ALTER TABLE `pma__table_coords`
-  ADD PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`);
-
---
--- Índices de tabela `pma__table_info`
---
-ALTER TABLE `pma__table_info`
-  ADD PRIMARY KEY (`db_name`,`table_name`);
-
---
--- Índices de tabela `pma__table_uiprefs`
---
-ALTER TABLE `pma__table_uiprefs`
-  ADD PRIMARY KEY (`username`,`db_name`,`table_name`);
-
---
--- Índices de tabela `pma__tracking`
---
-ALTER TABLE `pma__tracking`
-  ADD PRIMARY KEY (`db_name`,`table_name`,`version`);
-
---
--- Índices de tabela `pma__userconfig`
---
-ALTER TABLE `pma__userconfig`
-  ADD PRIMARY KEY (`username`);
-
---
--- Índices de tabela `pma__usergroups`
---
-ALTER TABLE `pma__usergroups`
-  ADD PRIMARY KEY (`usergroup`,`tab`,`allowed`);
-
---
--- Índices de tabela `pma__users`
---
-ALTER TABLE `pma__users`
-  ADD PRIMARY KEY (`username`,`usergroup`);
-
---
--- AUTO_INCREMENT para tabelas despejadas
---
-
---
--- AUTO_INCREMENT de tabela `pma__bookmark`
---
-ALTER TABLE `pma__bookmark`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `pma__column_info`
---
-ALTER TABLE `pma__column_info`
-  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `pma__export_templates`
---
-ALTER TABLE `pma__export_templates`
-  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `pma__history`
---
-ALTER TABLE `pma__history`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `pma__pdf_pages`
---
-ALTER TABLE `pma__pdf_pages`
-  MODIFY `page_nr` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `pma__savedsearches`
---
-ALTER TABLE `pma__savedsearches`
-  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
---
 -- Banco de dados: `sigei`
 --
-CREATE DATABASE IF NOT EXISTS `sigei` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `sigei`;
 
 -- --------------------------------------------------------
 
@@ -518,7 +65,7 @@ CREATE TABLE `alunos` (
   `cpf_responsavel` char(11) DEFAULT NULL,
   `foto_arquivo` varchar(255) DEFAULT NULL,
   `termo_responsabilidade_arquivo` varchar(255) DEFAULT NULL,
-  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','ARQUIVADO') DEFAULT 'PENDENTE',
+  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','PENDENTE_CORRECAO','ARQUIVADO') DEFAULT 'PENDENTE',
   `motivo_reprovacao` text DEFAULT NULL,
   `id_ue` int(11) DEFAULT NULL,
   `id_usuario_ue` int(11) DEFAULT NULL,
@@ -530,9 +77,9 @@ CREATE TABLE `alunos` (
 --
 
 INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`, `municipio_nascimento`, `serie`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `termo_responsabilidade_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `id_ue`, `id_usuario_ue`, `data_cadastro`) VALUES
-(1, 'Henrique Gabriel Moreira', '41872596301', 'RA20260841', 'MANHÃ', 'Masculino', 'Pardo', 'Bragança Paulista', '6º Ano', '2014-04-18', 'Transtorno do Espectro Autista', 'Necessita de apoio na organização da rotina escolar e nas transições de atividades.', 'Juliana Moreira', '68391472508', NULL, NULL, 'PENDENTE', NULL, 1, 1, '2026-09-24 09:00:00'),
+(1, 'Henrique Gabriel Moreira', '41872596301', 'RA20260841', 'MANHÃ', 'Masculino', 'Pardo', 'Bragança Paulista', '6º Ano', '2014-04-18', 'Transtorno do Espectro Autista', 'Necessita de apoio na organização da rotina escolar e nas transições de atividades.', 'Juliana Moreira', '68391472508', NULL, NULL, 'PENDENTE_CORRECAO', 'Anexar rg.', 1, 1, '2026-09-24 09:00:00'),
 (2, 'Beatriz Fernanda Lopes', '52736190472', 'RA20260842', 'TARDE', 'Feminino', 'Branca', 'Bragança Paulista', '7º Ano', '2013-09-26', 'Transtorno do Déficit de Atenção e Hiperatividade', 'Apoio para organização de materiais, rotina e acompanhamento das atividades.', 'Marcelo Lopes', '81452936702', NULL, NULL, 'APROVADO', NULL, 1, 1, '2026-09-24 09:00:00'),
-(3, 'Miguel Ângelo Ferreira', '68143027594', 'RA20260843', 'MANHÃ', 'Masculino', 'Pardo', 'Atibaia', '8º Ano', '2012-02-11', 'Deficiência Intelectual', 'Acompanhamento individualizado durante atividades pedagógicas.', 'Carolina Ferreira', '30581764296', NULL, NULL, 'REPROVADO', 'Documentação necessária para análise não foi apresentada integralmente.', 1, 1, '2026-09-24 09:00:00'),
+(3, 'Miguel Ângelo Ferreira', '68143027594', 'RA20260843', 'MANHÃ', 'Masculino', 'Pardo', 'Atibaia', '8º Ano', '2012-02-11', 'Deficiência Intelectual', 'Acompanhamento individualizado durante atividades pedagógicas.', 'Carolina Ferreira', '30581764296', NULL, NULL, 'PENDENTE', '', 1, 1, '2026-09-24 09:00:00'),
 (4, 'Laura Vitória Martins', '74320581639', 'RA20260844', 'INTEGRAL', 'Feminino', 'Parda', 'Bragança Paulista', '6º Ano', '2014-07-03', 'Deficiência Auditiva', 'Apoio à comunicação e acompanhamento das atividades em sala.', 'Renata Martins', '49163820574', NULL, NULL, 'PENDENTE', NULL, 2, 3, '2026-09-24 09:00:00'),
 (5, 'Samuel Henrique Costa', '31690482751', 'RA20260845', 'TARDE', 'Masculino', 'Preta', 'Bragança Paulista', '7º Ano', '2013-11-19', 'Paralisia Cerebral', 'Apoio para mobilidade e participação nas atividades escolares.', 'Roberto Costa', '72841596307', NULL, NULL, 'APROVADO', NULL, 2, 3, '2026-09-24 09:00:00'),
 (6, 'Manuela Cristina Alves', '85924163720', 'RA20260846', 'MANHÃ', 'Feminino', 'Branca', 'Atibaia', '9º Ano', '2011-05-28', 'Transtorno do Espectro Autista', 'Rotina estruturada e acompanhamento durante mudanças de atividade.', 'Patrícia Alves', '57420381695', NULL, NULL, 'REPROVADO', 'Foi solicitada complementação da documentação para nova análise.', 2, 3, '2026-09-24 09:00:00');
@@ -557,7 +104,8 @@ CREATE TABLE `associacoes` (
 
 INSERT INTO `associacoes` (`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`) VALUES
 (1, 2, 1, 1, '2026-09-10'),
-(2, 5, 2, 1, '2026-09-12');
+(2, 5, 2, 1, '2026-09-12'),
+(3, 5, 1, 1, '2026-09-24');
 
 --
 -- Acionadores `associacoes`
@@ -654,7 +202,8 @@ INSERT INTO `laudos` (`id_laudo`, `id_aluno`, `nome_arquivo`, `caminho_arquivo`,
 (1, 1, 'laudo_henrique.pdf', 'uploads/laudos/laudo_henrique.pdf', 'Documento apresentado para análise do atendimento educacional.', '2026-09-24 09:00:00'),
 (2, 2, 'laudo_beatriz.pdf', 'uploads/laudos/laudo_beatriz.pdf', 'Documento para acompanhamento escolar.', '2026-09-24 09:00:00'),
 (3, 4, 'laudo_laura.pdf', 'uploads/laudos/laudo_laura.pdf', 'Documento referente às necessidades de comunicação.', '2026-09-24 09:00:00'),
-(4, 5, 'laudo_samuel.pdf', 'uploads/laudos/laudo_samuel.pdf', 'Documento referente às necessidades de mobilidade.', '2026-09-24 09:00:00');
+(4, 5, 'laudo_samuel.pdf', 'uploads/laudos/laudo_samuel.pdf', 'Documento referente às necessidades de mobilidade.', '2026-09-24 09:00:00'),
+(5, 1, 'certidão de imóvel - em profª. nilza faria (1).pdf', 'uploads/laudos/20260925161351_b063c3829f70.pdf', '', '2026-09-25 11:13:51');
 
 -- --------------------------------------------------------
 
@@ -752,7 +301,9 @@ INSERT INTO `termos_aceite` (`id`, `id_usuario`, `perfil`, `data_aceite`, `ip`) 
 (8, 1, 'PAE', '2026-09-20 11:30:00', '127.0.0.1'),
 (9, 2, 'PAE', '2026-09-20 12:00:00', '127.0.0.1'),
 (10, 1, 'ADMIN', '2026-09-20 12:30:00', '127.0.0.1'),
-(11, 4, 'USUARIO_SEFISC', '2026-09-24 10:18:16', '::1');
+(11, 4, 'USUARIO_SEFISC', '2026-09-24 10:18:16', '::1'),
+(12, 2, 'DIRIGENTE', '2026-09-24 10:33:07', '::1'),
+(13, 2, 'USUARIO_ESCOLA', '2026-09-25 11:03:00', '::1');
 
 -- --------------------------------------------------------
 
@@ -1068,7 +619,7 @@ ALTER TABLE `alunos`
 -- AUTO_INCREMENT de tabela `associacoes`
 --
 ALTER TABLE `associacoes`
-  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `empresas`
@@ -1080,7 +631,7 @@ ALTER TABLE `empresas`
 -- AUTO_INCREMENT de tabela `laudos`
 --
 ALTER TABLE `laudos`
-  MODIFY `id_laudo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_laudo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `recuperacao_senha`
@@ -1104,7 +655,7 @@ ALTER TABLE `seduc`
 -- AUTO_INCREMENT de tabela `termos_aceite`
 --
 ALTER TABLE `termos_aceite`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de tabela `unidades_escolares`
@@ -1202,11 +753,6 @@ ALTER TABLE `usuarios_ue`
 --
 ALTER TABLE `usuarios_ure`
   ADD CONSTRAINT `fk_usuario_ure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`) ON UPDATE CASCADE;
---
--- Banco de dados: `test`
---
-CREATE DATABASE IF NOT EXISTS `test` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `test`;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

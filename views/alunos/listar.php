@@ -221,6 +221,8 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                         <?php
                                             if ($aluno['status_aprovacao'] == 'PENDENTE') {
                                                 echo '<span class="badge bg-warning text-dark">Pendente</span>';
+                                            } elseif ($aluno['status_aprovacao'] == 'PENDENTE_CORRECAO') {
+                                                echo '<span class="badge bg-warning text-dark">Em Correção</span>';
                                             } elseif ($aluno['status_aprovacao'] == 'APROVADO') {
                                                 echo '<span class="badge bg-success">Aprovado</span>';
                                             } elseif ($aluno['status_aprovacao'] == 'REPROVADO') {

@@ -44,9 +44,9 @@ if ($busca !== '') {
     } elseif ($campoFiltro === '4' && !in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) { // Empresa
         $where[] = $isIgual ? "e.nome = '$termo'" : "e.nome LIKE '%$termo%'";
     } elseif ($campoFiltro === '5') { // Status
-        if (in_array(strtolower($termo), ['ativo', '1'])) {
+        if (in_array(strtolower($termo), ['ativo', '1', 'ativa'])) {
             $where[] = "p.ativo = 1";
-        } elseif (in_array(strtolower($termo), ['inativo', '0'])) {
+        } elseif (in_array(strtolower($termo), ['inativo', '0', 'inativa'])) {
             $where[] = "p.ativo = 0";
         }
     } else { // 0 = Todos os campos
@@ -58,7 +58,7 @@ if ($busca !== '') {
         } else {
             $conds = ["p.nome LIKE '%$termo%'", "p.email LIKE '%$termo%'"];
             if (!empty($cpfLimpo)) $conds[] = "p.cpf LIKE '%$cpfLimpo%'";
-            if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) $conds[] = "e.nome LIKE '%$empBusca%'";
+            if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) $conds[] = "e.nome LIKE '%$termo%'";
             $where[] = "(" . implode(' OR ', $conds) . ")";
         }
     }
@@ -119,28 +119,24 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
                     <!-- 2. Tipo (Contém / Igual a) -->
                     <div class="col-md-2 col-sm-6 col-12">
-                        <div class="form-group" id="tpFiltro">
-                            <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
-                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
-                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
-                            </select>
-                        </div>
+                        <select class="form-select form-select-sm" name="tp_filtro">
+                            <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                            <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                        </select>
                     </div>
 
                     <!-- 3. Campo de filtro -->
                     <div class="col-md-3 col-sm-6 col-12">
-                        <div class="form-group">
-                            <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
-                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
-                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
-                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CPF</option>
-                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>E-mail</option>
-                                <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
-                                    <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Empresa</option>
-                                <?php endif; ?>
-                                <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status</option>
-                            </select>
-                        </div>
+                        <select class="form-select form-select-sm" name="campo_filtro">
+                            <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
+                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CPF</option>
+                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>E-mail</option>
+                            <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+                                <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Empresa</option>
+                            <?php endif; ?>
+                            <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status</option>
+                        </select>
                     </div>
 
                     <!-- 4. Botões de ação -->

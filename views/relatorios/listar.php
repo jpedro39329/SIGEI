@@ -11,38 +11,59 @@ $idEmpresaUsuario = (int) ($_SESSION['id_empresa'] ?? 0);
 $alunos = [];
 $relatorios = [];
 
-// Filtros
-$buscaAluno = trim($_GET['aluno'] ?? '');
-$buscaPae = trim($_GET['pae'] ?? '');
-$tipoFiltro = trim($_GET['tipo'] ?? '');
-$dataInicio = trim($_GET['data_inicio'] ?? '');
-$dataFim = trim($_GET['data_fim'] ?? '');
+$busca = trim($_GET['busca'] ?? '');
+$tipoFiltro = trim($_GET['tp_filtro'] ?? '1'); // 0 = Igual a, 1 = Contém
+$campoFiltro = trim($_GET['campo_filtro'] ?? '0'); // 0 = Todos, 1 = Aluno, 2 = PAE, 3 = Tipo, 4 = Descrição, 5 = Empresa
 
 $whereFiltros = [];
 
-if ($buscaAluno !== '') {
-    $alTermo = mysqli_real_escape_string($conexao, $buscaAluno);
-    $whereFiltros[] = "a.nome LIKE '%$alTermo%'";
-}
+if ($busca !== '') {
+    $termo = mysqli_real_escape_string($conexao, $busca);
+    $isIgual = ($tipoFiltro === '0');
 
-if ($buscaPae !== '' && $userPerfil !== 'PAE') {
-    $paeTermo = mysqli_real_escape_string($conexao, $buscaPae);
-    $whereFiltros[] = "p.nome LIKE '%$paeTermo%'";
-}
-
-if ($tipoFiltro !== '') {
-    $tipoEsc = mysqli_real_escape_string($conexao, $tipoFiltro);
-    $whereFiltros[] = "r.tipo = '$tipoEsc'";
-}
-
-if ($dataInicio !== '') {
-    $dtIniEsc = mysqli_real_escape_string($conexao, $dataInicio);
-    $whereFiltros[] = "DATE(r.data_cadastro) >= '$dtIniEsc'";
-}
-
-if ($dataFim !== '') {
-    $dtFimEsc = mysqli_real_escape_string($conexao, $dataFim);
-    $whereFiltros[] = "DATE(r.data_cadastro) <= '$dtFimEsc'";
+    if ($campoFiltro === '1') { // Aluno
+        $whereFiltros[] = $isIgual ? "a.nome = '$termo'" : "a.nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '2' && $userPerfil !== 'PAE') { // PAE
+        $whereFiltros[] = $isIgual ? "p.nome = '$termo'" : "p.nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '3') { // Tipo
+        if (strcasecmp($termo, 'diario') === 0 || strcasecmp($termo, 'diário') === 0) {
+            $whereFiltros[] = "r.tipo = 'DIARIO'";
+        } elseif (strcasecmp($termo, 'mensal') === 0) {
+            $whereFiltros[] = "r.tipo = 'MENSAL'";
+        } else {
+            $whereFiltros[] = $isIgual ? "r.tipo = '$termo'" : "r.tipo LIKE '%$termo%'";
+        }
+    } elseif ($campoFiltro === '4') { // Descrição
+        $whereFiltros[] = $isIgual ? "r.descricao = '$termo'" : "r.descricao LIKE '%$termo%'";
+    } elseif ($campoFiltro === '5' && !in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'PAE'])) { // Empresa
+        $whereFiltros[] = $isIgual ? "e.nome = '$termo'" : "e.nome LIKE '%$termo%'";
+    } else { // 0 = Todos os campos
+        if ($isIgual) {
+            $conds = ["a.nome = '$termo'", "r.descricao = '$termo'"];
+            if ($userPerfil !== 'PAE') $conds[] = "p.nome = '$termo'";
+            if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'PAE'])) $conds[] = "e.nome = '$termo'";
+            if (strcasecmp($termo, 'diario') === 0 || strcasecmp($termo, 'diário') === 0) {
+                $conds[] = "r.tipo = 'DIARIO'";
+            } elseif (strcasecmp($termo, 'mensal') === 0) {
+                $conds[] = "r.tipo = 'MENSAL'";
+            } else {
+                $conds[] = "r.tipo = '$termo'";
+            }
+            $whereFiltros[] = "(" . implode(' OR ', $conds) . ")";
+        } else {
+            $conds = ["a.nome LIKE '%$termo%'", "r.descricao LIKE '%$termo%'"];
+            if ($userPerfil !== 'PAE') $conds[] = "p.nome LIKE '%$termo%'";
+            if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'PAE'])) $conds[] = "e.nome LIKE '%$termo%'";
+            if (strcasecmp($termo, 'diario') === 0 || strcasecmp($termo, 'diário') === 0) {
+                $conds[] = "r.tipo = 'DIARIO'";
+            } elseif (strcasecmp($termo, 'mensal') === 0) {
+                $conds[] = "r.tipo = 'MENSAL'";
+            } else {
+                $conds[] = "r.tipo LIKE '%$termo%'";
+            }
+            $whereFiltros[] = "(" . implode(' OR ', $conds) . ")";
+        }
+    }
 }
 
 if ($userPerfil === 'PAE') {
@@ -62,11 +83,12 @@ if ($userPerfil === 'PAE') {
 
     // Relatórios do PAE logado
     $sqlRelatorios = "
-        SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome
+        SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome, e.nome AS empresa_nome
         FROM relatorios r
         JOIN associacoes ass ON r.id_associacao = ass.id_associacao
         JOIN alunos a ON ass.id_aluno = a.id_aluno
         JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+        LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
         $whereSql
         ORDER BY r.data_cadastro DESC
     ";
@@ -166,56 +188,47 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
         </div>
     <?php endif; ?>
 
-    <!-- Filtros de Relatórios -->
+    <!-- Barra de pesquisa e filtros -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
-                    <div class="col-md-5 col-12">
-                        <div class="input-group">
-                            <input type="text" name="aluno" class="form-control form-control-sm" placeholder="Filtrar por nome do aluno..." value="<?php echo htmlspecialchars($buscaAluno); ?>">
-                            <button class="btn btn-dark btn-sm" type="submit" title="Pesquisar">
-                                Pesquisar
-                            </button>
-                        </div>
+                    <!-- 1. Campo para digitar -->
+                    <div class="col-md-5 col-sm-12 col-12">
+                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
-                    <div class="col-md-7 col-12 d-flex gap-2">
-                        <div class="dropdown flex-grow-1">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" type="button" id="dropdownFiltrosRel" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                <span>Filtros Avançados <?php echo ($buscaPae !== '' || $tipoFiltro !== '' || $dataInicio !== '' || $dataFim !== '') ? '<span class="badge bg-primary ms-1">Ativo</span>' : ''; ?></span>
-                            </button>
-                            <div class="dropdown-menu p-3 shadow-sm" style="min-width: 320px;" aria-labelledby="dropdownFiltrosRel">
-                                <?php if ($userPerfil !== 'PAE'): ?>
-                                    <div class="mb-2">
-                                        <label class="form-label small fw-bold mb-1">Cuidador (PAE)</label>
-                                        <input type="text" name="pae" class="form-control form-control-sm" placeholder="Nome do PAE..." value="<?php echo htmlspecialchars($buscaPae); ?>">
-                                    </div>
-                                <?php endif; ?>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold mb-1">Tipo</label>
-                                    <select name="tipo" class="form-select form-select-sm">
-                                        <option value="">Todos os tipos</option>
-                                        <option value="DIARIO" <?php echo $tipoFiltro === 'DIARIO' ? 'selected' : ''; ?>>Diário</option>
-                                        <option value="MENSAL" <?php echo $tipoFiltro === 'MENSAL' ? 'selected' : ''; ?>>Mensal</option>
-                                    </select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold mb-1">De (Data)</label>
-                                    <input type="date" name="data_inicio" class="form-control form-control-sm" value="<?php echo htmlspecialchars($dataInicio); ?>">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold mb-1">Até (Data)</label>
-                                    <input type="date" name="data_fim" class="form-control form-control-sm" value="<?php echo htmlspecialchars($dataFim); ?>">
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-dark btn-sm w-100">Aplicar Filtros</button>
-                                    <a href="listar.php" class="btn btn-outline-secondary btn-sm w-100">Limpar</a>
-                                </div>
-                            </div>
-                        </div>
-                        <?php if ($buscaAluno !== '' || $buscaPae !== '' || $tipoFiltro !== '' || $dataInicio !== '' || $dataFim !== ''): ?>
-                            <a href="listar.php" class="btn btn-outline-secondary btn-sm">Limpar</a>
+                    <!-- 2. Tipo (Contém / Igual a) -->
+                    <div class="col-md-2 col-sm-6 col-12">
+                        <select class="form-select form-select-sm" name="tp_filtro">
+                            <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                            <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Campo de filtro -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <select class="form-select form-select-sm" name="campo_filtro">
+                            <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Aluno</option>
+                            <?php if ($userPerfil !== 'PAE'): ?>
+                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>PAE</option>
+                            <?php endif; ?>
+                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Tipo (Diário/Mensal)</option>
+                            <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Descrição</option>
+                            <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'PAE'])): ?>
+                                <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Empresa</option>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <!-- 4. Botões de ação -->
+                    <div class="col-md-2 col-12 d-flex gap-2">
+                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
+                            Filtrar
+                        </button>
+                        <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
+                            <a href="listar.php" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
                         <?php endif; ?>
                     </div>
                 </div>

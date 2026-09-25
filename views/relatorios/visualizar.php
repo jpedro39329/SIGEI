@@ -15,7 +15,7 @@ if ($id_relatorio <= 0) {
 
 $sql = "
     SELECT r.*, a.nome AS aluno_nome, a.cpf AS aluno_cpf, a.ra AS aluno_ra,
-           p.nome AS pae_nome, p.cpf AS pae_cpf,
+           p.id_pae, p.nome AS pae_nome, p.cpf AS pae_cpf, p.id_empresa,
            e.nome AS empresa_nome, ue.nome AS escola_nome
     FROM relatorios r
     JOIN associacoes ass ON r.id_associacao = ass.id_associacao
@@ -72,7 +72,7 @@ if ($userPerfil === 'PAE') {
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4 pb-3 border-bottom">
                 <div>
                     <h4 class="mb-1">
-                        Relatório <?php echo ($relatorio['tipo'] == 'DIARIO') ? 'Diário de Atendimento' : 'Mensal de Evolução'; ?>
+                        Relatório <?php echo ($relatorio['tipo'] == 'DIARIO') ? 'Diário de Atendimento' : 'Mensal '; ?>
                     </h4>
                     <p class="text-muted mb-0">Registrado em <?php echo date('d/m/Y \à\s H:i', strtotime($relatorio['data_cadastro'])); ?></p>
                 </div>
@@ -91,15 +91,17 @@ if ($userPerfil === 'PAE') {
                         <h6 class="text-muted text-uppercase small fw-bold mb-2">Dados do Aluno</h6>
                         <p class="mb-1"><strong>Nome:</strong> <?php echo htmlspecialchars($relatorio['aluno_nome']); ?></p>
                         <p class="mb-1"><strong>Escola:</strong> <?php echo htmlspecialchars($relatorio['escola_nome'] ?? '-'); ?></p>
-                        <p class="mb-0"><strong>RA / CPF:</strong> <?php echo htmlspecialchars($relatorio['aluno_ra'] ?? '-'); ?> / <?php echo htmlspecialchars(formatarCPF($relatorio['aluno_cpf'])); ?></p>
+                        <p class="mb-0"><strong>RA:</strong> <?php echo htmlspecialchars($relatorio['aluno_ra'] ?? '-'); ?></p>
+                        <p class="mb-0"><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($relatorio['aluno_cpf'])); ?></p>
+
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <div class="p-3 bg-light rounded">
-                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Cuidador (PAE) & Empresa</h6>
-                        <p class="mb-1"><strong>PAE:</strong> <?php echo htmlspecialchars($relatorio['pae_nome']); ?></p>
-                        <p class="mb-1"><strong>CPF PAE:</strong> <?php echo htmlspecialchars(formatarCPF($relatorio['pae_cpf'])); ?></p>
+                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Profissional de Apoio Escolar & Empresa</h6>
+                        <p class="mb-1"><strong>Profissional de Apoio Escolar:</strong> <?php echo htmlspecialchars($relatorio['pae_nome']); ?></p>
+                        <p class="mb-1"><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($relatorio['pae_cpf'])); ?></p>
                         <p class="mb-0"><strong>Empresa:</strong> <?php echo htmlspecialchars($relatorio['empresa_nome'] ?? '-'); ?></p>
                     </div>
                 </div>
