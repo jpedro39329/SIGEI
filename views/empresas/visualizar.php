@@ -1,7 +1,7 @@
 <?php
 require_once "../../config/init.php";
 
-exigirPerfil(array('ADMIN', 'SEDUC'));
+exigirPerfil(array('ADMIN', 'SEDUC', 'USUARIO_SEFISC', 'SEFISC', 'DIRIGENTE'));
 
 $id = (int) ($_GET['id'] ?? 0);
 if ($id <= 0) {
@@ -18,6 +18,15 @@ $empresa = $stmt->get_result()->fetch_assoc();
 if (!$empresa) {
     header("Location: listar.php?erro=" . urlencode("Empresa não encontrada."));
     exit();
+}
+
+// Verifica se existe arquivo de contrato (com fallback para o arquivo padrão gerado)
+$contratoArquivo = $empresa['contrato_arquivo'] ?? '';
+if (empty($contratoArquivo)) {
+    if (file_exists(dirname(__DIR__, 2) . '/uploads/contratos/contrato_plena_servicos_ctr014_2026.pdf')) {
+        $contratoArquivo = 'uploads/contratos/contrato_plena_servicos_ctr014_2026.pdf';
+        $conexao->query("UPDATE empresas SET contrato_arquivo = '$contratoArquivo' WHERE id_empresa = " . (int)$empresa['id_empresa']);
+    }
 }
 
 // 2. UREs atendidas por esta empresa
@@ -72,7 +81,9 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Detalhes da Empresa</h2>
         <div class="d-flex gap-2">
-            <a href="editar.php?id=<?php echo $empresa['id_empresa']; ?>" class="btn btn-warning btn-sm">Editar Empresa</a>
+            <?php if (in_array($_SESSION['user_perfil'] ?? '', ['ADMIN', 'SEDUC'])): ?>
+                <a href="editar.php?id=<?php echo $empresa['id_empresa']; ?>" class="btn btn-warning btn-sm">Editar Empresa</a>
+            <?php endif; ?>
             <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
         </div>
     </div>
@@ -82,7 +93,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
         <div class="col-md-6 mb-4">
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">Informações Cadastrais</h5>
+                    <h5 class="mb-3">Informações Cadastrais e Contrato</h5>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Razão Social</span>
@@ -116,6 +127,18 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                                 ?>
                             </span>
                         </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Documento do Contrato</span>
+                            <span>
+                                <?php if (!empty($contratoArquivo)): ?>
+                                    <button type="button" class="btn btn-sm btn-primary py-1 px-3 d-flex align-items-center gap-1" onclick="visualizarDocumento('<?php echo htmlspecialchars($contratoArquivo); ?>', 'Contrato <?php echo htmlspecialchars(addslashes($empresa['numero_contrato'] ?: $empresa['nome'])); ?>')">
+                                        <i class="bi bi-file-earmark-pdf-fill"></i> Ver Documento do Contrato
+                                    </button>
+                                <?php else: ?>
+                                    <span class="text-muted small">Nenhum arquivo anexado</span>
+                                <?php endif; ?>
+                            </span>
+                        </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone</span>
                             <strong><?php echo htmlspecialchars(formatarTelefone($empresa['telefone']) ?: 'Não informado'); ?></strong>
@@ -129,36 +152,15 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                             <span class="text-end">
                                 <?php
                                 $endCompleto = array_filter([
-                                    $empresa['endereco'],
-                                    $empresa['numero'],
-                                    $empresa['bairro'],
-                                    $empresa['municipio'],
-                                    $empresa['cep'] ? 'CEP ' . $empresa['cep'] : null
+                                    $empresa['endereco'] ?? null,
+                                    $empresa['numero'] ?? null,
+                                    $empresa['bairro'] ?? null,
+                                    $empresa['municipio'] ?? null,
+                                    !empty($empresa['cep']) ? 'CEP ' . formatarCEP($empresa['cep']) : null
                                 ]);
                                 echo htmlspecialchars(implode(', ', $endCompleto) ?: 'Não informado');
                                 ?>
                             </span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Resumo Operacional -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h5 class="mb-3">Resumo Operacional</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Supervisores Vinculados</span>
-                            <strong><?php echo count($supervisores); ?></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">PAEs Ativos</span>
-                            <strong><?php echo $totalPaesAtivos; ?></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Total de UREs Atendidas</span>
-                            <strong><?php echo count($uresAtendidas); ?></strong>
                         </li>
                     </ul>
                 </div>
@@ -170,14 +172,16 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
             <!-- UREs Atendidas -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">UREs Atendidas pelo Contrato (<?php echo count($uresAtendidas); ?>)</h5>
-                    <div class="d-flex flex-wrap gap-2">
+                    <h5 class="mb-3">UREs Atendidas pelo Contrato</h5>
+                    <div>
                         <?php if (count($uresAtendidas) > 0): ?>
-                            <?php foreach ($uresAtendidas as $u): ?>
-                                <a href="../ures/visualizar.php?id=<?php echo $u['id_ure']; ?>" class="btn btn-sm btn-outline-secondary">
-                                    <?php echo ($u['uge'] ? htmlspecialchars($u['uge']) . ' - ' : '') . htmlspecialchars($u['nome']); ?>
-                                </a>
-                            <?php endforeach; ?>
+                            <ul class="list-unstyled mb-0">
+                                <?php foreach ($uresAtendidas as $u): ?>
+                                    <li class="py-1">
+                                        <?php echo ($u['uge'] ? htmlspecialchars($u['uge']) . ' - ' : '') . htmlspecialchars($u['nome']); ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
                         <?php else: ?>
                             <p class="text-muted small mb-0">Nenhuma URE associada a esta empresa.</p>
                         <?php endif; ?>
@@ -188,7 +192,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
             <!-- Supervisores da Empresa -->
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">Supervisores de Licitações e Contratos (<?php echo count($supervisores); ?>)</h5>
+                    <h5 class="mb-3">Supervisores de Licitações e Contratos</h5>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead>
@@ -196,7 +200,6 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                                     <th>Nome</th>
                                     <th>CPF</th>
                                     <th>Status</th>
-                                    <th>Ação</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -212,14 +215,11 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                                                     <span class="badge bg-secondary">Inativo</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td>
-                                                <a href="../supervisores/visualizar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted">Nenhum supervisor cadastrado.</td>
+                                        <td colspan="3" class="text-center text-muted">Nenhum supervisor cadastrado.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

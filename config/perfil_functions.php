@@ -15,13 +15,16 @@ function temPermissao($perfil, $perfisPermitidos) {
         return true;
     }
     // Compatibilidade entre sinônimos de perfil
-    if (in_array('USUARIO_ESCOLA', $perfisPermitidos) && in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
+    if ((in_array('USUARIO_ESCOLA', $perfisPermitidos) || in_array('USUARIO_UE', $perfisPermitidos) || in_array('ESCOLA', $perfisPermitidos)) && in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
         return true;
     }
-    if (in_array('SUPERVISOR', $perfisPermitidos) && in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    if ((in_array('SUPERVISOR', $perfisPermitidos) || in_array('USUARIO_EMPRESA', $perfisPermitidos)) && in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
         return true;
     }
-    if (in_array('USUARIO_EMPRESA', $perfisPermitidos) && in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    if ((in_array('SEFISC', $perfisPermitidos) || in_array('USUARIO_SEFISC', $perfisPermitidos)) && in_array($perfil, ['USUARIO_SEFISC', 'SEFISC'])) {
+        return true;
+    }
+    if ((in_array('DIRIGENTE', $perfisPermitidos) || in_array('ASURE', $perfisPermitidos)) && in_array($perfil, ['DIRIGENTE', 'ASURE'])) {
         return true;
     }
     return false;

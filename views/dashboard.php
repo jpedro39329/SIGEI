@@ -538,6 +538,19 @@ function totalDashboard($conexao, $sql) {
         <?php
         if ($idUreUsuario <= 0) $idUreUsuario = idUreUsuario($conexao, $userId);
 
+        // Busca a empresa e contrato vinculados à URE
+        $empresaContratoUre = null;
+        if ($idUreUsuario > 0) {
+            $resEmpUre = mysqli_query($conexao, "
+                SELECT e.*
+                FROM empresas e
+                JOIN empresa_ure eu ON e.id_empresa = eu.id_empresa
+                WHERE eu.id_ure = $idUreUsuario AND e.ativo = 1
+                LIMIT 1
+            ");
+            $empresaContratoUre = $resEmpUre ? mysqli_fetch_assoc($resEmpUre) : null;
+        }
+
         $totalUsuariosEscola = totalDashboard($conexao, "
             SELECT COUNT(*) AS total
             FROM usuarios_ue uue
@@ -580,6 +593,8 @@ function totalDashboard($conexao, $sql) {
         $resAlunosSefisc = mysqli_query($conexao, $sqlAlunosSefisc);
         $alunosSefisc = $resAlunosSefisc ? mysqli_fetch_all($resAlunosSefisc, MYSQLI_ASSOC) : [];
         ?>
+
+
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">

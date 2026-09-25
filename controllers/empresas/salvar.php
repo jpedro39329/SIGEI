@@ -1,5 +1,6 @@
 <?php
 require_once "../../config/init.php";
+require_once "../upload.php";
 
 exigirPerfil(array('ADMIN', 'SEDUC'));
 exigirTokenCSRF();
@@ -7,6 +8,12 @@ exigirTokenCSRF();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../../views/empresas/listar.php");
     exit();
+}
+
+// Garante que a coluna contrato_arquivo exista na tabela empresas
+$chk = $conexao->query("SHOW COLUMNS FROM empresas LIKE 'contrato_arquivo'");
+if ($chk && $chk->num_rows === 0) {
+    $conexao->query("ALTER TABLE empresas ADD COLUMN contrato_arquivo VARCHAR(255) NULL AFTER data_fim_contrato");
 }
 
 $nome = trim($_POST['nome'] ?? '');
@@ -23,6 +30,15 @@ $telefone = trim($_POST['telefone'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $ativo = 1; // Cadastro sempre automaticamente ATIVO conforme solicitado
 $uresSelecionadas = $_POST['ures'] ?? [];
+
+$contratoArquivo = null;
+if (isset($_FILES['contrato_arquivo']) && $_FILES['contrato_arquivo']['error'] === UPLOAD_ERR_OK) {
+    $contratoArquivo = uploadArquivo($_FILES['contrato_arquivo'], 'contratos');
+    if ($contratoArquivo === false) {
+        header("Location: ../../views/empresas/cadastrar.php?erro=" . urlencode("Erro ao enviar contrato. Envie PDF, JPG ou PNG de até 5MB."));
+        exit();
+    }
+}
 
 if ($nome === '' || $cnpj === '') {
     header("Location: ../../views/empresas/cadastrar.php?erro=" . urlencode("Preencha a razão social e o CNPJ da empresa."));
@@ -42,8 +58,8 @@ $stmtVerifica->close();
 $stmt = $conexao->prepare(
     "INSERT INTO empresas (
         nome, cnpj, endereco, numero, bairro, municipio, cep,
-        telefone, email, numero_contrato, data_inicio_contrato, data_fim_contrato, ativo
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        telefone, email, numero_contrato, data_inicio_contrato, data_fim_contrato, contrato_arquivo, ativo
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 
 if (!$stmt) {
@@ -52,9 +68,9 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    "ssssssssssssi",
+    "sssssssssssssi",
     $nome, $cnpj, $endereco, $numero, $bairro, $municipio, $cep,
-    $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $ativo
+    $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $contratoArquivo, $ativo
 );
 
 if ($stmt->execute()) {

@@ -1,5 +1,6 @@
 <?php
 require_once "../../config/init.php";
+require_once "../upload.php";
 
 exigirPerfil(array('ADMIN', 'SEDUC'));
 exigirTokenCSRF();
@@ -7,6 +8,12 @@ exigirTokenCSRF();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../../views/empresas/listar.php");
     exit();
+}
+
+// Garante que a coluna contrato_arquivo exista na tabela empresas
+$chk = $conexao->query("SHOW COLUMNS FROM empresas LIKE 'contrato_arquivo'");
+if ($chk && $chk->num_rows === 0) {
+    $conexao->query("ALTER TABLE empresas ADD COLUMN contrato_arquivo VARCHAR(255) NULL AFTER data_fim_contrato");
 }
 
 $id_empresa = (int) ($_POST['id_empresa'] ?? 0);
@@ -24,6 +31,17 @@ $telefone = trim($_POST['telefone'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $ativo = (int) ($_POST['ativo'] ?? 1);
 $uresSelecionadas = $_POST['ures'] ?? [];
+
+$contratoArquivo = null;
+if (isset($_FILES['contrato_arquivo']) && $_FILES['contrato_arquivo']['error'] === UPLOAD_ERR_OK) {
+    $upload = uploadArquivo($_FILES['contrato_arquivo'], 'contratos');
+    if ($upload !== false) {
+        $contratoArquivo = $upload;
+    } else {
+        header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Erro ao enviar contrato. Envie PDF, JPG ou PNG de até 5MB."));
+        exit();
+    }
+}
 
 if ($id_empresa <= 0) {
     header("Location: ../../views/empresas/listar.php?erro=" . urlencode("Empresa inválida."));
@@ -45,24 +63,42 @@ if ($stmtVerifica->get_result()->num_rows > 0) {
 }
 $stmtVerifica->close();
 
-$stmt = $conexao->prepare(
-    "UPDATE empresas SET
-        nome = ?, cnpj = ?, endereco = ?, numero = ?, bairro = ?, municipio = ?, cep = ?,
-        telefone = ?, email = ?, numero_contrato = ?, data_inicio_contrato = ?, data_fim_contrato = ?, ativo = ?
-     WHERE id_empresa = ?"
-);
+if ($contratoArquivo !== null) {
+    $stmt = $conexao->prepare(
+        "UPDATE empresas SET
+            nome = ?, cnpj = ?, endereco = ?, numero = ?, bairro = ?, municipio = ?, cep = ?,
+            telefone = ?, email = ?, numero_contrato = ?, data_inicio_contrato = ?, data_fim_contrato = ?, contrato_arquivo = ?, ativo = ?
+         WHERE id_empresa = ?"
+    );
+    if ($stmt) {
+        $stmt->bind_param(
+            "sssssssssssssii",
+            $nome, $cnpj, $endereco, $numero, $bairro, $municipio, $cep,
+            $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $contratoArquivo, $ativo,
+            $id_empresa
+        );
+    }
+} else {
+    $stmt = $conexao->prepare(
+        "UPDATE empresas SET
+            nome = ?, cnpj = ?, endereco = ?, numero = ?, bairro = ?, municipio = ?, cep = ?,
+            telefone = ?, email = ?, numero_contrato = ?, data_inicio_contrato = ?, data_fim_contrato = ?, ativo = ?
+         WHERE id_empresa = ?"
+    );
+    if ($stmt) {
+        $stmt->bind_param(
+            "ssssssssssssii",
+            $nome, $cnpj, $endereco, $numero, $bairro, $municipio, $cep,
+            $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $ativo,
+            $id_empresa
+        );
+    }
+}
 
 if (!$stmt) {
     header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Erro ao preparar consulta: " . $conexao->error));
     exit();
 }
-
-$stmt->bind_param(
-    "ssssssssssssii",
-    $nome, $cnpj, $endereco, $numero, $bairro, $municipio, $cep,
-    $telefone, $email, $numeroContrato, $dataInicio, $dataFim, $ativo,
-    $id_empresa
-);
 
 if ($stmt->execute()) {
     // Atualiza vínculos com UREs
@@ -74,7 +110,7 @@ if ($stmt->execute()) {
             foreach ($uresSelecionadas as $idUre) {
                 $idUreInt = (int) $idUre;
                 if ($idUreInt > 0) {
-                    $stmtUre->bind_param("ii", $idEmpresa, $idUreInt);
+                    $stmtUre->bind_param("ii", $id_empresa, $idUreInt);
                     $stmtUre->execute();
                 }
             }
@@ -88,4 +124,3 @@ if ($stmt->execute()) {
 
 header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Erro ao atualizar empresa: " . $stmt->error));
 exit();
-

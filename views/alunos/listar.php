@@ -125,9 +125,15 @@ $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — consulta e acompanhamento de alunos.</p>
         </div>
 
-        <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
-            <a href="cadastrar.php" class="btn btn-primary">Cadastrar aluno</a>
-        <?php endif; ?>
+        <div class="d-flex align-items-center gap-2">
+            <a href="../../controllers/alunos/exportar_excel.php<?php echo !empty($_SERVER['QUERY_STRING']) ? '?' . htmlspecialchars($_SERVER['QUERY_STRING']) : ''; ?>" class="btn btn-success d-flex align-items-center gap-2" title="Exportar lista de alunos para Excel">
+                <i class="bi bi-file-earmark-excel-fill"></i> Excel
+            </a>
+
+            <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
+                <a href="cadastrar.php" class="btn btn-primary">Cadastrar aluno</a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'sucesso'): ?>

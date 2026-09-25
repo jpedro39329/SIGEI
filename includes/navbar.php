@@ -72,6 +72,9 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 <!-- SEFISC -->
                 <?php if ($userPerfil === 'USUARIO_SEFISC') { ?>
                     <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'empresas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/empresas/listar.php">Empresas</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'usuarios_ue/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/usuarios_ue/listar.php">Usuários das Escolas</a>
                     </li>
                     <li class="nav-item">

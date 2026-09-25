@@ -63,7 +63,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                         <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_GET['erro']); ?></div>
                     <?php endif; ?>
 
-                    <form action="../../controllers/empresas/salvar.php" method="POST" id="formEmpresa">
+                    <form action="../../controllers/empresas/salvar.php" method="POST" enctype="multipart/form-data" id="formEmpresa">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         
                         <div class="row">
@@ -94,6 +94,12 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Fim do Contrato (Vigência)</label>
                                 <input type="date" name="data_fim_contrato" class="form-control">
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Arquivo do Contrato (PDF, JPG ou PNG)</label>
+                                <input type="file" name="contrato_arquivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="text-muted">Anexe o termo de contrato assinado (máx. 5MB).</small>
                             </div>
 
                             <div class="col-md-6 mb-3">

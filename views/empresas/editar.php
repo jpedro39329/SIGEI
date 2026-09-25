@@ -89,7 +89,7 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
                         <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_GET['erro']); ?></div>
                     <?php endif; ?>
 
-                    <form action="../../controllers/empresas/editar_salvar.php" method="POST" id="formEmpresa">
+                    <form action="../../controllers/empresas/editar_salvar.php" method="POST" enctype="multipart/form-data" id="formEmpresa">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <input type="hidden" name="id_empresa" value="<?php echo $empresa['id_empresa']; ?>">
                         
@@ -121,6 +121,21 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Fim do Contrato (Vigência)</label>
                                 <input type="date" name="data_fim_contrato" class="form-control" value="<?php echo htmlspecialchars($empresa['data_fim_contrato'] ?? ''); ?>">
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Arquivo do Contrato (PDF, JPG ou PNG)</label>
+                                <input type="file" name="contrato_arquivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                <?php if (!empty($empresa['contrato_arquivo'])): ?>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Arquivo atual: </small>
+                                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars($empresa['contrato_arquivo']); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['nome'])); ?>')">
+                                            <i class="bi bi-file-earmark-pdf"></i> Ver Contrato Atual
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <small class="text-muted">Nenhum documento de contrato anexado ainda.</small>
+                                <?php endif; ?>
                             </div>
 
                             <div class="col-md-6 mb-3">
