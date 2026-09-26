@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
-$user = 'root';     // Mude de 'fatec' para 'root'
-$password = '';     // Deixe vazio entre as aspas
+$user = 'fatec';     
+$password = 'fatecbp';     /
 $dbname = 'sigei';
 
 $conexao = new mysqli($host, $user, $password, $dbname);
