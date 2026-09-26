@@ -1,8 +1,8 @@
 <?php
-$host = "localhost";
-$user = "fatec";
-$password = "fatecbp";
-$dbname = "sigei";
+$host = 'localhost';
+$user = 'root';     // Mude de 'fatec' para 'root'
+$password = '';     // Deixe vazio entre as aspas
+$dbname = 'sigei';
 
 $conexao = new mysqli($host, $user, $password, $dbname);
 
