@@ -34,7 +34,7 @@ INSERT INTO `admin`
 (`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`)
 VALUES
 (1, 'Ricardo Augusto Nogueira', '34019575118',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  '2026-09-24 09:00:00');
 
 -- ============================================================
@@ -105,7 +105,7 @@ INSERT INTO `seduc`
  `email`, `telefone`, `ativo`, `data_cadastro`)
 VALUES
 (1, 'Mariana Cristina de Almeida', '50154817139',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'DISPA',
  'Assistente III',
  'mariana.almeida@educacao.sp.gov.br',
@@ -234,7 +234,7 @@ INSERT INTO `usuarios_ure`
  `cargo`, `nivel_acesso`, `email`, `telefone`, `ativo`, `data_cadastro`)
 VALUES
 (1, 1, 'Eduardo Henrique Martins', '80451081340',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'ASURE',
  'Coordenador Dirigente Regional de Ensino',
  3,
@@ -244,7 +244,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (2, 1, 'Patrícia Renata de Souza', '78557830408',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'ASURE',
  'Assistente Técnico II',
  2,
@@ -254,7 +254,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (3, 1, 'Marcelo Antônio Ribeiro', '81816089419',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'SEFISC',
  'Chefe de Seção',
  2,
@@ -264,7 +264,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (4, 1, 'Luciana Ferreira Campos', '18427896867',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'SEFISC',
  'Oficial Administrativo',
  1,
@@ -274,7 +274,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (5, 1, 'Camila Fernanda Moreira', '14931820999',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'EDU_ESPECIAL',
  'Professor Especialista em Currículo',
  2,
@@ -284,7 +284,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (6, 1, 'André Luiz Barbosa', '85053257370',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'EDU_ESPECIAL',
  'Auxiliar Administrativo',
  1,
@@ -321,7 +321,7 @@ INSERT INTO `usuarios_ue`
  `email`, `telefone`, `ativo`, `data_cadastro`)
 VALUES
 (1, 1, 'Daniela Martins de Souza', '28911860107',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Diretor Escolar',
  'daniela.souza@educacao.sp.gov.br',
  '11994725163',
@@ -329,7 +329,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (2, 1, 'Marcelo Augusto Vieira', '31760492856',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Coordenador de Gestão Pedagógica',
  'marcelo.vieira@educacao.sp.gov.br',
  '11983642157',
@@ -337,7 +337,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (3, 2, 'Renata Cristina Oliveira', '62038195743',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Diretor Escolar',
  'renata.oliveira@educacao.sp.gov.br',
  '11992517364',
@@ -345,7 +345,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (4, 2, 'Fábio Henrique Cardoso', '47392068152',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Vice-Diretor Escolar',
  'fabio.cardoso@educacao.sp.gov.br',
  '11987431526',
@@ -382,7 +382,7 @@ INSERT INTO `usuarios_pae`
  `email`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`)
 VALUES
 (1, '76149382057', 'Aline Cristina Rodrigues',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Profissional de Apoio Escolar',
  '11985274163',
  'aline.rodrigues@plenaservicos.com.br',
@@ -392,7 +392,7 @@ VALUES
  '2026-09-24 09:00:00'),
 
 (2, '59281746306', 'Rafael Augusto Pereira',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Profissional de Apoio Escolar',
  '11993628517',
  'rafael.pereira@plenaservicos.com.br',
@@ -433,7 +433,7 @@ VALUES
  1,
  'Gustavo Henrique Mendes',
  '93627150824',
- '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '$2y$10$pbYBKfGRjEOF5YxL9us2YO.GuV62dAd5prNVZfSfoY48aCz0aEb.W',
  'Supervisor de Licitações e Contratos',
  'gustavo.mendes@plenaservicos.com.br',
  '11996382714',
