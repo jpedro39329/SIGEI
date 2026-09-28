@@ -246,28 +246,37 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
         </div>
     </div>
 
-    <!-- Laudos -->
+    <!-- Laudos e Documentos -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">📄 Laudos</h5>
+            <h5 class="mb-3">📄 Laudos Médicos e Documentos</h5>
             <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
-                <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="mb-4">
+                <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="mb-4 p-3 bg-light rounded-3 border">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                     <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
                     <div class="row g-2 align-items-end">
-                        <div class="col-md-5">
-                            <label class="form-label">Nome do laudo</label>
-                            <input type="text" name="nome_arquivo" class="form-control" placeholder="Ex.: Laudo medico">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small">Tipo de Arquivo</label>
+                            <select name="tipo" class="form-select">
+                                <option value="LAUDO">Laudo Médico</option>
+                                <option value="DOCUMENTO">Documento Geral (RG, Certidão, etc.)</option>
+                            </select>
                         </div>
-                        <div class="col-md-5">
-                            <label class="form-label">Arquivo</label>
-                            <input type="file" name="laudo" class="form-control" accept="application/pdf,image/jpeg,image/png" required>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Identificação / Título (Opcional se múltiplos)</label>
+                            <input type="text" name="nome_arquivo" class="form-control" placeholder="Ex.: RG do aluno ou Laudo 2026">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small">Arquivo(s)</label>
+                            <input type="file" name="arquivos[]" class="form-control" accept="application/pdf,image/jpeg,image/png" multiple required>
                         </div>
                         <div class="col-md-2 d-grid">
-                            <button type="submit" class="btn btn-dark">Enviar</button>
+                            <button type="submit" class="btn btn-dark">Anexar</button>
                         </div>
                     </div>
-                    <textarea name="descricao" class="form-control mt-2" rows="2" placeholder="Descricao opcional"></textarea>
+                    <div class="mt-2">
+                        <input type="text" name="descricao" class="form-control form-control-sm" placeholder="Observações adicionais sobre o documento (opcional)">
+                    </div>
                 </form>
             <?php endif; ?>
 
@@ -276,7 +285,10 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                     <?php foreach ($laudos as $laudo): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="fw-semibold"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Laudo'); ?></span>
+                                <span class="badge <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary' : 'bg-primary'; ?> me-1">
+                                    <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento Geral' : 'Laudo Médico'; ?>
+                                </span>
+                                <span class="fw-semibold"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Documento'); ?></span>
                                 <?php if (!empty($laudo['descricao'])): ?>
                                     <small class="text-muted d-block"><?php echo htmlspecialchars($laudo['descricao']); ?></small>
                                 <?php endif; ?>
@@ -284,7 +296,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <div class="d-flex align-items-center gap-2">
                                 <span class="text-muted small"><?php echo date('d/m/Y', strtotime($laudo['data_envio'])); ?></span>
                                 <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                    <button type="button" onclick="visualizarDocumento('<?php echo htmlspecialchars($laudo['caminho_arquivo']); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Laudo')); ?>')" class="btn btn-sm btn-info">
+                                    <button type="button" onclick="visualizarDocumento('<?php echo htmlspecialchars($laudo['caminho_arquivo']); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Documento')); ?>')" class="btn btn-sm btn-info">
                                         Visualizar
                                     </button>
                                 <?php endif; ?>
@@ -293,7 +305,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                     <?php endforeach; ?>
                 </ul>
             <?php else: ?>
-                <p class="text-muted">Nenhum laudo cadastrado.</p>
+                <p class="text-muted">Nenhum laudo ou documento cadastrado.</p>
             <?php endif; ?>
         </div>
     </div>

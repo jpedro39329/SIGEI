@@ -478,55 +478,9 @@ $userPerfil = $_SESSION['user_perfil'];
                             </div>
 
 
-                            <!-- LAUDOS -->
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    Laudos
-                                </label>
-
-                                <input
-                                    type="file"
-                                    name="laudos[]"
-                                    class="form-control"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    multiple
-                                >
-
-                                <small class="text-muted">
-                                    Formatos aceitos: PDF, JPG e PNG.
-                                </small>
-
-                            </div>
-
-
-                            <!-- TERMO -->
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    Termo de Responsabilidade
-                                </label>
-
-                                <input
-                                    type="file"
-                                    name="termo_responsabilidade"
-                                    class="form-control"
-                                    accept=".pdf,.jpg,.jpeg"
-                                    required
-                                >
-
-                                <small class="text-muted">
-                                    Formatos aceitos: PDF e JPG.
-                                </small>
-
-                            </div>
-
-
                             <!-- FOTO -->
 
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
 
                                 <label class="form-label">
                                     Foto do Aluno
@@ -541,6 +495,75 @@ $userPerfil = $_SESSION['user_perfil'];
 
                                 <small class="text-muted">
                                     Campo opcional. Formatos: JPG, JPEG ou PNG.
+                                </small>
+
+                            </div>
+
+
+                            <!-- TERMO -->
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Termo de Responsabilidade <span class="text-danger">*</span>
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="termo_responsabilidade"
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    required
+                                >
+
+                                <small class="text-muted">
+                                    Obrigatório. Formatos aceitos: PDF, JPG e PNG.
+                                </small>
+
+                            </div>
+
+
+                            <!-- LAUDOS MÉDICOS -->
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Laudos Médicos
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="laudos[]"
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    multiple
+                                >
+
+                                <small class="text-muted">
+                                    Selecione um ou múltiplos laudos (PDF, JPG, PNG).
+                                </small>
+
+                            </div>
+
+
+                            <!-- DOCUMENTOS GERAIS (RG, CERTIDÃO, ETC.) -->
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Documentos Gerais (RG, Certidão, etc.)
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="documentos[]"
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    multiple
+                                >
+
+                                <small class="text-muted">
+                                    Selecione um ou múltiplos documentos (RG, Certidão, Comprovante).
                                 </small>
 
                             </div>

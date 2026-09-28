@@ -28,32 +28,70 @@ if ($stmtAluno->get_result()->num_rows == 0) {
 
 $stmtAluno->close();
 
-if (!isset($_FILES['laudo']) || $_FILES['laudo']['error'] !== UPLOAD_ERR_OK) {
-    die("Envie um arquivo de laudo válido.");
+$tipo = trim($_POST['tipo'] ?? 'LAUDO');
+if (!in_array($tipo, ['LAUDO', 'DOCUMENTO'])) {
+    $tipo = 'LAUDO';
 }
 
-$caminhoArquivo = uploadArquivo($_FILES['laudo'], 'laudos');
-if ($caminhoArquivo === false) {
-    die("Erro ao enviar laudo. Envie um PDF, JPG ou PNG de até 5MB.");
-}
-
-$nomeArquivo = trim($_POST['nome_arquivo'] ?? '');
-if ($nomeArquivo === '') {
-    $nomeArquivo = $_FILES['laudo']['name'] ?? 'Laudo';
-}
-
+$pastaDestino = ($tipo === 'DOCUMENTO') ? 'documentos' : 'laudos';
 $descricao = trim($_POST['descricao'] ?? '');
+$nomeInformado = trim($_POST['nome_arquivo'] ?? '');
 
-$stmt = $conexao->prepare(
-    "INSERT INTO laudos (id_aluno, nome_arquivo, caminho_arquivo, descricao)
-     VALUES (?, ?, ?, ?)"
-);
-$stmt->bind_param("isss", $id_aluno, $nomeArquivo, $caminhoArquivo, $descricao);
+$enviados = 0;
 
-if ($stmt->execute()) {
+// Trata múltiplos arquivos enviados pelo campo 'arquivos[]'
+if (isset($_FILES['arquivos']) && is_array($_FILES['arquivos']['name'])) {
+    $stmt = $conexao->prepare(
+        "INSERT INTO laudos (id_aluno, tipo, nome_arquivo, caminho_arquivo, descricao)
+         VALUES (?, ?, ?, ?, ?)"
+    );
+
+    for ($i = 0; $i < count($_FILES['arquivos']['name']); $i++) {
+        if (empty($_FILES['arquivos']['name'][$i]) || $_FILES['arquivos']['error'][$i] === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+
+        $arq = array(
+            'name' => $_FILES['arquivos']['name'][$i],
+            'type' => $_FILES['arquivos']['type'][$i],
+            'tmp_name' => $_FILES['arquivos']['tmp_name'][$i],
+            'error' => $_FILES['arquivos']['error'][$i],
+            'size' => $_FILES['arquivos']['size'][$i]
+        );
+
+        $caminhoArquivo = uploadArquivo($arq, $pastaDestino);
+        if ($caminhoArquivo !== false) {
+            $nomeFinal = $nomeInformado !== '' && count($_FILES['arquivos']['name']) === 1 ? $nomeInformado : $arq['name'];
+            $stmt->bind_param("issss", $id_aluno, $tipo, $nomeFinal, $caminhoArquivo, $descricao);
+            $stmt->execute();
+            $enviados++;
+        }
+    }
+
+    if ($stmt) {
+        $stmt->close();
+    }
+}
+// Compatibilidade com envio individual por 'laudo'
+elseif (isset($_FILES['laudo']) && $_FILES['laudo']['error'] === UPLOAD_ERR_OK) {
+    $caminhoArquivo = uploadArquivo($_FILES['laudo'], $pastaDestino);
+    if ($caminhoArquivo !== false) {
+        $nomeArquivo = $nomeInformado !== '' ? $nomeInformado : ($_FILES['laudo']['name'] ?? 'Arquivo');
+        $stmt = $conexao->prepare(
+            "INSERT INTO laudos (id_aluno, tipo, nome_arquivo, caminho_arquivo, descricao)
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("issss", $id_aluno, $tipo, $nomeArquivo, $caminhoArquivo, $descricao);
+        $stmt->execute();
+        $stmt->close();
+        $enviados++;
+    }
+}
+
+if ($enviados > 0) {
     header("Location: ../../views/alunos/visualizar.php?id=$id_aluno&msg=laudo_ok");
     exit();
 }
 
-echo "Erro ao salvar laudo: " . $stmt->error;
+die("Nenhum arquivo válido foi enviado. Verifique se os arquivos são PDF, JPG ou PNG de até 5MB.");
 ?>

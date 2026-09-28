@@ -22,6 +22,11 @@ if (!$aluno) {
     die("Aluno não encontrado ou não pertence à sua escola.");
 }
 
+// Busca laudos e documentos do aluno
+$sqlLaudos = "SELECT * FROM laudos WHERE id_aluno = $id_aluno ORDER BY data_envio DESC";
+$resultLaudos = mysqli_query($conexao, $sqlLaudos);
+$laudos = $resultLaudos ? mysqli_fetch_all($resultLaudos, MYSQLI_ASSOC) : [];
+
 $isAjuste = ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO');
 $isReprovado = ($aluno['status_aprovacao'] === 'REPROVADO');
 $precisaReenvio = ($isAjuste || $isReprovado);
@@ -341,10 +346,63 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="file"
                                     name="termo_responsabilidade"
                                     class="form-control"
-                                    accept=".pdf,.jpg,.jpeg"
+                                    accept=".pdf,.jpg,.jpeg,.png"
                                 >
                                 <small class="text-muted">
-                                    Formatos: PDF, JPG ou JPEG. Envie apenas se desejar substituir o termo atual.
+                                    Formatos: PDF, JPG ou PNG. Envie apenas se desejar substituir o termo atual.
+                                </small>
+                            </div>
+
+                            <!-- LISTA DE LAUDOS E DOCUMENTOS JÁ ANEXADOS -->
+                            <?php if (count($laudos) > 0): ?>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-semibold">Arquivos e Laudos Anexados</label>
+                                    <div class="list-group list-group-flush border rounded-3 p-2 bg-light">
+                                        <?php foreach ($laudos as $l): ?>
+                                            <div class="list-group-item d-flex justify-content-between align-items-center bg-white rounded-2 mb-1 border">
+                                                <div>
+                                                    <span class="badge <?php echo ($l['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary' : 'bg-primary'; ?> me-1">
+                                                        <?php echo ($l['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento Geral' : 'Laudo Médico'; ?>
+                                                    </span>
+                                                    <span class="fw-semibold"><?php echo htmlspecialchars($l['nome_arquivo'] ?? 'Documento'); ?></span>
+                                                    <small class="text-muted d-block"><?php echo date('d/m/Y H:i', strtotime($l['data_envio'])); ?> <?php echo !empty($l['descricao']) ? '— ' . htmlspecialchars($l['descricao']) : ''; ?></small>
+                                                </div>
+                                                <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars($l['caminho_arquivo']); ?>', '<?php echo htmlspecialchars(addslashes($l['nome_arquivo'] ?? 'Documento')); ?>')" class="btn btn-sm btn-outline-primary">
+                                                    Visualizar
+                                                </button>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- NOVOS LAUDOS MÉDICOS -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Anexar Novos Laudos Médicos</label>
+                                <input
+                                    type="file"
+                                    name="laudos[]"
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    multiple
+                                >
+                                <small class="text-muted">
+                                    Formatos aceitos: PDF, JPG e PNG. Selecione um ou múltiplos arquivos.
+                                </small>
+                            </div>
+
+                            <!-- NOVOS DOCUMENTOS GERAIS (RG, CERTIDÃO, ETC.) -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Anexar Documentos Gerais (RG, Certidão, etc.)</label>
+                                <input
+                                    type="file"
+                                    name="documentos[]"
+                                    class="form-control"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    multiple
+                                >
+                                <small class="text-muted">
+                                    Formatos aceitos: PDF, JPG e PNG. Selecione um ou múltiplos arquivos.
                                 </small>
                             </div>
 

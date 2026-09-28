@@ -161,11 +161,16 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
                             <?php foreach ($laudos as $laudo): ?>
                                 <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center border-bottom">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-primary-subtle text-primary p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                                            <i class="bi bi-file-earmark-pdf fs-4"></i>
+                                        <div class="<?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary-subtle text-secondary' : 'bg-primary-subtle text-primary'; ?> p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                            <i class="<?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bi bi-file-earmark-text' : 'bi bi-file-earmark-medical'; ?> fs-4"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-semibold text-dark"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Documento Comprobatório'); ?></div>
+                                            <div class="fw-semibold text-dark">
+                                                <span class="badge <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary' : 'bg-primary'; ?> me-1 small">
+                                                    <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento Geral' : 'Laudo Médico'; ?>
+                                                </span>
+                                                <?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Documento Comprobatório'); ?>
+                                            </div>
                                             <small class="text-muted">
                                                 <i class="bi bi-clock me-1"></i>Enviado em <?php echo date('d/m/Y \à\s H:i', strtotime($laudo['data_envio'])); ?>
                                                 <?php if (!empty($laudo['descricao'])): ?>

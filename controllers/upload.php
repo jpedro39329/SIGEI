@@ -23,9 +23,11 @@ function uploadArquivo($arquivo, $pasta) {
     $raizProjeto = dirname(__DIR__);
     $caminhoPasta = $raizProjeto . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $pasta . DIRECTORY_SEPARATOR;
 
-    // A estrutura é fixa: se a pasta obrigatória não existir, aborta com erro claro
+    // Se a pasta de destino não existir, cria automaticamente
     if (!is_dir($caminhoPasta)) {
-        die("Erro: O diretório de destino obrigatório 'uploads/" . htmlspecialchars($pasta) . "/' não existe no sistema.");
+        if (!mkdir($caminhoPasta, 0777, true) && !is_dir($caminhoPasta)) {
+            return false;
+        }
     }
 
     // Tipos de arquivo permitidos (MIME -> extensão)

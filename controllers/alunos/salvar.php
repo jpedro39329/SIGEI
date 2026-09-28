@@ -127,13 +127,13 @@ if ($stmt->execute()) {
     // Upload dos laudos (múltiplos, opcional)
     if (isset($_FILES['laudos']) && is_array($_FILES['laudos']['name'])) {
         $stmtLaudo = $conexao->prepare(
-            "INSERT INTO laudos (id_aluno, nome_arquivo, caminho_arquivo, descricao)
-             VALUES (?, ?, ?, 'Laudo enviado pela escola')"
+            "INSERT INTO laudos (id_aluno, tipo, nome_arquivo, caminho_arquivo, descricao)
+             VALUES (?, 'LAUDO', ?, ?, 'Laudo médico enviado pela escola')"
         );
 
         if ($stmtLaudo) {
             for ($i = 0; $i < count($_FILES['laudos']['name']); $i++) {
-                if ($_FILES['laudos']['error'][$i] === UPLOAD_ERR_NO_FILE) {
+                if (empty($_FILES['laudos']['name'][$i]) || $_FILES['laudos']['error'][$i] === UPLOAD_ERR_NO_FILE) {
                     continue;
                 }
 
@@ -147,17 +147,48 @@ if ($stmt->execute()) {
 
                 $caminhoLaudo = uploadArquivo($laudo, 'laudos');
 
-                if ($caminhoLaudo === false) {
-                    die("Aluno cadastrado, mas houve erro ao enviar um laudo. Envie apenas PDF, JPG ou PNG de até 5MB.");
+                if ($caminhoLaudo !== false) {
+                    $nomeLaudo = $laudo['name'];
+                    $stmtLaudo->bind_param("iss", $id_aluno, $nomeLaudo, $caminhoLaudo);
+                    $stmtLaudo->execute();
                 }
-
-                $nomeLaudo = $laudo['name'];
-
-                $stmtLaudo->bind_param("iss", $id_aluno, $nomeLaudo, $caminhoLaudo);
-                $stmtLaudo->execute();
             }
 
             $stmtLaudo->close();
+        }
+    }
+
+    // Upload dos documentos gerais (RG, certidão, comprovantes, etc., múltiplos, opcional)
+    if (isset($_FILES['documentos']) && is_array($_FILES['documentos']['name'])) {
+        $stmtDoc = $conexao->prepare(
+            "INSERT INTO laudos (id_aluno, tipo, nome_arquivo, caminho_arquivo, descricao)
+             VALUES (?, 'DOCUMENTO', ?, ?, 'Documento do aluno (RG/Certidão/Geral)')"
+        );
+
+        if ($stmtDoc) {
+            for ($i = 0; $i < count($_FILES['documentos']['name']); $i++) {
+                if (empty($_FILES['documentos']['name'][$i]) || $_FILES['documentos']['error'][$i] === UPLOAD_ERR_NO_FILE) {
+                    continue;
+                }
+
+                $doc = array(
+                    'name' => $_FILES['documentos']['name'][$i],
+                    'type' => $_FILES['documentos']['type'][$i],
+                    'tmp_name' => $_FILES['documentos']['tmp_name'][$i],
+                    'error' => $_FILES['documentos']['error'][$i],
+                    'size' => $_FILES['documentos']['size'][$i]
+                );
+
+                $caminhoDoc = uploadArquivo($doc, 'documentos');
+
+                if ($caminhoDoc !== false) {
+                    $nomeDoc = $doc['name'];
+                    $stmtDoc->bind_param("iss", $id_aluno, $nomeDoc, $caminhoDoc);
+                    $stmtDoc->execute();
+                }
+            }
+
+            $stmtDoc->close();
         }
     }
 
