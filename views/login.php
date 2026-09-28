@@ -16,7 +16,7 @@ require_once "../config/init.php";
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Times New Roman', Times, serif;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
       background-color: #ddeeff;
       min-height: 100vh;
       position: relative;
@@ -69,7 +69,7 @@ require_once "../config/init.php";
     }
 
     .logo-texto h1 {
-      color: #0d47a1;
+      color: #0038bb;
       font-size: 4.8rem;
       font-weight: 800;
       margin: 0 0 6px 0;

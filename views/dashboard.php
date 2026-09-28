@@ -795,7 +795,7 @@ new Chart(document.getElementById('graficoStatusAlunos'), {
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosEmAtendimentoGeral; ?>, <?php echo $alunosSemAtendimentoGeral; ?>, <?php echo $alunosPendentesGeral; ?>],
-            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d']
         }]
     },
     options: {
@@ -813,7 +813,7 @@ new Chart(document.getElementById('graficoEscolasUre'), {
         datasets: [{
             label: 'Escolas',
             data: <?php echo json_encode($valoresEscolasUre); ?>,
-            backgroundColor: ['#0d6efd', '#1565c0', '#0d47a1', '#1a9e85', '#40d9b8']
+            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1']
         }]
     },
     options: {
@@ -831,7 +831,7 @@ new Chart(document.getElementById('graficoPaesUre'), {
         datasets: [{
             label: 'PAEs Ativos',
             data: <?php echo json_encode($valoresPaesUre); ?>,
-            backgroundColor: ['#6f42c1', '#0d6efd', '#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1']
         }]
     },
     options: {
@@ -849,7 +849,7 @@ new Chart(document.getElementById('graficoEvolucao'), {
         datasets: [{
             label: 'Alunos Cadastrados',
             data: <?php echo json_encode($valoresHistorico); ?>,
-            backgroundColor: '#0d6efd'
+            backgroundColor: '#0038bb'
         }]
     },
     options: {
@@ -869,7 +869,7 @@ new Chart(document.getElementById('graficoDirigenteStatus'), {
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosEmAtendimentoUre; ?>, <?php echo $alunosSemAtendimentoUre; ?>, <?php echo $alunosPendentesUre; ?>],
-            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#1aa78d', '#7ab8ff']
         }]
     },
     options: {
@@ -887,7 +887,7 @@ new Chart(document.getElementById('graficoDirigenteEscolas'), {
         datasets: [{
             label: 'Alunos',
             data: <?php echo json_encode($valoresEscolasUre); ?>,
-            backgroundColor: ['#0d6efd', '#1565c0', '#0d47a1', '#1a9e85', '#40d9b8', '#2ebfa0']
+            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1', '#d7f5ef']
         }]
     },
     options: {
@@ -905,7 +905,7 @@ new Chart(document.getElementById('graficoDirigenteDeficiencias'), {
         datasets: [{
             label: 'Alunos',
             data: <?php echo json_encode($valoresDef); ?>,
-            backgroundColor: ['#6f42c1', '#0d6efd', '#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1']
         }]
     },
     options: {
@@ -923,7 +923,7 @@ new Chart(document.getElementById('graficoDirigenteEvolucao'), {
         datasets: [{
             label: 'Alunos',
             data: <?php echo json_encode($valoresHistUre); ?>,
-            backgroundColor: '#0d6efd'
+            backgroundColor: '#0038bb'
         }]
     },
     options: {
@@ -942,7 +942,7 @@ new Chart(document.getElementById('graficoEscola'), {
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosEmAtendimento; ?>, <?php echo $alunosSemAtendimento; ?>, <?php echo $alunosPendentes; ?>],
-            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#1aa78d', '#7ab8ff']
         }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }
@@ -957,7 +957,7 @@ new Chart(document.getElementById('graficoEducacao'), {
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosPendentes; ?>, <?php echo $alunosAprovados; ?>, <?php echo $alunosEmAtendimento; ?>],
-            backgroundColor: ['#ffc107', '#198754', '#0d6efd']
+            backgroundColor: ['#7ab8ff', '#1aa78d', '#0038bb']
         }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }
@@ -972,7 +972,7 @@ new Chart(document.getElementById('graficoSefisc'), {
         datasets: [{
             label: 'Total',
             data: [<?php echo $alunosAprovadosUre; ?>, <?php echo $alunosPendentesUre; ?>, <?php echo $totalUsuariosEscola; ?>, <?php echo $totalPaesUre; ?>],
-            backgroundColor: ['#198754', '#ffc107', '#0d6efd', '#0dcaf0']
+            backgroundColor: ['#0038bb', '#1aa78d', '#2d6df0', '#7ab8ff']
         }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }
@@ -987,7 +987,7 @@ new Chart(document.getElementById('graficoSupervisor'), {
         datasets: [{
             label: 'Total',
             data: [<?php echo $totalPAEs; ?>, <?php echo $paesAtendendo; ?>, <?php echo $totalAssocAtivas; ?>, <?php echo $totalRelatorios; ?>],
-            backgroundColor: ['#0d6efd', '#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#1aa78d', '#2d6df0', '#7ab8ff']
         }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }

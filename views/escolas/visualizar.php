@@ -259,7 +259,7 @@ new Chart(document.getElementById('graficoEscolaAlunos'), {
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosAtendidos; ?>, <?php echo $alunosSemAtendimento; ?>, <?php echo $alunosPendentes; ?>],
-            backgroundColor: ['#198754', '#0dcaf0', '#ffc107']
+            backgroundColor: ['#0038bb', '#1aa78d', '#7ab8ff']
         }]
     },
     options: {
