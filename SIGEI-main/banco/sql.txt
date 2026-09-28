@@ -1,0 +1,885 @@
+-- ============================================================
+-- SIGEI - BANCO DE DADOS COMPLETO
+-- Recriação do banco do zero
+-- MariaDB 10.4+
+-- ============================================================
+
+DROP DATABASE IF EXISTS `sigei`;
+
+CREATE DATABASE `sigei`
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_general_ci;
+
+USE `sigei`;
+
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+SET time_zone = '+00:00';
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ============================================================
+-- TABELA: admin
+-- ============================================================
+
+CREATE TABLE `admin` (
+  `id_admin` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_admin`),
+  UNIQUE KEY `uk_admin_cpf` (`cpf`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `admin`
+(`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`)
+VALUES
+(1, 'Ricardo Augusto Nogueira', '34019575118',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: empresas
+-- ============================================================
+
+CREATE TABLE `empresas` (
+  `id_empresa` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `cnpj` varchar(18) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `numero_contrato` varchar(100) DEFAULT NULL,
+  `data_inicio_contrato` date DEFAULT NULL,
+  `data_fim_contrato` date DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_empresa`),
+  UNIQUE KEY `uk_empresa_cnpj` (`cnpj`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `empresas`
+(`id_empresa`, `nome`, `cnpj`, `endereco`, `numero`, `bairro`,
+ `municipio`, `cep`, `telefone`, `email`, `numero_contrato`,
+ `data_inicio_contrato`, `data_fim_contrato`, `ativo`, `data_cadastro`)
+VALUES
+(1, 'Plena Serviços de Apoio Escolar Ltda.',
+ '28.746.315/0001-42',
+ 'Rua Coronel Teófilo Leme',
+ '845',
+ 'Centro',
+ 'Bragança Paulista',
+ '12900-005',
+ '(11) 4034-2187',
+ 'contato@plenaservicos.com.br',
+ 'CTR-014/2026',
+ '2026-01-15',
+ '2026-12-31',
+ 1,
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: seduc
+-- ============================================================
+
+CREATE TABLE `seduc` (
+  `id_seduc` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `setor` varchar(100) DEFAULT 'DISPA',
+  `cargo` varchar(150) DEFAULT 'Assistente III',
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_seduc`),
+  UNIQUE KEY `uk_seduc_cpf` (`cpf`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `seduc`
+(`id_seduc`, `nome`, `cpf`, `senha`, `setor`, `cargo`,
+ `email`, `telefone`, `ativo`, `data_cadastro`)
+VALUES
+(1, 'Mariana Cristina de Almeida', '50154817139',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'DISPA',
+ 'Assistente III',
+ 'mariana.almeida@educacao.sp.gov.br',
+ '11984736215',
+ 1,
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: unidades_regionais
+-- ============================================================
+
+CREATE TABLE `unidades_regionais` (
+  `id_ure` int(11) NOT NULL AUTO_INCREMENT,
+  `uge` varchar(20) DEFAULT NULL,
+  `nome` varchar(150) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_ure`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `unidades_regionais`
+(`id_ure`, `uge`, `nome`, `endereco`, `telefone`, `email`, `data_cadastro`)
+VALUES
+(1,
+ '080300',
+ 'Unidade Regional de Ensino de Bragança Paulista',
+ 'Rua José Domingues, 100 - Centro - Bragança Paulista/SP',
+ '(11) 4034-0001',
+ 'ure.braganca@educacao.sp.gov.br',
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: unidades_escolares
+-- ============================================================
+
+CREATE TABLE `unidades_escolares` (
+  `id_ue` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `cie` varchar(30) NOT NULL,
+  `ua` varchar(20) DEFAULT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `modalidade` enum('PEI','REGULAR') NOT NULL DEFAULT 'REGULAR',
+  `id_ure` int(11) NOT NULL,
+  `horario_funcionamento` varchar(100) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_ue`),
+  UNIQUE KEY `uk_ue_cie` (`cie`),
+  KEY `fk_ue_ure` (`id_ure`),
+  CONSTRAINT `fk_ue_ure`
+    FOREIGN KEY (`id_ure`)
+    REFERENCES `unidades_regionais` (`id_ure`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `unidades_escolares`
+(`id_ue`, `nome`, `cie`, `ua`, `endereco`, `numero`, `bairro`,
+ `municipio`, `cep`, `modalidade`, `id_ure`, `horario_funcionamento`,
+ `telefone`, `email`, `data_cadastro`)
+VALUES
+(1,
+ 'E.E. Professor José Alves',
+ 'CIE080301',
+ '42962',
+ 'Rua das Flores',
+ '100',
+ 'Centro',
+ 'Bragança Paulista',
+ '12900-000',
+ 'REGULAR',
+ 1,
+ '07:00 - 23:00',
+ '(11) 4034-1001',
+ 'ee.josealves@educacao.sp.gov.br',
+ '2026-09-24 09:00:00'),
+
+(2,
+ 'E.E. Major Juvenal Alvim',
+ 'CIE080302',
+ '42963',
+ 'Avenida dos Estudantes',
+ '250',
+ 'Jardim América',
+ 'Bragança Paulista',
+ '12900-100',
+ 'PEI',
+ 1,
+ '07:00 - 18:00',
+ '(11) 4034-1002',
+ 'ee.juvenalalvim@educacao.sp.gov.br',
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_ure
+-- ============================================================
+
+CREATE TABLE `usuarios_ure` (
+  `id_usuario_ure` int(11) NOT NULL AUTO_INCREMENT,
+  `id_ure` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `setor` enum('ASURE','SEFISC','EDU_ESPECIAL') NOT NULL,
+  `cargo` varchar(150) DEFAULT NULL,
+  `nivel_acesso` tinyint(4) DEFAULT 1,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_ure`),
+  UNIQUE KEY `uk_usuario_ure_cpf` (`cpf`),
+  KEY `fk_usuario_ure_ure` (`id_ure`),
+  CONSTRAINT `fk_usuario_ure_ure`
+    FOREIGN KEY (`id_ure`)
+    REFERENCES `unidades_regionais` (`id_ure`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_ure`
+(`id_usuario_ure`, `id_ure`, `nome`, `cpf`, `senha`, `setor`,
+ `cargo`, `nivel_acesso`, `email`, `telefone`, `ativo`, `data_cadastro`)
+VALUES
+(1, 1, 'Eduardo Henrique Martins', '80451081340',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'ASURE',
+ 'Coordenador Dirigente Regional de Ensino',
+ 3,
+ 'eduardo.martins@educacao.sp.gov.br',
+ '11982174635',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(2, 1, 'Patrícia Renata de Souza', '78557830408',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'ASURE',
+ 'Assistente Técnico II',
+ 2,
+ 'patricia.souza@educacao.sp.gov.br',
+ '11976543821',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(3, 1, 'Marcelo Antônio Ribeiro', '81816089419',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'SEFISC',
+ 'Chefe de Seção',
+ 2,
+ 'marcelo.ribeiro@educacao.sp.gov.br',
+ '11993481726',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(4, 1, 'Luciana Ferreira Campos', '18427896867',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'SEFISC',
+ 'Oficial Administrativo',
+ 1,
+ 'luciana.campos@educacao.sp.gov.br',
+ '11985629374',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(5, 1, 'Camila Fernanda Moreira', '14931820999',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'EDU_ESPECIAL',
+ 'Professor Especialista em Currículo',
+ 2,
+ 'camila.moreira@educacao.sp.gov.br',
+ '11991263847',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(6, 1, 'André Luiz Barbosa', '85053257370',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'EDU_ESPECIAL',
+ 'Auxiliar Administrativo',
+ 1,
+ 'andre.barbosa@educacao.sp.gov.br',
+ '11987361425',
+ 1,
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_ue
+-- ============================================================
+
+CREATE TABLE `usuarios_ue` (
+  `id_usuario_ue` int(11) NOT NULL AUTO_INCREMENT,
+  `id_ue` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `cargo` varchar(150) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_ue`),
+  UNIQUE KEY `uk_usuario_ue_cpf` (`cpf`),
+  KEY `fk_usuario_ue` (`id_ue`),
+  CONSTRAINT `fk_usuario_ue`
+    FOREIGN KEY (`id_ue`)
+    REFERENCES `unidades_escolares` (`id_ue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_ue`
+(`id_usuario_ue`, `id_ue`, `nome`, `cpf`, `senha`, `cargo`,
+ `email`, `telefone`, `ativo`, `data_cadastro`)
+VALUES
+(1, 1, 'Daniela Martins de Souza', '28911860107',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Diretor Escolar',
+ 'daniela.souza@educacao.sp.gov.br',
+ '11994725163',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(2, 1, 'Marcelo Augusto Vieira', '31760492856',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Coordenador de Gestão Pedagógica',
+ 'marcelo.vieira@educacao.sp.gov.br',
+ '11983642157',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(3, 2, 'Renata Cristina Oliveira', '62038195743',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Diretor Escolar',
+ 'renata.oliveira@educacao.sp.gov.br',
+ '11992517364',
+ 1,
+ '2026-09-24 09:00:00'),
+
+(4, 2, 'Fábio Henrique Cardoso', '47392068152',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Vice-Diretor Escolar',
+ 'fabio.cardoso@educacao.sp.gov.br',
+ '11987431526',
+ 1,
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_pae
+-- ============================================================
+
+CREATE TABLE `usuarios_pae` (
+  `id_pae` int(11) NOT NULL AUTO_INCREMENT,
+  `cpf` char(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `cargo` varchar(150) NOT NULL DEFAULT 'Profissional de Apoio Escolar',
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_pae`),
+  UNIQUE KEY `uk_pae_cpf` (`cpf`),
+  KEY `fk_pae_empresa` (`id_empresa`),
+  CONSTRAINT `fk_pae_empresa`
+    FOREIGN KEY (`id_empresa`)
+    REFERENCES `empresas` (`id_empresa`)
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_pae`
+(`id_pae`, `cpf`, `nome`, `senha`, `cargo`, `telefone`,
+ `email`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`)
+VALUES
+(1, '76149382057', 'Aline Cristina Rodrigues',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Profissional de Apoio Escolar',
+ '11985274163',
+ 'aline.rodrigues@plenaservicos.com.br',
+ 'contrato_pae_aline.pdf',
+ 1,
+ 1,
+ '2026-09-24 09:00:00'),
+
+(2, '59281746306', 'Rafael Augusto Pereira',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Profissional de Apoio Escolar',
+ '11993628517',
+ 'rafael.pereira@plenaservicos.com.br',
+ 'contrato_pae_rafael.pdf',
+ 1,
+ 1,
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_supervisor
+-- ============================================================
+
+CREATE TABLE `usuarios_supervisor` (
+  `id_usuario_supervisor` int(11) NOT NULL AUTO_INCREMENT,
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `cargo` varchar(150) NOT NULL DEFAULT 'Supervisor de Licitações e Contratos',
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_supervisor`),
+  UNIQUE KEY `uk_supervisor_cpf` (`cpf`),
+  KEY `fk_supervisor_empresa` (`id_empresa`),
+  CONSTRAINT `fk_supervisor_empresa`
+    FOREIGN KEY (`id_empresa`)
+    REFERENCES `empresas` (`id_empresa`)
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_supervisor`
+(`id_usuario_supervisor`, `id_empresa`, `nome`, `cpf`, `senha`,
+ `cargo`, `email`, `telefone`, `ativo`, `data_cadastro`)
+VALUES
+(1,
+ 1,
+ 'Gustavo Henrique Mendes',
+ '93627150824',
+ '$2y$10$92IXUNpkj0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+ 'Supervisor de Licitações e Contratos',
+ 'gustavo.mendes@plenaservicos.com.br',
+ '11996382714',
+ 1,
+ '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: empresa_ure
+-- ============================================================
+
+CREATE TABLE `empresa_ure` (
+  `id_empresa` int(11) NOT NULL,
+  `id_ure` int(11) NOT NULL,
+  PRIMARY KEY (`id_empresa`, `id_ure`),
+  KEY `fk_empresa_ure_ure` (`id_ure`),
+  CONSTRAINT `fk_empresa_ure_empresa`
+    FOREIGN KEY (`id_empresa`)
+    REFERENCES `empresas` (`id_empresa`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_empresa_ure_ure`
+    FOREIGN KEY (`id_ure`)
+    REFERENCES `unidades_regionais` (`id_ure`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `empresa_ure`
+(`id_empresa`, `id_ure`)
+VALUES
+(1, 1);
+
+-- ============================================================
+-- TABELA: alunos
+-- ============================================================
+
+CREATE TABLE `alunos` (
+  `id_aluno` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) DEFAULT NULL,
+  `ra` varchar(30) DEFAULT NULL,
+  `turno_aula` enum('MANHÃ','TARDE','NOITE','INTEGRAL') DEFAULT NULL,
+  `genero` varchar(50) DEFAULT NULL,
+  `raca` varchar(50) DEFAULT NULL,
+  `municipio_nascimento` varchar(100) DEFAULT NULL,
+  `serie` varchar(50) DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `descricao_deficiencia` text DEFAULT NULL,
+  `descricao_cuidados` text DEFAULT NULL,
+  `nome_responsavel` varchar(150) DEFAULT NULL,
+  `cpf_responsavel` char(11) DEFAULT NULL,
+  `foto_arquivo` varchar(255) DEFAULT NULL,
+  `termo_responsabilidade_arquivo` varchar(255) DEFAULT NULL,
+  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','PENDENTE_CORRECAO','ARQUIVADO') DEFAULT 'PENDENTE',
+  `motivo_reprovacao` text DEFAULT NULL,
+  `id_ue` int(11) DEFAULT NULL,
+  `id_usuario_ue` int(11) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_aluno`),
+  UNIQUE KEY `uk_aluno_cpf` (`cpf`),
+  KEY `fk_aluno_ue` (`id_ue`),
+  KEY `fk_aluno_usuario_ue` (`id_usuario_ue`),
+  CONSTRAINT `fk_aluno_ue`
+    FOREIGN KEY (`id_ue`)
+    REFERENCES `unidades_escolares` (`id_ue`)
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_aluno_usuario_ue`
+    FOREIGN KEY (`id_usuario_ue`)
+    REFERENCES `usuarios_ue` (`id_usuario_ue`)
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `alunos`
+(`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`,
+ `municipio_nascimento`, `serie`, `data_nascimento`,
+ `descricao_deficiencia`, `descricao_cuidados`,
+ `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`,
+ `termo_responsabilidade_arquivo`, `status_aprovacao`,
+ `motivo_reprovacao`, `id_ue`, `id_usuario_ue`, `data_cadastro`)
+VALUES
+
+(1,
+ 'Henrique Gabriel Moreira',
+ '41872596301',
+ 'RA20260841',
+ 'MANHÃ',
+ 'MASCULINO',
+ 'BRANCA',
+ 'Bragança Paulista',
+ '7º ANO',
+ '2014-04-18',
+ 'Transtorno do Espectro Autista',
+ 'Necessita de apoio na organização da rotina escolar e nas transições de atividades.',
+ 'Juliana Moreira',
+ '68391472508',
+ NULL,
+ NULL,
+ 'PENDENTE_CORRECAO',
+ 'Arruma ai parça.',
+ 1,
+ 1,
+ '2026-09-24 09:00:00'),
+
+(2,
+ 'Beatriz Fernanda Lopes',
+ '52736190472',
+ 'RA20260842',
+ 'TARDE',
+ 'Feminino',
+ 'Branca',
+ 'Bragança Paulista',
+ '7º Ano',
+ '2013-09-26',
+ 'Transtorno do Déficit de Atenção e Hiperatividade',
+ 'Apoio para organização de materiais, rotina e acompanhamento das atividades.',
+ 'Marcelo Lopes',
+ '81452936702',
+ NULL,
+ NULL,
+ 'APROVADO',
+ NULL,
+ 1,
+ 1,
+ '2026-09-24 09:00:00'),
+
+(3,
+ 'Miguel Ângelo Ferreira',
+ '68143027594',
+ 'RA20260843',
+ 'MANHÃ',
+ 'Masculino',
+ 'Pardo',
+ 'Atibaia',
+ '8º Ano',
+ '2012-02-11',
+ 'Deficiência Intelectual',
+ 'Acompanhamento individualizado durante atividades pedagógicas.',
+ 'Carolina Ferreira',
+ '30581764296',
+ NULL,
+ NULL,
+ 'PENDENTE',
+ '',
+ 1,
+ 1,
+ '2026-09-24 09:00:00'),
+
+(4,
+ 'Laura Vitória Martins',
+ '74320581639',
+ 'RA20260844',
+ 'INTEGRAL',
+ 'Feminino',
+ 'Parda',
+ 'Bragança Paulista',
+ '6º Ano',
+ '2014-07-03',
+ 'Deficiência Auditiva',
+ 'Apoio à comunicação e acompanhamento das atividades em sala.',
+ 'Renata Martins',
+ '49163820574',
+ NULL,
+ NULL,
+ 'PENDENTE',
+ NULL,
+ 2,
+ 3,
+ '2026-09-24 09:00:00'),
+
+(5,
+ 'Samuel Henrique Costa',
+ '31690482751',
+ 'RA20260845',
+ 'TARDE',
+ 'Masculino',
+ 'Preta',
+ 'Bragança Paulista',
+ '7º Ano',
+ '2013-11-19',
+ 'Paralisia Cerebral',
+ 'Apoio para mobilidade e participação nas atividades escolares.',
+ 'Roberto Costa',
+ '72841596307',
+ NULL,
+ NULL,
+ 'APROVADO',
+ NULL,
+ 2,
+ 3,
+ '2026-09-24 09:00:00'),
+
+(6,
+ 'Manuela Cristina Alves',
+ '85924163720',
+ 'RA20260846',
+ 'MANHÃ',
+ 'Feminino',
+ 'Branca',
+ 'Atibaia',
+ '9º Ano',
+ '2011-05-28',
+ 'Transtorno do Espectro Autista',
+ 'Rotina estruturada e acompanhamento durante mudanças de atividade.',
+ 'Patrícia Alves',
+ '57420381695',
+ NULL,
+ NULL,
+ 'REPROVADO',
+ 'Foi solicitada complementação da documentação para nova análise.',
+ 2,
+ 3,
+ '2026-09-24 09:00:00'),
+
+(7,
+ 'chjdgfh',
+ '65645234538',
+ '320013374224',
+ 'TARDE',
+ 'NAO_BINARIO',
+ 'PRETA',
+ 'Vargem',
+ '1ª SÉRIE',
+ '0056-06-05',
+ 'Transtorno do Espectro Autista',
+ 'fghfdgh',
+ 'Juliana Moreira',
+ '34534534534',
+ 'uploads/fotos/20260928141943_7be9c17807c9.jpg',
+ 'uploads/documentos/20260928141943_6ff2423d9338.pdf',
+ 'PENDENTE',
+ NULL,
+ 1,
+ 1,
+ '2026-09-28 09:19:43');
+
+-- ============================================================
+-- TABELA: laudos
+-- ============================================================
+
+CREATE TABLE `laudos` (
+  `id_laudo` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
+  `tipo` varchar(50) NOT NULL DEFAULT 'LAUDO',
+  `nome_arquivo` varchar(255) NOT NULL,
+  `caminho_arquivo` varchar(255) NOT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_envio` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_laudo`),
+  KEY `fk_laudo_aluno` (`id_aluno`),
+  CONSTRAINT `fk_laudo_aluno`
+    FOREIGN KEY (`id_aluno`)
+    REFERENCES `alunos` (`id_aluno`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `laudos`
+(`id_laudo`, `id_aluno`, `tipo`, `nome_arquivo`,
+ `caminho_arquivo`, `descricao`, `data_envio`)
+VALUES
+
+(1,
+ 1,
+ 'LAUDO',
+ 'laudo_henrique.pdf',
+ 'uploads/laudos/laudo_henrique.pdf',
+ 'Documento apresentado para análise do atendimento educacional.',
+ '2026-09-24 09:00:00'),
+
+(2,
+ 2,
+ 'LAUDO',
+ 'laudo_beatriz.pdf',
+ 'uploads/laudos/laudo_beatriz.pdf',
+ 'Documento para acompanhamento escolar.',
+ '2026-09-24 09:00:00'),
+
+(3,
+ 4,
+ 'LAUDO',
+ 'laudo_laura.pdf',
+ 'uploads/laudos/laudo_laura.pdf',
+ 'Documento referente às necessidades de comunicação.',
+ '2026-09-24 09:00:00'),
+
+(4,
+ 5,
+ 'LAUDO',
+ 'laudo_samuel.pdf',
+ 'uploads/laudos/laudo_samuel.pdf',
+ 'Documento referente às necessidades de mobilidade.',
+ '2026-09-24 09:00:00'),
+
+(5,
+ 1,
+ 'LAUDO',
+ 'certidão de imóvel - em profª. nilza faria (1).pdf',
+ 'uploads/laudos/20260925161351_b063c3829f70.pdf',
+ '',
+ '2026-09-25 11:13:51'),
+
+(6,
+ 7,
+ 'LAUDO',
+ 'SEI_0122823461_Oficio.pdf',
+ 'uploads/laudos/20260928141943_fc750d728e90.pdf',
+ 'Laudo enviado pela escola',
+ '2026-09-28 09:19:43');
+
+-- ============================================================
+-- TABELA: associacoes
+-- ============================================================
+
+CREATE TABLE `associacoes` (
+  `id_associacao` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
+  `id_pae` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_inicio` date NOT NULL,
+  PRIMARY KEY (`id_associacao`),
+  KEY `fk_associacao_aluno` (`id_aluno`),
+  KEY `fk_associacao_pae` (`id_pae`),
+  CONSTRAINT `fk_associacao_aluno`
+    FOREIGN KEY (`id_aluno`)
+    REFERENCES `alunos` (`id_aluno`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_associacao_pae`
+    FOREIGN KEY (`id_pae`)
+    REFERENCES `usuarios_pae` (`id_pae`)
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `associacoes`
+(`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`)
+VALUES
+(1, 2, 1, 1, '2026-09-10'),
+(2, 5, 2, 1, '2026-09-12'),
+(3, 5, 1, 1, '2026-09-24');
+
+DELIMITER $$
+
+CREATE TRIGGER `trg_limite_pae`
+BEFORE INSERT ON `associacoes`
+FOR EACH ROW
+BEGIN
+    DECLARE qtd INT;
+
+    IF NEW.ativo = 1 THEN
+        SELECT COUNT(*)
+        INTO qtd
+        FROM associacoes
+        WHERE id_pae = NEW.id_pae
+          AND ativo = 1;
+
+        IF qtd >= 3 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'O PAE já possui 3 alunos ativos.';
+        END IF;
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- ============================================================
+-- TABELA: relatorios
+-- ============================================================
+
+CREATE TABLE `relatorios` (
+  `id_relatorio` int(11) NOT NULL AUTO_INCREMENT,
+  `id_associacao` int(11) NOT NULL,
+  `tipo` enum('DIARIO','MENSAL') DEFAULT 'DIARIO',
+  `descricao` text DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_relatorio`),
+  KEY `fk_relatorio_associacao` (`id_associacao`),
+  CONSTRAINT `fk_relatorio_associacao`
+    FOREIGN KEY (`id_associacao`)
+    REFERENCES `associacoes` (`id_associacao`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `relatorios`
+(`id_relatorio`, `id_associacao`, `tipo`, `descricao`, `data_cadastro`)
+VALUES
+(1, 1, 'DIARIO',
+ 'Acompanhamento realizado durante as atividades escolares.',
+ '2026-09-18 10:00:00'),
+
+(2, 1, 'MENSAL',
+ 'Relatório mensal referente ao acompanhamento do aluno.',
+ '2026-09-20 16:00:00'),
+
+(3, 2, 'DIARIO',
+ 'Apoio durante atividades pedagógicas e deslocamento.',
+ '2026-09-19 13:30:00');
+
+-- ============================================================
+-- TABELA: recuperacao_senha
+-- ============================================================
+
+CREATE TABLE `recuperacao_senha` (
+  `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT,
+  `token` varchar(255) NOT NULL,
+  `codigo` varchar(20) DEFAULT NULL,
+  `tipo_perfil` enum('ADMIN','SEDUC','URE','SUPERVISOR','ESCOLA','PAE') NOT NULL,
+  `id_reference` int(11) NOT NULL,
+  `contato` varchar(150) DEFAULT NULL,
+  `expiracao` datetime NOT NULL,
+  `usado` tinyint(1) DEFAULT 0,
+  `data_criacao` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_recuperacao`),
+  UNIQUE KEY `uk_recuperacao_token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ============================================================
+-- TABELA: termos_aceite
+-- ============================================================
+
+CREATE TABLE `termos_aceite` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `perfil` varchar(50) NOT NULL,
+  `data_aceite` datetime DEFAULT current_timestamp(),
+  `ip` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_termo_usuario_perfil` (`id_usuario`, `perfil`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `termos_aceite`
+(`id`, `id_usuario`, `perfil`, `data_aceite`, `ip`)
+VALUES
+(1, 1, 'SEDUC', '2026-09-20 08:00:00', '127.0.0.1'),
+(2, 1, 'DIRIGENTE', '2026-09-20 08:30:00', '127.0.0.1'),
+(3, 3, 'USUARIO_SEFISC', '2026-09-20 09:00:00', '127.0.0.1'),
+(4, 5, 'USUARIO_EDUCACAO_ESPECIAL', '2026-09-20 09:30:00', '127.0.0.1'),
+(5, 1, 'USUARIO_ESCOLA', '2026-09-20 10:00:00', '127.0.0.1'),
+(6, 3, 'USUARIO_ESCOLA', '2026-09-20 10:30:00', '127.0.0.1'),
+(7, 1, 'SUPERVISOR', '2026-09-20 11:00:00', '127.0.0.1'),
+(8, 1, 'PAE', '2026-09-20 11:30:00', '127.0.0.1'),
+(9, 2, 'PAE', '2026-09-20 12:00:00', '127.0.0.1'),
+(10, 1, 'ADMIN', '2026-09-20 12:30:00', '127.0.0.1'),
+(11, 4, 'USUARIO_SEFISC', '2026-09-24 10:18:16', '::1'),
+(12, 2, 'DIRIGENTE', '2026-09-24 10:33:07', '::1'),
+(13, 2, 'USUARIO_ESCOLA', '2026-09-25 11:03:00', '::1');
+
+-- ============================================================
+-- FINALIZAÇÃO
+-- ============================================================
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+COMMIT;

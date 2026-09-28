@@ -1,0 +1,40 @@
+<?php
+require_once "../../config/init.php";
+
+exigirPerfil(array('DIRIGENTE', 'ADMIN', 'SEDUC'));
+
+$id = (int) ($_GET['id'] ?? 0);
+$token = $_GET['csrf_token'] ?? '';
+
+if (!validarTokenCSRF($token)) {
+    header("Location: ../../views/escolas/listar.php?erro=" . urlencode("Token de segurança inválido."));
+    exit();
+}
+
+if ($id <= 0) {
+    header("Location: ../../views/escolas/listar.php?erro=" . urlencode("Escola não informada."));
+    exit();
+}
+
+// Verifica se existem alunos matriculados
+$stmtAlunos = $conexao->prepare("SELECT COUNT(*) as total FROM alunos WHERE id_ue = ?");
+$stmtAlunos->bind_param("i", $id);
+$stmtAlunos->execute();
+$totalAlunos = $stmtAlunos->get_result()->fetch_assoc()['total'];
+
+if ($totalAlunos > 0) {
+    header("Location: ../../views/escolas/listar.php?erro=" . urlencode("Não é possível excluir esta escola pois existem $totalAlunos aluno(s) cadastrado(s)."));
+    exit();
+}
+
+$stmt = $conexao->prepare("DELETE FROM unidades_escolares WHERE id_ue = ?");
+$stmt->bind_param("i", $id);
+
+if ($stmt->execute()) {
+    header("Location: ../../views/escolas/listar.php?msg=excluido");
+    exit();
+}
+
+header("Location: ../../views/escolas/listar.php?erro=" . urlencode("Erro ao excluir escola: " . $stmt->error));
+exit();
+
