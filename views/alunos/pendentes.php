@@ -9,7 +9,8 @@ $userId = (int) $_SESSION['user_id'];
 $idEscola = idEscolaUsuario($conexao, $userId);
 
 $busca = trim($_GET['busca'] ?? '');
-$deficienciaFiltro = trim($_GET['deficiencia'] ?? '');
+$tipoFiltro = trim($_GET['tp_filtro'] ?? '1'); // 0 = Igual a, 1 = Contém
+$campoFiltro = trim($_GET['campo_filtro'] ?? '0'); // 0 = Todos, 1 = Nome, 2 = RA, 3 = CPF, 4 = Deficiência
 $abaAtiva = trim($_GET['aba'] ?? 'analise');
 
 $where = array();
@@ -18,16 +19,28 @@ $where[] = "id_ue = $idEscola";
 if ($busca !== '') {
     $termo = mysqli_real_escape_string($conexao, $busca);
     $cpfLimpo = preg_replace('/\D/', '', $busca);
-    if (!empty($cpfLimpo)) {
-        $where[] = "(nome LIKE '%$termo%' OR ra LIKE '%$termo%' OR cpf LIKE '%$cpfLimpo%')";
-    } else {
-        $where[] = "(nome LIKE '%$termo%' OR ra LIKE '%$termo%')";
-    }
-}
+    $isIgual = ($tipoFiltro === '0');
 
-if ($deficienciaFiltro !== '') {
-    $defBusca = mysqli_real_escape_string($conexao, $deficienciaFiltro);
-    $where[] = "descricao_deficiencia LIKE '%$defBusca%'";
+    if ($campoFiltro === '1') { // Nome
+        $where[] = $isIgual ? "nome = '$termo'" : "nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '2') { // RA
+        $where[] = $isIgual ? "ra = '$termo'" : "ra LIKE '%$termo%'";
+    } elseif ($campoFiltro === '3') { // CPF
+        $valCpf = !empty($cpfLimpo) ? $cpfLimpo : $termo;
+        $where[] = $isIgual ? "cpf = '$valCpf'" : "cpf LIKE '%$valCpf%'";
+    } elseif ($campoFiltro === '4') { // Deficiência
+        $where[] = $isIgual ? "descricao_deficiencia = '$termo'" : "descricao_deficiencia LIKE '%$termo%'";
+    } else { // 0 = Todos
+        if ($isIgual) {
+            $conds = ["nome = '$termo'", "ra = '$termo'", "descricao_deficiencia = '$termo'"];
+            if (!empty($cpfLimpo)) $conds[] = "cpf = '$cpfLimpo'";
+            $where[] = "(" . implode(' OR ', $conds) . ")";
+        } else {
+            $conds = ["nome LIKE '%$termo%'", "ra LIKE '%$termo%'", "descricao_deficiencia LIKE '%$termo%'"];
+            if (!empty($cpfLimpo)) $conds[] = "cpf LIKE '%$cpfLimpo%'";
+            $where[] = "(" . implode(' OR ', $conds) . ")";
+        }
+    }
 }
 
 $whereBase = implode(' AND ', $where);
@@ -97,39 +110,47 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
         <div class="alert alert-success">Solicitação criada com sucesso e enviada para análise!</div>
     <?php endif; ?>
 
-    <!-- Barra de pesquisa com lupa e dropdown de filtros -->
+    <!-- Barra de pesquisa e filtros -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
-            <form method="GET" action="pendentes.php">
-                <input type="hidden" name="aba" value="<?php echo htmlspecialchars($abaAtiva); ?>">
+            <form method="GET" action="pendentes.php" id="formFiltroPendentes">
+                <input type="hidden" name="aba" id="inputAbaAtiva" value="<?php echo htmlspecialchars($abaAtiva); ?>">
                 <div class="row g-2 align-items-center">
-                    <div class="col-md-7 col-12">
-                        <div class="input-group">
-                            <input type="text" name="busca" class="form-control form-control-sm" placeholder="Pesquisar solicitação por aluno, RA ou CPF..." value="<?php echo htmlspecialchars($busca); ?>">
-                            <button class="btn btn-dark btn-sm" type="submit" title="Pesquisar">
-                                Pesquisar
-                            </button>
+                    <!-- 1. Campo para digitar -->
+                    <div class="col-md-5 col-sm-12 col-12">
+                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                    </div>
+
+                    <!-- 2. Tipo (Contém / Igual a) -->
+                    <div class="col-md-2 col-sm-6 col-12">
+                        <div class="form-group" id="tpFiltro">
+                            <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
+                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="col-md-5 col-12 d-flex gap-2">
-                        <div class="dropdown flex-grow-1">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" type="button" id="dropdownFiltrosSol" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                <span>Filtros <?php echo ($deficienciaFiltro !== '') ? '<span class="badge bg-primary ms-1">Ativo</span>' : ''; ?></span>
-                            </button>
-                            <div class="dropdown-menu p-3 shadow-sm" style="min-width: 280px;" aria-labelledby="dropdownFiltrosSol">
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold mb-1">Deficiência</label>
-                                    <input type="text" name="deficiencia" class="form-control form-control-sm" placeholder="Ex: Autismo, Visual..." value="<?php echo htmlspecialchars($deficienciaFiltro); ?>">
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-dark btn-sm w-100">Aplicar</button>
-                                    <a href="pendentes.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm w-100">Limpar</a>
-                                </div>
-                            </div>
+                    <!-- 3. Campo de filtro -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="form-group">
+                            <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
+                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
+                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>RA</option>
+                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>CPF</option>
+                                <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Deficiência</option>
+                            </select>
                         </div>
-                        <?php if ($busca !== '' || $deficienciaFiltro !== ''): ?>
-                            <a href="pendentes.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm">Limpar</a>
+                    </div>
+
+                    <!-- 4. Botões de ação -->
+                    <div class="col-md-2 col-12 d-flex gap-2">
+                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
+                            Filtrar
+                        </button>
+                        <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
+                            <a href="pendentes.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -232,6 +253,11 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                                 <div class="d-flex gap-1">
                                                     <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
                                                     <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Ajustar</a>
+                                                    <form action="../../controllers/alunos/reenviar.php" method="POST" class="d-inline">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                                                        <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-primary" title="Reenviar solicitação para análise">Reenviar</button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
@@ -278,6 +304,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td>
                                                 <div class="d-flex gap-1">
                                                     <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Ajustar</a>
                                                     <form action="../../controllers/alunos/reenviar.php" method="POST" class="d-inline">
                                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                         <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
@@ -300,6 +327,18 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
         </div>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('#solicitacoesTabs button[data-bs-toggle="tab"]').forEach(function(tabEl) {
+    tabEl.addEventListener('shown.bs.tab', function(event) {
+        const targetId = event.target.getAttribute('data-bs-target').replace('#', '');
+        const inputAba = document.getElementById('inputAbaAtiva');
+        if (inputAba) {
+            inputAba.value = targetId;
+        }
+    });
+});
+</script>
 
 </body>
 </html>

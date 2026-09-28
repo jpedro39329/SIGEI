@@ -1,8 +1,8 @@
 <?php
 require_once "../../config/init.php";
 
-// Apenas USUARIO_ESCOLA pode editar alunos
-exigirPerfil(array('USUARIO_ESCOLA'));
+// Apenas usuários de escola podem editar alunos
+exigirPerfil(array('USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'));
 
 $userId = $_SESSION['user_id'];
 $idEscola = idEscolaUsuario($conexao, $userId);
@@ -21,6 +21,10 @@ $aluno = mysqli_fetch_assoc($result);
 if (!$aluno) {
     die("Aluno não encontrado ou não pertence à sua escola.");
 }
+
+$isAjuste = ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO');
+$isReprovado = ($aluno['status_aprovacao'] === 'REPROVADO');
+$precisaReenvio = ($isAjuste || $isReprovado);
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +32,7 @@ if (!$aluno) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Aluno</title>
+    <title><?php echo $isAjuste ? 'Ajustar Solicitação' : ($isReprovado ? 'Ajustar Solicitação Reprovada' : 'Editar Aluno'); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
@@ -40,10 +44,55 @@ if (!$aluno) {
 <div class="content">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card card-form">
+            <div class="card card-form shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h2 class="mb-2">Editar Aluno</h2>
-                    <p class="text-muted mb-4">Edite os dados cadastrais do aluno. O CPF e o vínculo escolar não podem ser alterados.</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h2 class="mb-1"><?php echo $isAjuste ? 'Ajustar Solicitação' : ($isReprovado ? 'Ajustar Solicitação Reprovada' : 'Editar Aluno'); ?></h2>
+                            <p class="text-muted mb-0">
+                                <?php if ($isAjuste): ?>
+                                    Revise os dados e faça as correções solicitadas pela Educação Especial.
+                                <?php elseif ($isReprovado): ?>
+                                    Revise os dados e corrija os apontamentos para submeter novamente à análise.
+                                <?php else: ?>
+                                    Edite os dados cadastrais do aluno. O CPF e o vínculo escolar não podem ser alterados.
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                        <?php if ($isAjuste): ?>
+                            <span class="badge bg-warning text-dark px-3 py-2">Ajuste Solicitado</span>
+                        <?php elseif ($isReprovado): ?>
+                            <span class="badge bg-danger px-3 py-2">Reprovado</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ($isAjuste && !empty($aluno['motivo_reprovacao'])): ?>
+                        <div class="alert alert-warning border border-warning-subtle shadow-sm mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="fs-5 me-2">⚠️</span>
+                                <h6 class="alert-heading fw-bold mb-0 text-dark">Orientação / Ajustes Solicitados pela Educação Especial</h6>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-warning-subtle text-dark mb-2">
+                                <?php echo nl2br(htmlspecialchars($aluno['motivo_reprovacao'])); ?>
+                            </div>
+                            <small class="text-muted d-block">
+                                Realize as alterações necessárias nos campos abaixo. Ao salvar, a solicitação será reenviada automaticamente para análise.
+                            </small>
+                        </div>
+                    <?php elseif ($isReprovado && !empty($aluno['motivo_reprovacao'])): ?>
+                        <div class="alert alert-danger border border-danger-subtle shadow-sm mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="fs-5 me-2">❌</span>
+                                <h6 class="alert-heading fw-bold mb-0 text-danger">Motivo da Reprovação Anterior</h6>
+                            </div>
+                            <div class="p-3 bg-white rounded border border-danger-subtle text-dark mb-2">
+                                <?php echo nl2br(htmlspecialchars($aluno['motivo_reprovacao'])); ?>
+                            </div>
+                            <small class="text-muted d-block">
+                                Corrija as informações necessárias nos campos abaixo. Ao salvar, a solicitação será reenviada para análise.
+                            </small>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- ================================================= -->
                     <!-- FORMULÁRIO -->
@@ -318,8 +367,13 @@ if (!$aluno) {
                         <!-- BOTÕES -->
                         <!-- ================================================= -->
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-dark">Salvar Alterações</button>
-                            <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-secondary">Voltar</a>
+                            <?php if ($precisaReenvio): ?>
+                                <button type="submit" class="btn btn-primary px-4">Salvar e Reenviar Solicitação</button>
+                                <a href="pendentes.php?aba=<?php echo $isReprovado ? 'reprovados' : 'correcao'; ?>" class="btn btn-secondary">Cancelar</a>
+                            <?php else: ?>
+                                <button type="submit" class="btn btn-dark px-4">Salvar Alterações</button>
+                                <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-secondary">Voltar</a>
+                            <?php endif; ?>
                         </div>
 
                     </form>

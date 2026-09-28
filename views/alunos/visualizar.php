@@ -103,7 +103,18 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Detalhes do Aluno</h2>
-        <a href="listar.php" class="btn btn-secondary">Voltar</a>
+        <div class="d-flex gap-2">
+            <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
+                <?php if ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO'): ?>
+                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning">Ajustar Solicitação</a>
+                <?php elseif ($aluno['status_aprovacao'] === 'REPROVADO'): ?>
+                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning">Ajustar Solicitação</a>
+                <?php endif; ?>
+                <a href="pendentes.php?aba=<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO' ? 'correcao' : ($aluno['status_aprovacao'] === 'REPROVADO' ? 'reprovados' : 'analise')); ?>" class="btn btn-secondary">Voltar</a>
+            <?php else: ?>
+                <a href="listar.php" class="btn btn-secondary">Voltar</a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'editado'): ?>

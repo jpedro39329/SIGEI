@@ -1,6 +1,7 @@
 <?php
 require_once "../../config/init.php";
 require_once "../upload.php";
+exigirPerfil(array('USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'));
 exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -15,8 +16,8 @@ if ($id_aluno <= 0 || $id_escola <= 0) {
     die("Aluno ou escola inválidos.");
 }
 
-// Verifica se o aluno pertence à escola do usuário
-$stmtAluno = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_ue = ?");
+// Verifica se o aluno pertence à escola do usuário e obtém status atual
+$stmtAluno = $conexao->prepare("SELECT id_aluno, status_aprovacao FROM alunos WHERE id_aluno = ? AND id_ue = ?");
 $stmtAluno->bind_param("ii", $id_aluno, $id_escola);
 $stmtAluno->execute();
 $resultAluno = $stmtAluno->get_result();
@@ -24,6 +25,10 @@ $resultAluno = $stmtAluno->get_result();
 if ($resultAluno->num_rows == 0) {
     die("Aluno não encontrado ou não pertence à sua escola.");
 }
+
+$alunoAtual = $resultAluno->fetch_assoc();
+$statusAtual = $alunoAtual['status_aprovacao'] ?? '';
+$isAjusteOuReprovado = in_array($statusAtual, ['PENDENTE_CORRECAO', 'REPROVADO']);
 
 $stmtAluno->close();
 
@@ -82,6 +87,7 @@ $query = "UPDATE alunos SET
     descricao_cuidados = ?,
     nome_responsavel = ?,
     cpf_responsavel = ?" .
+    ($isAjusteOuReprovado ? ", status_aprovacao = 'PENDENTE', motivo_reprovacao = ''" : "") .
     ($fotoArquivo !== null ? ", foto_arquivo = ?" : "") .
     ($termoArquivo !== null ? ", termo_responsabilidade_arquivo = ?" : "") .
     " WHERE id_aluno = ? AND id_ue = ?";
@@ -125,8 +131,13 @@ $types .= "ii";
 $stmt->bind_param($types, ...$params);
 
 if ($stmt->execute()) {
-    header("Location: ../../views/alunos/visualizar.php?id=$id_aluno&msg=editado");
+    if ($isAjusteOuReprovado) {
+        header("Location: ../../views/alunos/pendentes.php?msg=reenviado&aba=analise");
+    } else {
+        header("Location: ../../views/alunos/visualizar.php?id=$id_aluno&msg=editado");
+    }
     exit();
 }
 
+echo "Erro ao salvar dados do aluno: " . $stmt->error;
 ?>
