@@ -225,6 +225,18 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <strong class="<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO') ? 'text-warning text-dark' : 'text-danger'; ?>"><?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?></strong>
                         </li>
                         <?php endif; ?>
+                        <?php if ($aluno['status_aprovacao'] === 'ARQUIVADO' && !empty($aluno['motivo_arquivamento'])): ?>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Motivo do Arquivamento</span>
+                            <strong class="text-secondary"><?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?></strong>
+                        </li>
+                        <?php if (!empty($aluno['data_arquivamento'])): ?>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Data do Arquivamento</span>
+                            <strong><?php echo date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])); ?></strong>
+                        </li>
+                        <?php endif; ?>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>
@@ -250,7 +262,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
             <h5 class="mb-3">Laudos Médicos e Documentos</h5>
-            <?php if ($userPerfil == 'USUARIO_ESCOLA'): ?>
+            <?php if ($userPerfil == 'USUARIO_ESCOLA' && !in_array($aluno['status_aprovacao'], ['APROVADO', 'ARQUIVADO'])): ?>
                 <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="mb-4 p-3 bg-light rounded-3 border">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                     <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">

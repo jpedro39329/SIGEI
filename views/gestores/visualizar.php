@@ -32,21 +32,21 @@ if (!$dirigente) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Dirigente - <?php echo htmlspecialchars($dirigente['nome']); ?></title>
+    <title>Detalhes do Servidor - <?php echo htmlspecialchars($dirigente['nome']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
-<body class="page-dirigentes-visualizar">
+<body class="page-gestores-visualizar">
 
 <?php require("../../includes/navbar.php"); ?>
 
 <div class="content">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Detalhes do Coordenador Dirigente Regional</h2>
+        <h2 class="mb-0">Detalhes do Servidor (ASURE)</h2>
         <div class="d-flex gap-2">
-            <a href="editar.php?id=<?php echo $dirigente['id_usuario_ure']; ?>" class="btn btn-warning btn-sm">Editar Dirigente</a>
+            <a href="editar.php?id=<?php echo $dirigente['id_usuario_ure']; ?>" class="btn btn-warning btn-sm">Editar Servidor</a>
             <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
         </div>
     </div>

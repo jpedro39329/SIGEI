@@ -1,0 +1,69 @@
+<?php
+require_once "../../config/init.php";
+
+// Apenas perfis autorizados (Escola, Educação Especial, SEDUC, ADMIN) podem arquivar
+exigirLogin();
+exigirTokenCSRF();
+
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+
+if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC'])) {
+    die("Você não tem permissão para arquivar alunos.");
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../../views/alunos/listar.php");
+    exit();
+}
+
+$idAluno = (int) ($_POST['id_aluno'] ?? 0);
+$motivo = trim($_POST['motivo_arquivamento'] ?? '');
+
+if ($idAluno <= 0 || $motivo === '') {
+    header("Location: ../../views/alunos/listar.php?erro=" . urlencode("Informe o aluno e o motivo do arquivamento."));
+    exit();
+}
+
+// Verifica restrição de escola se o perfil for escolar
+if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
+    $idEscola = idEscolaUsuario($conexao, $userId);
+    $check = $conexao->prepare("SELECT id_aluno FROM alunos WHERE id_aluno = ? AND id_ue = ?");
+    $check->bind_param("ii", $idAluno, $idEscola);
+    $check->execute();
+    if ($check->get_result()->num_rows === 0) {
+        $check->close();
+        die("Aluno não pertence à sua unidade escolar.");
+    }
+    $check->close();
+}
+
+// Desativa associações ativas com PAE deste aluno ao arquivar
+$stmtAssoc = $conexao->prepare("UPDATE associacoes SET ativo = 0, data_fim = NOW() WHERE id_aluno = ? AND ativo = 1");
+if ($stmtAssoc) {
+    $stmtAssoc->bind_param("i", $idAluno);
+    $stmtAssoc->execute();
+    $stmtAssoc->close();
+}
+
+// Atualiza o aluno para ARQUIVADO com motivo e data
+$stmt = $conexao->prepare("
+    UPDATE alunos 
+    SET status_aprovacao = 'ARQUIVADO', 
+        motivo_arquivamento = ?, 
+        data_arquivamento = NOW() 
+    WHERE id_aluno = ?
+");
+
+if ($stmt) {
+    $stmt->bind_param("si", $motivo, $idAluno);
+    if ($stmt->execute()) {
+        $stmt->close();
+        header("Location: ../../views/alunos/listar.php?aba=arquivados&msg=arquivado");
+        exit();
+    }
+    $stmt->close();
+}
+
+header("Location: ../../views/alunos/listar.php?erro=" . urlencode("Erro ao arquivar aluno: " . $conexao->error));
+exit();

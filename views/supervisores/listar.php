@@ -152,12 +152,6 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <div class="d-flex gap-1">
                                             <a href="visualizar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            <a href="editar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>" class="btn btn-sm btn-warning">Editar</a>
-                                            <a href="../../controllers/supervisores/inativar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-secondary"
-                                               title="<?php echo $sup['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>">
-                                                <?php echo $sup['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>
-                                            </a>
                                             <a href="../../controllers/supervisores/excluir.php?id=<?php echo $sup['id_usuario_supervisor']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-danger btn-confirmar-exclusao"
                                                data-msg="Tem certeza que deseja excluir este supervisor?">Excluir</a>

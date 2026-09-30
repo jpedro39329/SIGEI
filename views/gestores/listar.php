@@ -54,7 +54,7 @@ $sqlDirigentes = "
     ORDER BY uu.nome ASC
 ";
 $result = mysqli_query($conexao, $sqlDirigentes);
-$dirigentes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
+$gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>
@@ -62,12 +62,12 @@ $dirigentes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordenadores Dirigentes Regionais</title>
+    <title>Gestores Regionais - Servidores ASURE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
-<body class="page-dirigentes">
+<body class="page-gestores">
 
 <?php require("../../includes/navbar.php"); ?>
 
@@ -75,19 +75,19 @@ $dirigentes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Coordenadores Dirigentes Regionais</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro e acompanhamento dos dirigentes regionais de ensino.</p>
+            <h2 class="mb-1">Gestores - ASURE</h2>
+            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro e acompanhamento dos servidores da assessoria regional (ASURE).</p>
         </div>
-        <a href="cadastrar.php" class="btn btn-primary">Novo Dirigente</a>
+        <a href="cadastrar.php" class="btn btn-primary">Novo Servidor</a>
     </div>
 
     <?php if (isset($_GET['msg'])): ?>
         <?php if ($_GET['msg'] === 'cadastrado'): ?>
-            <div class="alert alert-success">Dirigente Regional cadastrado com sucesso!</div>
+            <div class="alert alert-success">Servidor cadastrado com sucesso!</div>
         <?php elseif ($_GET['msg'] === 'atualizado'): ?>
-            <div class="alert alert-success">Dirigente Regional atualizado com sucesso!</div>
+            <div class="alert alert-success">Servidor atualizado com sucesso!</div>
         <?php elseif ($_GET['msg'] === 'excluido'): ?>
-            <div class="alert alert-success">Dirigente Regional excluído com sucesso!</div>
+            <div class="alert alert-success">Servidor excluído com sucesso!</div>
         <?php endif; ?>
     <?php endif; ?>
 
@@ -138,7 +138,7 @@ $dirigentes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Dirigentes -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Dirigentes Regionais Cadastrados</h5>
+            <h5 class="mb-3">Servidores ASURE Cadastrados</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -153,8 +153,8 @@ $dirigentes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (count($dirigentes) > 0): ?>
-                            <?php foreach ($dirigentes as $dir): ?>
+                        <?php if (count($gestores) > 0): ?>
+                            <?php foreach ($gestores as $dir): ?>
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($dir['nome']); ?></strong></td>
                                     <td><span class="badge bg-secondary"><?php echo htmlspecialchars($dir['cargo'] ?: 'Assistente Técnico'); ?></span></td>
@@ -172,16 +172,16 @@ $dirigentes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                         <div class="d-flex gap-1">
                                             <a href="visualizar.php?id=<?php echo $dir['id_usuario_ure']; ?>" class="btn btn-sm btn-info">Ver</a>
                                             <a href="editar.php?id=<?php echo $dir['id_usuario_ure']; ?>" class="btn btn-sm btn-warning">Editar</a>
-                                            <a href="../../controllers/dirigentes/excluir.php?id=<?php echo $dir['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/gestores/excluir.php?id=<?php echo $dir['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-danger btn-confirmar-exclusao"
-                                               data-msg="Tem certeza que deseja excluir este dirigente regional?">Excluir</a>
+                                               data-msg="Tem certeza que deseja excluir este servidor?">Excluir</a>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Nenhum dirigente cadastrado.</td>
+                                <td colspan="7" class="text-center text-muted">Nenhum servidor cadastrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

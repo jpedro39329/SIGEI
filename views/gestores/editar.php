@@ -36,7 +36,7 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Dirigente Regional</title>
+    <title>Editar Servidor ASURE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
@@ -53,7 +53,7 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
         }
     </style>
 </head>
-<body class="page-dirigentes-editar">
+<body class="page-gestores-editar">
 
 <?php require("../../includes/navbar.php"); ?>
 
@@ -63,13 +63,13 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
         <div class="col-lg-9">
             <div class="card card-form">
                 <div class="card-body p-4">
-                    <h2 class="mb-4">Editar Coordenador Dirigente Regional</h2>
+                    <h2 class="mb-4">Editar Servidor (ASURE)</h2>
 
                     <?php if (isset($_GET['erro'])): ?>
                         <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_GET['erro']); ?></div>
                     <?php endif; ?>
 
-                    <form action="../../controllers/dirigentes/editar_salvar.php" method="POST" id="formDirigente">
+                    <form action="../../controllers/gestores/editar_salvar.php" method="POST" id="formDirigente">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <input type="hidden" name="id_usuario_ure" value="<?php echo $dirigente['id_usuario_ure']; ?>">
                         <input type="hidden" name="id_ure" id="id_ure_input" value="<?php echo $dirigente['id_ure']; ?>" required>
@@ -79,53 +79,41 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 <h5 class="mb-3">Dados Pessoais</h5>
                             </div>
 
-                            <div class="col-md-8 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Nome Completo <span class="text-danger">*</span></label>
                                 <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($dirigente['nome']); ?>" required>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">CPF <span class="text-danger">*</span></label>
                                 <input type="text" name="cpf" id="cpf" class="form-control font-monospace" maxlength="14" value="<?php echo htmlspecialchars(formatarCPF($dirigente['cpf'])); ?>" required>
                             </div>
 
-                            <!-- Seleção Prática de URE por Código UGE -->
-                            <div class="col-12 mt-2">
-                                <h5 class="mb-2">Unidade Regional de Ensino (URE) Vinculada</h5>
-                                <p class="text-muted small mb-3">Você pode digitar o código UGE ou selecionar na lista:</p>
-                            </div>
-
-                            <div class="col-md-5 mb-3">
-                                <label class="form-label">Código UGE</label>
-                                <div class="input-group">
-                                    <input type="text" id="campoUgeBusca" class="form-control font-monospace" value="<?php echo htmlspecialchars($dirigente['ure_uge'] ?? ''); ?>" maxlength="20">
-                                    <button class="btn btn-outline-secondary" type="button" id="btnBuscarUge">Localizar</button>
-                                </div>
-                            </div>
-
-                            <div class="col-md-7 mb-3">
-                                <label class="form-label">Selecione na lista:</label>
-                                <select id="selectUreFallback" class="form-select">
-                                    <option value="">-- Selecione uma URE --</option>
-                                    <?php foreach ($ures as $u): ?>
-                                        <option value="<?php echo $u['id_ure']; ?>" <?php echo $dirigente['id_ure'] == $u['id_ure'] ? 'selected' : ''; ?> data-uge="<?php echo htmlspecialchars($u['uge'] ?? ''); ?>" data-nome="<?php echo htmlspecialchars($u['nome']); ?>">
-                                            <?php echo ($u['uge'] ? '[' . $u['uge'] . '] ' : '') . htmlspecialchars($u['nome']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cargo / Função <span class="text-danger">*</span></label>
+                                <select name="cargo" class="form-select" required>
+                                    <option value="">-- Selecione o Cargo --</option>
+                                    <option value="Coordenador Dirigente Regional de Ensino" <?php echo ($dirigente['cargo'] ?? '') === 'Coordenador Dirigente Regional de Ensino' ? 'selected' : ''; ?>>Coordenador Dirigente Regional de Ensino</option>
+                                    <option value="Assistente Técnico II" <?php echo ($dirigente['cargo'] ?? '') === 'Assistente Técnico II' ? 'selected' : ''; ?>>Assistente Técnico II</option>
+                                    <option value="Assistente Técnico I" <?php echo ($dirigente['cargo'] ?? '') === 'Assistente Técnico I' ? 'selected' : ''; ?>>Assistente Técnico I</option>
+                                    <option value="Assistente Técnico" <?php echo ($dirigente['cargo'] ?? '') === 'Assistente Técnico' ? 'selected' : ''; ?>>Assistente Técnico</option>
+                                    <option value="Diretor de Centro de Recursos Humanos" <?php echo ($dirigente['cargo'] ?? '') === 'Diretor de Centro de Recursos Humanos' ? 'selected' : ''; ?>>Diretor de Centro de Recursos Humanos</option>
+                                    <option value="Diretor de Administração" <?php echo ($dirigente['cargo'] ?? '') === 'Diretor de Administração' ? 'selected' : ''; ?>>Diretor de Administração</option>
+                                    <option value="Outro" <?php echo !in_array($dirigente['cargo'] ?? '', ['Coordenador Dirigente Regional de Ensino', 'Assistente Técnico II', 'Assistente Técnico I', 'Assistente Técnico', 'Diretor de Centro de Recursos Humanos', 'Diretor de Administração']) ? 'selected' : ''; ?>>Outro Servidor Regional</option>
                                 </select>
                             </div>
 
-                            <div class="col-12 mb-3">
-                                <div id="cardUreConfirmada" class="uge-result-card">
-                                    <div>
-                                        <div class="small text-muted">URE Selecionada:</div>
-                                        <strong id="nomeUreConfirmada"><?php echo htmlspecialchars($dirigente['ure_nome']); ?></strong>
-                                        <div class="small text-primary font-monospace" id="codigoUgeConfirmada">Código UGE: <?php echo htmlspecialchars($dirigente['ure_uge'] ?: 'Não informado'); ?></div>
-                                    </div>
-                                </div>
-                                <div id="alertaUgeNaoEncontrada" class="alert alert-warning py-2 small mt-2 d-none">
-                                    Nenhuma URE encontrada com este código UGE.
-                                </div>
+                            <!-- Seleção via Menu Suspenso de URE (UGE) -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Unidade Regional de Ensino (URE / UGE) <span class="text-danger">*</span></label>
+                                <select name="id_ure" id="selectUre" class="form-select" required>
+                                    <option value="">-- Selecione a URE pela UGE --</option>
+                                    <?php foreach ($ures as $u): ?>
+                                        <option value="<?php echo $u['id_ure']; ?>" <?php echo $dirigente['id_ure'] == $u['id_ure'] ? 'selected' : ''; ?>>
+                                            <?php echo ($u['uge'] ? '[UGE ' . htmlspecialchars($u['uge']) . '] ' : '') . htmlspecialchars($u['nome']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
 
                             <div class="col-12 mt-2">
@@ -152,7 +140,7 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-12 mt-2">
                                 <h5 class="mb-2">Alterar Senha de Acesso (Opcional)</h5>
-                                <p class="text-muted small mb-3">Preencha apenas se desejar trocar a senha do dirigente.</p>
+                                <p class="text-muted small mb-3">Preencha apenas se desejar trocar a senha do servidor.</p>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -180,52 +168,6 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const listaUres = <?php echo json_encode($ures); ?>;
-    const inputIdUre = document.getElementById('id_ure_input');
-    const campoUge = document.getElementById('campoUgeBusca');
-    const btnBuscar = document.getElementById('btnBuscarUge');
-    const selectUre = document.getElementById('selectUreFallback');
-    const nomeUreText = document.getElementById('nomeUreConfirmada');
-    const codigoUgeText = document.getElementById('codigoUgeConfirmada');
-    const alertaNaoEncontrada = document.getElementById('alertaUgeNaoEncontrada');
-
-    function selecionarUre(id, nome, uge) {
-        inputIdUre.value = id;
-        nomeUreText.textContent = nome;
-        codigoUgeText.textContent = 'Código UGE: ' + (uge || 'Não informado');
-        alertaNaoEncontrada.classList.add('d-none');
-        campoUge.value = uge || '';
-        selectUre.value = id;
-    }
-
-    function buscarPorUge() {
-        const query = campoUge.value.trim().toLowerCase();
-        if (!query) return;
-
-        const encontrada = listaUres.find(u => (u.uge && u.uge.toLowerCase() === query) || (u.uge && u.uge.toLowerCase().includes(query)));
-        if (encontrada) {
-            selecionarUre(encontrada.id_ure, encontrada.nome, encontrada.uge);
-        } else {
-            alertaNaoEncontrada.classList.remove('d-none');
-        }
-    }
-
-    campoUge.addEventListener('input', function() {
-        if (this.value.trim().length >= 3) {
-            buscarPorUge();
-        }
-    });
-
-    btnBuscar.addEventListener('click', buscarPorUge);
-
-    selectUre.addEventListener('change', function() {
-        const id = this.value;
-        if (id) {
-            const opt = this.options[this.selectedIndex];
-            selecionarUre(id, opt.getAttribute('data-nome'), opt.getAttribute('data-uge'));
-        }
-    });
-
     const cpfInput = document.getElementById('cpf');
     if (cpfInput) {
         cpfInput.addEventListener('input', function(e) {

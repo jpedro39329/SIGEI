@@ -49,7 +49,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <a class="nav-link <?php echo (strpos($scriptPath, 'supervisores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/supervisores/listar.php">Supervisores</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'dirigentes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/dirigentes/listar.php">Dirigentes</a>
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'gestores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/gestores/listar.php">Gestores</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Unidades Escolares</a>
@@ -180,7 +180,10 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <?php if ($totalNotificacoes > 0): ?>
                             <div class="navbar-notifications-list" style="max-height: 360px; overflow-y: auto;">
                                 <?php foreach ($listaNotificacoes as $notif): ?>
-                                    <a href="<?php echo htmlspecialchars($notif['link']); ?>" class="dropdown-item p-3 border-bottom d-flex align-items-start gap-2 text-wrap navbar-notification-item">
+                                    <?php 
+                                        $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']);
+                                    ?>
+                                    <a href="<?php echo htmlspecialchars($urlLida); ?>" class="dropdown-item p-3 border-bottom d-flex align-items-start gap-2 text-wrap navbar-notification-item">
                                         <div class="flex-shrink-0 mt-1">
                                             <span class="navbar-notif-icon-badge bg-<?php echo $notif['tipo']; ?>-subtle text-<?php echo $notif['tipo']; ?>">
                                                 <i class="bi <?php echo htmlspecialchars($notif['icone']); ?>"></i>
@@ -378,6 +381,67 @@ document.getElementById('modalVisualizarDocumentoGlobal')?.addEventListener('hid
     if (iframe) iframe.src = '';
     if (img) img.src = '';
 });
+<?php 
+$exibirModalLogin = false;
+if (!empty($_SESSION['exibir_notificacoes_login']) && $totalNotificacoes > 0) {
+    $exibirModalLogin = true;
+    unset($_SESSION['exibir_notificacoes_login']);
+}
+?>
+
+<?php if ($totalNotificacoes > 0): ?>
+<!-- Modal de Notificações ao Entrar no Sistema -->
+<div class="modal fade" id="modalNotificacoesLogin" tabindex="-1" aria-labelledby="modalNotificacoesLoginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fs-6 d-flex align-items-center gap-2" id="modalNotificacoesLoginLabel">
+                    <i class="bi bi-bell-fill"></i> Você possui notificações pendentes
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="p-3 bg-light border-bottom">
+                    <p class="small text-muted mb-0">Identificamos <strong><?php echo $totalNotificacoes; ?></strong> assunto(s) que requer(em) sua atenção no sistema:</p>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
+                    <?php foreach ($listaNotificacoes as $notif): ?>
+                        <?php 
+                            $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']);
+                        ?>
+                        <a href="<?php echo htmlspecialchars($urlLida); ?>" class="list-group-item list-group-item-action p-3 d-flex align-items-start gap-2">
+                            <span class="navbar-notif-icon-badge bg-<?php echo $notif['tipo']; ?>-subtle text-<?php echo $notif['tipo']; ?> flex-shrink-0 mt-1">
+                                <i class="bi <?php echo htmlspecialchars($notif['icone']); ?>"></i>
+                            </span>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small"><?php echo htmlspecialchars($notif['titulo']); ?></strong>
+                                    <small class="text-muted" style="font-size: 0.7rem;"><?php echo htmlspecialchars($notif['tempo']); ?></small>
+                                </div>
+                                <div class="small text-muted"><?php echo $notif['mensagem']; ?></div>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="modal-footer bg-light py-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<script>
+<?php if ($exibirModalLogin): ?>
+document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('modalNotificacoesLogin');
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+});
+<?php endif; ?>
 </script>
 <script src="<?php echo $baseUrl; ?>assets/js/termos.js"></script>
 <script src="<?php echo $baseUrl; ?>assets/js/confirmacao.js"></script>

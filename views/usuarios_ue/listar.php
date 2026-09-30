@@ -12,10 +12,10 @@ if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario <= 0) {
     $idUreUsuario = idUreUsuario($conexao, $userId);
 }
 
-// Filtro de busca
+// Filtro de busca padrão
 $busca = trim($_GET['busca'] ?? '');
-$statusFiltro = trim($_GET['status'] ?? '');
-$escolaFiltro = trim($_GET['escola'] ?? '');
+$tipoFiltro = trim($_GET['tp_filtro'] ?? '1'); // 0 = Igual a, 1 = Contém
+$campoFiltro = trim($_GET['campo_filtro'] ?? '0'); // 0 = Todos, 1 = Nome, 2 = CPF, 3 = E-mail, 4 = Escola, 5 = Status
 
 $where = [];
 
@@ -26,21 +26,34 @@ if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0) {
 if ($busca !== '') {
     $termo = mysqli_real_escape_string($conexao, $busca);
     $cpfLimpo = preg_replace('/\D/', '', $busca);
-    if (!empty($cpfLimpo)) {
-        $where[] = "(uue.nome LIKE '%$termo%' OR uue.cpf LIKE '%$cpfLimpo%' OR uue.email LIKE '%$termo%')";
-    } else {
-        $where[] = "(uue.nome LIKE '%$termo%' OR uue.email LIKE '%$termo%')";
+    $isIgual = ($tipoFiltro === '0');
+
+    if ($campoFiltro === '1') { // Nome
+        $where[] = $isIgual ? "uue.nome = '$termo'" : "uue.nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '2') { // CPF
+        $valCpf = !empty($cpfLimpo) ? $cpfLimpo : $termo;
+        $where[] = $isIgual ? "uue.cpf = '$valCpf'" : "uue.cpf LIKE '%$valCpf%'";
+    } elseif ($campoFiltro === '3') { // E-mail
+        $where[] = $isIgual ? "uue.email = '$termo'" : "uue.email LIKE '%$termo%'";
+    } elseif ($campoFiltro === '4') { // Escola
+        $where[] = $isIgual ? "ue.nome = '$termo'" : "ue.nome LIKE '%$termo%'";
+    } elseif ($campoFiltro === '5') { // Status
+        if (in_array(strtolower($termo), ['ativo', '1'])) {
+            $where[] = "uue.ativo = 1";
+        } elseif (in_array(strtolower($termo), ['inativo', '0'])) {
+            $where[] = "uue.ativo = 0";
+        }
+    } else { // 0 = Todos os campos
+        if ($isIgual) {
+            $conds = ["uue.nome = '$termo'", "uue.email = '$termo'", "ue.nome = '$termo'"];
+            if (!empty($cpfLimpo)) $conds[] = "uue.cpf = '$cpfLimpo'";
+            $where[] = "(" . implode(' OR ', $conds) . ")";
+        } else {
+            $conds = ["uue.nome LIKE '%$termo%'", "uue.email LIKE '%$termo%'", "ue.nome LIKE '%$termo%'"];
+            if (!empty($cpfLimpo)) $conds[] = "uue.cpf LIKE '%$cpfLimpo%'";
+            $where[] = "(" . implode(' OR ', $conds) . ")";
+        }
     }
-}
-
-if ($statusFiltro !== '') {
-    $stVal = (int) $statusFiltro;
-    $where[] = "uue.ativo = $stVal";
-}
-
-if ($escolaFiltro !== '') {
-    $escTermo = mysqli_real_escape_string($conexao, $escolaFiltro);
-    $where[] = "ue.nome LIKE '%$escTermo%'";
 }
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -89,45 +102,39 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         <div class="alert alert-success">Dados do usuário atualizados com sucesso!</div>
     <?php endif; ?>
 
-    <!-- Barra de pesquisa com lupa e dropdown de filtros -->
+    <!-- Barra de pesquisa e filtros -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
-                    <div class="col-md-7 col-12">
-                        <div class="input-group">
-                            <input type="text" name="busca" class="form-control form-control-sm" placeholder="Pesquisar por nome, CPF ou e-mail..." value="<?php echo htmlspecialchars($busca); ?>">
-                            <button class="btn btn-dark btn-sm" type="submit" title="Pesquisar">
-                                Pesquisar
-                            </button>
-                        </div>
+                    <div class="col-md-5 col-sm-12 col-12">
+                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
-                    <div class="col-md-5 col-12 d-flex gap-2">
-                        <div class="dropdown flex-grow-1">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" type="button" id="dropdownFiltros" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                <span>Filtros <?php echo ($statusFiltro !== '' || $escolaFiltro !== '') ? '<span class="badge bg-primary ms-1">Ativo</span>' : ''; ?></span>
-                            </button>
-                            <div class="dropdown-menu p-3 shadow-sm" style="min-width: 280px;" aria-labelledby="dropdownFiltros">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold mb-1">Status</label>
-                                    <select name="status" class="form-select form-select-sm">
-                                        <option value="">Todos</option>
-                                        <option value="1" <?php echo $statusFiltro === '1' ? 'selected' : ''; ?>>Ativo</option>
-                                        <option value="0" <?php echo $statusFiltro === '0' ? 'selected' : ''; ?>>Inativo</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold mb-1">Escola</label>
-                                    <input type="text" name="escola" class="form-control form-control-sm" placeholder="Nome da escola..." value="<?php echo htmlspecialchars($escolaFiltro); ?>">
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-dark btn-sm w-100">Aplicar</button>
-                                    <a href="listar.php" class="btn btn-outline-secondary btn-sm w-100">Limpar</a>
-                                </div>
-                            </div>
-                        </div>
-                        <?php if ($busca !== '' || $statusFiltro !== '' || $escolaFiltro !== ''): ?>
-                            <a href="listar.php" class="btn btn-outline-secondary btn-sm">Limpar</a>
+
+                    <div class="col-md-2 col-sm-6 col-12">
+                        <select class="form-select form-select-sm" name="tp_filtro">
+                            <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                            <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <select class="form-select form-select-sm" name="campo_filtro">
+                            <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
+                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CPF</option>
+                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>E-mail</option>
+                            <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Escola</option>
+                            <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status (Ativo/Inativo)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 col-12 d-flex gap-2">
+                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
+                            Filtrar
+                        </button>
+                        <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
+                            <a href="listar.php" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
                         <?php endif; ?>
                     </div>
                 </div>

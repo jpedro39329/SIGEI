@@ -623,6 +623,35 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
             ];
         }
     }
+    // Atribui uma chave única (hash) e rota normalizada para cada notificação
+    foreach ($notificacoes as &$n) {
+        $rotaRelativa = preg_replace('#^(\.\./)+#', '', $n['link']);
+        $n['rota'] = $rotaRelativa;
+        $n['key'] = md5($n['titulo'] . '|' . $rotaRelativa);
+    }
+    unset($n);
+
+    // Filtra as notificações já marcadas como lidas pelo usuário
+    if (!empty($notificacoes)) {
+        $keys = array_map(function($n) use ($conexao) {
+            return "'" . mysqli_real_escape_string($conexao, $n['key']) . "'";
+        }, $notificacoes);
+        $keysIn = implode(',', $keys);
+        $perfilEscaped = mysqli_real_escape_string($conexao, $perfil);
+
+        $sqlLidas = "SELECT notificacao_key FROM notificacoes_lidas WHERE id_usuario = $userId AND perfil = '$perfilEscaped' AND notificacao_key IN ($keysIn)";
+        $resLidas = mysqli_query($conexao, $sqlLidas);
+        $chavesLidas = [];
+        if ($resLidas) {
+            while ($row = mysqli_fetch_assoc($resLidas)) {
+                $chavesLidas[$row['notificacao_key']] = true;
+            }
+        }
+
+        $notificacoes = array_values(array_filter($notificacoes, function($n) use ($chavesLidas) {
+            return !isset($chavesLidas[$n['key']]);
+        }));
+    }
 
     return $notificacoes;
 }

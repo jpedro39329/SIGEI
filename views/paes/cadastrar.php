@@ -107,7 +107,10 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-dark">Cadastrar PAE</button>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-dark">Cadastrar PAE</button>
+                            <a href="listar.php" class="btn btn-secondary">Voltar</a>
+                        </div>
                     </form>
                 </div>
             </div>

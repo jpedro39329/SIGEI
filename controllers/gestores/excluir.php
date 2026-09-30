@@ -7,12 +7,12 @@ $id = (int) ($_GET['id'] ?? 0);
 $token = $_GET['csrf_token'] ?? '';
 
 if (!validarTokenCSRF($token)) {
-    header("Location: ../../views/dirigentes/listar.php?erro=" . urlencode("Token de segurança inválido."));
+    header("Location: ../../views/gestores/listar.php?erro=" . urlencode("Token de segurança inválido."));
     exit();
 }
 
 if ($id <= 0) {
-    header("Location: ../../views/dirigentes/listar.php?erro=" . urlencode("Dirigente não informado."));
+    header("Location: ../../views/gestores/listar.php?erro=" . urlencode("Dirigente não informado."));
     exit();
 }
 
@@ -20,10 +20,10 @@ $stmt = $conexao->prepare("DELETE FROM usuarios_ure WHERE id_usuario_ure = ? AND
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
-    header("Location: ../../views/dirigentes/listar.php?msg=excluido");
+    header("Location: ../../views/gestores/listar.php?msg=excluido");
     exit();
 }
 
-header("Location: ../../views/dirigentes/listar.php?erro=" . urlencode("Erro ao excluir dirigente: " . $stmt->error));
+header("Location: ../../views/gestores/listar.php?erro=" . urlencode("Erro ao excluir dirigente: " . $stmt->error));
 exit();
 

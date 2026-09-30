@@ -1,9 +1,21 @@
 <?php
 require_once "../../config/init.php";
 
-exigirPerfil(array('ADMIN', 'SEDUC', 'USUARIO_SEFISC', 'SEFISC', 'DIRIGENTE'));
+exigirPerfil(array('ADMIN', 'SEDUC', 'USUARIO_SEFISC', 'SEFISC', 'DIRIGENTE', 'SUPERVISOR', 'USUARIO_EMPRESA'));
 
 $id = (int) ($_GET['id'] ?? 0);
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    $idEmpresaSupervisor = (int) ($_SESSION['id_empresa'] ?? idEmpresaSupervisor($conexao, $userId));
+    if ($id <= 0) {
+        $id = $idEmpresaSupervisor;
+    } elseif ($id !== $idEmpresaSupervisor) {
+        die("Acesso negado.");
+    }
+}
+
 if ($id <= 0) {
     header("Location: listar.php?erro=" . urlencode("Empresa não informada."));
     exit();
@@ -81,10 +93,11 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Detalhes da Empresa</h2>
         <div class="d-flex gap-2">
-            <?php if (in_array($_SESSION['user_perfil'] ?? '', ['ADMIN', 'SEDUC'])): ?>
-                <a href="editar.php?id=<?php echo $empresa['id_empresa']; ?>" class="btn btn-warning btn-sm">Editar Empresa</a>
+            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+                <a href="../dashboard.php" class="btn btn-secondary btn-sm">Voltar</a>
+            <?php else: ?>
+                <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
             <?php endif; ?>
-            <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
         </div>
     </div>
 
