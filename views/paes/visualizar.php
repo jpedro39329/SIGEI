@@ -91,7 +91,7 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
                 <div class="col-md-6 mb-2">
                     <strong>Contrato:</strong>
                     <?php if (!empty($pae['contrato_arquivo'])): ?>
-                        <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" onclick="visualizarDocumento('../../<?php echo htmlspecialchars($pae['contrato_arquivo']); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($pae['nome'])); ?>')">Ver Contrato</button>
+                        <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($pae['contrato_arquivo'], '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($pae['nome'])); ?>')">Ver Contrato</button>
                     <?php else: ?>
                         <span class="text-muted">Nao enviado</span>
                     <?php endif; ?>

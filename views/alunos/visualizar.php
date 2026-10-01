@@ -214,7 +214,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                         <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="text-muted">Termo de Responsabilidade</span>
-                            <button type="button" onclick="visualizarDocumento('<?php echo htmlspecialchars($aluno['termo_responsabilidade_arquivo']); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
+                            <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
                                  Visualizar Termo
                             </button>
                         </li>
@@ -308,7 +308,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <div class="d-flex align-items-center gap-2">
                                 <span class="text-muted small"><?php echo date('d/m/Y', strtotime($laudo['data_envio'])); ?></span>
                                 <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                    <button type="button" onclick="visualizarDocumento('<?php echo htmlspecialchars($laudo['caminho_arquivo']); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Documento')); ?>')" class="btn btn-sm btn-info">
+                                    <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Documento')); ?>')" class="btn btn-sm btn-info">
                                         Visualizar
                                     </button>
                                 <?php endif; ?>

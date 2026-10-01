@@ -180,7 +180,7 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
                                         </div>
                                     </div>
                                     <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                        <button type="button" class="btn btn-sm btn-outline-primary fw-semibold d-flex align-items-center gap-1" onclick="abrirModalLaudo('<?php echo htmlspecialchars($laudo['caminho_arquivo']); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Laudo')); ?>')">
+                                        <button type="button" class="btn btn-sm btn-outline-primary fw-semibold d-flex align-items-center gap-1" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Laudo')); ?>')">
                                             <i class="bi bi-eye"></i> Visualizar
                                         </button>
                                     <?php endif; ?>
