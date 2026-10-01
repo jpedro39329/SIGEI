@@ -127,12 +127,6 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <a class="nav-link <?php echo (strpos($scriptPath, 'relatorios/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/relatorios/listar.php">Meus Relatórios</a>
                     </li>
                 <?php } ?>
-
-                <!-- Perfil (todos) -->
-                <li class="nav-item">
-                    <a class="nav-link <?php echo (strpos($scriptPath, 'perfil.php') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/perfil.php">Perfil</a>
-                </li>
-
             </ul>
 
             <!-- Direita: Notificações + Avatar / Menu do Usuário -->
@@ -333,7 +327,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
 <?php
 $currentUserId = (int) ($_SESSION['user_id'] ?? 0);
 $currentUserPerfil = $_SESSION['user_perfil'] ?? '';
-if ($currentUserId > 0 && !isset($_SESSION['termos_aceitos']) && isset($conexao)) {
+if ($currentUserId > 0 && empty($_SESSION['termos_aceitos']) && isset($conexao)) {
     $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $currentUserId, $currentUserPerfil);
 }
 $termoAceito = !empty($_SESSION['termos_aceitos']);
@@ -472,40 +466,41 @@ if (!empty($_SESSION['exibir_notificacoes_login']) && $totalNotificacoes > 0) {
 <?php if ($totalNotificacoes > 0): ?>
 <!-- Modal de Notificações ao Entrar no Sistema -->
 <div class="modal fade" id="modalNotificacoesLogin" tabindex="-1" aria-labelledby="modalNotificacoesLoginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fs-6 d-flex align-items-center gap-2" id="modalNotificacoesLoginLabel">
-                    <i class="bi bi-bell-fill"></i> Você possui notificações pendentes
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+            <div class="modal-header bg-white border-bottom px-4 py-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="bi bi-bell fs-6"></i>
+                    </div>
+                    <h6 class="modal-title fw-bold text-dark mb-0" id="modalNotificacoesLoginLabel">Notificações</h6>
+                    <span class="badge rounded-pill bg-light text-secondary border fw-normal px-2 py-1 small"><?php echo $totalNotificacoes; ?></span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body p-0">
-                <div class="p-3 bg-light border-bottom">
-                    <p class="small text-muted mb-0">Identificamos <strong><?php echo $totalNotificacoes; ?></strong> assunto(s) que requer(em) sua atenção no sistema:</p>
-                </div>
                 <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
                     <?php foreach ($listaNotificacoes as $notif): ?>
                         <?php 
                             $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']);
                         ?>
-                        <a href="<?php echo htmlspecialchars($urlLida); ?>" class="list-group-item list-group-item-action p-3 d-flex align-items-start gap-2">
+                        <a href="<?php echo htmlspecialchars($urlLida); ?>" class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-start gap-3 border-bottom text-decoration-none">
                             <span class="navbar-notif-icon-badge bg-<?php echo $notif['tipo']; ?>-subtle text-<?php echo $notif['tipo']; ?> flex-shrink-0 mt-1">
                                 <i class="bi <?php echo htmlspecialchars($notif['icone']); ?>"></i>
                             </span>
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong class="text-dark small"><?php echo htmlspecialchars($notif['titulo']); ?></strong>
-                                    <small class="text-muted" style="font-size: 0.7rem;"><?php echo htmlspecialchars($notif['tempo']); ?></small>
+                                    <span class="text-dark fw-semibold small"><?php echo htmlspecialchars($notif['titulo']); ?></span>
+                                    <small class="text-muted" style="font-size: 0.72rem;"><?php echo htmlspecialchars($notif['tempo']); ?></small>
                                 </div>
-                                <div class="small text-muted"><?php echo $notif['mensagem']; ?></div>
+                                <div class="text-secondary small" style="font-size: 0.82rem; line-height: 1.4;"><?php echo $notif['mensagem']; ?></div>
                             </div>
                         </a>
                     <?php endforeach; ?>
                 </div>
             </div>
-            <div class="modal-footer bg-light py-2">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+            <div class="modal-footer bg-white border-0 px-4 py-2 justify-content-end">
+                <button type="button" class="btn btn-sm btn-light border px-3 rounded-2 text-secondary" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>

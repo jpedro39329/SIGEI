@@ -191,7 +191,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                             <ul class="list-unstyled mb-0">
                                 <?php foreach ($uresAtendidas as $u): ?>
                                     <li class="py-1">
-                                        <?php echo ($u['uge'] ? htmlspecialchars($u['uge']) . ' - ' : '') . htmlspecialchars($u['nome']); ?>
+                                        <?php echo ((!empty($u['uge'])) ? htmlspecialchars($u['uge']) . ' - ' : '') . htmlspecialchars($u['nome']); ?>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
