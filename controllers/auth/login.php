@@ -106,6 +106,7 @@ foreach ($tabelas as $tabela => $info) {
 
             $_SESSION['user_id']   = (int) $user[$campoId];
             $_SESSION['user_name'] = $user['nome'];
+            $_SESSION['user_cpf']  = preg_replace('/\D/', '', $user['cpf'] ?? $cpf);
 
             if ($tabela === 'usuarios_ure') {
                 $setor = $user['setor'] ?? '';

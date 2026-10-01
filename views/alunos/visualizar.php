@@ -236,27 +236,32 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                         </li>
                         <?php endif; ?>
                         <?php if ($aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
-                            <?php if (!empty($aluno['motivo_arquivamento'])): ?>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span class="text-muted">Motivo do Arquivamento</span>
-                                <strong class="text-secondary"><?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?></strong>
-                            </li>
-                            <?php endif; ?>
                             <?php if (!empty($aluno['data_arquivamento'])): ?>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span class="text-muted">Data da Inativação</span>
-                                <strong><?php echo date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])); ?></strong>
+                                <strong><?php echo date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])); ?></strong>
                             </li>
                             <?php endif; ?>
-                            <?php if (!empty($aluno['arquivado_por_nome'])): ?>
-                            <li class="list-group-item d-flex justify-content-between">
+                            <?php if (!empty($aluno['arquivado_por_nome']) || !empty($aluno['arquivado_por_cpf'])): ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span class="text-muted">Inativado Por</span>
-                                <strong>
-                                    <?php echo htmlspecialchars($aluno['arquivado_por_nome']); ?>
-                                    <?php if (!empty($aluno['arquivado_por_perfil'])): ?>
-                                        <span class="badge bg-light text-dark border ms-1"><?php echo htmlspecialchars($aluno['arquivado_por_perfil']); ?></span>
+                                <div class="text-end">
+                                    <strong class="d-block"><?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?? 'Usuário'); ?></strong>
+                                    <?php if (!empty($aluno['arquivado_por_cpf'])): ?>
+                                        <small class="font-monospace text-muted d-block">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])); ?></small>
                                     <?php endif; ?>
-                                </strong>
+                                    <?php if (!empty($aluno['arquivado_por_perfil'])): ?>
+                                        <span class="badge bg-light text-dark border mt-1"><?php echo htmlspecialchars($aluno['arquivado_por_perfil']); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (!empty($aluno['motivo_arquivamento'])): ?>
+                            <li class="list-group-item">
+                                <span class="text-muted d-block mb-1">Motivo do Arquivamento</span>
+                                <div class="p-2 rounded bg-light border text-dark small" style="white-space: pre-wrap;">
+                                    <?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?>
+                                </div>
                             </li>
                             <?php endif; ?>
                         <?php endif; ?>

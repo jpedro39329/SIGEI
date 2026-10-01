@@ -82,7 +82,7 @@ $whereBaseSql = (count($where) > 0) ? 'WHERE ' . implode(' AND ', $where) : '';
 $baseSelect = "
     SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, a.data_nascimento,
            TIMESTAMPDIFF(YEAR, a.data_nascimento, CURDATE()) AS idade,
-           a.status_aprovacao, a.motivo_arquivamento, a.data_arquivamento, a.arquivado_por_nome, a.arquivado_por_perfil, a.data_cadastro,
+           a.status_aprovacao, a.motivo_arquivamento, a.data_arquivamento, a.arquivado_por_nome, a.arquivado_por_cpf, a.arquivado_por_perfil, a.data_cadastro,
            e.nome AS escola_nome,
            (SELECT p.nome FROM associacoes ass
             JOIN usuarios_pae p ON ass.id_pae = p.id_pae
@@ -265,7 +265,8 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                             <th>Deficiência</th>
                             <?php if ($abaAtiva === 'arquivados'): ?>
                                 <th>Data Inativação</th>
-                                <th>Inativado Por</th>
+                                <th>Inativado Por (CPF)</th>
+                                <th>Motivo</th>
                             <?php else: ?>
                                 <th>Status</th>
                                 <th>Profissional de Apoio Escolar</th>
@@ -279,11 +280,6 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                 <tr>
                                     <td>
                                         <strong><?php echo htmlspecialchars($aluno['nome']); ?></strong>
-                                        <?php if ($aluno['status_aprovacao'] === 'ARQUIVADO' && !empty($aluno['motivo_arquivamento'])): ?>
-                                            <div class="small text-muted" title="<?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?>">
-                                                <i class="bi bi-info-circle"></i> Motivo: <?php echo htmlspecialchars(mb_strimwidth($aluno['motivo_arquivamento'], 0, 45, '...')); ?>
-                                            </div>
-                                        <?php endif; ?>
                                     </td>
                                     <td><?php echo htmlspecialchars($aluno['ra'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
@@ -297,11 +293,28 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                             <?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>
                                         </td>
                                         <td>
-                                            <?php if (!empty($aluno['arquivado_por_nome'])): ?>
-                                                <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['arquivado_por_nome']); ?></span>
-                                                <?php if (!empty($aluno['arquivado_por_perfil'])): ?>
-                                                    <small class="text-muted d-block"><?php echo htmlspecialchars($aluno['arquivado_por_perfil']); ?></small>
-                                                <?php endif; ?>
+                                            <?php if (!empty($aluno['arquivado_por_cpf']) || !empty($aluno['arquivado_por_nome'])): ?>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-light border py-1 px-2 text-dark btn-detalhes-inativacao font-monospace small d-inline-flex align-items-center gap-1"
+                                                        data-nome-aluno="<?php echo htmlspecialchars($aluno['nome']); ?>"
+                                                        data-resp-nome="<?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?? 'Não informado'); ?>"
+                                                        data-resp-cpf="<?php echo htmlspecialchars(!empty($aluno['arquivado_por_cpf']) ? formatarCPF($aluno['arquivado_por_cpf']) : 'Não informado'); ?>"
+                                                        data-resp-perfil="<?php echo htmlspecialchars($aluno['arquivado_por_perfil'] ?? '-'); ?>"
+                                                        data-data="<?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>"
+                                                        data-motivo="<?php echo htmlspecialchars($aluno['motivo_arquivamento'] ?? 'Não informado'); ?>"
+                                                        title="Clique para ver os dados de quem inativou">
+                                                    <i class="bi bi-person-badge"></i>
+                                                    <?php echo !empty($aluno['arquivado_por_cpf']) ? htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])) : htmlspecialchars($aluno['arquivado_por_nome']); ?>
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($aluno['motivo_arquivamento'])): ?>
+                                                <span class="text-muted small" title="<?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?>">
+                                                    <?php echo htmlspecialchars(mb_strimwidth($aluno['motivo_arquivamento'], 0, 40, '...')); ?>
+                                                </span>
                                             <?php else: ?>
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
@@ -446,6 +459,54 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
     </div>
 </div>
 
+<!-- Modal de Detalhes da Inativação (Card Clean) -->
+<div class="modal fade" id="modalDetalhesInativacao" tabindex="-1" aria-labelledby="modalDetalhesInativacaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-body p-4">
+                <!-- Topo com ícone e título clean -->
+                <div class="text-center mb-3">
+                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center" 
+                         style="width: 48px; height: 48px; border-radius: 50%; background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; font-size: 1.3rem;">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1 text-dark" id="modalDetalhesInativacaoLabel">Registro de Inativação</h5>
+                    <p class="text-muted small mb-0" id="detalhe_aluno_nome">-</p>
+                </div>
+
+                <!-- Card de informações do responsável e data -->
+                <div class="bg-light rounded-3 p-3 mb-3 border">
+                    <div class="mb-2 pb-2 border-bottom">
+                        <span class="text-muted small text-uppercase fw-semibold d-block">Responsável pela Inativação</span>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <strong class="text-dark" id="detalhe_resp_nome">-</strong>
+                            <span class="badge bg-secondary" id="detalhe_resp_perfil">-</span>
+                        </div>
+                    </div>
+                    <div class="mb-2 pb-2 border-bottom">
+                        <span class="text-muted small text-uppercase fw-semibold d-block">CPF do Usuário</span>
+                        <strong class="font-monospace text-dark" id="detalhe_resp_cpf">-</strong>
+                    </div>
+                    <div class="mb-2 pb-2 border-bottom">
+                        <span class="text-muted small text-uppercase fw-semibold d-block">Data e Hora</span>
+                        <strong class="text-dark" id="detalhe_data">-</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold d-block">Motivo Declarado</span>
+                        <span class="text-dark small" id="detalhe_motivo" style="white-space: pre-wrap;">-</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-4 py-2 rounded-2 fw-medium" data-bs-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Modal Arquivar
@@ -478,6 +539,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 inputReativarId.value = this.getAttribute('data-id');
                 spanReativarNome.textContent = this.getAttribute('data-nome');
                 modalReativar.show();
+            });
+        });
+    }
+
+    // Modal Detalhes da Inativação (Card Clean)
+    const modalDetalhesEl = document.getElementById('modalDetalhesInativacao');
+    if (modalDetalhesEl) {
+        const modalDetalhes = new bootstrap.Modal(modalDetalhesEl);
+        const elAluno = document.getElementById('detalhe_aluno_nome');
+        const elNome = document.getElementById('detalhe_resp_nome');
+        const elCpf = document.getElementById('detalhe_resp_cpf');
+        const elPerfil = document.getElementById('detalhe_resp_perfil');
+        const elData = document.getElementById('detalhe_data');
+        const elMotivo = document.getElementById('detalhe_motivo');
+
+        document.querySelectorAll('.btn-detalhes-inativacao').forEach(btn => {
+            btn.addEventListener('click', function () {
+                elAluno.textContent = this.getAttribute('data-nome-aluno');
+                elNome.textContent = this.getAttribute('data-resp-nome');
+                elCpf.textContent = this.getAttribute('data-resp-cpf');
+                elPerfil.textContent = this.getAttribute('data-resp-perfil');
+                elData.textContent = this.getAttribute('data-data');
+                elMotivo.textContent = this.getAttribute('data-motivo');
+                modalDetalhes.show();
             });
         });
     }

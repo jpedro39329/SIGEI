@@ -56,6 +56,7 @@ $stmt = $conexao->prepare("
         motivo_arquivamento = NULL, 
         data_arquivamento = NULL,
         arquivado_por_nome = NULL,
+        arquivado_por_cpf = NULL,
         arquivado_por_perfil = NULL
     WHERE id_aluno = ?
 ");

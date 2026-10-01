@@ -47,6 +47,23 @@ if ($stmtAssoc) {
 }
 
 $userName = $_SESSION['user_name'] ?? 'Usuário do Sistema';
+$userCpf = preg_replace('/\D/', '', $_SESSION['user_cpf'] ?? '');
+
+// Se CPF não estiver na sessão, busca do banco pelo perfil e id
+if ($userCpf === '' && $userId > 0) {
+    if ($userPerfil === 'ADMIN') {
+        $q = $conexao->query("SELECT cpf FROM admin WHERE id_admin = $userId");
+    } elseif ($userPerfil === 'SEDUC') {
+        $q = $conexao->query("SELECT cpf FROM seduc WHERE id_seduc = $userId");
+    } elseif (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
+        $q = $conexao->query("SELECT cpf FROM usuarios_ue WHERE id_usuario_ue = $userId");
+    } else {
+        $q = $conexao->query("SELECT cpf FROM usuarios_ure WHERE id_usuario_ure = $userId");
+    }
+    if ($q && $r = $q->fetch_assoc()) {
+        $userCpf = preg_replace('/\D/', '', $r['cpf'] ?? '');
+    }
+}
 
 // Atualiza o aluno para ARQUIVADO com motivo, data e identificação de quem inativou
 $stmt = $conexao->prepare("
@@ -55,12 +72,13 @@ $stmt = $conexao->prepare("
         motivo_arquivamento = ?, 
         data_arquivamento = NOW(),
         arquivado_por_nome = ?,
+        arquivado_por_cpf = ?,
         arquivado_por_perfil = ?
     WHERE id_aluno = ?
 ");
 
 if ($stmt) {
-    $stmt->bind_param("sssi", $motivo, $userName, $userPerfil, $idAluno);
+    $stmt->bind_param("ssssi", $motivo, $userName, $userCpf, $userPerfil, $idAluno);
     if ($stmt->execute()) {
         $stmt->close();
         header("Location: ../../views/alunos/listar.php?aba=arquivados&msg=arquivado");

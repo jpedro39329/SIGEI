@@ -669,6 +669,7 @@ CREATE TABLE `alunos` (
   `motivo_arquivamento` text DEFAULT NULL,
   `data_arquivamento` datetime DEFAULT NULL,
   `arquivado_por_nome` varchar(150) DEFAULT NULL,
+  `arquivado_por_cpf` char(11) DEFAULT NULL,
   `arquivado_por_perfil` varchar(50) DEFAULT NULL,
   `id_ue` int(11) DEFAULT NULL,
   `id_usuario_ue` int(11) DEFAULT NULL,
