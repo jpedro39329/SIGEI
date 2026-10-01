@@ -668,6 +668,8 @@ CREATE TABLE `alunos` (
   `motivo_reprovacao` text DEFAULT NULL,
   `motivo_arquivamento` text DEFAULT NULL,
   `data_arquivamento` datetime DEFAULT NULL,
+  `arquivado_por_nome` varchar(150) DEFAULT NULL,
+  `arquivado_por_perfil` varchar(50) DEFAULT NULL,
   `id_ue` int(11) DEFAULT NULL,
   `id_usuario_ue` int(11) DEFAULT NULL,
   `data_cadastro` datetime DEFAULT current_timestamp()
@@ -886,7 +888,8 @@ CREATE TABLE `associacoes` (
   `id_aluno` int(11) NOT NULL,
   `id_pae` int(11) NOT NULL,
   `ativo` tinyint(1) DEFAULT 1,
-  `data_inicio` date NOT NULL
+  `data_inicio` date NOT NULL,
+  `data_fim` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `associacoes`

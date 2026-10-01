@@ -46,17 +46,21 @@ if ($stmtAssoc) {
     $stmtAssoc->close();
 }
 
-// Atualiza o aluno para ARQUIVADO com motivo e data
+$userName = $_SESSION['user_name'] ?? 'Usuário do Sistema';
+
+// Atualiza o aluno para ARQUIVADO com motivo, data e identificação de quem inativou
 $stmt = $conexao->prepare("
     UPDATE alunos 
     SET status_aprovacao = 'ARQUIVADO', 
         motivo_arquivamento = ?, 
-        data_arquivamento = NOW() 
+        data_arquivamento = NOW(),
+        arquivado_por_nome = ?,
+        arquivado_por_perfil = ?
     WHERE id_aluno = ?
 ");
 
 if ($stmt) {
-    $stmt->bind_param("si", $motivo, $idAluno);
+    $stmt->bind_param("sssi", $motivo, $userName, $userPerfil, $idAluno);
     if ($stmt->execute()) {
         $stmt->close();
         header("Location: ../../views/alunos/listar.php?aba=arquivados&msg=arquivado");

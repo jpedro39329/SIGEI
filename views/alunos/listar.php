@@ -82,7 +82,7 @@ $whereBaseSql = (count($where) > 0) ? 'WHERE ' . implode(' AND ', $where) : '';
 $baseSelect = "
     SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, a.data_nascimento,
            TIMESTAMPDIFF(YEAR, a.data_nascimento, CURDATE()) AS idade,
-           a.status_aprovacao, a.motivo_arquivamento, a.data_arquivamento, a.data_cadastro,
+           a.status_aprovacao, a.motivo_arquivamento, a.data_arquivamento, a.arquivado_por_nome, a.arquivado_por_perfil, a.data_cadastro,
            e.nome AS escola_nome,
            (SELECT p.nome FROM associacoes ass
             JOIN usuarios_pae p ON ass.id_pae = p.id_pae
@@ -164,6 +164,8 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
             <div class="alert alert-success">Solicitação enviada com sucesso!</div>
         <?php elseif ($_GET['msg'] === 'arquivado'): ?>
             <div class="alert alert-success">Aluno arquivado com sucesso no sistema. O histórico do registro foi preservado.</div>
+        <?php elseif ($_GET['msg'] === 'reativado'): ?>
+            <div class="alert alert-success">Aluno reativado com sucesso! O cadastro voltou a constar na lista de ativos.</div>
         <?php endif; ?>
     <?php endif; ?>
 
@@ -261,8 +263,13 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                 <th>Escola</th>
                             <?php endif; ?>
                             <th>Deficiência</th>
-                            <th>Status</th>
-                            <th>PAE</th>
+                            <?php if ($abaAtiva === 'arquivados'): ?>
+                                <th>Data Inativação</th>
+                                <th>Inativado Por</th>
+                            <?php else: ?>
+                                <th>Status</th>
+                                <th>Profissional de Apoio Escolar</th>
+                            <?php endif; ?>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -284,22 +291,40 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                         <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
                                     <?php endif; ?>
                                     <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
-                                    <td>
-                                        <?php
-                                            if ($aluno['status_aprovacao'] == 'PENDENTE') {
-                                                echo '<span class="badge bg-warning text-dark">Pendente</span>';
-                                            } elseif ($aluno['status_aprovacao'] == 'PENDENTE_CORRECAO') {
-                                                echo '<span class="badge bg-warning text-dark">Em Correção</span>';
-                                            } elseif ($aluno['status_aprovacao'] == 'APROVADO') {
-                                                echo '<span class="badge bg-success">Aprovado</span>';
-                                            } elseif ($aluno['status_aprovacao'] == 'REPROVADO') {
-                                                echo '<span class="badge bg-danger">Reprovado</span>';
-                                            } else {
-                                                echo '<span class="badge bg-secondary">Arquivado</span>';
-                                            }
-                                        ?>
-                                    </td>
-                                    <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem PAE'); ?></td>
+
+                                    <?php if ($abaAtiva === 'arquivados'): ?>
+                                        <td>
+                                            <?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($aluno['arquivado_por_nome'])): ?>
+                                                <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['arquivado_por_nome']); ?></span>
+                                                <?php if (!empty($aluno['arquivado_por_perfil'])): ?>
+                                                    <small class="text-muted d-block"><?php echo htmlspecialchars($aluno['arquivado_por_perfil']); ?></small>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    <?php else: ?>
+                                        <td>
+                                            <?php
+                                                if ($aluno['status_aprovacao'] == 'PENDENTE') {
+                                                    echo '<span class="badge bg-warning text-dark">Pendente</span>';
+                                                } elseif ($aluno['status_aprovacao'] == 'PENDENTE_CORRECAO') {
+                                                    echo '<span class="badge bg-warning text-dark">Em Correção</span>';
+                                                } elseif ($aluno['status_aprovacao'] == 'APROVADO') {
+                                                    echo '<span class="badge bg-success">Aprovado</span>';
+                                                } elseif ($aluno['status_aprovacao'] == 'REPROVADO') {
+                                                    echo '<span class="badge bg-danger">Reprovado</span>';
+                                                } else {
+                                                    echo '<span class="badge bg-secondary">Arquivado</span>';
+                                                }
+                                            ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem Profissional'); ?></td>
+                                    <?php endif; ?>
+
                                     <td>
                                         <div class="d-flex gap-1 flex-wrap">
                                             <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
@@ -309,10 +334,18 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                             <?php endif; ?>
 
                                             <?php if ($userPerfil == 'ADMIN' && $aluno['status_aprovacao'] == 'APROVADO'): ?>
-                                                <a href="../associacoes/gerenciar.php?aluno=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-primary">Associar PAE</a>
+                                                <a href="../associacoes/gerenciar.php?aluno=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-primary">Associar Profissional</a>
                                             <?php endif; ?>
 
-                                            <?php if ($podeArquivar && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
+                                            <?php if ($podeArquivar && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-success btn-abrir-reativacao"
+                                                        data-id="<?php echo $aluno['id_aluno']; ?>"
+                                                        data-nome="<?php echo htmlspecialchars($aluno['nome']); ?>"
+                                                        title="Reativar aluno no sistema">
+                                                    <i class="bi bi-arrow-counterclockwise"></i> Reativar
+                                                </button>
+                                            <?php elseif ($podeArquivar && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
                                                 <button type="button" 
                                                         class="btn btn-sm btn-outline-danger btn-abrir-arquivamento"
                                                         data-id="<?php echo $aluno['id_aluno']; ?>"
@@ -327,7 +360,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="<?php echo $userPerfil === 'USUARIO_ESCOLA' ? '7' : '8'; ?>" class="text-center text-muted">Nenhum aluno encontrado nesta aba.</td>
+                                <td colspan="<?php echo ($userPerfil === 'USUARIO_ESCOLA') ? ($abaAtiva === 'arquivados' ? '7' : '7') : ($abaAtiva === 'arquivados' ? '8' : '8'); ?>" class="text-center text-muted">Nenhum aluno encontrado nesta aba.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -338,35 +371,75 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
 
 </div>
 
-<!-- Modal de Confirmação com Motivo de Arquivamento -->
-<div class="modal fade" id="modalArquivarAluno" tabindex="-1" aria-labelledby="modalArquivarAlunoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0">
+<!-- Modal de Confirmação com Motivo de Arquivamento (Clean) -->
+<div class="modal fade" id="modalArquivarAluno" tabindex="-1" aria-labelledby="modalArquivarAlunoLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <form action="../../controllers/alunos/arquivar.php" method="POST" id="formArquivarAluno">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                 <input type="hidden" name="id_aluno" id="arquivar_id_aluno" value="">
                 
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title fs-6" id="modalArquivarAlunoLabel">
-                        <i class="bi bi-archive-fill"></i> Confirmar Arquivamento de Aluno
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <p class="mb-3">
-                        Tem certeza que deseja arquivar o aluno <strong id="arquivar_nome_aluno">-</strong>?
+                <div class="modal-body p-4 text-center">
+                    <!-- Ícone Clean -->
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                         style="width: 48px; height: 48px; border-radius: 50%; background: #fef2f2; color: #dc2626; font-size: 1.4rem;">
+                        <i class="bi bi-archive"></i>
+                    </div>
+
+                    <h5 class="fw-bold mb-1 text-dark" id="modalArquivarAlunoLabel">Arquivar Aluno</h5>
+                    <p class="text-muted small mb-3">
+                        Tem certeza que deseja arquivar <strong id="arquivar_nome_aluno" class="text-dark">-</strong>?
                     </p>
-                    <div class="alert alert-warning py-2 small mb-3">
-                        <i class="bi bi-shield-exclamation"></i> O registro não será excluído, mantendo o histórico oficial do aluno no sistema. Se houver cuidador (PAE) associado, o vínculo ativo será encerrado.
-                    </div>
-                    <div class="mb-3">
-                        <label for="motivo_arquivamento" class="form-label fw-bold">Motivo do arquivamento <span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="motivo_arquivamento" id="motivo_arquivamento" rows="3" placeholder="Ex.: Transferência de escola, conclusão de etapa ou interrupção do atendimento..." required></textarea>
+
+                    <div class="text-start mb-2">
+                        <label for="motivo_arquivamento" class="form-label small fw-semibold text-muted text-uppercase mb-1">
+                            Motivo do arquivamento <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control rounded-3" name="motivo_arquivamento" id="motivo_arquivamento" rows="3" placeholder="Ex.: Transferência de escola, conclusão de etapa ou encerramento..." required></textarea>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger btn-sm">Confirmar e Arquivar</button>
+
+                <div class="modal-footer border-0 bg-light px-4 py-3 gap-2 d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2 rounded-2 fw-medium" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-danger px-3 py-2 rounded-2 fw-medium shadow-sm">
+                        Arquivar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Reativação (Clean) -->
+<div class="modal fade" id="modalReativarAluno" tabindex="-1" aria-labelledby="modalReativarAlunoLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form action="../../controllers/alunos/reativar.php" method="POST" id="formReativarAluno">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                <input type="hidden" name="id_aluno" id="reativar_id_aluno" value="">
+                
+                <div class="modal-body p-4 text-center">
+                    <!-- Ícone Clean Sucesso / Reativar -->
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                         style="width: 48px; height: 48px; border-radius: 50%; background: #ecfdf5; color: #059669; font-size: 1.4rem;">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </div>
+
+                    <h5 class="fw-bold mb-1 text-dark" id="modalReativarAlunoLabel">Reativar Aluno</h5>
+                    <p class="text-muted small mb-0">
+                        Deseja reativar o cadastro de <strong id="reativar_nome_aluno" class="text-dark">-</strong>? O aluno voltará a constar como ativo no sistema.
+                    </p>
+                </div>
+
+                <div class="modal-footer border-0 bg-light px-4 py-3 gap-2 d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2 rounded-2 fw-medium" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-success px-3 py-2 rounded-2 fw-medium shadow-sm">
+                        Confirmar Reativação
+                    </button>
                 </div>
             </form>
         </div>
@@ -375,21 +448,39 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Modal Arquivar
     const modalArquivarEl = document.getElementById('modalArquivarAluno');
-    if (!modalArquivarEl) return;
-    const modalArquivar = new bootstrap.Modal(modalArquivarEl);
-    const inputId = document.getElementById('arquivar_id_aluno');
-    const spanNome = document.getElementById('arquivar_nome_aluno');
-    const txtMotivo = document.getElementById('motivo_arquivamento');
+    if (modalArquivarEl) {
+        const modalArquivar = new bootstrap.Modal(modalArquivarEl);
+        const inputId = document.getElementById('arquivar_id_aluno');
+        const spanNome = document.getElementById('arquivar_nome_aluno');
+        const txtMotivo = document.getElementById('motivo_arquivamento');
 
-    document.querySelectorAll('.btn-abrir-arquivamento').forEach(btn => {
-        btn.addEventListener('click', function () {
-            inputId.value = this.getAttribute('data-id');
-            spanNome.textContent = this.getAttribute('data-nome');
-            if (txtMotivo) txtMotivo.value = '';
-            modalArquivar.show();
+        document.querySelectorAll('.btn-abrir-arquivamento').forEach(btn => {
+            btn.addEventListener('click', function () {
+                inputId.value = this.getAttribute('data-id');
+                spanNome.textContent = this.getAttribute('data-nome');
+                if (txtMotivo) txtMotivo.value = '';
+                modalArquivar.show();
+            });
         });
-    });
+    }
+
+    // Modal Reativar
+    const modalReativarEl = document.getElementById('modalReativarAluno');
+    if (modalReativarEl) {
+        const modalReativar = new bootstrap.Modal(modalReativarEl);
+        const inputReativarId = document.getElementById('reativar_id_aluno');
+        const spanReativarNome = document.getElementById('reativar_nome_aluno');
+
+        document.querySelectorAll('.btn-abrir-reativacao').forEach(btn => {
+            btn.addEventListener('click', function () {
+                inputReativarId.value = this.getAttribute('data-id');
+                spanReativarNome.textContent = this.getAttribute('data-nome');
+                modalReativar.show();
+            });
+        });
+    }
 });
 </script>
 

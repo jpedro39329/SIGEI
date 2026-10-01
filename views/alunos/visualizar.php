@@ -104,6 +104,16 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Detalhes do Aluno</h2>
         <div class="d-flex gap-2">
+            <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC']) && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
+                <form action="../../controllers/alunos/reativar.php" method="POST" class="d-inline" onsubmit="return confirm('Deseja realmente reativar este aluno?');">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                    <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
+                    <button type="submit" class="btn btn-success d-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reativar Aluno
+                    </button>
+                </form>
+            <?php endif; ?>
+
             <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
                 <?php if ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO'): ?>
                     <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning">Ajustar Solicitação</a>
@@ -112,7 +122,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                 <?php endif; ?>
                 <a href="pendentes.php?aba=<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO' ? 'correcao' : ($aluno['status_aprovacao'] === 'REPROVADO' ? 'reprovados' : 'analise')); ?>" class="btn btn-secondary">Voltar</a>
             <?php else: ?>
-                <a href="listar.php" class="btn btn-secondary">Voltar</a>
+                <a href="listar.php<?php echo ($aluno['status_aprovacao'] === 'ARQUIVADO') ? '?aba=arquivados' : ''; ?>" class="btn btn-secondary">Voltar</a>
             <?php endif; ?>
         </div>
     </div>
@@ -225,17 +235,30 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <strong class="<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO') ? 'text-warning text-dark' : 'text-danger'; ?>"><?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?></strong>
                         </li>
                         <?php endif; ?>
-                        <?php if ($aluno['status_aprovacao'] === 'ARQUIVADO' && !empty($aluno['motivo_arquivamento'])): ?>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Motivo do Arquivamento</span>
-                            <strong class="text-secondary"><?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?></strong>
-                        </li>
-                        <?php if (!empty($aluno['data_arquivamento'])): ?>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Data do Arquivamento</span>
-                            <strong><?php echo date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])); ?></strong>
-                        </li>
-                        <?php endif; ?>
+                        <?php if ($aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
+                            <?php if (!empty($aluno['motivo_arquivamento'])): ?>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="text-muted">Motivo do Arquivamento</span>
+                                <strong class="text-secondary"><?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?></strong>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (!empty($aluno['data_arquivamento'])): ?>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="text-muted">Data da Inativação</span>
+                                <strong><?php echo date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])); ?></strong>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (!empty($aluno['arquivado_por_nome'])): ?>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="text-muted">Inativado Por</span>
+                                <strong>
+                                    <?php echo htmlspecialchars($aluno['arquivado_por_nome']); ?>
+                                    <?php if (!empty($aluno['arquivado_por_perfil'])): ?>
+                                        <span class="badge bg-light text-dark border ms-1"><?php echo htmlspecialchars($aluno['arquivado_por_perfil']); ?></span>
+                                    <?php endif; ?>
+                                </strong>
+                            </li>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </ul>
                 </div>
@@ -246,14 +269,14 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
     <!-- PAE associado -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">PAE Associado</h5>
+            <h5 class="mb-3">Profissional de Apoio Escolar Associado</h5>
             <?php if ($pae): ?>
                 <p><strong>Nome:</strong> <?php echo htmlspecialchars($pae['nome']); ?></p>
                 <?php if ($userPerfil == 'ADMIN' || $userPerfil == 'USUARIO_ESCOLA'): ?>
                     <p><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></p>
                 <?php endif; ?>
             <?php else: ?>
-                <p class="text-muted">Nenhum PAE associado a este aluno.</p>
+                <p class="text-muted">Nenhum Profissional de Apoio Escolar associado a este aluno.</p>
             <?php endif; ?>
         </div>
     </div>
@@ -333,7 +356,7 @@ $relatorios = mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC);
                             <tr>
                                 <th>Tipo</th>
                                 <th>Descrição</th>
-                                <th>PAE</th>
+                                <th>Profissional de Apoio Escolar</th>
                                 <th>Data</th>
                             </tr>
                         </thead>
