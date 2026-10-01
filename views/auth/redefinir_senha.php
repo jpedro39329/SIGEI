@@ -1,13 +1,29 @@
 <?php
-require_once "../config/init.php";
-?><!DOCTYPE html>
-<!DOCTYPE html>
-<html lang="pt-BR">
 
+require_once '../../config/database.php';
+
+$token = $_GET['token'] ?? '';
+
+if (!$token) {
+    die("Token inválido.");
+}
+
+$sql = "SELECT * FROM recuperacao_senha WHERE token = ? AND usado = 0 AND expira_em >= NOW()";
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("s", $token);
+$stmt->execute();
+$recuperacao = $stmt->get_result()->fetch_assoc();
+
+if (!$recuperacao) {
+    die("Este link de recuperação é inválido ou já expirou.");
+}
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIGEI — Login</title>
+  <title>SIGEI — REDEFINIR SENHA</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ===== RESET E BASE ===== */
@@ -16,13 +32,17 @@ require_once "../config/init.php";
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+      font-family: 'Times New Roman', Times, serif;
       background-color: #ddeeff;
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
     }
 
+
+
+
+    
     .bg-svg {
       position: fixed;
       bottom: 0;
@@ -69,7 +89,7 @@ require_once "../config/init.php";
     }
 
     .logo-texto h1 {
-      color: #0038bb;
+      color: #0d47a1;
       font-size: 4.8rem;
       font-weight: 800;
       margin: 0 0 6px 0;
@@ -92,7 +112,7 @@ require_once "../config/init.php";
       margin: 0;
     }
 
-    /* ===== LADO DIREITO (LOGIN) ===== */
+    /* ===== LADO DIREITO (REDEFINIÇÃO) ===== */
     .caixa.direita {
       flex: 0 0 33.333vw;
       display: flex;
@@ -205,72 +225,27 @@ require_once "../config/init.php";
       text-decoration: underline;
     }
 
-    .login-links .link-btn.voltar {
-      color: #777;
-      font-weight: 400;
-    }
-
-    .login-links .link-btn.voltar:hover {
-      color: #555;
-    }
-
-    .footer-note {
-      color: #757575;
-      font-size: 0.82rem;
-      text-align: center;
-      margin-top: 24px;
-      margin-bottom: 0;
-    }
-
     /* ===== RESPONSIVO ===== */
     @media (max-width: 1024px) {
       .caixa.esquerda {
         padding: 40px 48px 80px 80px;
       }
-
-      .logo {
-        width: 260px;
-      }
-
-      .logo-texto h1 {
-        font-size: 3.8rem;
-      }
+      .logo { width: 260px; }
+      .logo-texto h1 { font-size: 3.8rem; }
     }
 
     @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-
+      .container { flex-direction: column; }
       .caixa.esquerda {
         padding: 40px 24px 60px 24px;
         margin-top: 0;
         align-items: center;
         text-align: center;
       }
-
-      .caixa.esquerda p {
-        max-width: 100%;
-      }
-
-      .logo-bloco {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-
-      .logo {
-        width: 200px;
-      }
-
-      .logo-texto h1 {
-        font-size: 3rem;
-      }
-
-      .logo-texto span {
-        font-size: 1.1rem;
-      }
-
+      .caixa.esquerda p { max-width: 100%; }
+      .logo-bloco { flex-direction: column; align-items: center; text-align: center; }
+      .logo { width: 200px; }
+      .logo-texto h1 { font-size: 3rem; }
       .caixa.direita {
         flex: none;
         width: 100%;
@@ -278,44 +253,12 @@ require_once "../config/init.php";
         box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.06);
       }
     }
-
-    @media (max-width: 480px) {
-      .caixa.esquerda {
-        padding: 24px 16px 40px 16px;
-      }
-
-      .logo {
-        width: 160px;
-      }
-
-      .logo-texto h1 {
-        font-size: 2.5rem;
-      }
-
-      .caixa.direita {
-        padding: 28px 20px;
-      }
-
-      .login-header .section-label {
-        font-size: 1.5rem;
-      }
-
-      .login-form .form-control {
-        padding: 10px 14px;
-        font-size: 0.95rem;
-      }
-
-      .btn-login {
-        padding: 12px;
-        font-size: 1rem;
-      }
-    }
   </style>
-    <link rel="icon" type="image/png" href="../assets/imgs/favicon.png">
+    <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body>
 
-  <!-- ===== SVG DE FUNDO (mesmo da tela inicial) ===== -->
+  <!-- ===== SVG DE FUNDO ===== -->
   <svg class="bg-svg" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
     <rect width="1440" height="900" fill="#ddeeff"/>
     <ellipse cx="200" cy="820" rx="280" ry="110" fill="#40d9b8"/>
@@ -349,7 +292,7 @@ require_once "../config/init.php";
     <!-- LADO ESQUERDO -->
     <div class="caixa esquerda">
       <div class="logo-bloco">
-        <img src="../assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
+        <img src="../../assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
         <div class="logo-texto">
           <h1>SIGEI</h1>
           <span>Sistema de Gestão Escolar<br>para a Inclusão</span>
@@ -358,91 +301,32 @@ require_once "../config/init.php";
       <p>Gestão eficiente para uma educação inclusiva.<br>O SIGEI centraliza informações, auxilia no acompanhamento de alunos elegíveis à educação especial e apoia a distribuição de Profissionais de Apoio Escolar.</p>
     </div>
 
-    <!-- LADO DIREITO (LOGIN) -->
+    <!-- LADO DIREITO (NOVA SENHA) -->
     <div class="caixa direita">
       
       <div class="login-header">
-        <h2 class="section-label">Acessar o sistema</h2>
-        <p class="section-sub">Informe seu CPF e senha para continuar</p>
+        <h2 class="section-label">Nova Senha</h2>
+        <p class="section-sub">Defina sua nova senha de acesso ao sistema</p>
       </div>
 
-      <form class="login-form" action="../controllers/auth/login.php" method="post">
-
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-          <?php if (isset($_GET['perfil'])): ?>
-              <input type="hidden" name="perfil" value="<?php echo htmlspecialchars($_GET['perfil']); ?>">
-          <?php endif; ?>
-
-          <?php if (isset($_GET['erro'])): ?>
-              <div style="background-color: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; text-align: center;">
-                  <?php
-                  if ($_GET['erro'] === 'usuario_nao_encontrado') {
-                      echo "Usuário não localizado para o perfil selecionado ou credenciais inválidas.";
-                  } else {
-                      echo "CPF ou senha incorretos.";
-                  }
-                  ?>
-              </div>
-          <?php endif; ?>
-
+      <form class="login-form" action="../../controllers/auth/processa_redefinir_senha.php" method="POST">
+        <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+        
         <div class="form-group">
-          <label for="cpf">CPF</label>
-          <input 
-            type="text" 
-            id="cpf" 
-            name="cpf" 
-            class="form-control"
-            placeholder="000.000.000-00"
-            maxlength="14"
-            required
-          >
+          <label for="nova_senha">Nova Senha</label>
+          <input type="password" name="nova_senha" id="nova_senha" class="form-control" required placeholder="••••••••">
         </div>
-
-        <div class="form-group">
-          <label for="senha">Senha</label>
-          <input 
-            type="password" 
-            id="senha" 
-            name="senha" 
-            class="form-control"
-            placeholder="Digite sua senha"
-            required
-          >
+        
+        <button type="submit" class="btn-login">Salvar Nova Senha</button>
+        
+        <div class="login-links">
+          <a href="login.php" class="link-btn">← Voltar para o Login</a>
         </div>
-
-        <button type="submit" class="btn-login">Entrar</button>
-
-      <div class="login-links">
-    <a href="esqueciminha_senha.php" class="link-btn" style="text-decoration: none; display: inline-block; text-align: center;">Esqueci minha senha</a>
-    <button type="button" class="link-btn voltar" onclick="window.location.href='../index.html';">← Voltar</button>
-</div>
       </form>
 
-      <p class="footer-note">Todos os acessos são monitorados e registrados.</p>
     </div>
 
   </section>
-
-  <!-- ===== MÁSCARA DE CPF ===== -->
-  <script>
-    const cpfInput = document.getElementById('cpf');
-
-    cpfInput.addEventListener('input', function () {
-      let value = this.value.replace(/\D/g, '');
-
-      if (value.length > 3) {
-        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-      }
-      if (value.length > 7) {
-        value = value.replace(/(\d{3})(\d)/, '$1.$2');
-      }
-      if (value.length > 11) {
-        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-      }
-
-      this.value = value;
-    });
-  </script>
 
 </body>
 </html>

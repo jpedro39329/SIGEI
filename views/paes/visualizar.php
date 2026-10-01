@@ -89,18 +89,13 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
                 <div class="col-md-6 mb-2"><strong>Telefone:</strong> <?php echo htmlspecialchars(formatarTelefone($pae['telefone']) ?: '-'); ?></div>
                 <div class="col-md-6 mb-2"><strong>Email:</strong> <?php echo htmlspecialchars($pae['email'] ?? '-'); ?></div>
                 <div class="col-md-6 mb-2">
-                    <strong>Contrato:</strong>
-                    <?php if (!empty($pae['contrato_arquivo'])): ?>
-                        <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($pae['contrato_arquivo'], '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($pae['nome'])); ?>')">Ver Contrato</button>
-                    <?php else: ?>
-                        <span class="text-muted">Nao enviado</span>
-                    <?php endif; ?>
+                   
+                    
+                       
                 </div>
             </div>
 
-            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
-                <a href="editar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-warning btn-sm mt-3">Editar PAE</a>
-            <?php endif; ?>
+            
         </div>
     </div>
 

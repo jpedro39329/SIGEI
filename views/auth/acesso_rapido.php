@@ -1,5 +1,5 @@
 <?php
-require_once "../config/init.php";
+require_once "../../config/init.php";
 
 $perfil = trim($_GET['perfil'] ?? '');
 
@@ -134,7 +134,7 @@ if ($perfil !== '') {
     // Se tiver apenas 1 usuário, redireciona diretamente!
     if (count($usuarios) === 1) {
         $idUnico = (int) $usuarios[0][$campoId];
-        header("Location: ../controllers/auth/acesso_rapido.php?tabela=" . urlencode($tabela) . "&id=" . $idUnico);
+        header("Location: ../../controllers/auth/acesso_rapido.php?tabela=" . urlencode($tabela) . "&id=" . $idUnico);
         exit();
     }
 }
@@ -415,7 +415,7 @@ if ($perfil !== '') {
       }
     }
   </style>
-    <link rel="icon" type="image/png" href="../assets/imgs/favicon.png">
+    <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body>
 
@@ -453,7 +453,7 @@ if ($perfil !== '') {
     <!-- LADO ESQUERDO -->
     <div class="caixa esquerda">
       <div class="logo-bloco">
-        <img src="../assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
+        <img src="../../assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
         <div class="logo-texto">
           <h1>SIGEI</h1>
           <span>Sistema de Gestão Escolar<br>para a Inclusão</span>
@@ -486,7 +486,7 @@ if ($perfil !== '') {
           </a>
         <?php endforeach; ?>
 
-        <a href="../index.html" class="btn-voltar-link">← Voltar para tela inicial</a>
+        <a href="../../index.html" class="btn-voltar-link">← Voltar para tela inicial</a>
 
       <?php else: ?>
         <!-- ETAPA 2: ESCOLHER USUÁRIO DENTRO DO PERFIL -->
@@ -515,7 +515,7 @@ if ($perfil !== '') {
               if ($setor) $detalhes[] = "Setor: " . $setor;
               $detalhesTexto = implode(" — ", $detalhes);
             ?>
-            <a href="../controllers/auth/acesso_rapido.php?tabela=<?php echo urlencode($tabela); ?>&id=<?php echo $idUsuario; ?>" class="profile-link">
+            <a href="../../controllers/auth/acesso_rapido.php?tabela=<?php echo urlencode($tabela); ?>&id=<?php echo $idUsuario; ?>" class="profile-link">
               <div class="profile-info">
                 <span class="profile-name" style="font-size: 1.05rem;"><?php echo htmlspecialchars($nome); ?></span>
                 <?php if ($detalhesTexto): ?>

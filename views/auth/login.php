@@ -1,17 +1,18 @@
+<?php
+require_once "../../config/init.php";
+?><!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIGEI — Seleção de Perfil</title>
+  <title>SIGEI — Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* ===== RESET E BASE ===== */
     * { box-sizing: border-box; }
 
-
-    
     body {
       margin: 0;
       padding: 0;
@@ -41,7 +42,7 @@
       align-items: stretch;
     }
 
-    /* ===== LADO ESQUERDO (IGUAL AO LOGIN) ===== */
+    /* ===== LADO ESQUERDO ===== */
     .caixa.esquerda {
       flex: 1;
       display: flex;
@@ -91,102 +92,137 @@
       margin: 0;
     }
 
-    /* ===== LADO DIREITO (IGUAL AO LOGIN) ===== */
+    /* ===== LADO DIREITO (LOGIN) ===== */
     .caixa.direita {
       flex: 0 0 33.333vw;
       display: flex;
       flex-direction: column;
       justify-content: center;
       background-color: #ffffff;
-      padding: 36px 36px;
+      padding: 60px 48px;
       box-shadow: -6px 0 32px rgba(0, 0, 0, 0.08);
-      max-height: 100vh;
-      overflow-y: auto;
     }
 
-    .section-label {
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-header .section-label {
       color: #0d47a1;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       font-weight: 800;
-      text-align: center;
-      margin: 0 0 2px 0;
+      margin: 0 0 4px 0;
     }
 
-    .section-sub {
+    .login-header .section-sub {
       color: #555;
-      font-size: 0.88rem;
-      text-align: center;
-      margin: 0 0 16px 0;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    /* ===== FORMULÁRIO ===== */
+    .login-form .form-group {
+      margin-bottom: 20px;
+    }
+
+    .login-form label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #0d47a1;
+      margin-bottom: 6px;
+    }
+
+    .login-form .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e7ef;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background-color: #f8fafc;
+    }
+
+    .login-form .form-control:focus {
+      outline: none;
+      border-color: #0d47a1;
+      box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.12);
+      background-color: #ffffff;
+    }
+
+    .login-form .form-control::placeholder {
+      color: #aab;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background-color: #0d47a1;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      margin-top: 8px;
+    }
+
+    .btn-login:hover {
+      background-color: #0a3a87;
+    }
+
+    .btn-login:active {
+      transform: scale(0.98);
+    }
+
+    .login-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 20px;
+    }
+
+    .login-links .link-btn {
+      background: none;
+      border: none;
+      color: #0d47a1;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .login-links .link-btn:hover {
+      color: #1a6bc4;
+      text-decoration: underline;
+    }
+
+    .login-links .link-btn.voltar {
+      color: #777;
+      font-weight: 400;
+    }
+
+    .login-links .link-btn.voltar:hover {
+      color: #555;
     }
 
     .footer-note {
       color: #757575;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       text-align: center;
-      margin-top: 14px;
+      margin-top: 24px;
       margin-bottom: 0;
     }
 
-    /* ===== LINKS DE PERFIL (ESTILO ADAPTADO) ===== */
-    .profile-link {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #f8fafc;
-      padding: 10px 16px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: all 0.2s ease-in-out;
-      border: 2px solid #e0e7ef;
-    }
-
-    .profile-info {
-      display: flex;
-      gap: 8px;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
-
-    .profile-prefix {
-      font-size: 0.9rem;
-      color: #666666;
-    }
-
-    .profile-name {
-      font-weight: 800;
-      font-size: 1.3rem;
-      color: #0d47a1;
-    }
-
-    .profile-desc {
-      font-size: 0.88rem;
-      color: #555555;
-    }
-
-    .arrow {
-      color: #0d47a1;
-      font-weight: bold;
-      font-size: 1.2rem;
-      transition: transform 0.2s ease;
-      flex-shrink: 0;
-      margin-left: 10px;
-    }
-
-    .profile-link:hover {
-      background-color: #0d47a1;
-      border-color: #0d47a1;
-      transform: translateX(4px);
-    }
-
-    .profile-link:hover .profile-prefix,
-    .profile-link:hover .profile-name,
-    .profile-link:hover .profile-desc,
-    .profile-link:hover .arrow {
-      color: #ffffff;
-    }
-
-    /* ===== RESPONSIVO (MESMO DO LOGIN) ===== */
+    /* ===== RESPONSIVO ===== */
     @media (max-width: 1024px) {
       .caixa.esquerda {
         padding: 40px 48px 80px 80px;
@@ -241,18 +277,6 @@
         padding: 40px 28px;
         box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.06);
       }
-
-      .profile-link {
-        padding: 12px 16px;
-      }
-
-      .profile-name {
-        font-size: 1.1rem;
-      }
-
-      .profile-desc {
-        font-size: 0.82rem;
-      }
     }
 
     @media (max-width: 480px) {
@@ -268,58 +292,30 @@
         font-size: 2.5rem;
       }
 
-      .logo-texto span {
-        font-size: 0.9rem;
-      }
-
-      .caixa.esquerda p {
-        font-size: 1rem;
-      }
-
       .caixa.direita {
         padding: 28px 20px;
       }
 
-      .section-label {
+      .login-header .section-label {
         font-size: 1.5rem;
       }
 
-      .section-sub {
-        font-size: 0.85rem;
-      }
-
-      .profile-link {
+      .login-form .form-control {
         padding: 10px 14px;
-        margin-bottom: 10px;
+        font-size: 0.95rem;
       }
 
-      .profile-info {
-        gap: 4px;
-      }
-
-      .profile-name {
-        font-size: 1rem;
-      }
-
-      .profile-desc {
-        font-size: 0.75rem;
-      }
-
-      .profile-prefix {
-        font-size: 0.8rem;
-      }
-
-      .arrow {
+      .btn-login {
+        padding: 12px;
         font-size: 1rem;
       }
     }
   </style>
-  <link rel="icon" type="image/png" href="./assets/imgs/favicon.png">
+    <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
-
 <body>
 
-  <!-- ===== SVG DE FUNDO ===== -->
+  <!-- ===== SVG DE FUNDO (mesmo da tela inicial) ===== -->
   <svg class="bg-svg" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
     <rect width="1440" height="900" fill="#ddeeff"/>
     <ellipse cx="200" cy="820" rx="280" ry="110" fill="#40d9b8"/>
@@ -353,7 +349,7 @@
     <!-- LADO ESQUERDO -->
     <div class="caixa esquerda">
       <div class="logo-bloco">
-        <img src="assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
+        <img src="../../assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
         <div class="logo-texto">
           <h1>SIGEI</h1>
           <span>Sistema de Gestão Escolar<br>para a Inclusão</span>
@@ -362,86 +358,91 @@
       <p>Gestão eficiente para uma educação inclusiva.<br>O SIGEI centraliza informações, auxilia no acompanhamento de alunos elegíveis à educação especial e apoia a distribuição de Profissionais de Apoio Escolar.</p>
     </div>
 
-    <!-- LADO DIREITO (PERFIS) -->
+    <!-- LADO DIREITO (LOGIN) -->
     <div class="caixa direita">
       
-      <h2 class="section-label">Selecione seu perfil</h2>
-      <p class="section-sub">Escolha o perfil correspondente ao seu tipo de acesso.</p>
-
-      <a href="views/auth/login.php?perfil=seduc" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">SEDUC</span>
-          <span class="profile-desc">Órgão Central - SEDUC-SP</span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <a href="views/auth/login.php?perfil=asure" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">ASURE</span>
-          <span class="profile-desc">Assistência Técnica - ASURE</span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <a href="views/auth/login.php?perfil=educacao_especial" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">PEC</span>
-          <span class="profile-desc">Equipe da Educação Especial - EEC </span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <a href="views/auth/login.php?perfil=sefisc" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">SEFISC</span>
-          <span class="profile-desc">Setor de Fiscalização</span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <a href="views/auth/login.php?perfil=escola" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">UE</span>
-          <span class="profile-desc">Unidade Escolar</span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <a href="views/auth/login.php?perfil=empresa" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">Empresa</span>
-          <span class="profile-desc">Supervisor da Empresa</span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <a href="views/auth/login.php?perfil=pae" class="profile-link">
-        <div class="profile-info">
-          <span class="profile-prefix">Sou</span>
-          <span class="profile-name">PAE</span>
-          <span class="profile-desc">Profissional de Apoio Escolar</span>
-        </div>
-        <span class="arrow">&#8594;</span>
-      </a>
-
-      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #e2e8f0; text-align: center;">
-        <a href="views/auth/acesso_rapido.php" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; background: linear-gradient(135deg, #0d47a1, #1a9e85); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 0.95rem; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(13, 71, 161, 0.15);">
-          <span> Acesso Rápido</span>
-          
-        </a>
+      <div class="login-header">
+        <h2 class="section-label">Acessar o sistema</h2>
+        <p class="section-sub">Informe seu CPF e senha para continuar</p>
       </div>
+
+      <form class="login-form" action="../../controllers/auth/login.php" method="post">
+
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+          <?php if (isset($_GET['perfil'])): ?>
+              <input type="hidden" name="perfil" value="<?php echo htmlspecialchars($_GET['perfil']); ?>">
+          <?php endif; ?>
+
+          <?php if (isset($_GET['erro'])): ?>
+              <div style="background-color: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; text-align: center;">
+                  <?php
+                  if ($_GET['erro'] === 'usuario_nao_encontrado') {
+                      echo "Usuário não localizado para o perfil selecionado ou credenciais inválidas.";
+                  } else {
+                      echo "CPF ou senha incorretos.";
+                  }
+                  ?>
+              </div>
+          <?php endif; ?>
+
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input 
+            type="text" 
+            id="cpf" 
+            name="cpf" 
+            class="form-control"
+            placeholder="000.000.000-00"
+            maxlength="14"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <input 
+            type="password" 
+            id="senha" 
+            name="senha" 
+            class="form-control"
+            placeholder="Digite sua senha"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn-login">Entrar</button>
+
+      <div class="login-links">
+    <a href="esqueciminha_senha.php" class="link-btn" style="text-decoration: none; display: inline-block; text-align: center;">Esqueci minha senha</a>
+    <button type="button" class="link-btn voltar" onclick="window.location.href='../../index.html';">← Voltar</button>
+</div>
+      </form>
 
       <p class="footer-note">Todos os acessos são monitorados e registrados.</p>
     </div>
 
   </section>
+
+  <!-- ===== MÁSCARA DE CPF ===== -->
+  <script>
+    const cpfInput = document.getElementById('cpf');
+
+    cpfInput.addEventListener('input', function () {
+      let value = this.value.replace(/\D/g, '');
+
+      if (value.length > 3) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      }
+      if (value.length > 7) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      }
+      if (value.length > 11) {
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+
+      this.value = value;
+    });
+  </script>
 
 </body>
 </html>

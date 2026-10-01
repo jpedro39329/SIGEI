@@ -38,3 +38,4 @@ if (!empty($destino)) {
 
 header("Location: ../views/dashboard.php");
 exit();
+

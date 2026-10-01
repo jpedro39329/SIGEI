@@ -30,16 +30,28 @@ function temPermissao($perfil, $perfisPermitidos) {
     return false;
 }
 
-// Retorna o caminho correto da página de login (views/ ou controllers/)
+// Retorna o caminho correto da página de login conforme a localização do script
 function urlLogin() {
     $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
-    $dir = strtolower(basename(dirname($script)));
 
-    if ($dir === 'controllers') {
-        return '../views/login.php';
+    // Se estiver dentro de subpasta de views (ex: views/alunos/listar.php)
+    if (preg_match('#/views/[^/]+/[^/]+$#', $script)) {
+        return '../auth/login.php';
+    }
+    // Se estiver diretamente em views (ex: views/dashboard.php)
+    if (preg_match('#/views/[^/]+$#', $script)) {
+        return 'auth/login.php';
+    }
+    // Se estiver em subpasta de controllers
+    if (preg_match('#/controllers/[^/]+/[^/]+$#', $script)) {
+        return '../../views/auth/login.php';
+    }
+    // Se estiver diretamente em controllers
+    if (preg_match('#/controllers/[^/]+$#', $script)) {
+        return '../views/auth/login.php';
     }
 
-    return 'login.php';
+    return 'views/auth/login.php';
 }
 
 // Redireciona para o login se não estiver logado

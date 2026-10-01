@@ -8,7 +8,7 @@ $cpf = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
 $senha = $_POST['senha'] ?? '';
 
 if ($cpf === '' || $senha === '') {
-    $redirectUrl = "../../views/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=dados_invalidos" : "?erro=dados_invalidos");
+    $redirectUrl = "../../views/auth/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=dados_invalidos" : "?erro=dados_invalidos");
     header("Location: $redirectUrl");
     exit();
 }
@@ -151,7 +151,7 @@ foreach ($tabelas as $tabela => $info) {
     $stmt->close();
 }
 
-$redirectUrl = "../../views/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=usuario_nao_encontrado" : "?erro=usuario_nao_encontrado");
+$redirectUrl = "../../views/auth/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=usuario_nao_encontrado" : "?erro=usuario_nao_encontrado");
 header("Location: $redirectUrl");
 exit();
 ?>

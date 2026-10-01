@@ -153,7 +153,7 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
                     <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
                         <i class="bi bi-file-earmark-medical text-primary"></i> Laudos e Documentos Anexados
                     </h5>
-                    <span class="badge bg-light text-dark border"><?php echo count($laudos); ?> arquivo(s)</span>
+                    <span class="badge rounded-pill bg-light text-secondary border fw-normal px-2 py-1"><?php echo count($laudos); ?> arquivo(s)</span>
                 </div>
                 <div class="card-body p-4">
                     <?php if (count($laudos) > 0): ?>
@@ -161,27 +161,19 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
                             <?php foreach ($laudos as $laudo): ?>
                                 <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center border-bottom">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="<?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary-subtle text-secondary' : 'bg-primary-subtle text-primary'; ?> p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                                            <i class="<?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bi bi-file-earmark-text' : 'bi bi-file-earmark-medical'; ?> fs-4"></i>
+                                        <div class="<?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary-subtle text-secondary' : 'bg-primary-subtle text-primary'; ?> rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                            <i class="<?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bi bi-file-earmark-text' : 'bi bi-file-earmark-medical'; ?> fs-5"></i>
                                         </div>
-                                        <div>
-                                            <div class="fw-semibold text-dark">
-                                                <span class="badge <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary' : 'bg-primary'; ?> me-1 small">
-                                                    <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento Geral' : 'Laudo Médico'; ?>
-                                                </span>
-                                                <?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Documento Comprobatório'); ?>
-                                            </div>
-                                            <small class="text-muted">
-                                                <i class="bi bi-clock me-1"></i>Enviado em <?php echo date('d/m/Y \à\s H:i', strtotime($laudo['data_envio'])); ?>
-                                                <?php if (!empty($laudo['descricao'])): ?>
-                                                    — <span class="text-secondary"><?php echo htmlspecialchars($laudo['descricao']); ?></span>
-                                                <?php endif; ?>
-                                            </small>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary-subtle text-secondary border' : 'bg-primary-subtle text-primary border border-primary-subtle'; ?> rounded-pill small px-2 py-1">
+                                                <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento' : 'Laudo Médico'; ?>
+                                            </span>
+                                            <span class="text-dark fw-medium"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?? 'Documento Comprobatório'); ?></span>
                                         </div>
                                     </div>
                                     <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                        <button type="button" class="btn btn-sm btn-outline-primary fw-semibold d-flex align-items-center gap-1" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Laudo')); ?>')">
-                                            <i class="bi bi-eye"></i> Visualizar
+                                        <button type="button" class="btn btn-sm btn-light border text-secondary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Visualizar documento" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?? 'Laudo')); ?>')">
+                                            <i class="bi bi-eye fs-6"></i>
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -202,22 +194,22 @@ $cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
                     <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
                         <i class="bi bi-clipboard-check text-primary"></i> Parecer e Deliberação
                     </h5>
-                    <p class="text-muted small mb-3">Selecione a deliberação técnica cabível para esta solicitação de apoio escolar:</p>
+                    <p class="text-muted small mb-3">Selecione a deliberação técnica para esta solicitação:</p>
 
                     <div class="d-flex flex-wrap gap-2 pt-1">
                         <!-- 1. Aprovar -->
-                        <button type="button" class="btn btn-success px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3 shadow-sm" onclick="aprovar(<?php echo $aluno['id_aluno']; ?>)">
-                            <i class="bi bi-check-circle-fill"></i> Aprovar Solicitação
+                        <button type="button" class="btn btn-sm btn-success px-3 py-2 fw-medium d-inline-flex align-items-center gap-2 rounded-2" onclick="aprovar(<?php echo $aluno['id_aluno']; ?>)">
+                            <i class="bi bi-check2"></i> Aprovar
                         </button>
 
                         <!-- 2. Solicitar Ajuste / Correção -->
-                        <button type="button" class="btn btn-warning text-dark px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3 shadow-sm" onclick="solicitarAjuste(<?php echo $aluno['id_aluno']; ?>)">
+                        <button type="button" class="btn btn-sm btn-outline-warning text-dark px-3 py-2 fw-medium d-inline-flex align-items-center gap-2 rounded-2" onclick="solicitarAjuste(<?php echo $aluno['id_aluno']; ?>)">
                             <i class="bi bi-arrow-repeat"></i> Solicitar Ajustes
                         </button>
 
                         <!-- 3. Recusar -->
-                        <button type="button" class="btn btn-outline-danger px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3" onclick="reprovar(<?php echo $aluno['id_aluno']; ?>)">
-                            <i class="bi bi-x-circle-fill"></i> Recusar Solicitação
+                        <button type="button" class="btn btn-sm btn-outline-danger px-3 py-2 fw-medium d-inline-flex align-items-center gap-2 rounded-2" onclick="reprovar(<?php echo $aluno['id_aluno']; ?>)">
+                            <i class="bi bi-x-lg"></i> Recusar
                         </button>
                     </div>
                 </div>

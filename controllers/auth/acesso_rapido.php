@@ -5,7 +5,7 @@ $tabela = trim($_GET['tabela'] ?? $_POST['tabela'] ?? '');
 $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
 
 if (!$tabela || $id <= 0) {
-    header("Location: ../../views/acesso_rapido.php?erro=parametros_invalidos");
+    header("Location: ../../views/auth/acesso_rapido.php?erro=parametros_invalidos");
     exit();
 }
 
@@ -49,13 +49,13 @@ switch ($tabela) {
         break;
 
     default:
-        header("Location: ../../views/acesso_rapido.php?erro=tabela_invalida");
+        header("Location: ../../views/auth/acesso_rapido.php?erro=tabela_invalida");
         exit();
 }
 
 $stmt = $conexao->prepare($query);
 if (!$stmt) {
-    header("Location: ../../views/acesso_rapido.php?erro=erro_consulta");
+    header("Location: ../../views/auth/acesso_rapido.php?erro=erro_consulta");
     exit();
 }
 
@@ -112,6 +112,6 @@ if ($result && $result->num_rows === 1) {
 }
 
 $stmt->close();
-header("Location: ../../views/acesso_rapido.php?erro=usuario_nao_encontrado");
+header("Location: ../../views/auth/acesso_rapido.php?erro=usuario_nao_encontrado");
 exit();
 
