@@ -931,4 +931,56 @@ textarea:focus-visible, [tabindex]:focus-visible {
     border-color: #0038bb;
 }
 
+/* Timeline Minimalista do Histórico de Solicitações / Alunos */
+.sigei-timeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+.sigei-timeline::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 6px;
+    width: 2px;
+    background: #e2e8f0;
+}
+.sigei-timeline-item {
+    position: relative;
+    padding-bottom: 1.25rem;
+}
+.sigei-timeline-item:last-child {
+    padding-bottom: 0;
+}
+.sigei-timeline-dot {
+    position: absolute;
+    left: -1.5rem;
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--sigei-blue-700);
+    z-index: 1;
+}
+.sigei-timeline-dot.dot-success { border-color: var(--sigei-teal-600); }
+.sigei-timeline-dot.dot-warning { border-color: #f59e0b; }
+.sigei-timeline-dot.dot-danger { border-color: #ef4444; }
+.sigei-timeline-dot.dot-secondary { border-color: #94a3b8; }
+.sigei-timeline-dot.dot-primary { border-color: var(--sigei-blue-900); }
+.sigei-timeline-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--sigei-ink);
+}
+.sigei-timeline-time {
+    font-size: 0.78rem;
+    color: var(--sigei-muted);
+}
+.sigei-timeline-body {
+    font-size: 0.85rem;
+    color: #334155;
+    margin-top: 0.25rem;
+}
+
 

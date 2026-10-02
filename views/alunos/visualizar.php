@@ -93,17 +93,15 @@ function calcularIdade($dataNasc) {
     $hoje = new DateTime();
     return $nasc->diff($hoje)->y;
 }
+$idadeAluno = calcularIdade($aluno['data_nascimento']);
 
-$dataNascimentoTexto = '-';
-if (!empty($aluno['data_nascimento'])) {
-    $dataNascFormatada = date('d/m/Y', strtotime($aluno['data_nascimento']));
-    $idadeAluno = calcularIdade($aluno['data_nascimento']);
-    if ($idadeAluno !== null) {
-        $dataNascimentoTexto = $dataNascFormatada . ' - ' . $idadeAluno . ' anos';
-    } else {
-        $dataNascimentoTexto = $dataNascFormatada;
-    }
-}
+// Iniciais para avatar fallback
+$nomesPartes = explode(' ', trim($aluno['nome']));
+$iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nomesPartes[1]) ? mb_substr($nomesPartes[1], 0, 1) : ''));
+
+$cpf = formatarCPF($aluno['cpf']);
+$cpfResponsavel = formatarCPF($aluno['cpf_responsavel'] ?? '');
+$foto = $aluno['foto_arquivo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -119,414 +117,531 @@ if (!empty($aluno['data_nascimento'])) {
 
 <?php require("../../includes/navbar.php"); ?>
 
-<div class="content">
+<div class="content container-fluid px-lg-4 py-4">
 
-    <!-- Cabeçalho e Ações -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Cabeçalho Principal -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-            <h2 class="mb-0">Visualizar Aluno</h2>
+            <h2 class="mb-0 fw-bold text-dark">Detalhes do Aluno</h2>
+            <span class="text-muted small">Prontuário e histórico de atendimento especializado</span>
         </div>
         <div class="d-flex gap-2">
-            <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC']) && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
-                <form action="../../controllers/alunos/reativar.php" method="POST" class="d-inline" onsubmit="return confirm('Deseja realmente reativar este aluno?');">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                    <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
-                    <button type="submit" class="btn btn-success btn-sm">
-                        Reativar Aluno
-                    </button>
-                </form>
-            <?php endif; ?>
-
             <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
-                <?php if (in_array($aluno['status_aprovacao'], ['PENDENTE_CORRECAO', 'REPROVADO'])): ?>
-                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning btn-sm text-dark">Ajustar Solicitação</a>
-                <?php endif; ?>
-                <a href="pendentes.php?aba=<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO' ? 'correcao' : ($aluno['status_aprovacao'] === 'REPROVADO' ? 'reprovados' : 'analise')); ?>" class="btn btn-secondary btn-sm">Voltar</a>
+                <a href="pendentes.php?aba=<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO' ? 'correcao' : ($aluno['status_aprovacao'] === 'REPROVADO' ? 'reprovados' : 'analise')); ?>" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+                    Voltar
+                </a>
             <?php else: ?>
-                <a href="listar.php<?php echo ($aluno['status_aprovacao'] === 'ARQUIVADO') ? '?aba=arquivados' : ''; ?>" class="btn btn-secondary btn-sm">Voltar</a>
+                <a href="listar.php<?php echo ($aluno['status_aprovacao'] === 'ARQUIVADO') ? '?aba=arquivados' : ''; ?>" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+                    Voltar à Lista
+                </a>
             <?php endif; ?>
         </div>
     </div>
 
+    <!-- Alertas de Sucesso/Mensagens -->
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'editado'): ?>
-        <div class="alert alert-success">Aluno editado com sucesso!</div>
+        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+            Cadastro do aluno editado com sucesso!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'laudo_ok'): ?>
-        <div class="alert alert-success">Documento anexado com sucesso!</div>
+        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+            Documento anexado com sucesso!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'laudo_removido'): ?>
-        <div class="alert alert-success">Documento removido com sucesso.</div>
+        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+            Documento removido com sucesso.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
-    <!-- 1. Informações Pessoais do Aluno -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Informações do Aluno</h5>
-                <div>
-                    <?php
-                        $status = $aluno['status_aprovacao'];
-                        if ($status == 'PENDENTE') {
-                            echo '<span class="badge bg-warning text-dark">Aguardando Análise</span>';
-                        } elseif ($status == 'PENDENTE_CORRECAO') {
-                            echo '<span class="badge bg-warning text-dark">Ajuste Solicitado</span>';
-                        } elseif ($status == 'APROVADO') {
-                            echo '<span class="badge bg-success">Aprovado</span>';
-                        } elseif ($status == 'REPROVADO') {
-                            echo '<span class="badge bg-danger">Reprovado</span>';
-                        } else {
-                            echo '<span class="badge bg-secondary">Arquivado</span>';
-                        }
-                    ?>
-                </div>
-            </div>
+    <!-- Grid Assimétrico Responsivo (8 colunas principal / 4 colunas lateral) -->
+    <div class="row g-4">
 
-            <?php if (!empty($aluno['foto_arquivo']) && file_exists("../../" . $aluno['foto_arquivo'])): ?>
-                <div class="mb-3">
-                    <img src="../../<?php echo htmlspecialchars($aluno['foto_arquivo']); ?>" class="rounded" style="max-height: 140px; object-fit: cover;" alt="Foto do aluno">
-                </div>
-            <?php endif; ?>
+        <!-- ============================================== -->
+        <!-- COLUNA PRINCIPAL (ESQUERDA - 8 COLUNAS)        -->
+        <!-- ============================================== -->
+        <div class="col-lg-8">
 
-            <div class="row g-3">
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">Nome</span>
-                    <strong><?php echo htmlspecialchars($aluno['nome']); ?></strong>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">CPF</span>
-                    <span><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></span>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">RA</span>
-                    <span><?php echo htmlspecialchars($aluno['ra'] ?: '-'); ?></span>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">Data de Nascimento</span>
-                    <span><?php echo htmlspecialchars($dataNascimentoTexto); ?></span>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">Gênero</span>
-                    <span><?php echo htmlspecialchars($aluno['genero'] ?: '-'); ?></span>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">Raça</span>
-                    <span><?php echo htmlspecialchars($aluno['raca'] ?: '-'); ?></span>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <span class="text-muted small d-block">Município de Nascimento</span>
-                    <span><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: '-'); ?></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. Dados Escolares e Cuidados -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Dados Escolares</h5>
-            <div class="row g-3">
-                <div class="col-md-6 col-sm-12">
-                    <span class="text-muted small d-block">Unidade Escolar</span>
-                    <strong><?php echo htmlspecialchars($aluno['escola_nome'] ?: '-'); ?></strong>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <span class="text-muted small d-block">Série</span>
-                    <span><?php echo htmlspecialchars($aluno['serie'] ?: '-'); ?></span>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <span class="text-muted small d-block">Turno</span>
-                    <span><?php echo htmlspecialchars($aluno['turno_aula'] ?: '-'); ?></span>
-                </div>
-                <div class="col-12">
-                    <span class="text-muted small d-block">Deficiência</span>
-                    <span><?php echo htmlspecialchars($aluno['descricao_deficiencia'] ?: '-'); ?></span>
-                </div>
-                <div class="col-12">
-                    <span class="text-muted small d-block">Cuidados Necessários</span>
-                    <span><?php echo htmlspecialchars($aluno['descricao_cuidados'] ?: 'Não informado'); ?></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. Responsável -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Responsável</h5>
-            <div class="row g-3">
-                <div class="col-md-6 col-sm-6">
-                    <span class="text-muted small d-block">Nome do Responsável</span>
-                    <span><?php echo htmlspecialchars($aluno['nome_responsavel'] ?: 'Não informado'); ?></span>
-                </div>
-                <div class="col-md-6 col-sm-6">
-                    <span class="text-muted small d-block">CPF do Responsável</span>
-                    <span><?php echo htmlspecialchars(formatarCPF($aluno['cpf_responsavel']) ?: 'Não informado'); ?></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. Histórico da Solicitação e Acompanhamento -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Histórico da Solicitação</h5>
-            <div class="row g-3">
-                <!-- Envio -->
-                <div class="col-md-6 col-12">
-                    <span class="text-muted small d-block">Enviado por</span>
-                    <span>
-                        <?php if (!empty($aluno['cadastrado_por_nome'])): ?>
-                            <?php echo htmlspecialchars($aluno['cadastrado_por_nome']); ?>
-                            <?php if (!empty($aluno['cadastrado_por_cpf'])): ?>
-                                - CPF: <?php echo htmlspecialchars(formatarCPF($aluno['cadastrado_por_cpf'])); ?>
-                            <?php endif; ?>
+            <!-- 1. Card de Informações Pessoais do Aluno -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    
+                    <!-- Avatar e Nome do Aluno -->
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <?php if (!empty($foto) && file_exists("../../$foto")): ?>
+                            <img src="../../<?php echo htmlspecialchars($foto); ?>" alt="Foto do aluno" class="rounded-3 object-fit-cover shadow-sm flex-shrink-0" style="width: 64px; height: 64px;">
                         <?php else: ?>
-                            Usuário da Escola
-                        <?php endif; ?>
-                        <?php if (!empty($aluno['data_cadastro'])): ?>
-                            <small class="text-muted d-block"><?php echo date('d/m/Y \à\s H:i', strtotime($aluno['data_cadastro'])); ?></small>
-                        <?php endif; ?>
-                    </span>
-                </div>
-
-                <!-- Deliberação (Aprovado / Reprovado / Ajustes) -->
-                <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
-                    <div class="col-md-6 col-12">
-                        <span class="text-muted small d-block">Aprovado por</span>
-                        <span>
-                            <?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Equipe Educação Especial'); ?>
-                            <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
-                                - CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?>
-                            <?php endif; ?>
-                            <?php if (!empty($aluno['data_deliberacao'])): ?>
-                                <small class="text-muted d-block"><?php echo date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])); ?></small>
-                            <?php endif; ?>
-                        </span>
-                    </div>
-
-                <?php elseif ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO'): ?>
-                    <div class="col-md-6 col-12">
-                        <span class="text-muted small d-block">Ajuste solicitado por</span>
-                        <span>
-                            <?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Equipe Educação Especial'); ?>
-                            <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
-                                - CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?>
-                            <?php endif; ?>
-                            <?php if (!empty($aluno['data_deliberacao'])): ?>
-                                <small class="text-muted d-block"><?php echo date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])); ?></small>
-                            <?php endif; ?>
-                        </span>
-                        <?php if (!empty($aluno['motivo_reprovacao'])): ?>
-                            <div class="mt-2 text-dark">
-                                <span class="text-muted small d-block">Orientação</span>
-                                <?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?>
+                            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 fw-bold fs-5 text-primary" style="width: 64px; height: 64px; background-color: #e8f1ff;">
+                                <?php echo htmlspecialchars($iniciais); ?>
                             </div>
                         <?php endif; ?>
-                    </div>
 
-                <?php elseif ($aluno['status_aprovacao'] === 'REPROVADO'): ?>
-                    <div class="col-md-6 col-12">
-                        <span class="text-muted small d-block">Reprovado por</span>
-                        <span>
-                            <?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Equipe Educação Especial'); ?>
-                            <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
-                                - CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?>
-                            <?php endif; ?>
-                            <?php if (!empty($aluno['data_deliberacao'])): ?>
-                                <small class="text-muted d-block"><?php echo date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])); ?></small>
-                            <?php endif; ?>
-                        </span>
-                        <?php if (!empty($aluno['motivo_reprovacao'])): ?>
-                            <div class="mt-2 text-dark">
-                                <span class="text-muted small d-block">Motivo</span>
-                                <?php echo htmlspecialchars($aluno['motivo_reprovacao']); ?>
+                        <div class="overflow-hidden">
+                            <h4 class="fw-bold text-dark mb-1 text-truncate"><?php echo htmlspecialchars($aluno['nome']); ?></h4>
+                            <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+                                <span>RA: <strong class="text-dark"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></strong></span>
+                                <span>•</span>
+                                <span>CPF: <strong class="text-dark"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></strong></span>
                             </div>
-                        <?php endif; ?>
+                        </div>
                     </div>
 
-                <?php elseif ($aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
-                    <div class="col-md-6 col-12">
-                        <span class="text-muted small d-block">Arquivado por</span>
-                        <span>
-                            <?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?: 'Usuário'); ?>
-                            <?php if (!empty($aluno['arquivado_por_cpf'])): ?>
-                                - CPF: <?php echo htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])); ?>
-                            <?php endif; ?>
-                            <?php if (!empty($aluno['data_arquivamento'])): ?>
-                                <small class="text-muted d-block"><?php echo date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])); ?></small>
-                            <?php endif; ?>
-                        </span>
-                        <?php if (!empty($aluno['motivo_arquivamento'])): ?>
-                            <div class="mt-2 text-dark">
-                                <span class="text-muted small d-block">Motivo</span>
-                                <?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                <?php else: ?>
-                    <div class="col-md-6 col-12">
-                        <span class="text-muted small d-block">Situação</span>
-                        <span>Aguardando análise da equipe da Educação Especial</span>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. Profissional de Apoio Escolar (Apenas se Aprovado) -->
-    <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <h5 class="mb-3">Profissional de Apoio Escolar</h5>
-                <?php if ($pae): ?>
+                    <!-- Grid Interno de Dados Pessoais -->
                     <div class="row g-3">
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Nome</span>
-                            <strong><?php echo htmlspecialchars($pae['nome']); ?></strong>
-                        </div>
-                        <div class="col-md-4 col-sm-6">
                             <span class="text-muted small d-block">CPF</span>
-                            <span><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Data de Início</span>
-                            <span><?php echo !empty($pae['data_inicio']) ? date('d/m/Y', strtotime($pae['data_inicio'])) : '-'; ?></span>
+                            <span class="text-muted small d-block">RA do Aluno</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></span>
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <span class="text-muted small d-bl)ock">Data de Nascimento</span>
+                            <span class="fw-medium text-dark">
+                                <?php if (!empty($aluno['data_nascimento'])): ?>
+                                    <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?>
+                                    <?php if ($idadeAluno !== null): ?>
+                                        • <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1"><?php echo $idadeAluno; ?> anos</span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    Não informada
+                                <?php endif; ?>
+                            </span>
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <span class="text-muted small d-block">Gênero</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <span class="text-muted small d-block">Raça / Cor</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <span class="text-muted small d-block">Município de Nascimento</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
                         </div>
                     </div>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Nenhum profissional de apoio vinculado no momento.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    <?php endif; ?>
 
-    <!-- 6. Documentos e Laudos -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Documentos e Laudos</h5>
-                <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#formAnexoLaudo">
-                        Anexar Documento
-                    </button>
-                <?php endif; ?>
+                </div>
             </div>
 
-            <!-- Formulário de Anexo Retrátil (Escola) -->
-            <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
-                <div class="collapse mb-4" id="formAnexoLaudo">
-                    <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="p-3 bg-light rounded border">
-                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                        <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
-                        <div class="row g-2 align-items-end">
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold">Tipo</label>
-                                <select name="tipo" class="form-select form-select-sm">
-                                    <option value="LAUDO">Laudo Médico</option>
-                                    <option value="DOCUMENTO">Documento Geral</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label small fw-semibold">Arquivo</label>
-                                <input type="file" name="arquivos[]" class="form-control form-control-sm" accept="application/pdf,image/jpeg,image/png" multiple required>
-                            </div>
-                            <div class="col-md-3 d-grid">
-                                <button type="submit" class="btn btn-dark btn-sm">Enviar Arquivo</button>
-                            </div>
+            <!-- 2. Card de Dados Escolares e Necessidades -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Dados Escolares & Necessidades</h5>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6 col-sm-12">
+                            <span class="text-muted small d-block">Unidade Escolar</span>
+                            <strong class="text-dark"><?php echo htmlspecialchars($aluno['escola_nome'] ?: 'Não informada'); ?></strong>
                         </div>
-                    </form>
+                        <div class="col-md-6 col-sm-12">
+                            <span class="text-muted small d-block">Unidade Regioonal de Ensino</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['ure_nome'] ?: 'Não informada'); ?></span>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <span class="text-muted small d-block">Série</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['serie'] ?: 'Não informada'); ?></span>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <span class="text-muted small d-block">Turno de Aula</span>
+                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['turno_aula'] ?: 'Não informado'); ?></span>
+                        </div>
+                    </div>
+
+                    <!-- Diagnóstico Clínico / CID -->
+                    <div class="mt-3">
+                        <span class="text-muted small d-block mb-1">Diagnóstico Clínico / Deficiência</span>
+                        <div class="p-3 rounded-3 bg-light border text-dark">
+                            <?php echo nl2br(htmlspecialchars($aluno['descricao_deficiencia'] ?: 'Nenhuma descrição clínica informada')); ?>
+                        </div>
+                    </div>
+
+                    <!-- Cuidados Necessários -->
+                    <div class="mt-3">
+                        <span class="text-muted small d-block mb-1">Cuidados Necessários e Apoio Solicitado</span>
+                        <div class="p-3 rounded-3 bg-light border text-dark">
+                            <?php echo nl2br(htmlspecialchars($aluno['descricao_cuidados'] ?: 'Nenhum cuidado especial registrado pela escola.')); ?>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 3. Profissional de Apoio Escolar (Exibido se Aprovado) -->
+            <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Profissional de Apoio Escolar (PAE)</h5>
+
+                        <?php if ($pae): ?>
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-5 col-sm-6">
+                                    <span class="text-muted small d-block">Profissional Vinculado</span>
+                                    <strong class="text-dark"><?php echo htmlspecialchars($pae['nome']); ?></strong>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <span class="text-muted small d-block">CPF do Profissional</span>
+                                    <span class="fw-medium text-dark"><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></span>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <span class="text-muted small d-block">Início do Atendimento</span>
+                                    <span class="fw-medium text-dark"><?php echo !empty($pae['data_inicio']) ? date('d/m/Y', strtotime($pae['data_inicio'])) : 'Não informado'; ?></span>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="p-3 rounded-3 bg-light border text-muted small text-center">
+                                Nenhum profissional de apoio vinculado a este aluno no momento.
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endif; ?>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <tbody>
-                        <!-- Termo de Responsabilidade -->
+            <!-- 4. Card de Documentos e Laudos Anexos -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 flex-wrap gap-2">
+                        <h5 class="fw-bold text-dark mb-0">Documentos e Laudos Anexos</h5>
+                        <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-3 px-3" data-bs-toggle="collapse" data-bs-target="#formAnexoLaudo">
+                                Anexar Documento
+                            </button>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Formulário Retrátil para a Escola Anexar Laudos -->
+                    <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
+                        <div class="collapse mb-4" id="formAnexoLaudo">
+                            <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="p-3 bg-light rounded-3 border">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                                <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-muted">Tipo de Documento</label>
+                                        <select name="tipo" class="form-select form-select-sm rounded-2">
+                                            <option value="LAUDO">Laudo Médico</option>
+                                            <option value="DOCUMENTO">Documento Geral</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-semibold text-muted">Arquivo (PDF, PNG ou JPG)</label>
+                                        <input type="file" name="arquivos[]" class="form-control form-control-sm rounded-2" accept="application/pdf,image/jpeg,image/png" multiple required>
+                                    </div>
+                                    <div class="col-md-3 d-grid">
+                                        <button type="submit" class="btn btn-primary btn-sm rounded-2 fw-semibold">Enviar Arquivo</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Termo de Responsabilidade Obrigatório -->
                         <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
-                            <tr>
-                                <td>
-                                    <strong>Termo de Responsabilidade</strong>
-                                    <small class="text-muted d-block">Documento Obrigatório</small>
-                                </td>
-                                <td class="text-end">
-                                    <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
-                                        Ver
-                                    </button>
-                                </td>
-                            </tr>
+                            <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <strong class="text-dark small">Termo de Responsabilidade</strong>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill py-0 px-2" style="font-size: 0.72rem;">Obrigatório</span>
+                                    </div>
+                                    <span class="text-muted d-block" style="font-size: 0.78rem;">Documento anexado pela escola</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade — <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')">
+                                    Visualizar
+                                </button>
+                            </div>
                         <?php endif; ?>
 
                         <!-- Laudos e Documentos Complementares -->
                         <?php if (count($laudos) > 0): ?>
                             <?php foreach ($laudos as $laudo): ?>
-                                <tr>
-                                    <td>
-                                        <strong><?php echo htmlspecialchars($laudo['nome_arquivo'] ?: 'Documento'); ?></strong>
-                                        <small class="text-muted d-block"><?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento' : 'Laudo Médico'; ?></small>
-                                    </td>
-                                    <td class="text-end">
-                                        <div class="d-inline-flex gap-2">
-                                            <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                                <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?: 'Documento')); ?>')" class="btn btn-sm btn-outline-primary">
-                                                    Ver
-                                                </button>
-                                            <?php endif; ?>
-                                            <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
-                                                <form method="POST" action="../../controllers/alunos/remover_laudo.php" class="d-inline" onsubmit="return confirm('Deseja realmente remover este documento?')">
-                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                                                    <input type="hidden" name="id_laudo" value="<?php echo $laudo['id_laudo']; ?>">
-                                                    <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover">&times;</button>
-                                                </form>
-                                            <?php endif; ?>
+                                <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <strong class="text-dark small"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?: 'Documento Anexo'); ?></strong>
+                                            <span class="badge bg-light text-secondary border rounded-pill py-0 px-2" style="font-size: 0.72rem;">
+                                                <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento' : 'Laudo Médico'; ?>
+                                            </span>
                                         </div>
-                                    </td>
-                                </tr>
+                                        <?php if (!empty($laudo['data_envio'])): ?>
+                                            <span class="text-muted d-block" style="font-size: 0.78rem;">Enviado em <?php echo date('d/m/Y \à\s H:i', strtotime($laudo['data_envio'])); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="d-inline-flex gap-2 align-items-center">
+                                        <?php if (!empty($laudo['caminho_arquivo'])): ?>
+                                            <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?: 'Documento')); ?>')">
+                                                Visualizar
+                                            </button>
+                                        <?php endif; ?>
+                                        <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
+                                            <form method="POST" action="../../controllers/alunos/remover_laudo.php" class="d-inline" onsubmit="return confirm('Deseja realmente remover este documento?')">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                                                <input type="hidden" name="id_laudo" value="<?php echo $laudo['id_laudo']; ?>">
+                                                <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2 rounded-2" title="Remover Documento">
+                                                    &times;
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             <?php endforeach; ?>
                         <?php elseif (empty($aluno['termo_responsabilidade_arquivo'])): ?>
-                            <tr>
-                                <td colspan="2" class="text-muted text-center py-3">Nenhum documento ou laudo anexado.</td>
-                            </tr>
+                            <div class="p-3 rounded-3 bg-light border text-muted small text-center">
+                                Nenhum documento ou laudo anexado ao aluno.
+                            </div>
                         <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- 7. Relatórios de Atendimento (Apenas se Aprovado) -->
-    <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <h5 class="mb-3">Relatórios de Atendimento</h5>
-                <?php if (count($relatorios) > 0): ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Tipo</th>
-                                    <th>Descrição</th>
-                                    <th>Profissional</th>
-                                    <th>Data</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($relatorios as $relatorio): ?>
-                                    <tr>
-                                        <td><?php echo $relatorio['tipo'] == 'DIARIO' ? 'Diário' : 'Mensal'; ?></td>
-                                        <td><small class="text-muted"><?php echo htmlspecialchars(mb_substr($relatorio['descricao'], 0, 90)) . (mb_strlen($relatorio['descricao']) > 90 ? '...' : ''); ?></small></td>
-                                        <td><?php echo htmlspecialchars($relatorio['pae_nome']); ?></td>
-                                        <td><?php echo date('d/m/Y H:i', strtotime($relatorio['data_cadastro'])); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
                     </div>
-                <?php else: ?>
-                    <p class="text-muted mb-0">Nenhum relatório registrado até o momento.</p>
-                <?php endif; ?>
+
+                </div>
             </div>
+
+            <!-- 5. Relatórios de Atendimento (Exibido se Aprovado e houver registros) -->
+            <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Relatórios de Atendimento</h5>
+
+                        <?php if (count($relatorios) > 0): ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr class="text-muted small">
+                                            <th>Tipo</th>
+                                            <th>Descrição / Síntese</th>
+                                            <th>Profissional</th>
+                                            <th>Data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($relatorios as $relatorio): ?>
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-light text-primary border rounded-pill px-2 py-1">
+                                                        <?php echo $relatorio['tipo'] == 'DIARIO' ? 'Diário' : 'Mensal'; ?>
+                                                    </span>
+                                                </td>
+                                                <td><small class="text-dark"><?php echo htmlspecialchars(mb_substr($relatorio['descricao'], 0, 90)) . (mb_strlen($relatorio['descricao']) > 90 ? '...' : ''); ?></small></td>
+                                                <td><small class="fw-medium text-dark"><?php echo htmlspecialchars($relatorio['pae_nome']); ?></small></td>
+                                                <td><small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($relatorio['data_cadastro'])); ?></small></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="p-3 rounded-3 bg-light border text-muted small text-center">
+                                Nenhum relatório de atendimento registrado até o momento.
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
         </div>
-    <?php endif; ?>
+
+        <!-- ============================================== -->
+        <!-- COLUNA LATERAL (DIREITA - 4 COLUNAS)           -->
+        <!-- ============================================== -->
+        <div class="col-lg-4">
+
+            <!-- 1. Card de Status e Ações do Aluno -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Status & Ações</h5>
+
+                    <!-- Badge de Status -->
+                    <div class="mb-3">
+                        <span class="text-muted small d-block mb-2">Situação do Atendimento</span>
+                        <div>
+                            <?php
+                                $status = $aluno['status_aprovacao'];
+                                if ($status == 'PENDENTE') {
+                                    echo '<span class="badge bg-info text-dark px-3 py-2 rounded-pill fw-semibold">Aguardando Análise</span>';
+                                } elseif ($status == 'PENDENTE_CORRECAO') {
+                                    echo '<span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-semibold">Ajuste Solicitado</span>';
+                                } elseif ($status == 'APROVADO') {
+                                    echo '<span class="badge bg-success px-3 py-2 rounded-pill fw-semibold">Atendimento Aprovado</span>';
+                                } elseif ($status == 'REPROVADO') {
+                                    echo '<span class="badge bg-danger px-3 py-2 rounded-pill fw-semibold">Solicitação Recusada</span>';
+                                } else {
+                                    echo '<span class="badge bg-secondary px-3 py-2 rounded-pill fw-semibold">Aluno Arquivado</span>';
+                                }
+                            ?>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação Contextuais -->
+                    <div class="d-grid gap-2 mt-3">
+                        <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC']) && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
+                            <form action="../../controllers/alunos/reativar.php" method="POST" class="d-grid" onsubmit="return confirm('Deseja realmente reativar este aluno?');">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                                <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
+                                <button type="submit" class="btn btn-success py-2 rounded-3 fw-semibold">
+                                    Reativar Aluno
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE_CORRECAO', 'REPROVADO'])): ?>
+                            <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning text-dark py-2 rounded-3 fw-semibold text-center">
+                                Ajustar Solicitação
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC', 'USUARIO_EDUCACAO_ESPECIAL']) && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
+                            <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-outline-primary py-2 rounded-3 fw-semibold text-center">
+                                Editar Cadastro
+                            </a>
+                        <?php endif; ?>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 2. Card de Responsável Legal -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Responsável Legal</h5>
+
+                    <div>
+                        <span class="text-muted small d-block">Nome do Responsável</span>
+                        <strong class="text-dark d-block mb-2"><?php echo htmlspecialchars($aluno['nome_responsavel'] ?: 'Não informado'); ?></strong>
+
+                        <span class="text-muted small d-block">CPF do Responsável</span>
+                        <span class="text-dark"><?php echo htmlspecialchars($cpfResponsavel ?: 'Não informado'); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Card de Histórico da Solicitação -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Histórico da Solicitação</h5>
+
+                    <div class="d-flex flex-column gap-3">
+                        <!-- 1. Envio / Cadastro -->
+                        <div class="p-3 rounded-3 bg-light border">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="text-dark small">Solicitação Enviada</strong>
+                                <span class="text-muted" style="font-size: 0.78rem;">
+                                    <?php echo !empty($aluno['data_cadastro']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_cadastro'])) : '-'; ?>
+                                </span>
+                            </div>
+                            <div class="small text-muted">
+                                Enviado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['cadastrado_por_nome'] ?: 'Equipe Escolar'); ?></strong>
+                                <?php if (!empty($aluno['cadastrado_por_cpf'])): ?>
+                                    <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['cadastrado_por_cpf'])); ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- 2. Deliberação / Parecer Técnico -->
+                        <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small">Atendimento Aprovado</strong>
+                                    <span class="text-muted" style="font-size: 0.78rem;">
+                                        <?php echo !empty($aluno['data_deliberacao']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])) : '-'; ?>
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    Aprovado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Educação Especial'); ?></strong>
+                                    <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
+                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                        <?php elseif ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO'): ?>
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small">Ajustes Solicitados</strong>
+                                    <span class="text-muted" style="font-size: 0.78rem;">
+                                        <?php echo !empty($aluno['data_deliberacao']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])) : '-'; ?>
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    Solicitado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Educação Especial'); ?></strong>
+                                    <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
+                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($aluno['motivo_reprovacao'])): ?>
+                                        <div class="mt-2 pt-2 border-top text-dark">
+                                            <strong class="d-block mb-1">Orientações de Correção:</strong>
+                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($aluno['motivo_reprovacao'])); ?></p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                        <?php elseif ($aluno['status_aprovacao'] === 'REPROVADO'): ?>
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small">Solicitação Recusada</strong>
+                                    <span class="text-muted" style="font-size: 0.78rem;">
+                                        <?php echo !empty($aluno['data_deliberacao']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])) : '-'; ?>
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    Recusado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Educação Especial'); ?></strong>
+                                    <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
+                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($aluno['motivo_reprovacao'])): ?>
+                                        <div class="mt-2 pt-2 border-top text-dark">
+                                            <strong class="d-block mb-1">Motivo:</strong>
+                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($aluno['motivo_reprovacao'])); ?></p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                        <?php elseif ($aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small">Aluno Arquivado</strong>
+                                    <span class="text-muted" style="font-size: 0.78rem;">
+                                        <?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    Arquivado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?: 'Usuário'); ?></strong>
+                                    <?php if (!empty($aluno['arquivado_por_cpf'])): ?>
+                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($aluno['motivo_arquivamento'])): ?>
+                                        <div class="mt-2 pt-2 border-top text-dark">
+                                            <strong class="d-block mb-1">Motivo:</strong>
+                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($aluno['motivo_arquivamento'])); ?></p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                        <?php else: ?>
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small">Em Análise Técnica</strong>
+                                    <span class="text-muted" style="font-size: 0.78rem;">Etapa atual</span>
+                                </div>
+                                <div class="small text-muted">
+                                    Aguardando deliberação da equipe da Educação Especial.
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
