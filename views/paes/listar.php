@@ -176,10 +176,12 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <div class="acoes-cell">
                                             <a href="visualizar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-primary" title="Ver Detalhes do PAE">Ver</a>
-                                            <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>                                                
+                                               <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir PAE"
                                                data-msg="Tem certeza que deseja excluir este PAE?">Excluir</a>
+                                             <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
