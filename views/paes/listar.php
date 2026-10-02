@@ -105,8 +105,8 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'salvo'): ?>
         <div class="alert alert-success">Profissional de Apoio Escolar salvo com sucesso.</div>
     <?php endif; ?>
-    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'excluido'): ?>
-        <div class="alert alert-success">PAE excluído com sucesso.</div>
+    <?php if (isset($_GET['msg']) && in_array($_GET['msg'], ['excluido', 'inativado'], true)): ?>
+        <div class="alert alert-success">PAE inativado. O histórico e os relatórios foram preservados.</div>
     <?php endif; ?>
     <?php if (!empty($_GET['erro'])): ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro'], ENT_QUOTES, 'UTF-8'); ?></div>
@@ -169,6 +169,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <th>Nome</th>
                             <th>CPF</th>
                             <th>Empresa</th>
+                            <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -179,22 +180,27 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars($pae['nome']); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></td>
                                     <td><?php echo htmlspecialchars($pae['empresa_nome'] ?? '-'); ?></td>
+                                    <td><?php echo $pae['ativo'] ? 'Ativo' : 'Inativo'; ?></td>
                                     <td>
                                         <div class="acoes-cell">
                                             <a href="visualizar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-primary" title="Ver Detalhes do PAE">Ver</a>
-                                            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>                                                
+                                            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+                                                <?php if ($pae['ativo']): ?>
                                                <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
-                                               title="Excluir PAE"
-                                               data-msg="Tem certeza que deseja excluir este PAE?">Excluir</a>
-                                             <?php endif; ?>
+                                               title="Inativar PAE"
+                                               data-msg="Tem certeza que deseja inativar este PAE?">Inativar</a>
+                                                <?php else: ?>
+                                                <a href="editar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-secondary" title="Editar ou reativar PAE">Editar</a>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Nenhum PAE encontrado.</td>
+                                <td colspan="5" class="text-center text-muted">Nenhum PAE encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
