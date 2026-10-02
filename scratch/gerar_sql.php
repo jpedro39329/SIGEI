@@ -1,0 +1,509 @@
+<?php
+// Script gerador do novo banco/sql.txt enriquecido e verídico
+$sql = <<<'SQL'
+DROP DATABASE IF EXISTS `sigei`;
+
+CREATE DATABASE `sigei`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
+USE `sigei`;
+
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+SET time_zone = '+00:00';
+
+SET FOREIGN_KEY_CHECKS = 0;
+SET UNIQUE_CHECKS = 0;
+
+START TRANSACTION;
+
+-- ============================================================
+-- TABELA: admin
+-- ============================================================
+CREATE TABLE `admin` (
+  `id_admin` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_admin`),
+  UNIQUE KEY `uk_admin_cpf` (`cpf`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `admin` (`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`) VALUES
+(1, 'Ricardo Augusto Nogueira', '83918234150', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: unidades_regionais
+-- ============================================================
+CREATE TABLE `unidades_regionais` (
+  `id_ure` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `uge` varchar(20) DEFAULT NULL,
+  `codigo` varchar(20) DEFAULT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_ure`),
+  UNIQUE KEY `uk_ure_codigo` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `unidades_regionais` (`id_ure`, `nome`, `uge`, `codigo`, `endereco`, `numero`, `bairro`, `municipio`, `cidade`, `cep`, `telefone`, `email`, `data_cadastro`) VALUES
+(1, 'Diretoria de Ensino de Bragança Paulista', '081240', 'DE-BP', 'Avenida José Gomes da Rocha Leão', '450', 'Centro', 'Bragança Paulista', 'Bragança Paulista', '12900-300', '(11) 4034-7100', 'debraganca@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(2, 'Diretoria de Ensino de Campinas Leste', '081350', 'DE-CL', 'Rua Barão de Jaguara', '1280', 'Centro', 'Campinas', 'Campinas', '13015-002', '(19) 3737-2500', 'decampinas@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(3, 'Diretoria de Ensino de Campinas Oeste', '081360', 'DE-CO', 'Rua Regente Feijó', '870', 'Centro', 'Campinas', 'Campinas', '13013-051', '(19) 3731-1800', 'decampinasoeste@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(4, 'Diretoria de Ensino de São José dos Campos', '081450', 'DE-SJC', 'Rua Euclides Miragaia', '525', 'Centro', 'São José dos Campos', 'São José dos Campos', '12245-820', '(12) 3925-1000', 'desjcampos@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(5, 'Diretoria de Ensino de Ribeirão Preto', '081560', 'DE-RP', 'Avenida Nove de Julho', '378', 'Higienópolis', 'Ribeirão Preto', 'Ribeirão Preto', '14015-170', '(16) 3605-1200', 'deribeiraopreto@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(6, 'Diretoria de Ensino de Santos', '081670', 'DE-SAN', 'Rua Guedes Coelho', '107', 'Encruzilhada', 'Santos', 'Santos', '11050-241', '(13) 3226-5500', 'desantos@educacao.sp.gov.br', '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: unidades_escolares
+-- ============================================================
+CREATE TABLE `unidades_escolares` (
+  `id_ue` int(11) NOT NULL AUTO_INCREMENT,
+  `cie` varchar(10) NOT NULL,
+  `ua` varchar(30) DEFAULT NULL,
+  `nome` varchar(150) NOT NULL,
+  `modalidade` varchar(100) DEFAULT 'Ensino Fundamental e Médio',
+  `tipo_ue` enum('ESCOLA','CRECHE','CENTRO_EDUCACIONAL') NOT NULL DEFAULT 'ESCOLA',
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `id_ure` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_ue`),
+  UNIQUE KEY `uk_ue_cie` (`cie`),
+  KEY `fk_ue_ure` (`id_ure`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `unidades_escolares` (`id_ue`, `cie`, `ua`, `nome`, `modalidade`, `tipo_ue`, `endereco`, `numero`, `bairro`, `municipio`, `cidade`, `cep`, `telefone`, `email`, `id_ure`, `ativo`, `data_cadastro`) VALUES
+(1, '012489', '41250', 'EE Cásper Líbero', 'Ensino Fundamental Anos Finais e Médio', 'ESCOLA', 'Rua Alziro de Oliveira', '120', 'Jardim Cerejeiras', 'Atibaia', 'Atibaia', '12951-240', '(11) 4412-3040', 'ee.casperlibero@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(2, '012502', '41255', 'EE Professor José Fernando Paschoal', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua Maestro Danzi', '55', 'Vila Municipal', 'Bragança Paulista', 'Bragança Paulista', '12908-120', '(11) 4033-8822', 'ee.josefernando@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(3, '012514', '41260', 'EE Silvio de Almeida', 'Ensino Médio Integral', 'ESCOLA', 'Rua Coronel Leme', '420', 'Centro', 'Bragança Paulista', 'Bragança Paulista', '12900-220', '(11) 4034-0199', 'ee.silvioalmeida@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(4, '012526', '41265', 'EE Major Juvenal Alvim', 'Ensino Fundamental Anos Iniciais e Finais', 'ESCOLA', 'Praça Guilherme Gonçalves', '100', 'Centro', 'Atibaia', 'Atibaia', '12940-020', '(11) 4411-2010', 'ee.juvenalalvim@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(5, '013401', '42100', 'EE Carlos Gomes', 'Ensino Fundamental e Médio', 'ESCOLA', 'Avenida Anchieta', '200', 'Centro', 'Campinas', 'Campinas', '13015-100', '(19) 3231-5088', 'ee.carlosgomes@educacao.sp.gov.br', 2, 1, '2026-09-24 09:00:00'),
+(6, '013415', '42110', 'EE Professor Milton da Silva Rodrigues', 'Ensino Médio e Técnico', 'ESCOLA', 'Rua Culto à Ciência', '310', 'Botafogo', 'Campinas', 'Campinas', '13020-060', '(19) 3232-7744', 'ee.miltonrodrigues@educacao.sp.gov.br', 2, 1, '2026-09-24 09:00:00'),
+(7, '013428', '42125', 'EE Adalberto Nascimento', 'Ensino Fundamental Anos Finais', 'ESCOLA', 'Rua Mogi Guaçu', '850', 'Chácara da Barra', 'Campinas', 'Campinas', '13090-605', '(19) 3251-1120', 'ee.adalbertonascimento@educacao.sp.gov.br', 3, 1, '2026-09-24 09:00:00'),
+(8, '014502', '43200', 'EE Nelson do Nascimento Monteiro', 'Ensino Fundamental e Médio', 'ESCOLA', 'Avenida Andrômeda', '1400', 'Jardim Satélite', 'São José dos Campos', 'São José dos Campos', '12230-001', '(12) 3931-4050', 'ee.nelsonmonteiro@educacao.sp.gov.br', 4, 1, '2026-09-24 09:00:00'),
+(9, '015603', '44100', 'EE Professor Alberto Santos Dumont', 'Ensino Médio Regular', 'ESCOLA', 'Rua Saldanha Marinho', '980', 'Centro', 'Ribeirão Preto', 'Ribeirão Preto', '14010-060', '(16) 3625-3311', 'ee.santosdumont@educacao.sp.gov.br', 5, 1, '2026-09-24 09:00:00'),
+(10, '016704', '45150', 'EE Barnabé', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua Marechal Pego Júnior', '15', 'Encruzilhada', 'Santos', 'Santos', '11050-080', '(13) 3221-7890', 'ee.barnabe@educacao.sp.gov.br', 6, 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: empresas
+-- ============================================================
+CREATE TABLE `empresas` (
+  `id_empresa` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `cnpj` varchar(18) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `numero_contrato` varchar(100) DEFAULT NULL,
+  `data_inicio_contrato` date DEFAULT NULL,
+  `data_fim_contrato` date DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_empresa`),
+  UNIQUE KEY `uk_empresa_cnpj` (`cnpj`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `empresas` (`id_empresa`, `nome`, `cnpj`, `endereco`, `numero`, `bairro`, `municipio`, `cep`, `telefone`, `email`, `numero_contrato`, `data_inicio_contrato`, `data_fim_contrato`, `contrato_arquivo`, `ativo`, `data_cadastro`) VALUES
+(1, 'Plena Serviços de Apoio Escolar Ltda.', '70.430.408/0001-89', 'Rua Coronel Teófilo Leme', '845', 'Centro', 'Bragança Paulista', '12900-005', '(11) 4034-2187', 'contato@plenaservicos.com.br', 'CTR-014/2026', '2026-01-15', '2026-12-31', 'uploads/contratos/contrato_plena_servicos_ctr014_2026.pdf', 1, '2026-09-24 09:00:00'),
+(2, 'Inova Apoio Educacional Especializado S/A', '86.034.389/0001-01', 'Avenida Francisco Glicério', '1520', 'Guanabara', 'Campinas', '13012-100', '(19) 3232-4411', 'atendimento@inovaapoio.com.br', 'CTR-029/2026', '2026-02-01', '2027-01-31', NULL, 1, '2026-09-24 09:00:00'),
+(3, 'Integração Apoio e Cuidados Inclusivos Ltda.', '54.128.963/0001-44', 'Rua Rubião Júnior', '340', 'Centro', 'São José dos Campos', '12210-180', '(12) 3941-8890', 'contato@integracaoapoio.com.br', 'CTR-038/2026', '2026-03-01', '2027-02-28', NULL, 1, '2026-09-24 09:00:00'),
+(4, 'Viver Bem Serviços Educacionais Terceirizados', '41.879.320/0001-62', 'Avenida Senador Feijó', '405', 'Vila Mathias', 'Santos', '11015-505', '(13) 3224-6010', 'administracao@viverbemapoio.com.br', 'CTR-042/2026', '2026-01-01', '2026-12-31', NULL, 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: empresa_ure
+-- ============================================================
+CREATE TABLE `empresa_ure` (
+  `id_empresa` int(11) NOT NULL,
+  `id_ure` int(11) NOT NULL,
+  PRIMARY KEY (`id_empresa`,`id_ure`),
+  KEY `fk_empresa_ure_ure` (`id_ure`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `empresa_ure` (`id_empresa`, `id_ure`) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3),
+(3, 4),
+(3, 5),
+(4, 6);
+
+-- ============================================================
+-- TABELA: seduc
+-- ============================================================
+CREATE TABLE `seduc` (
+  `id_seduc` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `setor` varchar(100) DEFAULT NULL,
+  `cargo` varchar(100) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_seduc`),
+  UNIQUE KEY `uk_seduc_cpf` (`cpf`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `seduc` (`id_seduc`, `nome`, `cpf`, `senha`, `email`, `telefone`, `setor`, `cargo`, `ativo`, `data_cadastro`) VALUES
+(1, 'Mariana Siqueira Fontes', '30483697834', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'mariana.fontes@educacao.sp.gov.br', '11981245566', 'Coordenadoria Pedagógica (COPED)', 'Especialista em Educação Especial', 1, '2026-09-24 09:00:00'),
+(2, 'Carlos Alberto Guimarães', '49281734890', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'carlos.guimaraes@educacao.sp.gov.br', '11982334455', 'Departamento de Contratos e Convênios', 'Diretor de Fiscalização de Contratos', 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_ure (Sem a coluna telefone conforme padrão)
+-- ============================================================
+CREATE TABLE `usuarios_ure` (
+  `id_usuario_ure` int(11) NOT NULL AUTO_INCREMENT,
+  `id_ure` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `setor` enum('ASURE','SEFISC','EDU_ESPECIAL','GABINETE') NOT NULL,
+  `cargo` varchar(100) DEFAULT NULL,
+  `nivel_acesso` int(11) DEFAULT 1,
+  `email` varchar(150) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_ure`),
+  UNIQUE KEY `uk_ure_user_cpf` (`cpf`),
+  KEY `fk_usuario_ure_ure` (`id_ure`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_ure` (`id_usuario_ure`, `id_ure`, `nome`, `cpf`, `senha`, `setor`, `cargo`, `nivel_acesso`, `email`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Eduardo Pinheiro de Moraes', '38897933980', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'GABINETE', 'Dirigente Regional de Ensino', 3, 'eduardo.moraes@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(2, 1, 'Beatriz Vasconcelos Lima', '08905621058', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'ASURE', 'Assistente Técnico de URE', 2, 'beatriz.vasconcelos@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(3, 1, 'Rodrigo Mendes Cavalcante', '16973929460', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'SEFISC', 'Supervisor de Fiscalização de Contratos', 2, 'rodrigo.cavalcante@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(4, 1, 'Luciana Cristina Campos', '34568254639', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'SEFISC', 'Oficial Administrativo', 1, 'luciana.campos@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(5, 1, 'Camila Fernanda Moreira', '06974141246', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Professor Especialista em Currículo', 2, 'camila.moreira@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(6, 1, 'André Luiz Barbosa', '68017529520', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Auxiliar Administrativo', 1, 'andre.barbosa@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(7, 2, 'Valéria Toledo de Castro', '52819034912', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'GABINETE', 'Dirigente Regional de Ensino', 3, 'valeria.castro@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(8, 2, 'Renato Faria Alencar', '29384719203', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'ASURE', 'Assistente Técnico de URE', 2, 'renato.alencar@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(9, 2, 'Helena Rios Peixoto', '18293049182', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Professor Especialista em Currículo', 2, 'helena.peixoto@educacao.sp.gov.br', 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_supervisor
+-- ============================================================
+CREATE TABLE `usuarios_supervisor` (
+  `id_usuario_supervisor` int(11) NOT NULL AUTO_INCREMENT,
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_supervisor`),
+  UNIQUE KEY `uk_sup_cpf` (`cpf`),
+  KEY `fk_supervisor_empresa` (`id_empresa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_supervisor` (`id_usuario_supervisor`, `id_empresa`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Marcelo Antunes Ribeiro', '57967958802', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'marcelo.ribeiro@plenaservicos.com.br', '(11) 97824-1590', 1, '2026-09-24 09:00:00'),
+(2, 2, 'Fernanda Helena Dias', '78673551030', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'fernanda.dias@inovaapoio.com.br', '(19) 98311-2200', 1, '2026-09-24 09:00:00'),
+(3, 3, 'Tiago Gonçalves Neves', '41298765432', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'tiago.neves@integracaoapoio.com.br', '(12) 99122-3344', 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_ue
+-- ============================================================
+CREATE TABLE `usuarios_ue` (
+  `id_usuario_ue` int(11) NOT NULL AUTO_INCREMENT,
+  `id_ue` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `cargo` enum('DIRETOR','VICE_DIRETOR','COORDENADOR','SECRETARIO','GOE') NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_usuario_ue`),
+  UNIQUE KEY `uk_ue_user_cpf` (`cpf`),
+  KEY `fk_usuario_ue` (`id_ue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_ue` (`id_usuario_ue`, `id_ue`, `nome`, `cpf`, `senha`, `cargo`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Patrícia Helena Prado', '85912099156', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'patricia.prado@educacao.sp.gov.br', '(11) 98341-6720', 1, '2026-09-24 09:00:00'),
+(2, 1, 'Lucas Vinícius Zanin', '65563428230', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'COORDENADOR', 'lucas.zanin@educacao.sp.gov.br', '(11) 97412-8935', 1, '2026-09-24 09:00:00'),
+(3, 2, 'Regina Célia Alcantara', '01630953458', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'regina.alcantara@educacao.sp.gov.br', '(11) 99321-4567', 1, '2026-09-24 09:00:00'),
+(4, 2, 'Marcos Vinícius Toledo', '03280936373', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'GOE', 'marcos.toledo@educacao.sp.gov.br', '(11) 98145-2390', 1, '2026-09-24 09:00:00'),
+(5, 3, 'Clarisse Bueno de Camargo', '31294857201', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'clarisse.camargo@educacao.sp.gov.br', '(11) 99876-1122', 1, '2026-09-24 09:00:00'),
+(6, 4, 'Jorge Luiz Antunes', '49182736450', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'VICE_DIRETOR', 'jorge.antunes@educacao.sp.gov.br', '(11) 98765-4321', 1, '2026-09-24 09:00:00'),
+(7, 5, 'Maria Teresa Mendonça', '71293846501', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'maria.mendonca@educacao.sp.gov.br', '(19) 99234-5678', 1, '2026-09-24 09:00:00'),
+(8, 6, 'Gustavo Henrique Pires', '82910394857', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'COORDENADOR', 'gustavo.pires@educacao.sp.gov.br', '(19) 98877-6655', 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: usuarios_pae
+-- ============================================================
+CREATE TABLE `usuarios_pae` (
+  `id_pae` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_pae`),
+  UNIQUE KEY `uk_pae_cpf` (`cpf`),
+  KEY `fk_pae_empresa` (`id_empresa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `usuarios_pae` (`id_pae`, `nome`, `cpf`, `senha`, `email`, `telefone`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`) VALUES
+(1, 'Aline Cristina Silveira', '92105689078', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'aline.silveira@plenaservicos.com.br', '(11) 98642-1098', NULL, 1, 1, '2026-09-24 09:00:00'),
+(2, 'Rafael Henrique Duarte', '89839629174', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'rafael.duarte@plenaservicos.com.br', '(11) 97519-3420', NULL, 1, 1, '2026-09-24 09:00:00'),
+(3, 'Juliana Mendes Ferraz', '67806795693', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'juliana.ferraz@inovaapoio.com.br', '(19) 98765-4321', NULL, 2, 1, '2026-09-24 09:00:00'),
+(4, 'Simone Aparecida Cunha', '51294837261', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'simone.cunha@plenaservicos.com.br', '(11) 99182-7364', NULL, 1, 1, '2026-09-24 09:00:00'),
+(5, 'Diego Rodrigues de Paula', '72381940562', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'diego.paula@inovaapoio.com.br', '(19) 99345-8761', NULL, 2, 1, '2026-09-24 09:00:00'),
+(6, 'Priscila Vasconcelos Prado', '83920194857', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'priscila.prado@integracaoapoio.com.br', '(12) 98112-9988', NULL, 3, 1, '2026-09-24 09:00:00');
+
+-- ============================================================
+-- TABELA: alunos
+-- ============================================================
+CREATE TABLE `alunos` (
+  `id_aluno` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) DEFAULT NULL,
+  `ra` varchar(30) DEFAULT NULL,
+  `turno_aula` enum('MANHÃ','TARDE','NOITE','INTEGRAL') DEFAULT NULL,
+  `genero` varchar(50) DEFAULT NULL,
+  `raca` varchar(50) DEFAULT NULL,
+  `municipio_nascimento` varchar(100) DEFAULT NULL,
+  `serie` varchar(50) DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `descricao_deficiencia` text DEFAULT NULL,
+  `descricao_cuidados` text DEFAULT NULL,
+  `nome_responsavel` varchar(150) DEFAULT NULL,
+  `cpf_responsavel` char(11) DEFAULT NULL,
+  `foto_arquivo` varchar(255) DEFAULT NULL,
+  `termo_responsabilidade_arquivo` varchar(255) DEFAULT NULL,
+  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','PENDENTE_CORRECAO','ARQUIVADO') DEFAULT 'PENDENTE',
+  `motivo_reprovacao` text DEFAULT NULL,
+  `motivo_arquivamento` text DEFAULT NULL,
+  `data_arquivamento` datetime DEFAULT NULL,
+  `arquivado_por_nome` varchar(150) DEFAULT NULL,
+  `arquivado_por_cpf` char(11) DEFAULT NULL,
+  `arquivado_por_perfil` varchar(50) DEFAULT NULL,
+  `id_ue` int(11) DEFAULT NULL,
+  `id_usuario_ue` int(11) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_aluno`),
+  KEY `fk_aluno_ue` (`id_ue`),
+  KEY `fk_aluno_usuario_ue` (`id_usuario_ue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`, `municipio_nascimento`, `serie`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `termo_responsabilidade_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `motivo_arquivamento`, `data_arquivamento`, `arquivado_por_nome`, `arquivado_por_cpf`, `arquivado_por_perfil`, `id_ue`, `id_usuario_ue`, `data_cadastro`) VALUES
+(1, 'Enzo Gabriel de Almeida', '06403706160', '112345678-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '6º ANO', '2014-04-12', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de mediação pedagógica contínua, suporte em momentos de sobrecarga sensorial e apoio na organização da rotina e transição de aulas.', 'Renata Cristina de Almeida', '10998616249', 'uploads/fotos/20260928141943_7be9c17807c9.jpg', 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, '2026-09-24 09:00:00'),
+(2, 'Sophia Helena Martins', '77184557000', '113987654-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-08-25', 'Paralisia Cerebral Espástica com diplegia motora (CID G80.1)', 'Usuária de cadeira de rodas; necessita de auxílio para locomoção pelo prédio escolar, uso de sanitários e transferências posturais.', 'Cláudia Martins da Silva', '19793723491', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 2, 3, '2026-09-24 09:00:00'),
+(3, 'Matheus Henrique Ramos', '74826774613', '114561239-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-11-03', 'Deficiência Intelectual Moderada associada a TDAH (CID F71 / F90)', 'Requer mediação direcionada na realização de atividades pedagógicas, supervisão durante intervalos e suporte nas relações sociais interpessoais.', 'Marcos Vinícius Ramos', '63942918544', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 2, 3, '2026-09-24 09:00:00'),
+(4, 'Laura Beatriz Santos', '62852031647', '115890234-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '6º ANO', '2014-02-18', 'Mielomeningocele com paraparesia e hidrocefalia corrigida (CID Q05)', 'Locomoção assistida com uso de andador infantil, necessidade de auxílio na higienização periódica e verificação de postura em sala.', 'Juliana dos Santos Ferraz', '97691385412', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, '2026-09-25 10:30:00'),
+(5, 'Cauã Felipe Nogueira', '53918274601', '116748291-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '9º ANO', '2011-06-14', 'Síndrome de Down com atraso motor e fonoaudiológico (CID Q90.9)', 'Suporte em atividades com motricidade fina, apoio na alimentação e estímulo à autonomia para participação em projetos coletivos.', 'Patrícia Nogueira Lopes', '48291049281', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', 'Favor anexar relatório neurológico atualizado com carimbo e assinatura legíveis do médico especialista.', NULL, NULL, NULL, NULL, NULL, 3, 5, '2026-09-26 14:15:00'),
+(6, 'Isabela Cristina Ferreira', '39182740592', '117829304-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Campinas', '1ª SÉRIE', '2010-09-20', 'Transtorno do Espectro Autista severo não verbal (CID F84.0)', 'Comunicação alternativa por pranchas pictográficas (PECS), suporte intensivo de contenção afetiva e mediação em tempo integral.', 'Marta Helena Ferreira', '31928401928', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, '2026-09-27 08:45:00'),
+(7, 'Felipe Gabriel Miranda', '81920394857', '118930491-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Campinas', '2ª SÉRIE', '2009-12-05', 'Déficit de atenção sem diagnóstico de deficiência comprovada por laudo', 'Solicitação submetida sem comprovação diagnóstica de elegibilidade para serviço de profissional de apoio escolar.', 'Sérgio Miranda Prado', '29384019283', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'O estudante não se enquadra nos critérios de elegibilidade para Profissional de Apoio Escolar conforme Deliberação CEE/SP e Instrução Normativa da SEDUC. Recomendado acompanhamento pedagógico via Sala de Recursos (AEE).', NULL, NULL, NULL, NULL, NULL, 6, 8, '2026-09-28 11:20:00'),
+(8, 'Beatriz Yasmin Oliveira', '48291039481', '119049281-SP', 'MANHÃ', 'FEMININO', 'PARDA', 'Bragança Paulista', '3ª SÉRIE', '2008-03-30', 'Paralisia Cerebral com monoparesia braquial direita (CID G80)', 'Estudante concluiu o Ensino Médio com êxito e autonomia estabelecida.', 'Tereza Cristina Oliveira', '58192039481', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Conclusão regular do Ensino Médio pelo estudante. Encerramento do ciclo de apoio escolar no SIGEI.', '2026-09-29 16:00:00', 'Eduardo Pinheiro de Moraes', '38897933980', 'DIRIGENTE', 3, 5, '2026-09-24 09:00:00'),
+(9, 'Lucas Gabriel da Silveira', '28190394812', '120192830-SP', 'INTEGRAL', 'MASCULINO', 'BRANCA', 'São José dos Campos', '1ª SÉRIE', '2010-05-18', 'Deficiência Visual - Baixa Visão Severa (CID H54.2)', 'Necessita de ampliação de materiais gráficos, suporte para locomoção em escadarias e espaços amplos, além de tecnologia assistiva.', 'Marilene da Silveira Costa', '69182039481', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 8, 1, '2026-09-28 09:30:00'),
+(10, 'Gabriela Medeiros Lima', '19283049182', '121928304-SP', 'MANHÃ', 'FEMININO', 'BRANCA', 'Ribeirão Preto', '8º ANO', '2012-07-22', 'Transtorno do Espectro Autista Nível 2 (CID F84.0)', 'Acompanhamento nas trocas de salas de aula, apoio alimentar e suporte pedagógico mediado.', 'Valquíria Medeiros Lima', '48192039482', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 9, 3, '2026-09-29 10:00:00');
+
+-- ============================================================
+-- TABELA: associacoes (Respeitando até 3 alunos por PAE)
+-- ============================================================
+CREATE TABLE `associacoes` (
+  `id_associacao` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
+  `id_pae` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_inicio` date NOT NULL,
+  `data_fim` date DEFAULT NULL,
+  PRIMARY KEY (`id_associacao`),
+  KEY `fk_associacao_aluno` (`id_aluno`),
+  KEY `fk_associacao_pae` (`id_pae`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `associacoes` (`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`, `data_fim`) VALUES
+(1, 1, 1, 1, '2026-09-24', NULL),
+(2, 2, 2, 1, '2026-09-24', NULL),
+(3, 3, 2, 1, '2026-09-24', NULL),
+(4, 6, 3, 1, '2026-09-27', NULL),
+(5, 9, 6, 1, '2026-09-28', NULL);
+
+-- ============================================================
+-- TABELA: laudos
+-- ============================================================
+CREATE TABLE `laudos` (
+  `id_laudo` int(11) NOT NULL AUTO_INCREMENT,
+  `id_aluno` int(11) NOT NULL,
+  `caminho_arquivo` varchar(255) NOT NULL,
+  `tipo` enum('LAUDO','DOCUMENTO') DEFAULT 'LAUDO',
+  `nome_arquivo` varchar(255) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_envio` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_laudo`),
+  KEY `fk_laudo_aluno` (`id_aluno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `laudos` (`id_laudo`, `id_aluno`, `caminho_arquivo`, `tipo`, `nome_arquivo`, `descricao`, `data_envio`) VALUES
+(1, 1, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico TEA - 2026', 'Avaliação neurológica com CID F84.0 confirmando necessidade de mediador escolar.', '2026-09-24 09:10:00'),
+(2, 1, 'uploads/laudos/20260928141943_05e0427c3da3.pdf', 'LAUDO', 'Avaliação Fonoaudiológica', 'Exame fonoaudiológico indicando necessidade de comunicação aumentativa.', '2026-09-24 09:12:00'),
+(3, 1, 'uploads/laudos/20260928141943_8f042e61df3e.pdf', 'DOCUMENTO', 'Certidão de Nascimento do Estudante', 'Documento de identificação civil civil complementar.', '2026-09-24 09:15:00'),
+(4, 2, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Fisiátrico - Paralisia Cerebral', 'Relatório ortopédico e fisiátrico apontando dependência de cadeira de rodas.', '2026-09-24 09:30:00'),
+(5, 3, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropsicológico - DI', 'Avaliação de funções cognitivas e inteligência global.', '2026-09-24 09:40:00'),
+(6, 6, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Psiquiátrico Infantil - TEA Não Verbal', 'Atestado médico circunstanciado indicando suporte de apoio contínuo.', '2026-09-27 09:00:00'),
+(7, 9, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Oftalmológico Baixa Visão', 'Exame acuidade visual comprovando baixa visão severa.', '2026-09-28 09:45:00');
+
+-- ============================================================
+-- TABELA: relatorios
+-- ============================================================
+CREATE TABLE `relatorios` (
+  `id_relatorio` int(11) NOT NULL AUTO_INCREMENT,
+  `id_associacao` int(11) NOT NULL,
+  `tipo` enum('DIARIO','MENSAL') NOT NULL,
+  `mes_competencia` varchar(7) DEFAULT NULL,
+  `descricao` text NOT NULL,
+  `conteudo` text DEFAULT NULL,
+  `arquivo_relatorio` varchar(255) DEFAULT NULL,
+  `status` enum('PENDENTE','ENVIADO','APROVADO','REJEITADO') DEFAULT 'ENVIADO',
+  `data_envio` datetime DEFAULT current_timestamp(),
+  `data_cadastro` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_relatorio`),
+  KEY `fk_relatorio_associacao` (`id_associacao`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `relatorios` (`id_relatorio`, `id_associacao`, `tipo`, `mes_competencia`, `descricao`, `conteudo`, `arquivo_relatorio`, `status`, `data_envio`, `data_cadastro`) VALUES
+(1, 1, 'DIARIO', '2026-09', 'O estudante participou com tranquilidade das atividades da manhã. Foi mediado na organização dos cadernos e na compreensão dos enunciados de Língua Portuguesa e História. Na hora do intervalo, lanchou adequadamente com auxílio e interagiu de forma positiva com os colegas de sala no pátio.', 'Relatório diário de rotina e acompanhamento escolar.', NULL, 'ENVIADO', '2026-09-25 12:15:00', '2026-09-25 12:15:00'),
+(2, 2, 'DIARIO', '2026-09', 'Suporte motor realizado com sucesso em todas as transferências necessárias. A estudante foi acompanhada até a sala de informática e o laboratório de ciências. Participou ativamente das tarefas em grupo com boa postura na cadeira de rodas.', 'Relatório diário de suporte motor e acessibilidade.', NULL, 'ENVIADO', '2026-09-25 17:30:00', '2026-09-25 17:30:00'),
+(3, 1, 'MENSAL', '2026-09', 'Evolução mensal extremamente satisfatória no mês de setembro. Observou-se redução significativa nos episódios de desorganização sensorial, maior autonomia na alimentação e avanço expressivo na socialização com os pares da turma.', 'Fechamento mensal de atendimento pedagógico inclusivo.', NULL, 'ENVIADO', '2026-09-30 16:45:00', '2026-09-30 16:45:00'),
+(4, 4, 'DIARIO', '2026-09', 'Acompanhamento na recepção e entrada da escola. Utilização das pranchas de comunicação alternativa para escolha de atividades. A estudante manteve-se focada e confortável durante todo o período da aula de artes.', 'Acompanhamento de aluna não verbal com comunicação alternativa.', NULL, 'ENVIADO', '2026-09-28 11:45:00', '2026-09-28 11:45:00'),
+(5, 5, 'DIARIO', '2026-09', 'Auxílio na adaptação e iluminação da bancada de estudo. O aluno utilizou os livros com fonte ampliada e participou da aula de matemática com apoio de lupa eletrônica.', 'Apoio em tecnologia assistiva e acessibilidade visual.', NULL, 'ENVIADO', '2026-09-29 15:20:00', '2026-09-29 15:20:00');
+
+-- ============================================================
+-- TABELA: termos_aceite
+-- ============================================================
+CREATE TABLE `termos_aceite` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `perfil` varchar(50) NOT NULL,
+  `ip` varchar(45) DEFAULT NULL,
+  `ip_usuario` varchar(45) DEFAULT NULL,
+  `data_aceite` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ============================================================
+-- TABELA: notificacoes_lidas
+-- ============================================================
+CREATE TABLE `notificacoes_lidas` (
+  `id_leitura` int(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` int(11) NOT NULL,
+  `perfil` varchar(50) NOT NULL,
+  `notificacao_key` varchar(100) NOT NULL,
+  `data_leitura` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_leitura`),
+  UNIQUE KEY `uk_notif_lida` (`id_usuario`,`perfil`,`notificacao_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ============================================================
+-- TABELA: recuperacao_senha
+-- ============================================================
+CREATE TABLE `recuperacao_senha` (
+  `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo_perfil` varchar(50) NOT NULL,
+  `id_referencia` int(11) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `codigo` char(6) NOT NULL,
+  `tipo_contato` enum('EMAIL','TELEFONE') NOT NULL,
+  `contato` varchar(150) NOT NULL,
+  `expira_em` datetime NOT NULL,
+  `usado` tinyint(1) DEFAULT 0,
+  `data_criacao` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_recuperacao`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ============================================================
+-- FOREIGN KEYS
+-- ============================================================
+ALTER TABLE `alunos`
+  ADD CONSTRAINT `fk_aluno_ue` FOREIGN KEY (`id_ue`) REFERENCES `unidades_escolares` (`id_ue`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_aluno_usuario_ue` FOREIGN KEY (`id_usuario_ue`) REFERENCES `usuarios_ue` (`id_usuario_ue`) ON UPDATE CASCADE;
+
+ALTER TABLE `associacoes`
+  ADD CONSTRAINT `fk_associacao_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_associacao_pae` FOREIGN KEY (`id_pae`) REFERENCES `usuarios_pae` (`id_pae`) ON UPDATE CASCADE;
+
+ALTER TABLE `empresa_ure`
+  ADD CONSTRAINT `fk_empresa_ure_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_empresa_ure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`) ON DELETE CASCADE;
+
+ALTER TABLE `laudos`
+  ADD CONSTRAINT `fk_laudo_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`) ON DELETE CASCADE;
+
+ALTER TABLE `relatorios`
+  ADD CONSTRAINT `fk_relatorio_associacao` FOREIGN KEY (`id_associacao`) REFERENCES `associacoes` (`id_associacao`) ON DELETE CASCADE;
+
+ALTER TABLE `unidades_escolares`
+  ADD CONSTRAINT `fk_ue_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
+
+ALTER TABLE `usuarios_pae`
+  ADD CONSTRAINT `fk_pae_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON UPDATE CASCADE;
+
+ALTER TABLE `usuarios_supervisor`
+  ADD CONSTRAINT `fk_supervisor_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON UPDATE CASCADE;
+
+ALTER TABLE `usuarios_ue`
+  ADD CONSTRAINT `fk_usuario_ue` FOREIGN KEY (`id_ue`) REFERENCES `unidades_escolares` (`id_ue`);
+
+ALTER TABLE `usuarios_ure`
+  ADD CONSTRAINT `fk_usuario_ure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
+
+-- ============================================================
+-- TRIGGER: máximo de 3 alunos ativos por PAE
+-- ============================================================
+DELIMITER $$
+CREATE TRIGGER `trg_limite_pae`
+BEFORE INSERT ON `associacoes`
+FOR EACH ROW
+BEGIN
+    DECLARE qtd INT DEFAULT 0;
+    IF NEW.ativo = 1 THEN
+        SELECT COUNT(*) INTO qtd
+        FROM associacoes
+        WHERE id_pae = NEW.id_pae AND ativo = 1;
+        IF qtd >= 3 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Este PAE já possui o limite de 3 alunos ativos.';
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+COMMIT;
+
+SET UNIQUE_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 1;
+SQL;
+
+file_put_contents(__DIR__ . '/../../banco/sql.txt', $sql);
+echo "Arquivo banco/sql.txt atualizado com sucesso! (" . strlen($sql) . " bytes)\n";
