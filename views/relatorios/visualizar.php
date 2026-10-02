@@ -101,7 +101,7 @@ if ($userPerfil === 'PAE') {
                 <div class="col-md-6">
                     <div class="p-3 bg-light rounded border">
                         <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Profissional & Empresa</h6>
-                        <div class="mb-2"><span class="text-muted small d-block">Profissional (PAE):</span> <strong><?php echo htmlspecialchars($relatorio['pae_nome']); ?></strong></div>
+                        <div class="mb-2"><span class="text-muted small d-block">Profissional de Apoio Escolar:</span> <strong><?php echo htmlspecialchars($relatorio['pae_nome']); ?></strong></div>
                         <div class="mb-2"><span class="text-muted small d-block">CPF:</span> <span><?php echo htmlspecialchars(formatarCPF($relatorio['pae_cpf'])); ?></span></div>
                         <div class="mb-0"><span class="text-muted small d-block">Empresa:</span> <span><?php echo htmlspecialchars($relatorio['empresa_nome'] ?? '-'); ?></span></div>
                     </div>
