@@ -118,8 +118,7 @@ $dataHoje = date('Y-m-d');
 
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
                         <div>
-                            <h2 class="mb-1">Nova Associação PAE ↔ Aluno</h2>
-                            <p class="text-muted mb-0">Vincule um profissional de apoio escolar a um aluno sem atendimento ativo.</p>
+                            <h2 class="mb-0">Nova Associação</h2>
                         </div>
                         <a href="gerenciar.php" class="btn btn-secondary btn-sm">Voltar</a>
                     </div>
@@ -135,24 +134,23 @@ $dataHoje = date('Y-m-d');
 
                         <!-- 1. Seleção do Profissional de Apoio (PAE) -->
                         <div class="mb-4">
-                            <label class="form-label">Profissional de Apoio Escolar (PAE) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Profissional de Apoio Escolar (PAE) <span class="text-danger">*</span></label>
                             <select name="id_pae" id="selectPae" class="form-select" required>
                                 <option value="">-- Selecione o profissional de apoio --</option>
                                 <?php foreach ($paesDisponiveis as $pae): ?>
                                     <option value="<?php echo $pae['id_pae']; ?>" <?php echo ($preIdPae === (int)$pae['id_pae']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($pae['nome']); ?> — <?php echo htmlspecialchars($pae['empresa_nome'] ?: 'Sem empresa'); ?> (<?php echo $pae['qtd_alunos']; ?>/3 alunos vinculados)
+                                        <?php echo htmlspecialchars($pae['nome']); ?> — <?php echo htmlspecialchars($pae['empresa_nome'] ?: 'Sem empresa'); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <small class="text-muted d-block mt-1">Limite do cuidador: cada PAE pode atender no máximo 3 alunos simultaneamente.</small>
                         </div>
 
                         <!-- 2. Pesquisa e Seleção do Aluno -->
                         <div class="mb-4">
-                            <label class="form-label">Aluno da Rede Estadual <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Aluno <span class="text-danger">*</span></label>
                             
                             <div class="aluno-busca-wrapper">
-                                <input type="text" id="inputBuscaAluno" class="form-control" placeholder="Pesquisar aluno por nome, CPF ou escola..." autocomplete="off">
+                                <input type="text" id="inputBuscaAluno" class="form-control" placeholder="Pesquisar aluno por nome, CPF ou escola..." autocomplete="off" maxlength="150">
                                 
                                 <div id="dropdownAlunos" class="aluno-dropdown-menu">
                                     <?php if (count($alunosDisponiveis) > 0): ?>
@@ -172,7 +170,7 @@ $dataHoje = date('Y-m-d');
                                             </div>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <div class="p-3 text-center text-muted small">Nenhum aluno aprovado sem PAE disponível no momento.</div>
+                                        <div class="p-3 text-center text-muted small">Nenhum aluno disponível para vínculo no momento.</div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -187,13 +185,6 @@ $dataHoje = date('Y-m-d');
                                     <button type="button" class="btn btn-outline-secondary btn-sm" id="btnAlterarAluno">Trocar Aluno</button>
                                 </div>
                             </div>
-                            <small class="text-muted d-block mt-1">Regra: apenas alunos aprovados e sem nenhum PAE vinculado podem ser selecionados.</small>
-                        </div>
-
-                        <!-- 3. Data de Início Automática -->
-                        <div class="mb-4">
-                            <label class="form-label">Data de Início do Atendimento</label>
-                            <input type="text" class="form-control" value="<?php echo date('d/m/Y'); ?> (Gerada automaticamente para hoje)" disabled>
                         </div>
 
                         <div class="d-flex gap-2 justify-content-end mt-4 pt-3 border-top">

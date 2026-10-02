@@ -49,14 +49,6 @@ if ($resultVerifica->num_rows > 0) {
 }
 
 $contratoArquivo = null;
-if (isset($_FILES['contrato_arquivo']) && $_FILES['contrato_arquivo']['error'] === UPLOAD_ERR_OK) {
-    $contratoArquivo = uploadArquivo($_FILES['contrato_arquivo'], 'contratos');
-
-    if ($contratoArquivo === false) {
-        header("Location: ../../views/paes/cadastrar.php?erro=" . urlencode("Erro ao enviar contrato. Envie PDF, JPG ou PNG de até 5MB."));
-        exit();
-    }
-}
 
 $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 

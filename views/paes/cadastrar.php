@@ -34,19 +34,21 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
         <div class="col-lg-8">
             <div class="card card-form">
                 <div class="card-body p-4">
-                    <h2 class="mb-2">Cadastrar Profissional de Apoio Escolar (PAE)</h2>
-                    <p class="text-muted mb-4">Olá, <?php echo htmlspecialchars($userName); ?> — preencha os dados do cuidador/PAE.</p>
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h2 class="mb-0">Cadastrar Profissional de Apoio Escolar (PAE)</h2>
+                        <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
+                    </div>
 
                     <?php if (isset($_GET['erro'])): ?>
                         <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro']); ?></div>
                     <?php endif; ?>
 
-                    <form action="../../controllers/paes/salvar.php" method="POST" enctype="multipart/form-data">
+                    <form action="../../controllers/paes/salvar.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Nome Completo</label>
-                                <input type="text" name="nome" class="form-control" placeholder="Ex.: Ana Paula da Silva" required>
+                                <input type="text" name="nome" class="form-control" maxlength="150" placeholder="Ex.: Ana Paula da Silva" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -75,12 +77,12 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="pae@empresa.com">
+                                <input type="email" name="email" class="form-control" maxlength="150" placeholder="pae@empresa.com">
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" placeholder="(11) 9999-3000">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" placeholder="(11) 9999-3000">
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -91,25 +93,20 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
                                 </select>
                             </div>
 
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Arquivo do Contrato de Trabalho (PDF, JPG, PNG)</label>
-                                <input type="file" name="contrato_arquivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                            </div>
-
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Senha</label>
-                                <input type="password" name="senha" id="senha" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                                <input type="password" name="senha" id="senha" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Confirmar Senha</label>
-                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" required>
+                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255" required>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-dark">Cadastrar PAE</button>
-                            <a href="listar.php" class="btn btn-secondary">Voltar</a>
+                        <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+                            <a href="listar.php" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Cadastrar PAE</button>
                         </div>
                     </form>
                 </div>

@@ -51,14 +51,14 @@ if ($novaSenha !== '') {
     }
     $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
     $stmt = $conexao->prepare(
-        "UPDATE usuarios_ure SET id_ure = ?, nome = ?, cpf = ?, cargo = ?, email = ?, telefone = ?, ativo = ?, senha = ? WHERE id_usuario_ure = ?"
+        "UPDATE usuarios_ure SET id_ure = ?, nome = ?, cpf = ?, cargo = ?, email = ?, ativo = ?, senha = ? WHERE id_usuario_ure = ?"
     );
-    $stmt->bind_param("isssssisi", $idUre, $nome, $cpf, $cargo, $email, $telefone, $ativo, $senhaHash, $idDirigente);
+    $stmt->bind_param("issssisi", $idUre, $nome, $cpf, $cargo, $email, $ativo, $senhaHash, $idDirigente);
 } else {
     $stmt = $conexao->prepare(
-        "UPDATE usuarios_ure SET id_ure = ?, nome = ?, cpf = ?, cargo = ?, email = ?, telefone = ?, ativo = ? WHERE id_usuario_ure = ?"
+        "UPDATE usuarios_ure SET id_ure = ?, nome = ?, cpf = ?, cargo = ?, email = ?, ativo = ? WHERE id_usuario_ure = ?"
     );
-    $stmt->bind_param("isssssii", $idUre, $nome, $cpf, $cargo, $email, $telefone, $ativo, $idDirigente);
+    $stmt->bind_param("issssii", $idUre, $nome, $cpf, $cargo, $email, $ativo, $idDirigente);
 }
 
 if ($stmt->execute()) {

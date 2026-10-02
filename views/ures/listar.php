@@ -64,8 +64,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Unidades Regionais de Ensino</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe e gerencie as UREs cadastradas.</p>
+            <h2 class="mb-0">Unidades Regionais de Ensino</h2>
         </div>
     </div>
 
@@ -85,7 +84,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -100,7 +99,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
                             <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Código UGE</option>
                             <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>Nome da URE</option>
-                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Endereço</option>
+                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Sede / Endereço</option>
                             <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>E-mail</option>
                         </select>
                     </div>
@@ -121,18 +120,16 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de UREs -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">UREs Cadastradas</h5>
+            <h5 class="mb-3">Unidades Regionais de Ensino</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>UGE</th>
-                            <th>Denominação da URE</th>
-                            <th>Endereço</th>
+                            <th>Cód. UGE</th>
+                            <th>Denominação</th>
+                            <th>Sede</th>
                             <th>Telefone</th>
-                            <th>Email</th>
-                            <th>Escolas</th>
-                            <th>Servidores</th>
+                            <th>E-mail</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -141,18 +138,15 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <?php foreach ($ures as $ure): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($ure['uge'] ?: 'N/D'); ?></td>
-                                    <td><strong><?php echo htmlspecialchars($ure['nome']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($ure['endereco'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($ure['nome']); ?></td>
+                                    <td><?php echo htmlspecialchars($ure['municipio'] ?: ($ure['endereco'] ?: '-')); ?></td>
                                     <td><?php echo htmlspecialchars(formatarTelefone($ure['telefone']) ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars($ure['email'] ?? '-'); ?></td>
-                                    <td><?php echo $ure['total_escolas']; ?></td>
-                                    <td><?php echo $ure['total_usuarios']; ?></td>
                                     <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $ure['id_ure']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            <a href="editar.php?id=<?php echo $ure['id_ure']; ?>" class="btn btn-sm btn-warning">Editar</a>
+                                        <div class="acoes-cell">
                                             <a href="../../controllers/ures/excluir.php?id=<?php echo $ure['id_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-danger btn-confirmar-exclusao"
+                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                               title="Excluir URE"
                                                data-msg="Tem certeza que deseja excluir esta URE?">Excluir</a>
                                         </div>
                                     </td>
@@ -160,7 +154,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center text-muted">Nenhuma URE cadastrada.</td>
+                                <td colspan="6" class="text-center text-muted">Nenhuma URE cadastrada.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

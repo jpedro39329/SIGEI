@@ -58,12 +58,12 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nome da Escola <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" placeholder="Ex.: EE Professor José Alves" required>
+                                <input type="text" name="nome" class="form-control" maxlength="150" placeholder="Ex.: EE Professor José Alves" required>
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Código CIE <span class="text-danger">*</span></label>
-                                <input type="text" name="cie" class="form-control font-monospace" maxlength="20" placeholder="Ex.: 123456" required>
+                                <input type="text" name="cie" class="form-control font-monospace" maxlength="10" placeholder="Ex.: 123456" required>
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -100,7 +100,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Horário de Funcionamento</label>
-                                <input type="text" name="horario_funcionamento" class="form-control" placeholder="Ex.: 07:00 às 17:00">
+                                <input type="text" name="horario_funcionamento" class="form-control" maxlength="100" placeholder="Ex.: 07:00 às 17:00">
                             </div>
 
                             <div class="col-12 mt-2">
@@ -109,17 +109,17 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Logradouro / Rua</label>
-                                <input type="text" name="rua" class="form-control" placeholder="Ex.: Av. São Paulo">
+                                <input type="text" name="rua" class="form-control" maxlength="255" placeholder="Ex.: Av. São Paulo">
                             </div>
 
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">Número</label>
-                                <input type="text" name="numero" class="form-control" placeholder="100">
+                                <input type="text" name="numero" class="form-control" maxlength="20" placeholder="100">
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Bairro</label>
-                                <input type="text" name="bairro" class="form-control" placeholder="Centro">
+                                <input type="text" name="bairro" class="form-control" maxlength="100" placeholder="Centro">
                             </div>
 
                             <div class="col-md-2 mb-3">
@@ -129,17 +129,17 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Cidade</label>
-                                <input type="text" name="cidade" class="form-control" value="Bragança Paulista">
+                                <input type="text" name="cidade" class="form-control" maxlength="100" value="Bragança Paulista">
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" placeholder="(11) 4034-1100">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" placeholder="(11) 4034-1100">
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">E-mail Institucional</label>
-                                <input type="email" name="email" class="form-control" placeholder="escola@educacao.sp.gov.br">
+                                <input type="email" name="email" class="form-control" maxlength="150" placeholder="escola@educacao.sp.gov.br">
                             </div>
                         </div>
 

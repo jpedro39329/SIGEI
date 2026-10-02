@@ -291,7 +291,7 @@
       <form class="login-form" action="../../controllers/auth/processa_esqueci_senha.php" method="POST">
         <div class="form-group">
           <label for="email">E-mail Cadastrado</label>
-          <input type="email" name="email" id="email" class="form-control" required placeholder="seu.email@exemplo.com">
+          <input type="email" name="email" id="email" class="form-control" maxlength="150" required placeholder="seu.email@exemplo.com">
         </div>
         
         <button type="submit" class="btn-login">Redefinir Senha</button>

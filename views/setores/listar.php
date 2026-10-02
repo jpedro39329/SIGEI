@@ -82,10 +82,9 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Servidores dos Setores da URE</h2>
-            <p class="text-muted">Gerenciamento de equipes (Assistência Técnica - ASURE, SEFISC e Educação Especial).</p>
+            <h2 class="mb-0">Cadastro de Usuários Serviços</h2>
         </div>
-        <a href="cadastrar.php" class="btn btn-primary">Cadastrar Servidor</a>
+        <a href="cadastrar.php" class="btn btn-primary btn-sm">Cadastrar Servidor</a>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cadastrado'): ?>
@@ -123,7 +122,6 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CPF</option>
                             <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Setor</option>
                             <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Cargo</option>
-                            <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status</option>
                         </select>
                     </div>
 
@@ -143,7 +141,7 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Servidores -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Servidores Registrados (<?php echo count($servidores); ?>)</h5>
+            <h5 class="mb-3">Servidores Cadastrados</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -152,8 +150,7 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <th>Setor</th>
                             <th>Cargo</th>
                             <th>CPF</th>
-                            <th>Regional</th>
-                            <th>Status</th>
+                            <th>Cód. UGE</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -161,7 +158,7 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($servidores) > 0): ?>
                             <?php foreach ($servidores as $s): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($s['nome']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($s['nome']); ?></td>
                                     <td>
                                         <?php if ($s['setor'] === 'ASURE' || $s['setor'] === 'GABINETE'): ?>
                                             ASURE
@@ -175,28 +172,20 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     </td>
                                     <td><?php echo htmlspecialchars($s['cargo'] ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($s['cpf'])); ?></td>
-                                    <td><?php echo htmlspecialchars($s['ure_nome']); ?></td>
+                                    <td><?php echo htmlspecialchars($s['ure_uge'] ?: 'N/D'); ?></td>
                                     <td>
-                                        <?php if ($s['ativo'] == 1): ?>
-                                            <span class="badge bg-success">Ativo</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Inativo</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $s['id_usuario_ure']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            <a href="editar.php?id=<?php echo $s['id_usuario_ure']; ?>" class="btn btn-sm btn-warning">Editar</a>
+                                        <div class="acoes-cell">
                                             <a href="../../controllers/setores/excluir.php?id=<?php echo $s['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-danger btn-confirmar-exclusao"
-                                               data-msg="Tem certeza que deseja excluir este servidor da regional?">Excluir</a>
+                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                               title="Excluir Servidor"
+                                               data-msg="Tem certeza que deseja excluir este usuário dos serviços da regional?">Excluir</a>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center text-muted">Nenhum servidor encontrado.</td>
+                                <td colspan="6" class="text-center text-muted">Nenhum servidor encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

@@ -55,8 +55,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Cadastrar Usuário da Escola</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro de novos usuários e vinculação às escolas (SEFISC).</p>
+            <h2 class="mb-0">Cadastrar Usuário da Escola</h2>
         </div>
         <a href="listar.php" class="btn btn-secondary">Voltar para a lista</a>
     </div>
@@ -78,7 +77,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Nome Completo</label>
-                        <input type="text" name="nome" class="form-control" placeholder="Ex.: Carlos da Silva" required>
+                        <input type="text" name="nome" class="form-control" maxlength="150" placeholder="Ex.: Carlos da Silva" required>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">CPF</label>
@@ -97,11 +96,11 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Email Institucional</label>
-                        <input type="email" name="email" class="form-control" placeholder="usuario@escola.sp.gov.br">
+                        <input type="email" name="email" class="form-control" maxlength="150" placeholder="usuario@escola.sp.gov.br">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Telefone</label>
-                        <input type="text" name="telefone" class="form-control" placeholder="(11) 9999-1000">
+                        <input type="text" name="telefone" class="form-control" maxlength="30" placeholder="(11) 9999-1000">
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Status</label>
@@ -112,11 +111,11 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Senha</label>
-                        <input type="password" name="senha" id="senha" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                        <input type="password" name="senha" id="senha" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Confirmar Senha</label>
-                        <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" required>
+                        <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255" required>
                     </div>
                 </div>
                 <div class="d-flex gap-2">

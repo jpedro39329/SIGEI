@@ -59,9 +59,6 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 <!-- DIRIGENTE / ASURE URE -->
                 <?php if ($userPerfil === 'DIRIGENTE') { ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Unidades Escolares</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'setores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/setores/listar.php">Servidores</a>
                     </li>
                     <li class="nav-item">

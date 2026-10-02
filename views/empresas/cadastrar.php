@@ -73,7 +73,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Razão Social / Nome Fantasia <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" placeholder="Ex.: Apoio Inclusivo Serviços Educacionais Ltda." required>
+                                <input type="text" name="nome" class="form-control" maxlength="200" placeholder="Ex.: Apoio Inclusivo Serviços Educacionais Ltda." required>
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -83,7 +83,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Número do Contrato / Edital</label>
-                                <input type="text" name="numero_contrato" class="form-control" placeholder="Ex.: CTR-001/2026">
+                                <input type="text" name="numero_contrato" class="form-control" maxlength="100" placeholder="Ex.: CTR-001/2026">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -104,12 +104,12 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" placeholder="(11) 4034-2001">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" placeholder="(11) 4034-2001">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="contato@empresa.com.br">
+                                <input type="email" name="email" class="form-control" maxlength="150" placeholder="contato@empresa.com.br">
                             </div>
 
                             <div class="col-12 mt-3">
@@ -118,17 +118,17 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Logradouro / Rua</label>
-                                <input type="text" name="endereco" class="form-control" placeholder="Ex.: Rua Comercial">
+                                <input type="text" name="endereco" class="form-control" maxlength="255" placeholder="Ex.: Rua Comercial">
                             </div>
 
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">Número</label>
-                                <input type="text" name="numero" class="form-control" placeholder="100">
+                                <input type="text" name="numero" class="form-control" maxlength="20" placeholder="100">
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Bairro</label>
-                                <input type="text" name="bairro" class="form-control" placeholder="Centro">
+                                <input type="text" name="bairro" class="form-control" maxlength="100" placeholder="Centro">
                             </div>
 
                             <div class="col-md-2 mb-3">
@@ -138,7 +138,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Cidade</label>
-                                <input type="text" name="municipio" class="form-control" placeholder="Ex.: Bragança Paulista">
+                                <input type="text" name="municipio" class="form-control" maxlength="100" placeholder="Ex.: Bragança Paulista">
                             </div>
 
                             <div class="col-12 mt-3">
@@ -147,7 +147,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 
                                 <div class="p-3 border rounded bg-light mb-3">
                                     <div class="mb-3">
-                                        <input type="text" id="filtroUre" class="form-control form-control-sm" placeholder="Pesquisar URE pelo nome ou código UGE...">
+                                        <input type="text" id="filtroUre" class="form-control form-control-sm" maxlength="100" placeholder="Pesquisar URE pelo nome ou código UGE...">
                                     </div>
 
                                     <div class="mb-3">

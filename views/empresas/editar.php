@@ -100,7 +100,7 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
 
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Razão Social / Nome Fantasia <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($empresa['nome']); ?>" required>
+                                <input type="text" name="nome" class="form-control" maxlength="200" value="<?php echo htmlspecialchars($empresa['nome']); ?>" required>
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -110,7 +110,7 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Número do Contrato / Edital</label>
-                                <input type="text" name="numero_contrato" class="form-control" value="<?php echo htmlspecialchars($empresa['numero_contrato'] ?? ''); ?>">
+                                <input type="text" name="numero_contrato" class="form-control" maxlength="100" value="<?php echo htmlspecialchars($empresa['numero_contrato'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -140,12 +140,12 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" value="<?php echo htmlspecialchars($empresa['telefone'] ?? ''); ?>">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" value="<?php echo htmlspecialchars($empresa['telefone'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($empresa['email'] ?? ''); ?>">
+                                <input type="email" name="email" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($empresa['email'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -162,17 +162,17 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
 
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Logradouro / Rua</label>
-                                <input type="text" name="endereco" class="form-control" value="<?php echo htmlspecialchars($empresa['endereco'] ?? ''); ?>">
+                                <input type="text" name="endereco" class="form-control" maxlength="255" value="<?php echo htmlspecialchars($empresa['endereco'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">Número</label>
-                                <input type="text" name="numero" class="form-control" value="<?php echo htmlspecialchars($empresa['numero'] ?? ''); ?>">
+                                <input type="text" name="numero" class="form-control" maxlength="20" value="<?php echo htmlspecialchars($empresa['numero'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Bairro</label>
-                                <input type="text" name="bairro" class="form-control" value="<?php echo htmlspecialchars($empresa['bairro'] ?? ''); ?>">
+                                <input type="text" name="bairro" class="form-control" maxlength="100" value="<?php echo htmlspecialchars($empresa['bairro'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-2 mb-3">
@@ -182,7 +182,7 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Cidade</label>
-                                <input type="text" name="municipio" class="form-control" value="<?php echo htmlspecialchars($empresa['municipio'] ?? ''); ?>">
+                                <input type="text" name="municipio" class="form-control" maxlength="100" value="<?php echo htmlspecialchars($empresa['municipio'] ?? ''); ?>">
                             </div>
 
                             <div class="col-12 mt-3">
@@ -191,7 +191,7 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
                                 
                                 <div class="p-3 border rounded bg-light mb-3">
                                     <div class="mb-3">
-                                        <input type="text" id="filtroUre" class="form-control form-control-sm" placeholder="Pesquisar URE pelo nome ou código UGE...">
+                                        <input type="text" id="filtroUre" class="form-control form-control-sm" maxlength="100" placeholder="Pesquisar URE pelo nome ou código UGE...">
                                     </div>
 
                                     <div class="mb-3">

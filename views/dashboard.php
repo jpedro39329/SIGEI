@@ -77,12 +77,28 @@ function totalDashboard($conexao, $sql) {
         ";
         $resultadoAlunos = mysqli_query($conexao, $sqlAlunos);
         $alunos = $resultadoAlunos ? mysqli_fetch_all($resultadoAlunos, MYSQLI_ASSOC) : [];
+        // Histórico de Crescimento / Cadastro por datas na Escola
+        $sqlHistEscola = "
+            SELECT DATE_FORMAT(a.data_cadastro, '%m/%Y') AS mes_ano, COUNT(*) AS total
+            FROM alunos a
+            WHERE a.id_ue = $idEscola
+            GROUP BY mes_ano
+            ORDER BY MIN(a.data_cadastro) ASC
+            LIMIT 6
+        ";
+        $resHistEscola = mysqli_query($conexao, $sqlHistEscola);
+        $dadosHistEscola = $resHistEscola ? mysqli_fetch_all($resHistEscola, MYSQLI_ASSOC) : [];
+        if (empty($dadosHistEscola)) {
+            $dadosHistEscola = [['mes_ano' => date('m/Y'), 'total' => ($alunosEmAtendimento + $alunosSemAtendimento + $alunosPendentes)]];
+        }
+        $labelsHistEscola = array_map(function($h) { return $h['mes_ano']; }, $dadosHistEscola);
+        $valoresHistEscola = array_map(function($h) { return (int) $h['total']; }, $dadosHistEscola);
         ?>
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Resumo dos alunos da escola</h5>
-                <canvas id="graficoEscola" height="100"></canvas>
+                <h5 class="mb-3">Crescimento de Alunos por Período (Datas)</h5>
+                <canvas id="graficoEscola" height="90"></canvas>
             </div>
         </div>
 
@@ -380,7 +396,9 @@ function totalDashboard($conexao, $sql) {
                                         <td><?php echo htmlspecialchars($sol['descricao_deficiencia']); ?></td>
                                         <td><?php echo !empty($sol['data_cadastro']) ? date('d/m/Y', strtotime($sol['data_cadastro'])) : '-'; ?></td>
                                         <td>
-                                            <a href="solicitacoes/analisar.php?id=<?php echo $sol['id_aluno']; ?>" class="btn btn-sm btn-info">Analisar</a>
+                                            <a href="solicitacoes/analisar.php?id=<?php echo $sol['id_aluno']; ?>" class="btn btn-action btn-action-view" title="Analisar Solicitação">
+                                                <i class="fa-solid fa-clipboard-check"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -488,10 +506,9 @@ function totalDashboard($conexao, $sql) {
 
         <?php
         $sqlAlunos = "
-            SELECT a.id_aluno, a.nome, a.descricao_deficiencia, ue.nome AS escola_nome
+            SELECT a.id_aluno, a.nome, a.cpf, a.descricao_deficiencia, a.descricao_cuidados
             FROM associacoes ass
             JOIN alunos a ON ass.id_aluno = a.id_aluno
-            LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
             WHERE ass.id_pae = $userId AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
             ORDER BY a.nome
         ";
@@ -499,30 +516,34 @@ function totalDashboard($conexao, $sql) {
         $alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
         ?>
 
-        <div class="cards mb-4">
-            <div class="card"><span class="text-muted">Meus Alunos Atendidos</span><strong><?php echo count($alunos); ?></strong></div>
-        </div>
-
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Meus Alunos Vinculados</h5>
-                    <a href="relatorios/listar.php" class="btn btn-primary btn-sm">Registrar Relatório</a>
+                    <h5 class="mb-0">Meus Alunos</h5>
+                    <a href="relatorios/listar.php" class="btn btn-primary btn-sm">Relatórios</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead><tr><th>Nome</th><th>Deficiência</th><th>Escola</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Deficiência</th>
+                                <th>Cuidados Necessários</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <?php if (count($alunos) > 0): ?>
                                 <?php foreach ($alunos as $aluno): ?>
                                     <tr>
-                                        <td><strong><?php echo htmlspecialchars($aluno['nome']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($aluno['nome']); ?></td>
+                                        <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
                                         <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
-                                        <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
+                                        <td><?php echo htmlspecialchars($aluno['descricao_cuidados'] ?: 'Não especificado'); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr><td colspan="3" class="text-center text-muted">Nenhum aluno associado no momento.</td></tr>
+                                <tr><td colspan="4" class="text-center text-muted">Nenhum aluno associado no momento.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -722,7 +743,7 @@ function totalDashboard($conexao, $sql) {
             FROM alunos
             GROUP BY mes_ano
             ORDER BY MIN(data_cadastro) ASC
-            LIMIT 6
+            LIMIT 12
         ";
         $resHistorico = mysqli_query($conexao, $sqlHistorico);
         $dadosHistorico = $resHistorico ? mysqli_fetch_all($resHistorico, MYSQLI_ASSOC) : [];
@@ -787,210 +808,274 @@ function totalDashboard($conexao, $sql) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
-// 1. Status de Atendimento dos Alunos (Barras)
+// 1. Status de Atendimento dos Alunos (Linhas)
 new Chart(document.getElementById('graficoStatusAlunos'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: ['Em Atendimento', 'Sem Atendimento', 'Pendentes'],
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosEmAtendimentoGeral; ?>, <?php echo $alunosSemAtendimentoGeral; ?>, <?php echo $alunosPendentesGeral; ?>],
-            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d']
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 
-// 2. Escolas por UGE (Barras)
+// 2. Escolas por UGE (Linhas)
 new Chart(document.getElementById('graficoEscolasUre'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: <?php echo json_encode($labelsUres); ?>,
         datasets: [{
             label: 'Escolas',
             data: <?php echo json_encode($valoresEscolasUre); ?>,
-            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1']
+            borderColor: '#1aa78d',
+            backgroundColor: 'rgba(26, 167, 141, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 
-// 3. PAEs por URE (Barras)
+// 3. PAEs por URE (Linhas)
 new Chart(document.getElementById('graficoPaesUre'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: <?php echo json_encode($labelsUres); ?>,
         datasets: [{
             label: 'PAEs Ativos',
             data: <?php echo json_encode($valoresPaesUre); ?>,
-            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1']
+            borderColor: '#2d6df0',
+            backgroundColor: 'rgba(45, 109, 240, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 
-// 4. Evolução de Alunos Cadastrados (Barras)
+// 4. Evolução de Alunos Cadastrados (Linhas)
 new Chart(document.getElementById('graficoEvolucao'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: <?php echo json_encode($labelsHistorico); ?>,
         datasets: [{
             label: 'Alunos Cadastrados',
             data: <?php echo json_encode($valoresHistorico); ?>,
-            backgroundColor: '#0038bb'
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 <?php endif; ?>
 
 <?php if ($userPerfil === 'DIRIGENTE'): ?>
-// 1. Status de Atendimento dos Alunos na Regional (Barras)
+// 1. Status de Atendimento dos Alunos na Regional (Linhas)
 new Chart(document.getElementById('graficoDirigenteStatus'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: ['Em Atendimento', 'Sem Atendimento', 'Pendentes'],
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosEmAtendimentoUre; ?>, <?php echo $alunosSemAtendimentoUre; ?>, <?php echo $alunosPendentesUre; ?>],
-            backgroundColor: ['#0038bb', '#1aa78d', '#7ab8ff']
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 
-// 2. Alunos por Escola na Regional (Barras)
+// 2. Alunos por Escola na Regional (Linhas)
 new Chart(document.getElementById('graficoDirigenteEscolas'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: <?php echo json_encode($labelsEscolasUre); ?>,
         datasets: [{
             label: 'Alunos',
             data: <?php echo json_encode($valoresEscolasUre); ?>,
-            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1', '#d7f5ef']
+            borderColor: '#1aa78d',
+            backgroundColor: 'rgba(26, 167, 141, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 
-// 3. Distribuição de Deficiências na Regional (Barras)
+// 3. Distribuição de Deficiências na Regional (Linhas)
 new Chart(document.getElementById('graficoDirigenteDeficiencias'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: <?php echo json_encode($labelsDef); ?>,
         datasets: [{
             label: 'Alunos',
             data: <?php echo json_encode($valoresDef); ?>,
-            backgroundColor: ['#0038bb', '#2d6df0', '#1aa78d', '#7ab8ff', '#92e4d1']
+            borderColor: '#2d6df0',
+            backgroundColor: 'rgba(45, 109, 240, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 
-// 4. Evolução de Alunos na Regional (Barras)
+// 4. Evolução de Alunos na Regional (Linhas)
 new Chart(document.getElementById('graficoDirigenteEvolucao'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: <?php echo json_encode($labelsHistUre); ?>,
         datasets: [{
             label: 'Alunos',
             data: <?php echo json_encode($valoresHistUre); ?>,
-            backgroundColor: '#0038bb'
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
     options: {
         responsive: true,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
     }
 });
 <?php endif; ?>
 
 <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
 new Chart(document.getElementById('graficoEscola'), {
-    type: 'bar',
+    type: 'line',
     data: {
-        labels: ['Em atendimento', 'Sem atendimento', 'Pendentes'],
+        labels: <?php echo json_encode($labelsHistEscola); ?>,
         datasets: [{
-            label: 'Alunos',
-            data: [<?php echo $alunosEmAtendimento; ?>, <?php echo $alunosSemAtendimento; ?>, <?php echo $alunosPendentes; ?>],
-            backgroundColor: ['#0038bb', '#1aa78d', '#7ab8ff']
+            label: 'Alunos Cadastrados',
+            data: <?php echo json_encode($valoresHistEscola); ?>,
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
+    }
 });
 <?php endif; ?>
 
 <?php if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL'): ?>
 new Chart(document.getElementById('graficoEducacao'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: ['Pendentes', 'Aprovados', 'Em Atendimento'],
         datasets: [{
             label: 'Alunos',
             data: [<?php echo $alunosPendentes; ?>, <?php echo $alunosAprovados; ?>, <?php echo $alunosEmAtendimento; ?>],
-            backgroundColor: ['#7ab8ff', '#1aa78d', '#0038bb']
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
+    }
 });
 <?php endif; ?>
 
 <?php if ($userPerfil === 'USUARIO_SEFISC'): ?>
 new Chart(document.getElementById('graficoSefisc'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: ['Alunos Aprovados', 'Solicitações Pendentes', 'Usuários de UE', 'PAEs na URE'],
         datasets: [{
             label: 'Total',
             data: [<?php echo $alunosAprovadosUre; ?>, <?php echo $alunosPendentesUre; ?>, <?php echo $totalUsuariosEscola; ?>, <?php echo $totalPaesUre; ?>],
-            backgroundColor: ['#0038bb', '#1aa78d', '#2d6df0', '#7ab8ff']
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
+    }
 });
 <?php endif; ?>
 
 <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
 new Chart(document.getElementById('graficoSupervisor'), {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: ['Total de PAEs', 'PAEs em Atendimento', 'Associações Ativas', 'Relatórios Enviados'],
         datasets: [{
             label: 'Total',
             data: [<?php echo $totalPAEs; ?>, <?php echo $paesAtendendo; ?>, <?php echo $totalAssocAtivas; ?>, <?php echo $totalRelatorios; ?>],
-            backgroundColor: ['#0038bb', '#1aa78d', '#2d6df0', '#7ab8ff']
+            borderColor: '#0038bb',
+            backgroundColor: 'rgba(0, 56, 187, 0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5
         }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } }
+    }
 });
 <?php endif; ?>
 </script>

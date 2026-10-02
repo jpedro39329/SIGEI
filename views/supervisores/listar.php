@@ -39,7 +39,7 @@ if ($busca !== '') {
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $sqlSupervisores = "
-    SELECT us.id_usuario_supervisor, us.nome, us.cpf, us.ativo,
+    SELECT us.id_usuario_supervisor, us.nome, us.cpf, us.ativo, us.email, us.telefone,
            e.nome AS empresa_nome
     FROM usuarios_supervisor us
     JOIN empresas e ON us.id_empresa = e.id_empresa
@@ -68,10 +68,8 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Supervisores de Licitações e Contratos</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro e gestão de supervisores das empresas.</p>
+            <h2 class="mb-0">Supervisores</h2>
         </div>
-        <a href="cadastrar.php" class="btn btn-primary">Novo Supervisor</a>
     </div>
 
     <?php if (isset($_GET['msg'])): ?>
@@ -96,7 +94,7 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -131,7 +129,7 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Supervisores -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Supervisores Cadastrados</h5>
+            <h5 class="mb-3">Supervisores</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -139,6 +137,9 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <th>Nome</th>
                             <th>CPF</th>
                             <th>Empresa</th>
+                            <th>Status</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -146,14 +147,28 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($supervisores) > 0): ?>
                             <?php foreach ($supervisores as $sup): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($sup['nome']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($sup['nome']); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($sup['cpf'])); ?></td>
                                     <td><?php echo htmlspecialchars($sup['empresa_nome']); ?></td>
                                     <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                        <?php if ($sup['ativo'] == 1): ?>
+                                            <span class="badge bg-success">Ativo</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Inativo</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($sup['email'] ?: '-'); ?></td>
+                                    <td><?php echo htmlspecialchars(formatarTelefone($sup['telefone']) ?: '-'); ?></td>
+                                    <td>
+                                        <div class="acoes-cell">
+                                            <a href="../../controllers/supervisores/inativar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                               class="btn btn-sm btn-outline-secondary"
+                                               title="<?php echo $sup['ativo'] == 1 ? 'Inativar Supervisor' : 'Ativar Supervisor'; ?>">
+                                                <?php echo $sup['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>
+                                            </a>
                                             <a href="../../controllers/supervisores/excluir.php?id=<?php echo $sup['id_usuario_supervisor']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-danger btn-confirmar-exclusao"
+                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                               title="Excluir Supervisor"
                                                data-msg="Tem certeza que deseja excluir este supervisor?">Excluir</a>
                                         </div>
                                     </td>
@@ -161,7 +176,7 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Nenhum supervisor encontrado.</td>
+                                <td colspan="7" class="text-center text-muted">Nenhum supervisor encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

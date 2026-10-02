@@ -106,9 +106,19 @@ $sqlCounts = "
 $resCounts = mysqli_query($conexao, $sqlCounts);
 $counts = $resCounts ? mysqli_fetch_assoc($resCounts) : ['total_todos' => 0, 'total_aprovados' => 0, 'total_pendentes' => 0, 'total_arquivados' => 0];
 
+$nomeUre = '';
+if ($idUreUsuario > 0) {
+    $resUre = mysqli_query($conexao, "SELECT nome FROM unidades_regionais WHERE id_ure = $idUreUsuario LIMIT 1");
+    if ($resUre && $rowU = mysqli_fetch_assoc($resUre)) {
+        $nomeUre = $rowU['nome'];
+    }
+}
+
 // Cláusula da aba selecionada
 $whereAba = $where;
-if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+if ($userPerfil === 'DIRIGENTE') {
+    // DIRIGENTE / ASURE vê tabela geral com todos os alunos
+} elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     $whereAba[] = "a.status_aprovacao = 'APROVADO'";
 } elseif ($abaAtiva === 'aprovados') {
     $whereAba[] = "a.status_aprovacao = 'APROVADO'";
@@ -144,8 +154,11 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Alunos da Educação Especial</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — consulta, acompanhamento e histórico de registros dos alunos.</p>
+            <?php if ($userPerfil === 'DIRIGENTE'): ?>
+                <h2 class="mb-0">Alunos da Unidade Regional de Ensino <?php echo htmlspecialchars($nomeUre ? $nomeUre : ''); ?></h2>
+            <?php else: ?>
+                <h2 class="mb-0">Alunos da Educação Especial</h2>
+            <?php endif; ?>
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -180,7 +193,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                 <input type="hidden" name="aba" value="<?php echo htmlspecialchars($abaAtiva); ?>">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -224,7 +237,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
     </div>
 
     <!-- Abas de Alunos -->
-    <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+    <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'DIRIGENTE'])): ?>
     <ul class="nav nav-tabs mb-3" id="alunosTabs">
         <li class="nav-item">
             <a class="nav-link fw-bold <?php echo ($abaAtiva === 'todos') ? 'active' : ''; ?>" href="listar.php?aba=todos<?php echo $busca !== '' ? '&busca=' . urlencode($busca) . '&tp_filtro=' . $tipoFiltro . '&campo_filtro=' . $campoFiltro : ''; ?>">
@@ -339,15 +352,15 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                     <?php endif; ?>
 
                                     <td>
-                                        <div class="d-flex gap-1 flex-wrap">
-                                            <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                        <div class="d-flex gap-1 flex-wrap align-items-center">
+                                            <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Ver</a>
 
                                             <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
-                                                <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Editar</a>
+                                                <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Aluno">Editar</a>
                                             <?php endif; ?>
 
                                             <?php if ($userPerfil == 'ADMIN' && $aluno['status_aprovacao'] == 'APROVADO'): ?>
-                                                <a href="../associacoes/gerenciar.php?aluno=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-primary">Associar Profissional</a>
+                                                <a href="../associacoes/gerenciar.php?aluno=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-info" title="Associar Profissional (PAE)">Associar</a>
                                             <?php endif; ?>
 
                                             <?php if ($podeArquivar && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
@@ -355,15 +368,15 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                                         class="btn btn-sm btn-outline-success btn-abrir-reativacao"
                                                         data-id="<?php echo $aluno['id_aluno']; ?>"
                                                         data-nome="<?php echo htmlspecialchars($aluno['nome']); ?>"
-                                                        title="Reativar aluno no sistema">
-                                                    <i class="bi bi-arrow-counterclockwise"></i> Reativar
+                                                        title="Reativar Aluno">
+                                                    Reativar
                                                 </button>
                                             <?php elseif ($podeArquivar && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-outline-danger btn-abrir-arquivamento"
+                                                        class="btn btn-sm btn-outline-secondary btn-abrir-arquivamento"
                                                         data-id="<?php echo $aluno['id_aluno']; ?>"
                                                         data-nome="<?php echo htmlspecialchars($aluno['nome']); ?>"
-                                                        title="Arquivar aluno sem excluir histórico">
+                                                        title="Arquivar Aluno">
                                                     Arquivar
                                                 </button>
                                             <?php endif; ?>
@@ -408,7 +421,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                         <label for="motivo_arquivamento" class="form-label small fw-semibold text-muted text-uppercase mb-1">
                             Motivo do arquivamento <span class="text-danger">*</span>
                         </label>
-                        <textarea class="form-control rounded-3" name="motivo_arquivamento" id="motivo_arquivamento" rows="3" placeholder="Ex.: Transferência de escola, conclusão de etapa ou encerramento..." required></textarea>
+                        <textarea class="form-control rounded-3" name="motivo_arquivamento" id="motivo_arquivamento" rows="3" maxlength="5000" placeholder="Ex.: Transferência de escola, conclusão de etapa ou encerramento..." required></textarea>
                     </div>
                 </div>
 

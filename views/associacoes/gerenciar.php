@@ -89,8 +89,7 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Associações PAE ↔ Aluno</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe os atendimentos e vincule profissionais aos alunos.</p>
+            <h2 class="mb-0">Associações</h2>
         </div>
 
         <a href="cadastrar.php" class="btn btn-primary">Nova Associação</a>
@@ -123,8 +122,8 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
                     <div class="col-md-3 col-sm-6 col-12">
                         <select class="form-select form-select-sm" name="campo_filtro">
                             <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
-                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Profissional de Apoio (PAE)</option>
-                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>Escola</option>
+                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Profissional de Apoio Escolar</option>
+                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>Unidade Escolar</option>
                             <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Alunos</option>
                         </select>
                     </div>
@@ -145,14 +144,14 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
     <!-- Tabela de Associações por Profissional de Apoio -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Profissionais com Alunos Vinculados</h5>
+            <h5 class="mb-3">Associações Ativas</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Profissional de Apoio (PAE)</th>
-                            <th>Escola</th>
-                            <th>Alunos Atendidos</th>
+                            <th>Profissional de Apoio Escolar</th>
+                            <th>Unidade Escolar</th>
+                            <th>Alunos atendidos</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -161,14 +160,16 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
                             <?php foreach ($listaPaes as $item): ?>
                                 <tr>
                                     <td>
-                                        <strong><?php echo htmlspecialchars($item['pae_nome']); ?></strong>
+                                        <?php echo htmlspecialchars($item['pae_nome']); ?>
                                     </td>
                                     <td><?php echo htmlspecialchars($item['escola_nome'] ?: '-'); ?></td>
                                     <td>
                                         <span><?php echo htmlspecialchars($item['alunos_nomes'] ?: '-'); ?></span>
                                     </td>
                                     <td>
-                                        <a href="visualizar.php?id=<?php echo $item['id_pae']; ?>" class="btn btn-sm btn-info">Visualizar</a>
+                                        <div class="acoes-cell">
+                                            <a href="visualizar.php?id=<?php echo $item['id_pae']; ?>" class="btn btn-sm btn-outline-primary" title="Ver Detalhes da Associação">Ver</a>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -177,6 +178,11 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
                                 <td colspan="4" class="text-center text-muted">Nenhuma associação ativa encontrada.</td>
                             </tr>
                         <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
                     </tbody>
                 </table>
             </div>

@@ -122,6 +122,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="text"
                                     name="nome"
                                     class="form-control"
+                                    maxlength="150"
                                     placeholder="Digite o nome completo do aluno"
                                     value="<?php echo htmlspecialchars($aluno['nome'] ?? ''); ?>"
                                     required
@@ -149,6 +150,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="text"
                                     name="ra"
                                     class="form-control"
+                                    maxlength="30"
                                     placeholder="Registro do aluno"
                                     value="<?php echo htmlspecialchars($aluno['ra'] ?? ''); ?>"
                                 >
@@ -200,6 +202,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="text"
                                     name="municipio_nascimento"
                                     class="form-control"
+                                    maxlength="100"
                                     placeholder="Ex.: Bragança Paulista"
                                     value="<?php echo htmlspecialchars($aluno['municipio_nascimento'] ?? ''); ?>"
                                     required
@@ -266,6 +269,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="text"
                                     name="deficiencia"
                                     class="form-control"
+                                    maxlength="5000"
                                     placeholder="Ex.: TEA - Transtorno do Espectro Autista"
                                     value="<?php echo htmlspecialchars($aluno['descricao_deficiencia'] ?? ''); ?>"
                                     required
@@ -286,6 +290,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="text"
                                     name="nome_responsavel"
                                     class="form-control"
+                                    maxlength="150"
                                     placeholder="Nome completo do responsável"
                                     value="<?php echo htmlspecialchars($aluno['nome_responsavel'] ?? ''); ?>"
                                 >
@@ -415,6 +420,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     name="observacoes"
                                     rows="4"
                                     class="form-control"
+                                    maxlength="5000"
                                     placeholder="Informe cuidados, necessidades de acompanhamento, adaptações etc."
                                 ><?php echo htmlspecialchars($aluno['descricao_cuidados'] ?? ''); ?></textarea>
                             </div>

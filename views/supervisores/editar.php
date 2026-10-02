@@ -62,7 +62,7 @@ $empresas = $resultEmpresas ? mysqli_fetch_all($resultEmpresas, MYSQLI_ASSOC) : 
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nome Completo <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($supervisor['nome']); ?>" required>
+                                <input type="text" name="nome" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($supervisor['nome']); ?>" required>
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -84,12 +84,12 @@ $empresas = $resultEmpresas ? mysqli_fetch_all($resultEmpresas, MYSQLI_ASSOC) : 
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">E-mail Institucional</label>
-                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($supervisor['email'] ?? ''); ?>">
+                                <input type="email" name="email" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($supervisor['email'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Telefone de Contato</label>
-                                <input type="text" name="telefone" class="form-control" value="<?php echo htmlspecialchars($supervisor['telefone'] ?? ''); ?>">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" value="<?php echo htmlspecialchars($supervisor['telefone'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -107,12 +107,12 @@ $empresas = $resultEmpresas ? mysqli_fetch_all($resultEmpresas, MYSQLI_ASSOC) : 
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nova Senha</label>
-                                <input type="password" name="nova_senha" id="senha" class="form-control" placeholder="Deixe em branco para manter a atual">
+                                <input type="password" name="nova_senha" id="senha" class="form-control" maxlength="255" placeholder="Deixe em branco para manter a atual">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Confirmar Nova Senha</label>
-                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" placeholder="Deixe em branco para manter a atual">
+                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255" placeholder="Deixe em branco para manter a atual">
                             </div>
                         </div>
 

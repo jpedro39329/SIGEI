@@ -96,8 +96,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
 <div class="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Solicitações</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe as solicitações de apoio escolar enviadas pela sua escola.</p>
+            <h2 class="mb-0">Solicitações</h2>
         </div>
         <a href="cadastrar.php" class="btn btn-primary">Nova solicitação</a>
     </div>
@@ -118,7 +117,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                 <div class="row g-2 align-items-center">
                     <!-- 1. Campo para digitar -->
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <!-- 2. Tipo (Contém / Igual a) -->
@@ -206,7 +205,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><span class="badge bg-info text-dark">Em Análise</span></td>
                                             <td><?php echo !empty($aluno['data_cadastro']) ? date('d/m/Y', strtotime($aluno['data_cadastro'])) : '-'; ?></td>
                                             <td>
-                                                <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                                <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Ver</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -250,13 +249,13 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><span class="badge bg-warning text-dark">Ajuste Solicitado</span></td>
                                             <td><span class="text-warning-emphasis"><?php echo htmlspecialchars($aluno['motivo_reprovacao'] ?? '-'); ?></span></td>
                                             <td>
-                                                <div class="d-flex gap-1">
-                                                    <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Ajustar</a>
+                                                <div class="d-flex gap-1 align-items-center">
+                                                    <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Ver</a>
+                                                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-warning" title="Ajustar Solicitação">Ajustar</a>
                                                     <form action="../../controllers/alunos/reenviar.php" method="POST" class="d-inline">
                                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                         <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-primary" title="Reenviar solicitação para análise">Reenviar</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-info" title="Reenviar solicitação para análise">Reenviar</button>
                                                     </form>
                                                 </div>
                                             </td>
@@ -302,13 +301,13 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><span class="badge bg-danger">Reprovado</span></td>
                                             <td><span class="text-danger"><?php echo htmlspecialchars($aluno['motivo_reprovacao'] ?? '-'); ?></span></td>
                                             <td>
-                                                <div class="d-flex gap-1">
-                                                    <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-warning">Ajustar</a>
+                                                <div class="d-flex gap-1 align-items-center">
+                                                    <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Ver</a>
+                                                    <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-warning" title="Ajustar e Reenviar">Ajustar</a>
                                                     <form action="../../controllers/alunos/reenviar.php" method="POST" class="d-inline">
                                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                         <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-primary">Reenviar</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-info" title="Reenviar para análise">Reenviar</button>
                                                     </form>
                                                 </div>
                                             </td>

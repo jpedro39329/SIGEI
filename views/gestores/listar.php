@@ -75,8 +75,7 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Gestores - ASURE</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — cadastro e acompanhamento dos servidores da assessoria regional (ASURE).</p>
+            <h2 class="mb-0">Gestores Regionais</h2>
         </div>
         <a href="cadastrar.php" class="btn btn-primary">Novo Servidor</a>
     </div>
@@ -101,7 +100,7 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -116,7 +115,7 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
                             <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
                             <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CPF</option>
-                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>URE</option>
+                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Cód. UGE</option>
                             <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>E-mail</option>
                             <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status</option>
                         </select>
@@ -138,7 +137,7 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Dirigentes -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Servidores ASURE Cadastrados</h5>
+            <h5 class="mb-3">Servidores Assistência Técnica</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -146,9 +145,9 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <th>Nome</th>
                             <th>Cargo</th>
                             <th>CPF</th>
-                            <th>URE Vinculada</th>
-                            <th>Email</th>
+                            <th>Cód. UGE</th>
                             <th>Status</th>
+                            <th>E-mail</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -156,11 +155,10 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($gestores) > 0): ?>
                             <?php foreach ($gestores as $dir): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($dir['nome']); ?></strong></td>
-                                    <td><span class="badge bg-secondary"><?php echo htmlspecialchars($dir['cargo'] ?: 'Assistente Técnico'); ?></span></td>
+                                    <td><?php echo htmlspecialchars($dir['nome']); ?></td>
+                                    <td><?php echo htmlspecialchars($dir['cargo'] ?: 'Assistente Técnico'); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($dir['cpf'])); ?></td>
-                                    <td><?php echo htmlspecialchars($dir['ure_nome']); ?></td>
-                                    <td><?php echo htmlspecialchars($dir['email'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($dir['ure_uge'] ?: 'N/D'); ?></td>
                                     <td>
                                         <?php if ($dir['ativo'] == 1): ?>
                                             <span class="badge bg-success">Ativo</span>
@@ -168,12 +166,13 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                             <span class="badge bg-secondary">Inativo</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td><?php echo htmlspecialchars($dir['email'] ?? '-'); ?></td>
                                     <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $dir['id_usuario_ure']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            <a href="editar.php?id=<?php echo $dir['id_usuario_ure']; ?>" class="btn btn-sm btn-warning">Editar</a>
+                                        <div class="acoes-cell">
+                                            <a href="editar.php?id=<?php echo $dir['id_usuario_ure']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Servidor">Editar</a>
                                             <a href="../../controllers/gestores/excluir.php?id=<?php echo $dir['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-danger btn-confirmar-exclusao"
+                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                               title="Excluir Servidor"
                                                data-msg="Tem certeza que deseja excluir este servidor?">Excluir</a>
                                         </div>
                                     </td>

@@ -94,8 +94,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <div class="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Profissionais de Apoio Escolar</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe os PAEs cadastrados.</p>
+            <h2 class="mb-0">Profissionais de Apoio Escolar</h2>
         </div>
 
         <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN', 'SEDUC'])) { ?>
@@ -114,7 +113,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                 <div class="row g-2 align-items-center">
                     <!-- 1. Campo para digitar -->
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <!-- 2. Tipo (Contém / Igual a) -->
@@ -156,17 +155,14 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de PAEs -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
+            <h5 class="mb-3">Profissionais de Apoio Escolar</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th>Nome</th>
                             <th>CPF</th>
-                            <?php if ($userPerfil != 'USUARIO_EMPRESA') { ?>
-                                <th>Empresa</th>
-                            <?php } ?>
-                            <th>Status</th>
-                            <th>Data de Cadastro</th>
+                            <th>Empresa</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -174,32 +170,19 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($paes) > 0): ?>
                             <?php foreach ($paes as $pae): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($pae['nome']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($pae['nome']); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></td>
-                                    <?php if ($userPerfil != 'USUARIO_EMPRESA') { ?>
-                                        <td><?php echo htmlspecialchars($pae['empresa_nome'] ?? '-'); ?></td>
-                                    <?php } ?>
+                                    <td><?php echo htmlspecialchars($pae['empresa_nome'] ?? '-'); ?></td>
                                     <td>
-                                        <?php if ($pae['ativo'] == 1): ?>
-                                            <span class="badge bg-success">Ativo</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger">Inativo</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo !empty($pae['data_cadastro']) ? date('d/m/Y', strtotime($pae['data_cadastro'])) : '-'; ?></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
-                                                <a href="editar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-warning">Editar</a>
-                                            <?php endif; ?>
+                                        <div class="acoes-cell">
+                                            <a href="visualizar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-primary" title="Ver Detalhes do PAE">Ver</a>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="<?php echo $userPerfil == 'USUARIO_EMPRESA' ? '5' : '6'; ?>" class="text-center text-muted">Nenhum PAE encontrado.</td>
+                                <td colspan="4" class="text-center text-muted">Nenhum PAE encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

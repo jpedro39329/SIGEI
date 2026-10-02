@@ -83,8 +83,7 @@ $alunosAssociados = $stmtAlunos->get_result()->fetch_all(MYSQLI_ASSOC);
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Alunos Vinculados ao Profissional</h2>
-            <p class="text-muted">Acompanhamento e gestão de atendimentos do cuidador escolar.</p>
+            <h2 class="mb-1">Associações do Profissional</h2>
         </div>
         <div class="d-flex gap-2">
             <?php if (count($alunosAssociados) < 3): ?>
@@ -176,10 +175,8 @@ $alunosAssociados = $stmtAlunos->get_result()->fetch_all(MYSQLI_ASSOC);
                                         <?php echo !empty($aluno['data_inicio']) ? date('d/m/Y', strtotime($aluno['data_inicio'])) : '-'; ?>
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-2">
-                                            <a href="../alunos/visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info" title="Abrir ficha cadastral do aluno">
-                                                Ver Aluno
-                                            </a>
+                                        <div class="acoes-cell">
+                                            <a href="../alunos/visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Abrir ficha cadastral do aluno">Ver</a>
 
                                             <form action="../../controllers/associacoes/desassociar.php" method="POST" style="display:inline;"
                                                   data-confirm="true"
@@ -190,7 +187,7 @@ $alunosAssociados = $stmtAlunos->get_result()->fetch_all(MYSQLI_ASSOC);
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                 <input type="hidden" name="id_associacao" value="<?php echo $aluno['id_associacao']; ?>">
                                                 <input type="hidden" name="redirect_pae" value="<?php echo $pae['id_pae']; ?>">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Desassociar</button>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Desassociar Aluno">Desassociar</button>
                                             </form>
                                         </div>
                                     </td>

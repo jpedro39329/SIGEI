@@ -81,6 +81,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Empresa - <?php echo htmlspecialchars($empresa['nome']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
@@ -91,12 +92,18 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
 <div class="content">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Detalhes da Empresa</h2>
+        <div>
+            <h2 class="mb-1">Detalhes da Empresa</h2>
+            <p class="text-muted mb-0"><?php echo htmlspecialchars($empresa['nome']); ?></p>
+        </div>
         <div class="d-flex gap-2">
             <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
-                <a href="../dashboard.php" class="btn btn-secondary btn-sm">Voltar</a>
+                <a href="../dashboard.php" class="btn btn-secondary">Voltar</a>
             <?php else: ?>
-                <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
+                <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
+                    <a href="editar.php?id=<?php echo $empresa['id_empresa']; ?>" class="btn btn-primary">Editar</a>
+                <?php endif; ?>
+                <a href="listar.php" class="btn btn-secondary">Voltar</a>
             <?php endif; ?>
         </div>
     </div>
@@ -106,7 +113,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
         <div class="col-md-6 mb-4">
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">Informações Cadastrais e Contrato</h5>
+                    <h5 class="mb-3">Informações Cadastrais</h5>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Razão Social</span>
@@ -127,32 +134,6 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                             </span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Nº Contrato</span>
-                            <strong><?php echo htmlspecialchars($empresa['numero_contrato'] ?: 'Não informado'); ?></strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Vigência</span>
-                            <span>
-                                <?php
-                                $ini = !empty($empresa['data_inicio_contrato']) ? date('d/m/Y', strtotime($empresa['data_inicio_contrato'])) : '-';
-                                $fim = !empty($empresa['data_fim_contrato']) ? date('d/m/Y', strtotime($empresa['data_fim_contrato'])) : '-';
-                                echo "$ini até $fim";
-                                ?>
-                            </span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Documento do Contrato</span>
-                            <span>
-                                <?php if (!empty($contratoArquivo)): ?>
-                                    <button type="button" class="btn btn-sm btn-primary py-1 px-3 d-flex align-items-center gap-1" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($contratoArquivo, '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['numero_contrato'] ?: $empresa['nome'])); ?>')">
-                                        <i class="bi bi-file-earmark-pdf-fill"></i> Ver Documento do Contrato
-                                    </button>
-                                <?php else: ?>
-                                    <span class="text-muted small">Nenhum arquivo anexado</span>
-                                <?php endif; ?>
-                            </span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
                             <span class="text-muted">Telefone</span>
                             <strong><?php echo htmlspecialchars(formatarTelefone($empresa['telefone']) ?: 'Não informado'); ?></strong>
                         </li>
@@ -161,7 +142,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                             <strong><?php echo htmlspecialchars($empresa['email'] ?: 'Não informado'); ?></strong>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
-                            <span class="text-muted">Endereço Sede</span>
+                            <span class="text-muted">Endereço</span>
                             <span class="text-end">
                                 <?php
                                 $endCompleto = array_filter([
@@ -178,6 +159,43 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                     </ul>
                 </div>
             </div>
+
+            <!-- Contrato -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">Contrato</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Nº Contrato</span>
+                            <strong><?php echo htmlspecialchars($empresa['numero_contrato'] ?: 'Não informado'); ?></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Vigência</span>
+                            <span>
+                                <?php
+                                $ini = !empty($empresa['data_inicio_contrato']) ? date('d/m/Y', strtotime($empresa['data_inicio_contrato'])) : '-';
+                                $fim = !empty($empresa['data_fim_contrato']) ? date('d/m/Y', strtotime($empresa['data_fim_contrato'])) : '-';
+                                echo "$ini até $fim";
+                                ?>
+                            </span>
+                        </li>
+                        <?php if (!empty($contratoArquivo)): ?>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Arquivo do Contrato</span>
+                            <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                                    onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($contratoArquivo, '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['numero_contrato'] ?: $empresa['nome'])); ?>')">
+                                <i class="bi bi-file-earmark-pdf"></i> Visualizar Contrato
+                            </button>
+                        </li>
+                        <?php else: ?>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Arquivo do Contrato</span>
+                            <span class="text-muted small">Nenhum arquivo anexado</span>
+                        </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- UREs Atendidas e Supervisores -->
@@ -185,59 +203,60 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
             <!-- UREs Atendidas -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">UREs Atendidas pelo Contrato</h5>
-                    <div>
-                        <?php if (count($uresAtendidas) > 0): ?>
-                            <ul class="list-unstyled mb-0">
-                                <?php foreach ($uresAtendidas as $u): ?>
-                                    <li class="py-1">
-                                        <?php echo ((!empty($u['uge'])) ? htmlspecialchars($u['uge']) . ' - ' : '') . htmlspecialchars($u['nome']); ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p class="text-muted small mb-0">Nenhuma URE associada a esta empresa.</p>
-                        <?php endif; ?>
-                    </div>
+                    <h5 class="mb-3">Unidades Regionais de Ensino Atendidas</h5>
+                    <?php if (count($uresAtendidas) > 0): ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Cód. UGE</th>
+                                        <th>Denominação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($uresAtendidas as $u): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($u['uge'] ?: 'N/D'); ?></td>
+                                            <td><?php echo htmlspecialchars($u['nome']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted mb-0">Nenhuma URE associada a esta empresa.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <!-- Supervisores da Empresa -->
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">Supervisores de Licitações e Contratos</h5>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>CPF</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($supervisores) > 0): ?>
+                    <h5 class="mb-3">Supervisores</h5>
+                    <?php if (count($supervisores) > 0): ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>CPF</th>
+                                        <th>Nome</th>
+                                        <th>E-mail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     <?php foreach ($supervisores as $sup): ?>
                                         <tr>
-                                            <td><strong><?php echo htmlspecialchars($sup['nome']); ?></strong></td>
                                             <td><?php echo htmlspecialchars(formatarCPF($sup['cpf'])); ?></td>
-                                            <td>
-                                                <?php if ($sup['ativo'] == 1): ?>
-                                                    <span class="badge bg-success">Ativo</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-secondary">Inativo</span>
-                                                <?php endif; ?>
-                                            </td>
+                                            <td><?php echo htmlspecialchars($sup['nome']); ?></td>
+                                            <td><?php echo htmlspecialchars($sup['email'] ?: '-'); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="3" class="text-center text-muted">Nenhum supervisor cadastrado.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted mb-0">Nenhum supervisor cadastrado.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

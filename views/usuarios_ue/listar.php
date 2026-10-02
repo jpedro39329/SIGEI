@@ -59,7 +59,7 @@ if ($busca !== '') {
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $sqlUsuarios = "
-    SELECT uue.*, ue.nome AS escola_nome, ue.cie, u.nome AS ure_nome
+    SELECT uue.*, ue.nome AS escola_nome, ue.ua, ue.cie, u.nome AS ure_nome, u.uge AS ure_uge
     FROM usuarios_ue uue
     JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
     JOIN unidades_regionais u ON ue.id_ure = u.id_ure
@@ -75,7 +75,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuários das Escolas — SEFISC</title>
+    <title>Usuários das Escolas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
@@ -88,18 +88,17 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Usuários das Escolas</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — listagem e gestão dos usuários das unidades escolares.</p>
+            <h2 class="mb-0">Usuários das Escolas</h2>
         </div>
         <a href="cadastrar.php" class="btn btn-primary">Cadastrar usuário</a>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'ok'): ?>
         <div class="alert alert-success">Usuário cadastrado com sucesso!</div>
-    <?php endif; ?>
-
-    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'editado'): ?>
+    <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'editado'): ?>
         <div class="alert alert-success">Dados do usuário atualizados com sucesso!</div>
+    <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'excluido'): ?>
+        <div class="alert alert-success">Usuário excluído com sucesso!</div>
     <?php endif; ?>
 
     <!-- Barra de pesquisa e filtros -->
@@ -108,7 +107,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -145,17 +144,16 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Usuários das Escolas -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
+            <h5 class="mb-3">Usuários das Escolas</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th>Nome</th>
                             <th>CPF</th>
-                            <th>Escola</th>
-                            <th>CIE</th>
-                            <th>URE</th>
-                            <th>Contato</th>
-                            <th>Status</th>
+                            <th>UA</th>
+                            <th>Cód. UGE</th>
+                            <th>E-mail</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -163,32 +161,25 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($usuariosEscola) > 0): ?>
                             <?php foreach ($usuariosEscola as $u): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($u['nome']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($u['nome']); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($u['cpf'])); ?></td>
-                                    <td><?php echo htmlspecialchars($u['escola_nome']); ?></td>
-                                    <td><code><?php echo htmlspecialchars($u['cie']); ?></code></td>
-                                    <td><?php echo htmlspecialchars($u['ure_nome']); ?></td>
+                                    <td><?php echo htmlspecialchars($u['ua'] ?: '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($u['ure_uge'] ?: 'N/D'); ?></td>
+                                    <td><?php echo htmlspecialchars($u['email'] ?: '-'); ?></td>
                                     <td>
-                                        <small><?php echo htmlspecialchars($u['email'] ?? '-'); ?><br><?php echo htmlspecialchars(formatarTelefone($u['telefone']) ?: ''); ?></small>
-                                    </td>
-                                    <td>
-                                        <?php if ($u['ativo'] == 1): ?>
-                                            <span class="badge bg-success">Ativo</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Inativo</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $u['id_usuario_ue']; ?>" class="btn btn-sm btn-info">Ver</a>
-                                            <a href="editar.php?id=<?php echo $u['id_usuario_ue']; ?>" class="btn btn-sm btn-warning">Editar</a>
+                                        <div class="acoes-cell">
+                                            <a href="editar.php?id=<?php echo $u['id_usuario_ue']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Usuário">Editar</a>
+                                            <a href="../../controllers/usuarios_ue/excluir.php?id=<?php echo $u['id_usuario_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                               title="Excluir Usuário"
+                                               data-msg="Tem certeza que deseja excluir este usuário da escola?">Excluir</a>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center text-muted">Nenhum usuário de escola encontrado.</td>
+                                <td colspan="6" class="text-center text-muted">Nenhum usuário de escola encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

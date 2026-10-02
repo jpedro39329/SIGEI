@@ -110,14 +110,9 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 <h5 class="mb-3">Contatos e Credenciais</h5>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label">E-mail Institucional</label>
                                 <input type="email" name="email" class="form-control" placeholder="servidor@educacao.sp.gov.br">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" placeholder="(11) 9999-4000">
                             </div>
 
                             <div class="col-md-6 mb-3">

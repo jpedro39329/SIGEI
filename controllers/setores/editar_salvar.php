@@ -71,17 +71,17 @@ if (!empty($novaSenha)) {
     $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
     $stmt = $conexao->prepare("
         UPDATE usuarios_ure
-        SET id_ure = ?, nome = ?, cpf = ?, senha = ?, setor = ?, cargo = ?, nivel_acesso = ?, email = ?, telefone = ?, ativo = ?
+        SET id_ure = ?, nome = ?, cpf = ?, senha = ?, setor = ?, cargo = ?, nivel_acesso = ?, email = ?, ativo = ?
         WHERE id_usuario_ure = ?
     ");
-    $stmt->bind_param("isssssissii", $idUre, $nome, $cpf, $senhaHash, $setor, $cargo, $nivelAcesso, $email, $telefone, $ativo, $idServidor);
+    $stmt->bind_param("isssssisii", $idUre, $nome, $cpf, $senhaHash, $setor, $cargo, $nivelAcesso, $email, $ativo, $idServidor);
 } else {
     $stmt = $conexao->prepare("
         UPDATE usuarios_ure
-        SET id_ure = ?, nome = ?, cpf = ?, setor = ?, cargo = ?, nivel_acesso = ?, email = ?, telefone = ?, ativo = ?
+        SET id_ure = ?, nome = ?, cpf = ?, setor = ?, cargo = ?, nivel_acesso = ?, email = ?, ativo = ?
         WHERE id_usuario_ure = ?
     ");
-    $stmt->bind_param("issssissii", $idUre, $nome, $cpf, $setor, $cargo, $nivelAcesso, $email, $telefone, $ativo, $idServidor);
+    $stmt->bind_param("issssissii", $idUre, $nome, $cpf, $setor, $cargo, $nivelAcesso, $email, $ativo, $idServidor);
 }
 
 if ($stmt->execute()) {

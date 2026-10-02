@@ -88,12 +88,8 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Empresas Contratadas</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe as empresas prestadoras e seus contratos.</p>
+            <h2 class="mb-0">Empresas</h2>
         </div>
-        <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
-            <a href="cadastrar.php" class="btn btn-primary">Nova Empresa</a>
-        <?php endif; ?>
     </div>
 
     <?php if (isset($_GET['msg'])): ?>
@@ -118,7 +114,7 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -134,7 +130,7 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Razão Social</option>
                             <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CNPJ</option>
                             <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Nº Contrato</option>
-                            <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Cidade</option>
+                            <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>E-mail</option>
                             <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Status</option>
                         </select>
                     </div>
@@ -155,16 +151,16 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Empresas -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Empresas Cadastradas</h5>
+            <h5 class="mb-3">Empresas</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Razão Social / Nome Fantasia</th>
+                            <th>Razão Social</th>
                             <th>CNPJ</th>
                             <th>Nº Contrato</th>
-                            <th>Vigência do Contrato</th>
-                            <th>Cidade</th>
+                            <th>Vigência</th>
+                            <th>E-mail</th>
                             <th>Telefone</th>
                             <th>Status</th>
                             <th>Ações</th>
@@ -179,31 +175,31 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                 $vigencia = ($ini || $fim) ? ($ini ?: 'Início não inf.') . ' até ' . ($fim ?: 'indeterminado') : '-';
                                 ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($emp['nome']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($emp['nome']); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCNPJ($emp['cnpj'])); ?></td>
                                     <td><?php echo htmlspecialchars($emp['numero_contrato'] ?: '-'); ?></td>
                                     <td><small class="text-muted"><?php echo htmlspecialchars($vigencia); ?></small></td>
-                                    <td><?php echo htmlspecialchars($emp['municipio'] ?: '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($emp['email'] ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars(formatarTelefone($emp['telefone']) ?: '-'); ?></td>
                                     <td>
                                         <?php if ($emp['ativo'] == 1): ?>
                                             <span class="badge bg-success">Ativa</span>
                                         <?php else: ?>
-                                            <span class="badge bg-secondary">Inativa</span>
+                                            <span class="badge bg-secondary">Arquivada</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $emp['id_empresa']; ?>" class="btn btn-sm btn-info" title="Ver detalhes da empresa e contrato">Ver</a>
+                                        <div class="acoes-cell">
+                                            <a href="visualizar.php?id=<?php echo $emp['id_empresa']; ?>" class="btn btn-sm btn-outline-primary" title="Ver detalhes da empresa e contrato">Ver</a>
                                             <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
-                                                <a href="editar.php?id=<?php echo $emp['id_empresa']; ?>" class="btn btn-sm btn-warning">Editar</a>
                                                 <a href="../../controllers/empresas/inativar.php?id=<?php echo $emp['id_empresa']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                                   class="btn btn-sm btn-secondary"
-                                                   title="<?php echo $emp['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>">
+                                                   class="btn btn-sm btn-outline-secondary"
+                                                   title="<?php echo $emp['ativo'] == 1 ? 'Inativar Empresa' : 'Ativar Empresa'; ?>">
                                                     <?php echo $emp['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>
                                                 </a>
                                                 <a href="../../controllers/empresas/excluir.php?id=<?php echo $emp['id_empresa']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                                   class="btn btn-sm btn-danger btn-confirmar-exclusao"
+                                                   class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                                   title="Excluir Empresa"
                                                    data-msg="Tem certeza que deseja excluir esta empresa?">Excluir</a>
                                             <?php endif; ?>
                                         </div>

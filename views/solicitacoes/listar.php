@@ -107,8 +107,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Solicitações</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhe as solicitações de apoio escolar.</p>
+            <h2 class="mb-0">Solicitações</h2>
         </div>
     </div>
 
@@ -124,7 +123,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                 <div class="row g-2 align-items-center">
                     <!-- 1. Campo para digitar -->
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <!-- 2. Tipo (Contém / Igual a) -->
@@ -211,7 +210,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><span class="badge bg-info text-dark">Pendente</span></td>
                                             <td><?php echo !empty($aluno['data_cadastro']) ? date('d/m/Y', strtotime($aluno['data_cadastro'])) : '-'; ?></td>
                                             <td>
-                                                <a href="analisar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Analisar</a>
+                                                <a href="analisar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Analisar Solicitação">Analisar</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -257,7 +256,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><span class="badge bg-warning text-dark">Em Correção</span></td>
                                             <td><span class="text-warning-emphasis"><?php echo htmlspecialchars($aluno['motivo_reprovacao'] ?? '-'); ?></span></td>
                                             <td>
-                                                <a href="analisar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                                <a href="analisar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Ver / Acompanhar Solicitação">Ver</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -303,7 +302,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                                             <td><span class="badge bg-danger">Recusado</span></td>
                                             <td><span class="text-danger"><?php echo htmlspecialchars($aluno['motivo_reprovacao'] ?? '-'); ?></span></td>
                                             <td>
-                                                <a href="analisar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                                <a href="analisar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Ver Solicitação Recusada">Ver</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

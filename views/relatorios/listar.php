@@ -119,13 +119,12 @@ if ($userPerfil === 'PAE') {
 $resultRelatorios = mysqli_query($conexao, $sqlRelatorios);
 $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC) : [];
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios dos PAEs</title>
+    <title><?php echo ($userPerfil === 'PAE') ? 'Meus Relatórios' : 'Relatórios de Atendimento'; ?> — SIGEI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
@@ -138,76 +137,83 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1"><?php echo ($userPerfil === 'PAE') ? 'Meus Relatórios' : 'Relatórios dos Profissionais de Apoio'; ?></h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — <?php echo ($userPerfil === 'PAE') ? 'registre e acompanhe seus relatórios.' : 'acompanhe os atendimentos realizados pelos PAEs.'; ?></p>
+            <h2 class="mb-0"><?php echo ($userPerfil === 'PAE') ? 'Relatórios de Atendimento' : 'Relatórios dos Profissionais de Apoio'; ?></h2>
         </div>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'ok'): ?>
-        <div class="alert alert-success">Relatório salvo com sucesso!</div>
+        <div class="alert alert-success">Relatório registrado com sucesso!</div>
     <?php endif; ?>
 
     <?php if (isset($_GET['erro'])): ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro']); ?></div>
     <?php endif; ?>
 
-    <!-- Formulário de novo relatório (apenas PAE) -->
+    <!-- Formulário de Novo Relatório (Apenas Perfil PAE) -->
     <?php if ($userPerfil === 'PAE'): ?>
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Novo Relatório de Atendimento</h5>
-                <form action="../../controllers/relatorios/salvar.php" method="POST">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Aluno Atendido</label>
-                            <select name="id_aluno" class="form-select" required>
-                                <option value="">Selecione o aluno...</option>
-                                <?php foreach ($alunos as $aluno): ?>
-                                    <option value="<?php echo $aluno['id_aluno']; ?>"><?php echo htmlspecialchars($aluno['nome']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                <h5 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">Registrar Atendimento</h5>
+                
+                <?php if (count($alunos) > 0): ?>
+                    <form action="../../controllers/relatorios/salvar.php" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Estudante Atendido <span class="text-danger">*</span></label>
+                                <select name="id_aluno" class="form-select" required>
+                                    <option value="">Selecione o aluno...</option>
+                                    <?php foreach ($alunos as $aluno): ?>
+                                        <option value="<?php echo $aluno['id_aluno']; ?>">
+                                            <?php echo htmlspecialchars($aluno['nome']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Tipo de Relatório</label>
-                            <select name="tipo" class="form-select" required>
-                                <option value="DIARIO">Diário (Atividades do Dia)</option>
-                                <option value="MENSAL">Mensal (Evolução / Fechamento)</option>
-                            </select>
-                        </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Tipo de Relatório <span class="text-danger">*</span></label>
+                                <select name="tipo" class="form-select" required>
+                                    <option value="DIARIO">Diário (Atividades e Rotina do Dia)</option>
+                                    <option value="MENSAL">Mensal (Evolução / Fechamento Periódico)</option>
+                                </select>
+                            </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Descrição do Atendimento / Observações</label>
-                            <textarea name="descricao" rows="4" class="form-control" placeholder="Descreva as atividades, alimentação, suporte e interação do aluno..." required></textarea>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Descrição do Atendimento e Observações <span class="text-danger">*</span></label>
+                                <textarea name="descricao" rows="4" class="form-control" maxlength="5000" placeholder="Relate o acompanhamento pedagógico, locomoção, higiene, alimentação e interação do aluno..." required></textarea>
+                            </div>
                         </div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary">Registrar Relatório</button>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <div class="p-3 text-center text-muted small bg-light rounded">
+                        Você não possui alunos vinculados no momento para registrar relatórios.
                     </div>
-                    <button type="submit" class="btn btn-dark">Registrar Relatório</button>
-                </form>
+                <?php endif; ?>
             </div>
         </div>
     <?php endif; ?>
 
-    <!-- Barra de pesquisa e filtros -->
+    <!-- Barra de Pesquisa e Filtros -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
-                    <!-- 1. Campo para digitar -->
-                    <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                    <div class="col-md-5 col-12">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Pesquisar por texto, aluno, descrição..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
-                    <!-- 2. Tipo (Contém / Igual a) -->
-                    <div class="col-md-2 col-sm-6 col-12">
+                    <div class="col-md-2 col-6">
                         <select class="form-select form-select-sm" name="tp_filtro">
                             <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
                             <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
                         </select>
                     </div>
 
-                    <!-- 3. Campo de filtro -->
-                    <div class="col-md-3 col-sm-6 col-12">
+                    <div class="col-md-3 col-6">
                         <select class="form-select form-select-sm" name="campo_filtro">
                             <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
                             <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Aluno</option>
@@ -222,13 +228,12 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
                         </select>
                     </div>
 
-                    <!-- 4. Botões de ação -->
                     <div class="col-md-2 col-12 d-flex gap-2">
-                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
+                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit">
                             Filtrar
                         </button>
                         <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
-                            <a href="listar.php" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
+                            <a href="listar.php" class="btn btn-outline-secondary btn-sm">Limpar</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -236,21 +241,22 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
         </div>
     </div>
 
-    <!-- Lista de relatórios -->
+    <!-- Lista de Relatórios -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Relatórios Registrados</h5>
-                <span class="badge bg-light text-dark border"><?php echo count($relatorios); ?> registro(s)</span>
+                <h5 class="card-title fw-bold text-dark mb-0">Relatórios Cadastrados</h5>
+                <span class="text-muted small"><?php echo count($relatorios); ?> registro(s)</span>
             </div>
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <?php if ($userPerfil !== 'PAE'): ?>
-                                <th>PAE</th>
+                                <th>Profissional (PAE)</th>
                             <?php endif; ?>
-                            <th>Aluno</th>
+                            <th>Estudante</th>
                             <th>Tipo</th>
                             <th>Prévia da Descrição</th>
                             <th>Data de Envio</th>
@@ -264,7 +270,7 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
                                     <?php if ($userPerfil !== 'PAE'): ?>
                                         <td><strong><?php echo htmlspecialchars($relatorio['pae_nome'] ?? '-'); ?></strong></td>
                                     <?php endif; ?>
-                                    <td><?php echo htmlspecialchars($relatorio['aluno_nome']); ?></td>
+                                    <td><strong><?php echo htmlspecialchars($relatorio['aluno_nome']); ?></strong></td>
                                     <td>
                                         <?php if ($relatorio['tipo'] == 'DIARIO'): ?>
                                             <span class="badge bg-info text-dark">Diário</span>
@@ -282,13 +288,13 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
                                     </td>
                                     <td><?php echo date('d/m/Y H:i', strtotime($relatorio['data_cadastro'])); ?></td>
                                     <td>
-                                        <a href="visualizar.php?id=<?php echo $relatorio['id_relatorio']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                        <a href="visualizar.php?id=<?php echo $relatorio['id_relatorio']; ?>" class="btn btn-sm btn-outline-primary">Ver</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="<?php echo ($userPerfil !== 'PAE') ? '6' : '5'; ?>" class="text-center text-muted">Nenhum relatório encontrado.</td>
+                                <td colspan="<?php echo ($userPerfil !== 'PAE') ? '6' : '5'; ?>" class="text-center text-muted py-4">Nenhum relatório encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

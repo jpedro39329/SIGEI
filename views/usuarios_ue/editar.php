@@ -76,7 +76,7 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nome Completo</label>
-                                <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($usuario['nome']); ?>" required>
+                                <input type="text" name="nome" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($usuario['nome']); ?>" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -106,22 +106,22 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">E-mail Institucional</label>
-                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>">
+                                <input type="email" name="email" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" value="<?php echo htmlspecialchars($usuario['telefone'] ?? ''); ?>">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" value="<?php echo htmlspecialchars($usuario['telefone'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nova Senha <small class="text-muted">(deixe em branco para não alterar)</small></label>
-                                <input type="password" name="senha" id="senha" class="form-control" placeholder="Mínimo 6 caracteres">
+                                <input type="password" name="senha" id="senha" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres">
                             </div>
 
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">Confirmar Nova Senha</label>
-                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control">
+                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255">
                             </div>
                         </div>
 

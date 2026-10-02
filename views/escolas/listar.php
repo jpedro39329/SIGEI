@@ -81,13 +81,8 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">Unidades Escolares</h2>
-            <p class="text-muted">Olá, <?php echo htmlspecialchars($userName); ?> — acompanhamento das unidades escolares da rede.</p>
+            <h2 class="mb-0">Unidades Escolares</h2>
         </div>
-
-        <?php if ($userPerfil === 'DIRIGENTE'): ?>
-            <a href="cadastrar.php" class="btn btn-primary">Cadastrar Escola</a>
-        <?php endif; ?>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'excluido'): ?>
@@ -104,7 +99,7 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             <form method="GET" action="listar.php">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
                     </div>
 
                     <div class="col-md-2 col-sm-6 col-12">
@@ -118,11 +113,8 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <select class="form-select form-select-sm" name="campo_filtro">
                             <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
                             <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Denominação</option>
-                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>CIE</option>
                             <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>UA</option>
-                            <?php if ($userPerfil !== 'DIRIGENTE'): ?>
-                                <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>URE</option>
-                            <?php endif; ?>
+                            <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Cód. UGE</option>
                             <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Cidade</option>
                             <option value="6" <?php echo $campoFiltro === '6' ? 'selected' : ''; ?>>Modalidade</option>
                         </select>
@@ -144,16 +136,15 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <!-- Tabela de Escolas -->
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <h5 class="mb-3">Escolas Cadastradas</h5>
+            <h5 class="mb-3">Unidades Escolares da Rede</h5>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th>Denominação</th>
-                            <th>CIE</th>
                             <th>UA</th>
                             <th>Modalidade</th>
-                            <th>Unidade Regional</th>
+                            <th>Cód. UGE</th>
                             <th>Cidade</th>
                             <th>Ações</th>
                         </tr>
@@ -162,17 +153,16 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                         <?php if (count($escolas) > 0): ?>
                             <?php foreach ($escolas as $esc): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($esc['nome']); ?></strong></td>
-                                    <td><code><?php echo htmlspecialchars($esc['cie']); ?></code></td>
-                                    <td><?php echo htmlspecialchars($esc['ua'] ?: '-'); ?></td>
-                                    <td><?php echo htmlspecialchars($esc['modalidade'] ?: '-'); ?></td>
-                                    <td><?php echo htmlspecialchars($esc['ure_nome']); ?></td>
+                                    <td><?php echo htmlspecialchars($esc['nome']); ?></td>
+                                    <td><?php echo htmlspecialchars($esc['ua'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($esc['modalidade'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($esc['ure_uge'] ?: 'N/D'); ?></td>
                                     <td><?php echo htmlspecialchars($esc['municipio'] ?: '-'); ?></td>
                                     <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="visualizar.php?id=<?php echo $esc['id_ue']; ?>" class="btn btn-sm btn-info">Ver</a>
+                                        <div class="acoes-cell">
                                             <a href="../../controllers/escolas/excluir.php?id=<?php echo $esc['id_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-danger btn-confirmar-exclusao"
+                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                               title="Excluir Escola"
                                                data-msg="Tem certeza que deseja excluir esta escola?">Excluir</a>
                                         </div>
                                     </td>
@@ -180,7 +170,7 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center text-muted">Nenhuma escola encontrada.</td>
+                                <td colspan="6" class="text-center text-muted">Nenhuma escola encontrada.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

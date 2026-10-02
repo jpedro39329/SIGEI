@@ -65,8 +65,8 @@ $nivelAcesso = ($setor === 'SEFISC') ? 2 : (($setor === 'ASURE' || $setor === 'G
 $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
 $stmt = $conexao->prepare(
-    "INSERT INTO usuarios_ure (id_ure, nome, cpf, senha, setor, cargo, nivel_acesso, email, telefone, ativo)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO usuarios_ure (id_ure, nome, cpf, senha, setor, cargo, nivel_acesso, email, ativo)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 
 if (!$stmt) {
@@ -74,7 +74,7 @@ if (!$stmt) {
     exit();
 }
 
-$stmt->bind_param("isssssissi", $idUre, $nome, $cpf, $senhaHash, $setor, $cargo, $nivelAcesso, $email, $telefone, $ativo);
+$stmt->bind_param("isssssisi", $idUre, $nome, $cpf, $senhaHash, $setor, $cargo, $nivelAcesso, $email, $ativo);
 
 if ($stmt->execute()) {
     header("Location: ../../views/setores/listar.php?msg=cadastrado");

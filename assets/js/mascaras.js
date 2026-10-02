@@ -57,5 +57,24 @@ document.addEventListener('DOMContentLoaded', function () {
             input.value = formatarCPFInput(input.value);
         });
     });
+
+    // 3. Validação de tamanho e limite de anexos (Máx 5MB)
+    var inputsArquivo = document.querySelectorAll('input[type="file"]');
+    var TAMANHO_MAXIMO_BYTES = 5 * 1024 * 1024; // 5 MB
+
+    inputsArquivo.forEach(function (input) {
+        input.addEventListener('change', function () {
+            if (this.files && this.files.length > 0) {
+                for (var i = 0; i < this.files.length; i++) {
+                    var arquivo = this.files[i];
+                    if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
+                        alert('O arquivo "' + arquivo.name + '" excede o limite máximo permitido de 5 MB.');
+                        this.value = ''; // Limpa o input
+                        return;
+                    }
+                }
+            }
+        });
+    });
 });
 

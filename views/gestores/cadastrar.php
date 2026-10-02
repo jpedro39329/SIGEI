@@ -60,7 +60,7 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nome Completo <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" placeholder="Ex.: Roberto Alves" required>
+                                <input type="text" name="nome" class="form-control" maxlength="150" placeholder="Ex.: Roberto Alves" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -99,14 +99,9 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 <h5 class="mb-3">Contatos Institucionais</h5>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label">E-mail Institucional</label>
-                                <input type="email" name="email" class="form-control" placeholder="servidor@educacao.sp.gov.br">
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" placeholder="(11) 4034-0001">
+                                <input type="email" name="email" class="form-control" maxlength="150" placeholder="servidor@educacao.sp.gov.br">
                             </div>
 
                             <div class="col-12 mt-2">
@@ -115,12 +110,12 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Senha de Acesso <span class="text-danger">*</span></label>
-                                <input type="password" name="senha" id="senha" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                                <input type="password" name="senha" id="senha" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
-                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" placeholder="Repita a senha" required>
+                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255" placeholder="Repita a senha" required>
                             </div>
                         </div>
 

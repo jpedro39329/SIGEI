@@ -46,7 +46,6 @@ if ($userPerfil === 'PAE') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -62,53 +61,55 @@ if ($userPerfil === 'PAE') {
 <?php require("../../includes/navbar.php"); ?>
 
 <div class="content">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Detalhes do Relatório</h2>
-        <a href="listar.php" class="btn btn-secondary">Voltar</a>
+        <div>
+            <h2 class="mb-0">Detalhes do Relatório</h2>
+        </div>
+        <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
     </div>
 
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4 pb-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 pb-3 border-bottom">
                 <div>
-                    <h4 class="mb-1">
-                        Relatório <?php echo ($relatorio['tipo'] == 'DIARIO') ? 'Diário de Atendimento' : 'Mensal '; ?>
+                    <h4 class="mb-1 text-dark">
+                        Relatório <?php echo ($relatorio['tipo'] == 'DIARIO') ? 'Diário de Atendimento' : 'Mensal de Acompanhamento'; ?>
                     </h4>
-                    <p class="text-muted mb-0">Registrado em <?php echo date('d/m/Y \à\s H:i', strtotime($relatorio['data_cadastro'])); ?></p>
+                    <p class="text-muted small mb-0">Registrado em <?php echo date('d/m/Y \à\s H:i', strtotime($relatorio['data_cadastro'])); ?></p>
                 </div>
                 <div>
                     <?php if ($relatorio['tipo'] == 'DIARIO'): ?>
-                        <span class="badge bg-info text-dark fs-6">Diário</span>
+                        <span class="badge bg-info text-dark px-3 py-2 rounded-pill">Diário</span>
                     <?php else: ?>
-                        <span class="badge bg-primary fs-6">Mensal</span>
+                        <span class="badge bg-primary px-3 py-2 rounded-pill">Mensal</span>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                    <div class="p-3 bg-light rounded">
-                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Dados do Aluno</h6>
-                        <p class="mb-1"><strong>Nome:</strong> <?php echo htmlspecialchars($relatorio['aluno_nome']); ?></p>
-                        <p class="mb-1"><strong>Escola:</strong> <?php echo htmlspecialchars($relatorio['escola_nome'] ?? '-'); ?></p>
-                        <p class="mb-0"><strong>RA:</strong> <?php echo htmlspecialchars($relatorio['aluno_ra'] ?? '-'); ?></p>
-                        <p class="mb-0"><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($relatorio['aluno_cpf'])); ?></p>
-
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded border">
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Estudante Atendido</h6>
+                        <div class="mb-2"><span class="text-muted small d-block">Nome:</span> <strong><?php echo htmlspecialchars($relatorio['aluno_nome']); ?></strong></div>
+                        <div class="mb-2"><span class="text-muted small d-block">Escola:</span> <span><?php echo htmlspecialchars($relatorio['escola_nome'] ?? '-'); ?></span></div>
+                        <div class="mb-2"><span class="text-muted small d-block">RA:</span> <span><?php echo htmlspecialchars($relatorio['aluno_ra'] ?? '-'); ?></span></div>
+                        <div class="mb-0"><span class="text-muted small d-block">CPF:</span> <span><?php echo htmlspecialchars(formatarCPF($relatorio['aluno_cpf'])); ?></span></div>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="p-3 bg-light rounded">
-                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Profissional de Apoio Escolar & Empresa</h6>
-                        <p class="mb-1"><strong>Profissional de Apoio Escolar:</strong> <?php echo htmlspecialchars($relatorio['pae_nome']); ?></p>
-                        <p class="mb-1"><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($relatorio['pae_cpf'])); ?></p>
-                        <p class="mb-0"><strong>Empresa:</strong> <?php echo htmlspecialchars($relatorio['empresa_nome'] ?? '-'); ?></p>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded border">
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Profissional & Empresa</h6>
+                        <div class="mb-2"><span class="text-muted small d-block">Profissional (PAE):</span> <strong><?php echo htmlspecialchars($relatorio['pae_nome']); ?></strong></div>
+                        <div class="mb-2"><span class="text-muted small d-block">CPF:</span> <span><?php echo htmlspecialchars(formatarCPF($relatorio['pae_cpf'])); ?></span></div>
+                        <div class="mb-0"><span class="text-muted small d-block">Empresa:</span> <span><?php echo htmlspecialchars($relatorio['empresa_nome'] ?? '-'); ?></span></div>
                     </div>
                 </div>
             </div>
 
-            <h5 class="mb-2">Descrição e Observações do Atendimento</h5>
-            <div class="p-3 border rounded bg-white mb-4" style="line-height: 1.7; white-space: pre-line;">
+            <h5 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">Descrição e Observações do Atendimento</h5>
+            <div class="p-3 border rounded bg-white mb-4" style="line-height: 1.8; white-space: pre-line;">
                 <?php echo htmlspecialchars($relatorio['descricao']); ?>
             </div>
 
@@ -117,8 +118,8 @@ if ($userPerfil === 'PAE') {
             </div>
         </div>
     </div>
+
 </div>
 
 </body>
 </html>
-

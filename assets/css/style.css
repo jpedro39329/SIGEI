@@ -294,10 +294,10 @@ body[class*="page-"] {
 
 /* Área principal compartilhada por todas as telas internas */
 body[class*="page-"] .content {
-    width: min(97%, 1680px);
+    width: min(99%, 1920px);
     min-width: 0;
     margin: 0 auto;
-    padding: clamp(1.5rem, 2.5vw, 2.75rem);
+    padding: clamp(1rem, 1.5vw, 1.75rem) clamp(1rem, 2vw, 2rem);
 }
 
 .content h1 {
@@ -347,23 +347,24 @@ body[class*="page-"] .content {
 /* Cartões e painéis */
 .content .card {
     min-width: 0;
-    border: 1px solid var(--sigei-border) !important;
-    border-radius: 1.05rem;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.85rem;
     background-color: var(--sigei-surface);
-    box-shadow: 0 12px 24px var(--sigei-shadow) !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+    transition: box-shadow 0.15s ease-in-out;
 }
 
 .content .card-body {
     min-width: 0;
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem;
 }
 
 .content .card-body.p-3 {
-    padding: 1.35rem 1.6rem !important;
+    padding: 1rem 1.25rem !important;
 }
 
 .content .card-body.p-4 {
-    padding: 1.85rem 2.2rem !important;
+    padding: 1.35rem 1.6rem !important;
 }
 
 .content .card-form {
@@ -575,6 +576,16 @@ body[class*="page-"] .content {
     white-space: nowrap;
 }
 
+/* Botões de ação compactos dentro de tabelas */
+.content .table td .acoes-cell .btn-sm {
+    min-height: unset !important;
+    padding: 0.25rem 0.6rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 600;
+    border-radius: 0.4rem !important;
+    width: auto !important;
+}
+
 .content .table tbody tr:last-child > * { border-bottom: 0; }
 .content .table-hover > tbody > tr:hover > * { color: inherit; background-color: #f7faff; }
 
@@ -609,9 +620,9 @@ body[class*="page-"] .content {
 }
 
 .content .list-group-item {
-    padding: 1rem 1.35rem;
-    font-size: 1.05rem;
-    border-color: var(--sigei-border);
+    padding: 0.85rem 1.1rem;
+    font-size: 0.98rem;
+    border-color: #f1f5f9;
     background-color: transparent;
 }
 
@@ -725,7 +736,7 @@ textarea:focus-visible, [tabindex]:focus-visible {
 @media (max-width: 767.98px) {
     .navbar { padding: 0.55rem 0.75rem; }
     .navbar .nav-link { padding: 0.7rem 0.75rem; }
-    body[class*="page-"] .content { padding: 1rem; }
+    body[class*="page-"] .content { padding: 0.75rem; }
     .content .card { border-radius: 0.85rem; }
     .content .card-body.p-4 { padding: 1.1rem !important; }
     .content > .d-flex.justify-content-between, .content .d-flex.justify-content-between { flex-wrap: wrap; gap: 0.75rem; }
@@ -771,4 +782,153 @@ textarea:focus-visible, [tabindex]:focus-visible {
     line-height: 1.5;
     color: #4b5563 !important;
 }
+
+/* Botões de Ação com Ícones Padronizados */
+.btn-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.18s ease-in-out;
+}
+.btn-action i {
+    pointer-events: none;
+    line-height: 1;
+    font-size: 1rem;
+}
+.btn-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+}
+/* Célula de ações: impede quebra de linha e centraliza verticalmente */
+.content .table td .acoes-cell {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+}
+.btn-action-view {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+.btn-action-view:hover {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    border-color: #1d4ed8;
+}
+.btn-action-edit {
+    background-color: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+.btn-action-edit:hover {
+    background-color: #d97706;
+    color: #ffffff;
+    border-color: #d97706;
+}
+.btn-action-delete {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+.btn-action-delete:hover {
+    background-color: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+}
+.btn-action-archive {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+}
+.btn-action-archive:hover {
+    background-color: #4b5563;
+    color: #ffffff;
+    border-color: #4b5563;
+}
+.btn-action-unarchive {
+    background-color: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+.btn-action-unarchive:hover {
+    background-color: #059669;
+    color: #ffffff;
+    border-color: #059669;
+}
+.btn-action-toggle {
+    background-color: #f8fafc;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+.btn-action-toggle:hover {
+    background-color: #64748b;
+    color: #ffffff;
+    border-color: #64748b;
+}
+
+/* Cards interativos de documentos/laudos com hover - Estilo Clean */
+.doc-card-item {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.95rem;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+    text-decoration: none !important;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.doc-card-item:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.doc-card-item .doc-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1f5f9;
+    color: #475569;
+    font-size: 1rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.doc-card-item:hover .doc-icon-wrapper {
+    background-color: #e2e8f0;
+    color: #0038bb;
+}
+.btn-doc-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #0038bb;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease;
+}
+.doc-card-item:hover .btn-doc-view {
+    background: #0038bb;
+    color: #ffffff;
+    border-color: #0038bb;
+}
+
 

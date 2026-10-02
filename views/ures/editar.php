@@ -54,7 +54,7 @@ if (!$ure) {
                         <div class="row">
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Nome da URE <span class="text-danger">*</span></label>
-                                <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($ure['nome']); ?>" required>
+                                <input type="text" name="nome" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($ure['nome']); ?>" required>
                             </div>
                             
                             <div class="col-md-4 mb-3">
@@ -64,17 +64,17 @@ if (!$ure) {
 
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Endereço Completo</label>
-                                <input type="text" name="endereco" class="form-control" value="<?php echo htmlspecialchars($ure['endereco'] ?? ''); ?>">
+                                <input type="text" name="endereco" class="form-control" maxlength="255" value="<?php echo htmlspecialchars($ure['endereco'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" value="<?php echo htmlspecialchars($ure['telefone'] ?? ''); ?>">
+                                <input type="text" name="telefone" class="form-control" maxlength="30" value="<?php echo htmlspecialchars($ure['telefone'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">E-mail Institucional</label>
-                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($ure['email'] ?? ''); ?>">
+                                <input type="email" name="email" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($ure['email'] ?? ''); ?>">
                             </div>
                         </div>
 

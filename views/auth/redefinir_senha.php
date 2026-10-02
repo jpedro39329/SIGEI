@@ -314,7 +314,7 @@ if (!$recuperacao) {
         
         <div class="form-group">
           <label for="nova_senha">Nova Senha</label>
-          <input type="password" name="nova_senha" id="nova_senha" class="form-control" required placeholder="••••••••">
+          <input type="password" name="nova_senha" id="nova_senha" class="form-control" maxlength="255" required placeholder="••••••••">
         </div>
         
         <button type="submit" class="btn-login">Salvar Nova Senha</button>

@@ -28,7 +28,7 @@ if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
 }
 
 $sqlAlunos = "
-    SELECT a.nome AS aluno_nome, e.nome AS escola_nome
+    SELECT a.nome AS aluno_nome, a.cpf AS aluno_cpf, e.nome AS escola_nome
     FROM associacoes ass
     JOIN alunos a ON ass.id_aluno = a.id_aluno
     LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
@@ -37,17 +37,6 @@ $sqlAlunos = "
 ";
 $resultAlunos = mysqli_query($conexao, $sqlAlunos);
 $alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
-
-$sqlRelatorios = "
-    SELECT r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome
-    FROM relatorios r
-    JOIN associacoes ass ON r.id_associacao = ass.id_associacao
-    JOIN alunos a ON ass.id_aluno = a.id_aluno
-    WHERE ass.id_pae = $id_pae
-    ORDER BY r.data_cadastro DESC
-";
-$resultRelatorios = mysqli_query($conexao, $sqlRelatorios);
-$relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>
@@ -70,83 +59,63 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
         <a href="listar.php" class="btn btn-secondary">Voltar</a>
     </div>
 
+    <!-- Informações do PAE -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                <div>
-                    <h4 class="mb-1"><?php echo htmlspecialchars($pae['nome']); ?></h4>
-                    <p class="text-muted mb-0"><?php echo htmlspecialchars($pae['empresa_nome'] ?? '-'); ?></p>
+            <h5 class="mb-3">Informações do Profissional</h5>
+            <div class="row g-3">
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-muted small d-block">Nome</span>
+                    <span><?php echo htmlspecialchars($pae['nome']); ?></span>
                 </div>
-                <?php if ($pae['ativo'] == 1): ?>
-                    <span class="badge bg-success">Ativo</span>
-                <?php else: ?>
-                    <span class="badge bg-danger">Inativo</span>
-                <?php endif; ?>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-2"><strong>CPF:</strong> <?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></div>
-                <div class="col-md-6 mb-2"><strong>Telefone:</strong> <?php echo htmlspecialchars(formatarTelefone($pae['telefone']) ?: '-'); ?></div>
-                <div class="col-md-6 mb-2"><strong>Email:</strong> <?php echo htmlspecialchars($pae['email'] ?? '-'); ?></div>
-                <div class="col-md-6 mb-2">
-                   
-                    
-                       
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-muted small d-block">CPF</span>
+                    <span><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-muted small d-block">Empresa</span>
+                    <span><?php echo htmlspecialchars($pae['empresa_nome'] ?? '-'); ?></span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-muted small d-block">Data de Cadastro</span>
+                    <span><?php echo !empty($pae['data_cadastro']) ? date('d/m/Y', strtotime($pae['data_cadastro'])) : '-'; ?></span>
                 </div>
             </div>
-
-            
         </div>
     </div>
 
+    <!-- Alunos associados -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">Alunos associados</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead><tr><th>Nome do aluno</th><th>Escola onde esta</th></tr></thead>
-                    <tbody>
-                        <?php if (count($alunos) > 0): ?>
+            <h5 class="mb-3">Alunos Associados</h5>
+            <?php if (count($alunos) > 0): ?>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Escola</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             <?php foreach ($alunos as $aluno): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($aluno['aluno_nome']); ?></td>
+                                    <td><?php echo htmlspecialchars(formatarCPF($aluno['aluno_cpf'])); ?></td>
                                     <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
                                 </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr><td colspan="2" class="text-center text-muted">Nenhum aluno associado.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-            <h5 class="mb-3">Relatorios do PAE</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead><tr><th>Aluno</th><th>Tipo</th><th>Descricao</th><th>Data</th></tr></thead>
-                    <tbody>
-                        <?php if (count($relatorios) > 0): ?>
-                            <?php foreach ($relatorios as $relatorio): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($relatorio['aluno_nome']); ?></td>
-                                    <td><?php echo htmlspecialchars($relatorio['tipo']); ?></td>
-                                    <td><?php echo htmlspecialchars($relatorio['descricao']); ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($relatorio['data_cadastro'])); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr><td colspan="4" class="text-center text-muted">Nenhum relatorio cadastrado.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p class="text-muted mb-0">Nenhum aluno associado a este PAE.</p>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
 </body>
 </html>
+
