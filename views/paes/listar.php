@@ -105,6 +105,12 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'salvo'): ?>
         <div class="alert alert-success">Profissional de Apoio Escolar salvo com sucesso.</div>
     <?php endif; ?>
+    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'excluido'): ?>
+        <div class="alert alert-success">PAE excluído com sucesso.</div>
+    <?php endif; ?>
+    <?php if (!empty($_GET['erro'])): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro'], ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
 
     <!-- Barra de pesquisa e filtros -->
     <div class="card border-0 shadow-sm mb-4">

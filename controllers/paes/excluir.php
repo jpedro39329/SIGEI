@@ -16,14 +16,26 @@ if ($id <= 0) {
     exit();
 } 
 
-$stmt = $conexao->prepare("DELETE FROM usuarios_pae WHERE id_pae = ?");
-$stmt->bind_param("i", $id);
+$stmtAssociacoes = $conexao->prepare("SELECT COUNT(*) AS total FROM associacoes WHERE id_pae = ?");
+$stmtAssociacoes->bind_param("i", $id);
+$stmtAssociacoes->execute();
+$totalAssociacoes = (int) $stmtAssociacoes->get_result()->fetch_assoc()['total'];
+$stmtAssociacoes->close();
 
-if ($stmt->execute()) {
-    header("Location: ../../views/paes/listar.php?msg=excluido");
+if ($totalAssociacoes > 0) {
+    header("Location: ../../views/paes/listar.php?erro=" . urlencode("Não é possível excluir este PAE porque existem alunos associados."));
     exit();
 }
 
-header("Location: ../../views/paes/listar.php?erro=" . urlencode("Erro ao excluir PAE: " . $stmt->error));
+try {
+    $stmt = $conexao->prepare("DELETE FROM usuarios_pae WHERE id_pae = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+} catch (mysqli_sql_exception $exception) {
+    header("Location: ../../views/paes/listar.php?erro=" . urlencode("Não foi possível excluir o PAE. Verifique se ele possui vínculos."));
+    exit();
+}
+
+header("Location: ../../views/paes/listar.php?msg=excluido");
 exit();
 
