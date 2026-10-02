@@ -66,6 +66,9 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         <div>
             <h2 class="mb-0">Unidades Regionais de Ensino</h2>
         </div>
+        <div>
+            <a href="cadastrar.php" class="btn btn-primary btn-sm">Nova URE</a>
+        </div>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'atualizado'): ?>
@@ -143,7 +146,8 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars(formatarTelefone($ure['telefone']) ?: '-'); ?></td>
                                     <td><?php echo htmlspecialchars($ure['email'] ?? '-'); ?></td>
                                     <td>
-                                        <div class="acoes-cell">
+                                        <div class="acoes-cell d-flex gap-1 justify-content-center">
+                                            <a href="editar.php?id=<?php echo $ure['id_ure']; ?>" class="btn btn-sm btn-outline-secondary" title="Editar URE">Editar</a>
                                             <a href="../../controllers/ures/excluir.php?id=<?php echo $ure['id_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir URE"

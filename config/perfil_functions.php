@@ -1,6 +1,53 @@
 <?php
 
 // ============================================================
+// CONSTANTES CANÔNICAS DE PERFIS DE USUÁRIO (SIGEI)
+// ============================================================
+define('PERFIL_ADMIN', 'ADMIN');
+define('PERFIL_SEDUC', 'SEDUC');
+define('PERFIL_DIRIGENTE', 'DIRIGENTE');
+define('PERFIL_USUARIO_SEFISC', 'USUARIO_SEFISC');
+define('PERFIL_USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_EDUCACAO_ESPECIAL');
+define('PERFIL_SUPERVISOR', 'SUPERVISOR');
+define('PERFIL_USUARIO_ESCOLA', 'USUARIO_ESCOLA');
+define('PERFIL_PAE', 'PAE');
+
+// Lista oficial canônica de perfis do sistema
+const PERFIS_CANONICOS = array(
+    PERFIL_ADMIN,
+    PERFIL_SEDUC,
+    PERFIL_DIRIGENTE,
+    PERFIL_USUARIO_SEFISC,
+    PERFIL_USUARIO_EDUCACAO_ESPECIAL,
+    PERFIL_SUPERVISOR,
+    PERFIL_USUARIO_ESCOLA,
+    PERFIL_PAE
+);
+
+// Mapeamento de aliases e sinônimos legados para normalização canônica
+const MAPA_ALIASES_PERFIS = array(
+    'ESCOLA'                    => PERFIL_USUARIO_ESCOLA,
+    'USUARIO_UE'                => PERFIL_USUARIO_ESCOLA,
+    'UE'                        => PERFIL_USUARIO_ESCOLA,
+    'USUARIO_EMPRESA'           => PERFIL_SUPERVISOR,
+    'EMPRESA'                   => PERFIL_SUPERVISOR,
+    'SEFISC'                    => PERFIL_USUARIO_SEFISC,
+    'ASURE'                     => PERFIL_DIRIGENTE,
+    'GABINETE'                  => PERFIL_DIRIGENTE,
+    'DIRIGENTE_REGIONAL'        => PERFIL_DIRIGENTE,
+    'EDU_ESPECIAL'              => PERFIL_USUARIO_EDUCACAO_ESPECIAL,
+    'EDUCACAO_ESPECIAL'         => PERFIL_USUARIO_EDUCACAO_ESPECIAL,
+    'AEE'                       => PERFIL_USUARIO_EDUCACAO_ESPECIAL,
+    'EEC'                       => PERFIL_USUARIO_EDUCACAO_ESPECIAL,
+);
+
+// Normaliza qualquer string de perfil para a constante canônica oficial
+function normalizarPerfil($perfil) {
+    $p = strtoupper(trim((string) $perfil));
+    return MAPA_ALIASES_PERFIS[$p] ?? $p;
+}
+
+// ============================================================
 // FUNÇÕES AUXILIARES DE PERMISSÃO
 // ============================================================
 
@@ -9,25 +56,17 @@ function estaLogado() {
     return isset($_SESSION['user_id']);
 }
 
-// Verifica se o usuário tem um dos perfis permitidos
+// Verifica se o usuário tem um dos perfis permitidos (com suporte canônico e aliases legados)
 function temPermissao($perfil, $perfisPermitidos) {
-    if (in_array($perfil, $perfisPermitidos)) {
-        return true;
+    if (empty($perfil)) {
+        return false;
     }
-    // Compatibilidade entre sinônimos de perfil
-    if ((in_array('USUARIO_ESCOLA', $perfisPermitidos) || in_array('USUARIO_UE', $perfisPermitidos) || in_array('ESCOLA', $perfisPermitidos)) && in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
-        return true;
-    }
-    if ((in_array('SUPERVISOR', $perfisPermitidos) || in_array('USUARIO_EMPRESA', $perfisPermitidos)) && in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
-        return true;
-    }
-    if ((in_array('SEFISC', $perfisPermitidos) || in_array('USUARIO_SEFISC', $perfisPermitidos)) && in_array($perfil, ['USUARIO_SEFISC', 'SEFISC'])) {
-        return true;
-    }
-    if ((in_array('DIRIGENTE', $perfisPermitidos) || in_array('ASURE', $perfisPermitidos)) && in_array($perfil, ['DIRIGENTE', 'ASURE'])) {
-        return true;
-    }
-    return false;
+    
+    $perfilNorm = normalizarPerfil($perfil);
+    $perfisPermitidosArray = is_array($perfisPermitidos) ? $perfisPermitidos : array($perfisPermitidos);
+    $permitidosNorm = array_map('normalizarPerfil', $perfisPermitidosArray);
+
+    return in_array($perfilNorm, $permitidosNorm, true);
 }
 
 // Retorna o caminho correto da página de login conforme a localização do script

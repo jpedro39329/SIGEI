@@ -78,4 +78,3 @@ function uploadArquivo($arquivo, $pasta) {
 }
 
 ?>
-require_once dirname(__DIR__) . '/helpers/upload.php';
