@@ -983,4 +983,54 @@ textarea:focus-visible, [tabindex]:focus-visible {
     margin-top: 0.25rem;
 }
 
+/* Balão de Notificação Estilo Quadrinhos (Comic Speech Bubble) */
+.notif-speech-bubble {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: -10px;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    background: #ffffff;
+    border: 2px solid var(--sigei-blue-900);
+    border-radius: 18px;
+    padding: 14px 16px;
+    z-index: 1055;
+    box-shadow: 0 12px 35px rgba(0, 56, 187, 0.20);
+    animation: comicBounceIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Ponta do balão apontando para o sino */
+.notif-speech-bubble .notif-speech-arrow {
+    position: absolute;
+    top: -11px;
+    right: 22px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 11px solid var(--sigei-blue-900);
+}
+.notif-speech-bubble .notif-speech-arrow::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 9px solid #ffffff;
+}
+
+@keyframes comicBounceIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 

@@ -188,40 +188,37 @@ $foto = $aluno['foto_arquivo'] ?? '';
                         </div>
                     </div>
 
-                    <!-- Grid Interno de Dados Pessoais -->
+                    <!-- Grid Interno de Dados Pessoais: Label em Negrito em cima, Valor normal embaixo -->
                     <div class="row g-3">
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">CPF</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">CPF</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">RA do Aluno</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">RA</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-bl)ock">Data de Nascimento</span>
-                            <span class="fw-medium text-dark">
+                            <strong class="d-block text-dark">Data de Nascimento</strong>
+                            <span class="text-secondary">
                                 <?php if (!empty($aluno['data_nascimento'])): ?>
-                                    <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?>
-                                    <?php if ($idadeAluno !== null): ?>
-                                        • <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1"><?php echo $idadeAluno; ?> anos</span>
-                                    <?php endif; ?>
+                                    <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?><?php echo ($idadeAluno !== null) ? ' - ' . $idadeAluno . ' anos' : ''; ?>
                                 <?php else: ?>
                                     Não informada
                                 <?php endif; ?>
                             </span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Gênero</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">Gênero</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Raça / Cor</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
+                            <strong class="d-block text-dark">Raça / Cor</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Município de Nascimento</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">Município de Nascimento</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
                         </div>
                     </div>
 
@@ -235,35 +232,35 @@ $foto = $aluno['foto_arquivo'] ?? '';
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6 col-sm-12">
-                            <span class="text-muted small d-block">Unidade Escolar</span>
-                            <strong class="text-dark"><?php echo htmlspecialchars($aluno['escola_nome'] ?: 'Não informada'); ?></strong>
+                            <strong class="d-block text-dark">Unidade Escolar</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['escola_nome'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-6 col-sm-12">
-                            <span class="text-muted small d-block">Unidade Regioonal de Ensino</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['ure_nome'] ?: 'Não informada'); ?></span>
+                            <strong class="d-block text-dark">Unidade Regional de Ensino</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['ure_nome'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-6 col-sm-6">
-                            <span class="text-muted small d-block">Série</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['serie'] ?: 'Não informada'); ?></span>
+                            <strong class="d-block text-dark">Série</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['serie'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-6 col-sm-6">
-                            <span class="text-muted small d-block">Turno de Aula</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['turno_aula'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">Turno de Aula</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['turno_aula'] ?: 'Não informado'); ?></span>
                         </div>
                     </div>
 
                     <!-- Diagnóstico Clínico / CID -->
                     <div class="mt-3">
-                        <span class="text-muted small d-block mb-1">Diagnóstico Clínico / Deficiência</span>
-                        <div class="p-3 rounded-3 bg-light border text-dark">
+                        <strong class="d-block text-dark mb-1">Diagnóstico Clínico</strong>
+                        <div class="p-3 rounded-3 bg-light border text-secondary">
                             <?php echo nl2br(htmlspecialchars($aluno['descricao_deficiencia'] ?: 'Nenhuma descrição clínica informada')); ?>
                         </div>
                     </div>
 
                     <!-- Cuidados Necessários -->
                     <div class="mt-3">
-                        <span class="text-muted small d-block mb-1">Cuidados Necessários e Apoio Solicitado</span>
-                        <div class="p-3 rounded-3 bg-light border text-dark">
+                        <strong class="d-block text-dark mb-1">Cuidados Necessários e Apoio Solicitado</strong>
+                        <div class="p-3 rounded-3 bg-light border text-secondary">
                             <?php echo nl2br(htmlspecialchars($aluno['descricao_cuidados'] ?: 'Nenhum cuidado especial registrado pela escola.')); ?>
                         </div>
                     </div>
@@ -275,21 +272,21 @@ $foto = $aluno['foto_arquivo'] ?? '';
             <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Profissional de Apoio Escolar (PAE)</h5>
+                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Profissional de Apoio Escolar</h5>
 
                         <?php if ($pae): ?>
                             <div class="row g-3 align-items-center">
                                 <div class="col-md-5 col-sm-6">
-                                    <span class="text-muted small d-block">Profissional Vinculado</span>
-                                    <strong class="text-dark"><?php echo htmlspecialchars($pae['nome']); ?></strong>
+                                    <strong class="d-block text-dark">Profissional Vinculado</strong>
+                                    <span class="text-secondary"><?php echo htmlspecialchars($pae['nome']); ?></span>
                                 </div>
                                 <div class="col-md-4 col-sm-6">
-                                    <span class="text-muted small d-block">CPF do Profissional</span>
-                                    <span class="fw-medium text-dark"><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></span>
+                                    <strong class="d-block text-dark">CPF do Profissional</strong>
+                                    <span class="text-secondary"><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></span>
                                 </div>
                                 <div class="col-md-3 col-sm-6">
-                                    <span class="text-muted small d-block">Início do Atendimento</span>
-                                    <span class="fw-medium text-dark"><?php echo !empty($pae['data_inicio']) ? date('d/m/Y', strtotime($pae['data_inicio'])) : 'Não informado'; ?></span>
+                                    <strong class="d-block text-dark">Início do Atendimento</strong>
+                                    <span class="text-secondary"><?php echo !empty($pae['data_inicio']) ? date('d/m/Y', strtotime($pae['data_inicio'])) : 'Não informado'; ?></span>
                                 </div>
                             </div>
                         <?php else: ?>
@@ -306,15 +303,10 @@ $foto = $aluno['foto_arquivo'] ?? '';
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 flex-wrap gap-2">
                         <h5 class="fw-bold text-dark mb-0">Documentos e Laudos Anexos</h5>
-                        <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
-                            <button type="button" class="btn btn-sm btn-outline-primary rounded-3 px-3" data-bs-toggle="collapse" data-bs-target="#formAnexoLaudo">
-                                Anexar Documento
-                            </button>
-                        <?php endif; ?>
-                    </div>
+                                           </div>
 
                     <!-- Formulário Retrátil para a Escola Anexar Laudos -->
-                    <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
+                    <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
                         <div class="collapse mb-4" id="formAnexoLaudo">
                             <form action="../../controllers/alunos/laudos_salvar.php" method="POST" enctype="multipart/form-data" class="p-3 bg-light rounded-3 border">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
@@ -377,7 +369,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                                                 Visualizar
                                             </button>
                                         <?php endif; ?>
-                                        <?php if ($userPerfil == 'USUARIO_ESCOLA' && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
+                                        <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
                                             <form method="POST" action="../../controllers/alunos/remover_laudo.php" class="d-inline" onsubmit="return confirm('Deseja realmente remover este documento?')">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                 <input type="hidden" name="id_laudo" value="<?php echo $laudo['id_laudo']; ?>">
@@ -412,7 +404,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                                     <thead>
                                         <tr class="text-muted small">
                                             <th>Tipo</th>
-                                            <th>Descrição / Síntese</th>
+                                            <th>Descrição</th>
                                             <th>Profissional</th>
                                             <th>Data</th>
                                         </tr>
@@ -475,8 +467,14 @@ $foto = $aluno['foto_arquivo'] ?? '';
                         </div>
                     </div>
 
-                    <!-- Botões de Ação Contextuais -->
+                    <!-- Botões de Ação Contextuais: Apenas Escola pode editar e somente se pendente de correção ou reprovado -->
                     <div class="d-grid gap-2 mt-3">
+                        <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE_CORRECAO', 'REPROVADO'])): ?>
+                            <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning text-dark py-2 rounded-3 fw-semibold text-center">
+                                Ajustar Solicitação
+                            </a>
+                        <?php endif; ?>
+
                         <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC']) && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
                             <form action="../../controllers/alunos/reativar.php" method="POST" class="d-grid" onsubmit="return confirm('Deseja realmente reativar este aluno?');">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
@@ -485,18 +483,6 @@ $foto = $aluno['foto_arquivo'] ?? '';
                                     Reativar Aluno
                                 </button>
                             </form>
-                        <?php endif; ?>
-
-                        <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE_CORRECAO', 'REPROVADO'])): ?>
-                            <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-warning text-dark py-2 rounded-3 fw-semibold text-center">
-                                Ajustar Solicitação
-                            </a>
-                        <?php endif; ?>
-
-                        <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC', 'USUARIO_EDUCACAO_ESPECIAL']) && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
-                            <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-outline-primary py-2 rounded-3 fw-semibold text-center">
-                                Editar Cadastro
-                            </a>
                         <?php endif; ?>
                     </div>
 
@@ -509,11 +495,14 @@ $foto = $aluno['foto_arquivo'] ?? '';
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Responsável Legal</h5>
 
                     <div>
-                        <span class="text-muted small d-block">Nome do Responsável</span>
-                        <strong class="text-dark d-block mb-2"><?php echo htmlspecialchars($aluno['nome_responsavel'] ?: 'Não informado'); ?></strong>
-
-                        <span class="text-muted small d-block">CPF do Responsável</span>
-                        <span class="text-dark"><?php echo htmlspecialchars($cpfResponsavel ?: 'Não informado'); ?></span>
+                        <div class="mb-3">
+                            <strong class="d-block text-dark">Nome do Responsável</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['nome_responsavel'] ?: 'Não informado'); ?></span>
+                        </div>
+                        <div>
+                            <strong class="d-block text-dark">CPF do Responsável</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($cpfResponsavel ?: 'Não informado'); ?></span>
+                        </div>
                     </div>
                 </div>
             </div>

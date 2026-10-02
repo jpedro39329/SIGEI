@@ -126,40 +126,37 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
                         </div>
                     </div>
 
-                    <!-- Grid Interno de Dados Pessoais -->
+                    <!-- Grid Interno de Dados Pessoais: Label em Negrito em cima, Valor normal embaixo -->
                     <div class="row g-3">
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">CPF</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">CPF</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">RA do Aluno</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">RA</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Data de Nascimento</span>
-                            <span class="fw-medium text-dark">
+                            <strong class="d-block text-dark">Data de Nascimento</strong>
+                            <span class="text-secondary">
                                 <?php if (!empty($aluno['data_nascimento'])): ?>
-                                    <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?>
-                                    <?php if ($idadeAluno !== null): ?>
-                                        • <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1"><?php echo $idadeAluno; ?> anos</span>
-                                    <?php endif; ?>
+                                    <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?><?php echo ($idadeAluno !== null) ? ' - ' . $idadeAluno . ' anos' : ''; ?>
                                 <?php else: ?>
                                     Não informada
                                 <?php endif; ?>
                             </span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Gênero</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">Gênero</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Raça / Cor</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
+                            <strong class="d-block text-dark">Raça / Cor</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <span class="text-muted small d-block">Município de Nascimento</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">Município de Nascimento</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
                         </div>
                     </div>
 
@@ -173,35 +170,35 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6 col-sm-12">
-                            <span class="text-muted small d-block">Unidade Escolar</span>
-                            <strong class="text-dark"><?php echo htmlspecialchars($aluno['escola_nome'] ?: 'Não informada'); ?></strong>
+                            <strong class="d-block text-dark">Unidade Escolar</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['escola_nome'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-6 col-sm-12">
-                            <span class="text-muted small d-block">Unidade Regional de Ensino</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['ure_nome'] ?: 'Não informada'); ?></span>
+                            <strong class="d-block text-dark">Unidade Regional de Ensino</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['ure_nome'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-6 col-sm-6">
-                            <span class="text-muted small d-block">Série</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['serie'] ?: 'Não informada'); ?></span>
+                            <strong class="d-block text-dark">Série</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['serie'] ?: 'Não informada'); ?></span>
                         </div>
                         <div class="col-md-6 col-sm-6">
-                            <span class="text-muted small d-block">Turno de Aula</span>
-                            <span class="fw-medium text-dark"><?php echo htmlspecialchars($aluno['turno_aula'] ?: 'Não informado'); ?></span>
+                            <strong class="d-block text-dark">Turno de Aula</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['turno_aula'] ?: 'Não informado'); ?></span>
                         </div>
                     </div>
 
                     <!-- Diagnóstico Clínico / CID -->
                     <div class="mt-3">
-                        <span class="text-muted small d-block mb-1">Diagnóstico Clínico / Deficiência</span>
-                        <div class="p-3 rounded-3 bg-light border text-dark">
+                        <strong class="d-block text-dark mb-1">Diagnóstico Clínico</strong>
+                        <div class="p-3 rounded-3 bg-light border text-secondary">
                             <?php echo nl2br(htmlspecialchars($aluno['descricao_deficiencia'] ?: 'Nenhuma descrição clínica informada')); ?>
                         </div>
                     </div>
 
                     <!-- Cuidados Necessários -->
                     <div class="mt-3">
-                        <span class="text-muted small d-block mb-1">Cuidados Necessários e Apoio Solicitado</span>
-                        <div class="p-3 rounded-3 bg-light border text-dark">
+                        <strong class="d-block text-dark mb-1">Cuidados Necessários e Apoio Solicitado</strong>
+                        <div class="p-3 rounded-3 bg-light border text-secondary">
                             <?php echo nl2br(htmlspecialchars($aluno['descricao_cuidados'] ?: 'Nenhum cuidado especial registrado pela escola.')); ?>
                         </div>
                     </div>
@@ -293,18 +290,24 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
                         </div>
                     </div>
 
-                    <!-- Botões de Ação com Abertura Direta dos Modais -->
-                    <div class="d-grid gap-2 mt-3">
-                        <button type="button" class="btn btn-success py-2 rounded-3 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAprovar">
-                            Aprovar Atendimento
-                        </button>
-                        <button type="button" class="btn btn-outline-warning text-dark py-2 rounded-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalAjuste">
-                            Solicitar Ajustes
-                        </button>
-                        <button type="button" class="btn btn-outline-danger py-2 rounded-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalReprovar">
-                            Recusar Solicitação
-                        </button>
-                    </div>
+                    <!-- Botões de Ação: Ocultos se estiver aguardando ajuste da escola -->
+                    <?php if ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO'): ?>
+                        <div class="p-3 bg-light rounded-3 border text-secondary small mt-3">
+                            A solicitação está aguardando correções da escola. Os botões de deliberação técnica estarão disponíveis assim que a escola reenviar o cadastro com os ajustes solicitados.
+                        </div>
+                    <?php else: ?>
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="button" class="btn btn-success py-2 rounded-3 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAprovar">
+                                Aprovar Atendimento
+                            </button>
+                            <button type="button" class="btn btn-outline-warning text-dark py-2 rounded-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalAjuste">
+                                Solicitar Ajustes
+                            </button>
+                            <button type="button" class="btn btn-outline-danger py-2 rounded-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalReprovar">
+                                Recusar Solicitação
+                            </button>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -314,11 +317,14 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Responsável Legal</h5>
 
                     <div>
-                        <span class="text-muted small d-block">Nome do Responsável</span>
-                        <strong class="text-dark d-block mb-2"><?php echo htmlspecialchars($aluno['nome_responsavel'] ?: 'Não informado'); ?></strong>
-
-                        <span class="text-muted small d-block">CPF do Responsável</span>
-                        <span class="text-dark"><?php echo htmlspecialchars($cpfResponsavel ?: 'Não informado'); ?></span>
+                        <div class="mb-3">
+                            <strong class="d-block text-dark">Nome do Responsável</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['nome_responsavel'] ?: 'Não informado'); ?></span>
+                        </div>
+                        <div>
+                            <strong class="d-block text-dark">CPF do Responsável</strong>
+                            <span class="text-secondary"><?php echo htmlspecialchars($cpfResponsavel ?: 'Não informado'); ?></span>
+                        </div>
                     </div>
                 </div>
             </div>

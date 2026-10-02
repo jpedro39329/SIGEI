@@ -161,11 +161,6 @@ $homePage = $baseUrl . 'views/dashboard.php';
                             <span class="fw-bold small text-dark d-flex align-items-center gap-2">
                                 <i class="bi bi-bell-fill text-primary"></i> Notificações
                             </span>
-                            <?php if ($totalNotificacoes > 0): ?>
-                                <span class="badge bg-primary text-white rounded-pill px-2 py-1"><?php echo $totalNotificacoes; ?> nova(s)</span>
-                            <?php else: ?>
-                                <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2 py-1">0 novas</span>
-                            <?php endif; ?>
                         </div>
 
                         <?php if ($totalNotificacoes > 0): ?>
@@ -453,64 +448,29 @@ document.getElementById('modalVisualizarDocumentoGlobal')?.addEventListener('hid
 });
 </script>
 <?php 
-$exibirModalLogin = false;
+$abrirNotificacoesLogin = false;
 if (!empty($_SESSION['exibir_notificacoes_login']) && $totalNotificacoes > 0) {
-    $exibirModalLogin = true;
+    $abrirNotificacoesLogin = true;
     unset($_SESSION['exibir_notificacoes_login']);
 }
 ?>
-
-<?php if ($totalNotificacoes > 0): ?>
-<!-- Modal de Notificações ao Entrar no Sistema -->
-<div class="modal fade" id="modalNotificacoesLogin" tabindex="-1" aria-labelledby="modalNotificacoesLoginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
-        <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
-            <div class="modal-header bg-white border-bottom px-4 py-3 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                        <i class="bi bi-bell fs-6"></i>
-                    </div>
-                    <h6 class="modal-title fw-bold text-dark mb-0" id="modalNotificacoesLoginLabel">Notificações</h6>
-                    <span class="badge rounded-pill bg-light text-secondary border fw-normal px-2 py-1 small"><?php echo $totalNotificacoes; ?></span>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body p-0">
-                <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
-                    <?php foreach ($listaNotificacoes as $notif): ?>
-                        <?php 
-                            $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']);
-                        ?>
-                        <a href="<?php echo htmlspecialchars($urlLida); ?>" class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-start gap-3 border-bottom text-decoration-none">
-                            <span class="navbar-notif-icon-badge bg-<?php echo $notif['tipo']; ?>-subtle text-<?php echo $notif['tipo']; ?> flex-shrink-0 mt-1">
-                                <i class="bi <?php echo htmlspecialchars($notif['icone']); ?>"></i>
-                            </span>
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="text-dark fw-semibold small"><?php echo htmlspecialchars($notif['titulo']); ?></span>
-                                    <small class="text-muted" style="font-size: 0.72rem;"><?php echo htmlspecialchars($notif['tempo']); ?></small>
-                                </div>
-                                <div class="text-secondary small" style="font-size: 0.82rem; line-height: 1.4;"><?php echo $notif['mensagem']; ?></div>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <div class="modal-footer bg-white border-0 px-4 py-2 justify-content-end">
-                <button type="button" class="btn btn-sm btn-light border px-3 rounded-2 text-secondary" data-bs-dismiss="modal">Fechar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <script>
-<?php if ($exibirModalLogin): ?>
+<?php if ($abrirNotificacoesLogin): ?>
 document.addEventListener('DOMContentLoaded', function () {
-    const modalEl = document.getElementById('modalNotificacoesLogin');
-    if (modalEl) {
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
+    const btn = document.getElementById('dropdownNotificacoes');
+    if (btn) {
+        setTimeout(function() {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                try {
+                    const dropdown = bootstrap.Dropdown.getOrCreateInstance(btn);
+                    dropdown.show();
+                } catch (e) {
+                    btn.click();
+                }
+            } else {
+                btn.click();
+            }
+        }, 300);
     }
 });
 <?php endif; ?>
