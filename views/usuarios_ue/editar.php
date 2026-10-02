@@ -127,7 +127,7 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-dark">Salvar Alterações</button>
-                            <a href="visualizar.php?id=<?php echo $usuario['id_usuario_ue']; ?>" class="btn btn-secondary">Voltar</a>
+                            <a href="listar.php?id=<?php echo $usuario['id_usuario_ue']; ?>" class="btn btn-secondary">Voltar</a>
                         </div>
                     </form>
                 </div>

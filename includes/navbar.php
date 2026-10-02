@@ -197,6 +197,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
                             </div>
                         <?php endif; ?>
                     </div>
+
                 </div>
 
                 <?php
@@ -448,29 +449,21 @@ document.getElementById('modalVisualizarDocumentoGlobal')?.addEventListener('hid
 });
 </script>
 <?php 
-$abrirNotificacoesLogin = false;
+$abrirDropdownNoLogin = false;
 if (!empty($_SESSION['exibir_notificacoes_login']) && $totalNotificacoes > 0) {
-    $abrirNotificacoesLogin = true;
+    $abrirDropdownNoLogin = true;
     unset($_SESSION['exibir_notificacoes_login']);
 }
 ?>
 <script>
-<?php if ($abrirNotificacoesLogin): ?>
+<?php if ($abrirDropdownNoLogin): ?>
 document.addEventListener('DOMContentLoaded', function () {
     const btn = document.getElementById('dropdownNotificacoes');
-    if (btn) {
+    if (btn && typeof bootstrap !== 'undefined') {
         setTimeout(function() {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
-                try {
-                    const dropdown = bootstrap.Dropdown.getOrCreateInstance(btn);
-                    dropdown.show();
-                } catch (e) {
-                    btn.click();
-                }
-            } else {
-                btn.click();
-            }
-        }, 300);
+            const dropdown = bootstrap.Dropdown.getOrCreateInstance(btn);
+            dropdown.show();
+        }, 350);
     }
 });
 <?php endif; ?>

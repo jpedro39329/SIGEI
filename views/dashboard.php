@@ -97,7 +97,7 @@ function totalDashboard($conexao, $sql) {
 
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
-                <h5 class="mb-3">Crescimento de Alunos por Período (Datas)</h5>
+                <h5 class="mb-3">Crescimento de Alunos por Período</h5>
                 <canvas id="graficoEscola" height="90"></canvas>
             </div>
         </div>
@@ -620,7 +620,7 @@ function totalDashboard($conexao, $sql) {
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Panorama Geral da URE (Fiscalização)</h5>
+                    <h5 class="mb-0">Panorama Geral da Unidade Regional</h5>
                     <a href="alunos/listar.php" class="btn btn-outline-primary btn-sm">Ver Todos os Alunos</a>
                 </div>
                 <canvas id="graficoSefisc" height="100"></canvas>

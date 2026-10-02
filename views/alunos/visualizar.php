@@ -392,42 +392,42 @@ $foto = $aluno['foto_arquivo'] ?? '';
                 </div>
             </div>
 
-            <!-- 5. Relatórios de Atendimento (Exibido se Aprovado e houver registros) -->
-            <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
+            <!-- 5. Relatórios de Atendimento (Exibido para Escola, Supervisor e Empresa) -->
+            <?php if ($aluno['status_aprovacao'] === 'APROVADO' && in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Relatórios de Atendimento</h5>
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                            <h5 class="fw-bold text-dark mb-0">Relatórios de Atendimento</h5>
+                           
+                        </div>
 
                         <?php if (count($relatorios) > 0): ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead>
-                                        <tr class="text-muted small">
-                                            <th>Tipo</th>
-                                            <th>Descrição</th>
-                                            <th>Profissional</th>
-                                            <th>Data</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($relatorios as $relatorio): ?>
-                                            <tr>
-                                                <td>
-                                                    <span class="badge bg-light text-primary border rounded-pill px-2 py-1">
-                                                        <?php echo $relatorio['tipo'] == 'DIARIO' ? 'Diário' : 'Mensal'; ?>
-                                                    </span>
-                                                </td>
-                                                <td><small class="text-dark"><?php echo htmlspecialchars(mb_substr($relatorio['descricao'], 0, 90)) . (mb_strlen($relatorio['descricao']) > 90 ? '...' : ''); ?></small></td>
-                                                <td><small class="fw-medium text-dark"><?php echo htmlspecialchars($relatorio['pae_nome']); ?></small></td>
-                                                <td><small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($relatorio['data_cadastro'])); ?></small></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                            <div class="d-flex flex-column gap-3">
+                                <?php foreach ($relatorios as $relatorio): ?>
+                                    <div class="p-3 bg-light rounded-3 border">
+                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-white text-dark border fw-semibold">
+                                                    <?php echo $relatorio['tipo'] == 'DIARIO' ? 'Diário' : 'Mensal'; ?>
+                                                </span>
+                                                <strong class="text-dark small"><?php echo htmlspecialchars($relatorio['pae_nome']); ?></strong>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="text-muted small"><?php echo date('d/m/Y \à\s H:i', strtotime($relatorio['data_cadastro'])); ?></span>
+                                                <a href="../relatorios/visualizar.php?id=<?php echo $relatorio['id_relatorio']; ?>" class="btn btn-sm btn-outline-primary px-2 py-0 rounded-2" style="font-size: 0.78rem;">
+                                                    Ver Detalhes
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="p-3 bg-white rounded-2 border text-secondary" style="line-height: 1.6; font-size: 0.9rem;">
+                                            <?php echo nl2br(htmlspecialchars($relatorio['descricao'])); ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         <?php else: ?>
                             <div class="p-3 rounded-3 bg-light border text-muted small text-center">
-                                Nenhum relatório de atendimento registrado até o momento.
+                                Nenhum relatório de atendimento registrado até o momento para este aluno.
                             </div>
                         <?php endif; ?>
                     </div>
