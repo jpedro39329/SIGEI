@@ -76,10 +76,13 @@ if (isset($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {
     }
 }
 
+$deliberadorNome = $_SESSION['user_name'] ?? 'Educação Especial';
+$deliberadorCpf = preg_replace('/\D/', '', $_SESSION['user_cpf'] ?? '');
+
 $stmt = $conexao->prepare(
-    "UPDATE alunos SET status_aprovacao = ?, motivo_reprovacao = ? WHERE id_aluno = ?"
+    "UPDATE alunos SET status_aprovacao = ?, motivo_reprovacao = ?, deliberado_por_nome = ?, deliberado_por_cpf = ?, data_deliberacao = NOW() WHERE id_aluno = ?"
 );
-$stmt->bind_param("ssi", $status, $motivo, $id_aluno);
+$stmt->bind_param("ssssi", $status, $motivo, $deliberadorNome, $deliberadorCpf, $id_aluno);
 
 if ($stmt->execute()) {
     header("Location: ../../views/solicitacoes/listar.php?msg=ok");
