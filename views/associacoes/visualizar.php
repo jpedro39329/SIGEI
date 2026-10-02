@@ -102,31 +102,31 @@ $alunosAssociados = $stmtAlunos->get_result()->fetch_all(MYSQLI_ASSOC);
     <!-- Informações do PAE -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
-            <h5 class="mb-3">Informações do Profissional de Apoio Escolar (PAE)</h5>
+            <h5 class="mb-3">Informações do Profissional de Apoio Escolar</h5>
             <div class="row">
                 <div class="col-md-6 mb-2">
-                    <span class="text-muted">Nome do Profissional:</span>
-                    <strong><?php echo htmlspecialchars($pae['nome']); ?></strong>
+                    <strong>Nome do Profissional:</strong>
+                    <span><?php echo htmlspecialchars($pae['nome']); ?></span>
                 </div>
                 <div class="col-md-6 mb-2">
-                    <span class="text-muted">CPF:</span>
-                    <strong class="font-monospace"><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></strong>
+                    <strong>CPF:</strong>
+                    <span class="font-monospace"><?php echo htmlspecialchars(formatarCPF($pae['cpf'])); ?></span>
                 </div>
                 <div class="col-md-6 mb-2">
-                    <span class="text-muted">Empresa Contratada:</span>
-                    <strong><?php echo htmlspecialchars($pae['empresa_nome'] ?: 'Não informada'); ?></strong>
+                    <strong>Empresa Contratada:</strong>
+                    <span><?php echo htmlspecialchars($pae['empresa_nome'] ?: 'Não informada'); ?></span>
                 </div>
                 <div class="col-md-6 mb-2">
-                    <span class="text-muted">Telefone:</span>
-                    <strong><?php echo htmlspecialchars(formatarTelefone($pae['telefone']) ?: 'Não informado'); ?></strong>
+                    <strong>Telefone:</strong>
+                    <span><?php echo htmlspecialchars(formatarTelefone($pae['telefone']) ?: 'Não informado'); ?></span>
                 </div>
                 <div class="col-md-6 mb-2">
-                    <span class="text-muted">E-mail:</span>
-                    <strong><?php echo htmlspecialchars($pae['email'] ?: 'Não informado'); ?></strong>
+                    <strong>E-mail:</strong>
+                    <span><?php echo htmlspecialchars($pae['email'] ?: 'Não informado'); ?></span>
                 </div>
                 <div class="col-md-6 mb-2">
-                    <span class="text-muted">Carga Atual de Atendimento:</span>
-                    <strong><?php echo count($alunosAssociados); ?> de 3 aluno(s)</strong>
+                    <strong>Carga Atual de Atendimento:</strong>
+                    <span><?php echo count($alunosAssociados); ?> de 3 aluno(s)</span>
                 </div>
             </div>
         </div>
@@ -136,8 +136,7 @@ $alunosAssociados = $stmtAlunos->get_result()->fetch_all(MYSQLI_ASSOC);
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Alunos Atualmente em Atendimento</h5>
-                <span class="text-muted small"><?php echo count($alunosAssociados); ?> vínculo(s) ativo(s)</span>
+                <h5 class="mb-0">Alunos Atualmente em Atendimento</h5>                
             </div>
 
             <div class="table-responsive">
@@ -208,4 +207,3 @@ $alunosAssociados = $stmtAlunos->get_result()->fetch_all(MYSQLI_ASSOC);
 
 </body>
 </html>
-

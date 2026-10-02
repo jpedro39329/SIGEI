@@ -103,7 +103,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'salvo'): ?>
-        <div class="alert alert-success">PAE salvo com sucesso.</div>
+        <div class="alert alert-success">Profissional de Apoio Escolar salvo com sucesso.</div>
     <?php endif; ?>
 
     <!-- Barra de pesquisa e filtros -->

@@ -35,8 +35,7 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
             <div class="card card-form">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                        <h2 class="mb-0">Cadastrar Profissional de Apoio Escolar (PAE)</h2>
-                        <a href="listar.php" class="btn btn-secondary btn-sm">Voltar</a>
+                        <h2 class="mb-0">Cadastrar Profissional de Apoio Escolar</h2>                        
                     </div>
 
                     <?php if (isset($_GET['erro'])): ?>
@@ -85,13 +84,14 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
                                 <input type="text" name="telefone" class="form-control" maxlength="30" placeholder="(11) 9999-3000">
                             </div>
 
-                            <div class="col-md-3 mb-3">
+                           <!--<div class="col-md-3 mb-3">
                                 <label class="form-label">Status</label>
                                 <select name="ativo" class="form-select" required>
                                     <option value="1" selected>Ativo</option>
                                     <option value="0">Inativo</option>
                                 </select>
                             </div>
+                            -->
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Senha</label>
