@@ -1,5 +1,10 @@
 <?php
 // Inclua sua sessão ou gerador de token CSRF se necessário aqui
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$msgErro = $_SESSION['recuperacao_msg_erro'] ?? '';
+unset($_SESSION['recuperacao_msg_erro']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -285,8 +290,14 @@
       
       <div class="login-header">
         <h2 class="section-label">Recuperar Senha</h2>
-        <p class="section-sub">Informe seu e-mail cadastrado para redefinir sua senha</p>
+        <p class="section-sub">Informe seu e-mail cadastrado para receber um código de verificação</p>
       </div>
+
+      <?php if ($msgErro): ?>
+        <div style="background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:14px;">
+          <?php echo htmlspecialchars($msgErro); ?>
+        </div>
+      <?php endif; ?>
 
       <form class="login-form" action="../../controllers/auth/processa_esqueci_senha.php" method="POST">
         <div class="form-group">
@@ -294,7 +305,7 @@
           <input type="email" name="email" id="email" class="form-control" maxlength="150" required placeholder="seu.email@exemplo.com">
         </div>
         
-        <button type="submit" class="btn-login">Redefinir Senha</button>
+        <button type="submit" class="btn-login">Enviar Código</button>
         
         <div class="login-links">
           <a href="login.php" class="link-btn">← Voltar para o Login</a>

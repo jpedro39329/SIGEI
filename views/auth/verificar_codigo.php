@@ -1,20 +1,21 @@
 <?php
-// views/auth/redefinir_senha.php
-// Etapa 3 da recuperação de senha: definição da nova senha (somente após o código ser verificado).
+// views/auth/verificar_codigo.php
+// Etapa 2 da recuperação de senha: o usuário digita o código recebido por e-mail.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$sucesso = !empty($_SESSION['recuperacao_sucesso']);
-unset($_SESSION['recuperacao_sucesso']);
-
-if (!$sucesso && (empty($_SESSION['recuperacao_verificada']) || empty($_SESSION['recuperacao_id']))) {
+if (empty($_SESSION['recuperacao_email'])) {
     header('Location: esqueciminha_senha.php');
     exit;
 }
 
+$msgInfo = $_SESSION['recuperacao_msg_info'] ?? '';
 $msgErro = $_SESSION['recuperacao_msg_erro'] ?? '';
-unset($_SESSION['recuperacao_msg_erro']);
+unset($_SESSION['recuperacao_msg_info'], $_SESSION['recuperacao_msg_erro']);
+
+// Disponível apenas em ambiente local (definido no controller)
+$codigoTeste = $_SESSION['recuperacao_codigo_teste'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -299,48 +300,43 @@ unset($_SESSION['recuperacao_msg_erro']);
       <p>Gestão eficiente para uma educação inclusiva.<br>O SIGEI centraliza informações, auxilia no acompanhamento de alunos elegíveis à educação especial e apoia a distribuição de Profissionais de Apoio Escolar.</p>
     </div>
 
-    <!-- LADO DIREITO (NOVA SENHA) -->
+    <!-- LADO DIREITO (VERIFICAR CÓDIGO) -->
     <div class="caixa direita">
       
-      <?php if ($sucesso): ?>
       <div class="login-header">
-        <h2 class="section-label">Senha Alterada</h2>
-        <p class="section-sub">Sua senha foi alterada com sucesso!</p>
-      </div>
-      <div style="background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:14px;">
-        Agora você já pode entrar no SIGEI com a nova senha.
-      </div>
-      <a href="login.php" class="btn-login" style="display:block;text-align:center;text-decoration:none;">Voltar para o Login</a>
-      <?php else: ?>
-      <div class="login-header">
-        <h2 class="section-label">Nova Senha</h2>
-        <p class="section-sub">Defina sua nova senha de acesso ao sistema</p>
+        <h2 class="section-label">Verificar Código</h2>
+        <p class="section-sub">Digite o código de 6 dígitos enviado para o seu e-mail</p>
       </div>
 
+      <?php if ($msgInfo): ?>
+        <div style="background:#e3f2fd;border:1px solid #90caf9;color:#0d47a1;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:14px;">
+          <?php echo htmlspecialchars($msgInfo); ?>
+        </div>
+      <?php endif; ?>
       <?php if ($msgErro): ?>
         <div style="background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:14px;">
           <?php echo htmlspecialchars($msgErro); ?>
         </div>
       <?php endif; ?>
-
-      <form class="login-form" action="../../controllers/auth/processa_redefinir_senha.php" method="POST" autocomplete="off">
-        <div class="form-group">
-          <label for="nova_senha">Nova Senha</label>
-          <input type="password" name="nova_senha" id="nova_senha" class="form-control" minlength="6" maxlength="255" required placeholder="••••••••">
+      <?php if ($codigoTeste): ?>
+        <div style="background:#fff8e1;border:1px dashed #ffb300;color:#6d4c00;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:13px;">
+          [Ambiente local] Código para testes: <strong><?php echo htmlspecialchars($codigoTeste); ?></strong>
         </div>
+      <?php endif; ?>
 
+      <form class="login-form" action="../../controllers/auth/processa_verificar_codigo.php" method="POST" autocomplete="off">
         <div class="form-group">
-          <label for="confirma_senha">Confirmar Nova Senha</label>
-          <input type="password" name="confirma_senha" id="confirma_senha" class="form-control" minlength="6" maxlength="255" required placeholder="••••••••">
+          <label for="codigo">Código de Verificação</label>
+          <input type="text" name="codigo" id="codigo" class="form-control" inputmode="numeric" pattern="\d{6}" maxlength="6" required placeholder="000000" autofocus>
         </div>
         
-        <button type="submit" class="btn-login">Salvar Nova Senha</button>
+        <button type="submit" class="btn-login">Verificar Código</button>
         
         <div class="login-links">
+          <a href="esqueciminha_senha.php" class="link-btn">Não recebeu? Solicitar novo código</a>
           <a href="login.php" class="link-btn">← Voltar para o Login</a>
         </div>
       </form>
-      <?php endif; ?>
 
     </div>
 
