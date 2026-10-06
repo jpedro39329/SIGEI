@@ -1,0 +1,23 @@
+# Configurações locais sensíveis
+config/database.php
+config/mail.php
+
+# Arquivos e diretórios de uploads
+uploads/fotos/*
+uploads/documentos/*
+uploads/laudos/*
+uploads/contratos/*
+!uploads/**/.gitkeep
+
+# Arquivos temporários e do sistema operacional
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Ambientes e dependências locais
+.env
+.env.*
+node_modules/
+vendor/
+

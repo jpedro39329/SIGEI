@@ -1,19 +1,11 @@
 <?php
 // controllers/auth/processa_esqueci_senha.php
-// Etapa 1 da recuperação de senha: gera e envia um código de 6 dígitos por e-mail.
+// Etapa 1 da recuperação de senha: gera o código de 6 dígitos para o e-mail informado.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once '../../config/database.php';
-
-// Caminhos corretos para a estrutura do PHPMailer
-require_once '../../phpmailer/src/Exception.php';
-require_once '../../phpmailer/src/PHPMailer.php';
-require_once '../../phpmailer/src/SMTP.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 // Validade do código (minutos)
 const RECUPERACAO_VALIDADE_MIN = 15;
@@ -86,37 +78,7 @@ if ($usuarioEncontrado) {
     );
     $stmtInsert->execute();
 
-    $mail = new PHPMailer(true);
-
-    try {
-        // Configurações do Servidor SMTP (Exemplo com Gmail)
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'seu_email@gmail.com'; // Seu e-mail do Gmail
-        $mail->Password   = 'sua_senha_de_aplicativo'; // A senha de 16 dígitos gerada no Google
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Alterado para SMTPS
-        $mail->Port       = 465;                        // Alterado para a porta 465
-        $mail->CharSet    = 'UTF-8';                   // Porta 465
-
-        // Remetente e Destinatário
-        $mail->setFrom('seu_email@gmail.com', 'Sistema SIGEI');
-        $mail->addAddress($email);
-
-        // Conteúdo
-        $mail->isHTML(true);
-        $mail->Subject = 'SIGEI - Código de Recuperação de Senha';
-        $mail->Body    = "Olá,<br><br>Recebemos uma solicitação para redefinir sua senha no SIGEI.<br>" .
-                         "Seu código de verificação é: <b style='font-size:20px;letter-spacing:3px;'>{$codigo}</b><br><br>" .
-                         "Este código é válido por " . RECUPERACAO_VALIDADE_MIN . " minutos e só pode ser usado uma vez.<br><br>" .
-                         "Se você não solicitou isso, ignore este e-mail.";
-        $mail->AltBody = "Seu código de verificação do SIGEI é: {$codigo} (válido por " . RECUPERACAO_VALIDADE_MIN . " minutos).";
-
-        $mail->send();
-    } catch (Exception $e) {
-        // Não expõe detalhes ao usuário; registra apenas no log do servidor.
-        error_log('[SIGEI] Falha ao enviar código de recuperação: ' . $mail->ErrorInfo);
-    }
+    // NOTA: O envio de e-mail será integrado futuramente via API HTTPS (ex.: Brevo, Resend).
 
     // Somente em ambiente local (XAMPP) o código fica disponível na tela para testes.
     $host = strtolower(explode(':', $_SERVER['HTTP_HOST'] ?? '')[0]);
