@@ -20,7 +20,7 @@ unset($_SESSION['recuperacao_msg_erro']);
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Times New Roman', Times, serif;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
       background-color: #ddeeff;
       min-height: 100vh;
       position: relative;
