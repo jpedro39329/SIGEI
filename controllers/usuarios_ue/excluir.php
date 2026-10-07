@@ -16,6 +16,18 @@ if ($id <= 0) {
     exit();
 }
 
+// Verifica se existem alunos vinculados/cadastrados por este usuário
+$stmtAlunos = $conexao->prepare("SELECT COUNT(*) as total FROM alunos WHERE id_usuario_ue = ?");
+$stmtAlunos->bind_param("i", $id);
+$stmtAlunos->execute();
+$totalAlunos = (int) $stmtAlunos->get_result()->fetch_assoc()['total'];
+$stmtAlunos->close();
+
+if ($totalAlunos > 0) {
+    header("Location: ../../views/usuarios_ue/listar.php?erro=" . urlencode("Não é possível excluir este usuário pois existem $totalAlunos aluno(s) cadastrado(s) por ele."));
+    exit();
+}
+
 $stmt = $conexao->prepare("DELETE FROM usuarios_ue WHERE id_usuario_ue = ?");
 $stmt->bind_param("i", $id);
 

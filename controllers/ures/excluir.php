@@ -27,6 +27,18 @@ if ($resEscolas && $resEscolas['total'] > 0) {
     exit();
 }
 
+// Verifica se existem servidores/usuários vinculados a esta regional
+$stmtUsuarios = $conexao->prepare("SELECT COUNT(*) as total FROM usuarios_ure WHERE id_ure = ?");
+$stmtUsuarios->bind_param("i", $id);
+$stmtUsuarios->execute();
+$totalUsuarios = (int) $stmtUsuarios->get_result()->fetch_assoc()['total'];
+$stmtUsuarios->close();
+
+if ($totalUsuarios > 0) {
+    header("Location: ../../views/ures/listar.php?erro=" . urlencode("Não é possível excluir esta URE pois existem $totalUsuarios servidor(es) vinculado(s) a ela."));
+    exit();
+}
+
 $stmt = $conexao->prepare("DELETE FROM unidades_regionais WHERE id_ure = ?");
 $stmt->bind_param("i", $id);
 
