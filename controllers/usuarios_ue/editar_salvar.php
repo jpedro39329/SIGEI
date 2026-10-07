@@ -73,6 +73,13 @@ if ($senha !== '') {
 }
 
 if ($stmt->execute()) {
+    registrarAuditoria($conexao, 'USUARIOS', 'EDITAR', 'usuarios_ue', $idUsuarioUe, [
+        'nome' => $nome,
+        'id_ue' => $idUe,
+        'ativo' => $ativo,
+        'email' => $email
+    ]);
+
     header("Location: ../../views/usuarios_ue/listar.php?msg=editado");
     exit();
 }

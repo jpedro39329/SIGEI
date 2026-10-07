@@ -143,6 +143,11 @@ foreach ($tabelas as $tabela => $info) {
             $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $_SESSION['user_id'], $_SESSION['user_perfil']);
             $_SESSION['exibir_notificacoes_login'] = true;
 
+            registrarAuditoria($conexao, 'AUTH', 'LOGIN', $tabela, $_SESSION['user_id'], [
+                'perfil' => $_SESSION['user_perfil'],
+                'tabela' => $tabela
+            ]);
+
             $stmt->close();
             header("Location: ../../views/dashboard.php");
             exit();

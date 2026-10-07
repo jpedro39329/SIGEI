@@ -85,6 +85,12 @@ $stmt = $conexao->prepare(
 $stmt->bind_param("ssssi", $status, $motivo, $deliberadorNome, $deliberadorCpf, $id_aluno);
 
 if ($stmt->execute()) {
+    registrarAuditoria($conexao, 'ALUNOS', 'DELIBERAR', 'alunos', $id_aluno, [
+        'status' => $status,
+        'motivo' => $motivo,
+        'deliberado_por' => $deliberadorNome
+    ]);
+
     header("Location: ../../views/solicitacoes/listar.php?msg=ok");
     exit();
 }

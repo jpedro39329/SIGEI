@@ -64,6 +64,11 @@ function sigei_pagina_erro(int $codigo = 500, string $urlInicio = ''): void
     <div class="marca">SIGEI</div>
     <h1><?php echo htmlspecialchars($titulo); ?></h1>
     <p><?php echo htmlspecialchars($texto); ?></p>
+    <?php if (!$is404): ?>
+      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: -16px; margin-bottom: 22px; font-family: monospace;">
+        Código: SIGEI-ERR-<?php echo (int)$codigo; ?>
+      </div>
+    <?php endif; ?>
     <?php if ($is404): ?>
       <a class="btn" href="<?php echo htmlspecialchars($inicio); ?>"
          onclick="if (history.length > 1) { history.back(); return false; }">Voltar</a>

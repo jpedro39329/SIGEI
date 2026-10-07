@@ -43,6 +43,10 @@ $stmt = $conexao->prepare("DELETE FROM unidades_regionais WHERE id_ure = ?");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
+    $stmt->close();
+    registrarAuditoria($conexao, 'URES', 'EXCLUIR', 'unidades_regionais', $id, [
+        'id_ure' => $id
+    ]);
     header("Location: ../../views/ures/listar.php?msg=excluido");
     exit();
 }

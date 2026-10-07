@@ -64,6 +64,11 @@ if ($stmt) {
     $stmt->bind_param("i", $idAluno);
     if ($stmt->execute()) {
         $stmt->close();
+        registrarAuditoria($conexao, 'ALUNOS', 'REATIVAR', 'alunos', $idAluno, [
+            'aluno_id' => $idAluno,
+            'reativado_por' => $_SESSION['user_name'] ?? 'Usuário',
+            'perfil' => $userPerfil
+        ]);
         header("Location: ../../views/alunos/listar.php?aba=aprovados&msg=reativado");
         exit();
     }

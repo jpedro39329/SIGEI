@@ -471,4 +471,5 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="<?php echo $baseUrl; ?>assets/js/termos.js"></script>
 <script src="<?php echo $baseUrl; ?>assets/js/confirmacao.js"></script>
 <script src="<?php echo $baseUrl; ?>assets/js/mascaras.js"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/erros.js"></script>
 

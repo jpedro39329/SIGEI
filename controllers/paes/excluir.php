@@ -46,6 +46,12 @@ try {
     $stmt = $conexao->prepare("UPDATE usuarios_pae SET ativo = 0 WHERE id_pae = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
+    $stmt->close();
+
+    registrarAuditoria($conexao, 'PAE', 'INATIVAR', 'usuarios_pae', $id, [
+        'id_empresa' => $idEmpresa,
+        'motivo' => 'Inativação via painel de supervisão'
+    ]);
 } catch (mysqli_sql_exception $exception) {
     header("Location: ../../views/paes/listar.php?erro=" . urlencode("Não foi possível inativar o PAE."));
     exit();

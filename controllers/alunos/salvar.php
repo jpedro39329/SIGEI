@@ -72,7 +72,10 @@ if ($resultVerifica->num_rows > 0) {
 
 $stmtVerifica->close();
 
-// Query de inserção com todos os campos da ficha do aluno
+$cadastradorNome = trim($_SESSION['user_name'] ?? 'Equipe Escolar');
+$cadastradorCpf  = preg_replace('/\D/', '', $_SESSION['user_cpf'] ?? '');
+
+// Query de inserção com todos os campos da ficha do aluno e snapshot do autor
 $query = "INSERT INTO alunos (
     nome,
     cpf,
@@ -91,8 +94,10 @@ $query = "INSERT INTO alunos (
     termo_responsabilidade_arquivo,
     status_aprovacao,
     id_ue,
-    id_usuario_ue
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDENTE', ?, ?)";
+    id_usuario_ue,
+    cadastrado_por_nome,
+    cadastrado_por_cpf
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDENTE', ?, ?, ?, ?)";
 
 $stmt = $conexao->prepare($query);
 
@@ -101,7 +106,7 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    "sssssssssssssssii",
+    "sssssssssssssssiss",
     $nome,
     $cpf,
     $ra,
@@ -118,11 +123,18 @@ $stmt->bind_param(
     $fotoArquivo,
     $termoArquivo,
     $id_escola,
-    $id_usuario_escola
+    $id_usuario_escola,
+    $cadastradorNome,
+    $cadastradorCpf
 );
 
 if ($stmt->execute()) {
     $id_aluno = $stmt->insert_id;
+    registrarAuditoria($conexao, 'ALUNOS', 'CRIAR', 'alunos', $id_aluno, [
+        'nome' => $nome,
+        'cpf' => $cpf,
+        'id_ue' => $id_escola
+    ]);
 
     // Upload dos laudos (múltiplos, opcional)
     if (isset($_FILES['laudos']) && is_array($_FILES['laudos']['name'])) {

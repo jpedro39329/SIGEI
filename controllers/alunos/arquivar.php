@@ -81,6 +81,11 @@ if ($stmt) {
     $stmt->bind_param("ssssi", $motivo, $userName, $userCpf, $userPerfil, $idAluno);
     if ($stmt->execute()) {
         $stmt->close();
+        registrarAuditoria($conexao, 'ALUNOS', 'ARQUIVAR', 'alunos', $idAluno, [
+            'motivo' => $motivo,
+            'arquivado_por' => $userName,
+            'perfil' => $userPerfil
+        ]);
         header("Location: ../../views/alunos/listar.php?aba=arquivados&msg=arquivado");
         exit();
     }

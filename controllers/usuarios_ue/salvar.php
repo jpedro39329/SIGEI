@@ -52,6 +52,14 @@ if (!$stmt) {
 $stmt->bind_param("isssssi", $idUe, $nome, $cpf, $senhaHash, $email, $telefone, $ativo);
 
 if ($stmt->execute()) {
+    $novoId = $stmt->insert_id;
+    registrarAuditoria($conexao, 'USUARIOS', 'CRIAR', 'usuarios_ue', $novoId, [
+        'nome' => $nome,
+        'cpf' => $cpf,
+        'id_ue' => $idUe,
+        'email' => $email
+    ]);
+
     header("Location: ../../views/usuarios_ue/listar.php?msg=ok");
     exit();
 }

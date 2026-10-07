@@ -98,7 +98,13 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'editado'): ?>
         <div class="alert alert-success">Dados do usuário atualizados com sucesso!</div>
     <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'excluido'): ?>
-        <div class="alert alert-success">Usuário excluído com sucesso!</div>
+        <div class="alert alert-success">Usuário excluído com sucesso! Histórico preservado.</div>
+    <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'inativado'): ?>
+        <div class="alert alert-warning">Acesso do usuário desativado com sucesso!</div>
+    <?php elseif (isset($_GET['msg']) && $_GET['msg'] == 'ativado'): ?>
+        <div class="alert alert-success">Acesso do usuário ativado com sucesso!</div>
+    <?php elseif (isset($_GET['erro'])): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro']); ?></div>
     <?php endif; ?>
 
     <!-- Barra de pesquisa e filtros -->
@@ -154,6 +160,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <th>UA</th>
                             <th>Cód. UGE</th>
                             <th>E-mail</th>
+                            <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -167,19 +174,31 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars($u['ure_uge'] ?: 'N/D'); ?></td>
                                     <td><?php echo htmlspecialchars($u['email'] ?: '-'); ?></td>
                                     <td>
+                                        <?php if ((int)$u['ativo'] === 1): ?>
+                                            <span class="badge bg-success">Ativo</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Inativo</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <div class="acoes-cell">
                                             <a href="editar.php?id=<?php echo $u['id_usuario_ue']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Usuário">Editar</a>
+                                            <a href="../../controllers/usuarios_ue/inativar.php?id=<?php echo $u['id_usuario_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                               class="btn btn-sm <?php echo ((int)$u['ativo'] === 1) ? 'btn-outline-secondary' : 'btn-outline-success'; ?>"
+                                               title="<?php echo ((int)$u['ativo'] === 1) ? 'Inativar Acesso' : 'Ativar Acesso'; ?>">
+                                               <?php echo ((int)$u['ativo'] === 1) ? 'Inativar' : 'Ativar'; ?>
+                                            </a>
                                             <a href="../../controllers/usuarios_ue/excluir.php?id=<?php echo $u['id_usuario_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir Usuário"
-                                               data-msg="Tem certeza que deseja excluir este usuário da escola?">Excluir</a>
+                                               data-msg="Tem certeza que deseja excluir este usuário da escola? As ações realizadas e o histórico de alunos cadastrados serão mantidos.">Excluir</a>
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Nenhum usuário de escola encontrado.</td>
+                                <td colspan="7" class="text-center text-muted">Nenhum usuário de escola encontrado.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

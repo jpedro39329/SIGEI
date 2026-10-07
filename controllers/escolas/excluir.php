@@ -42,6 +42,10 @@ $stmt = $conexao->prepare("DELETE FROM unidades_escolares WHERE id_ue = ?");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
+    $stmt->close();
+    registrarAuditoria($conexao, 'ESCOLAS', 'EXCLUIR', 'unidades_escolares', $id, [
+        'id_ue' => $id
+    ]);
     header("Location: ../../views/escolas/listar.php?msg=excluido");
     exit();
 }

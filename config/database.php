@@ -2,7 +2,7 @@
 $host = 'localhost';
 $user = 'admin';     
 $password = '123456';     
-$dbname = 'SIGEI';
+$dbname = 'wmshpicv_SIGEI';
 
 $conexao = new mysqli($host, $user, $password, $dbname);
 

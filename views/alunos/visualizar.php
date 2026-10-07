@@ -15,7 +15,8 @@ if ($id_aluno <= 0) {
 // Busca os dados completos do aluno, escola e quem cadastrou
 $sqlAluno = "
     SELECT a.*, ue.nome AS escola_nome, ue.id_ure, ure.nome AS ure_nome,
-           uue.nome AS cadastrado_por_nome, uue.cpf AS cadastrado_por_cpf
+           COALESCE(NULLIF(a.cadastrado_por_nome, ''), uue.nome) AS cadastrado_por_nome,
+           COALESCE(NULLIF(a.cadastrado_por_cpf, ''), uue.cpf) AS cadastrado_por_cpf
     FROM alunos a
     LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
     LEFT JOIN unidades_regionais ure ON ue.id_ure = ure.id_ure
