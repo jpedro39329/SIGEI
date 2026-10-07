@@ -1,8 +1,7 @@
 <?php
 require_once "../../config/init.php";
 
-// Apenas perfis autorizados (Escola, Educação Especial, SEDUC, ADMIN) podem reativar
-exibirErroSe(!estaLogado(), "Usuário não autenticado.");
+exigirLogin();
 exigirTokenCSRF();
 
 $userPerfil = $_SESSION['user_perfil'] ?? '';
