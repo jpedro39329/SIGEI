@@ -1,3 +1,4 @@
+<?php
 require_once "../../config/init.php";
 
 exigirPerfil(array('DIRIGENTE', 'ADMIN'));
