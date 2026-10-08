@@ -93,7 +93,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <?php if ($userPerfil === 'ADMIN' || $userPerfil === 'SEDUC'): ?>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label">Unidade Regional (URE) <span class="text-danger">*</span></label>
+                                    <label class="form-label">Unidade Regional de Ensino <span class="text-danger">*</span></label>
                                     <select name="id_ure" class="form-select" required>
                                         <?php foreach ($todasUres as $ure): ?>
                                             <option value="<?php echo $ure['id_ure']; ?>" <?php echo $servidor['id_ure'] == $ure['id_ure'] ? 'selected' : ''; ?>>
@@ -104,13 +104,13 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 </div>
                             <?php else: ?>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label">Unidade Regional (URE)</label>
+                                    <label class="form-label">Unidade Regional de Ensino</label>
                                     <input type="text" class="form-control" value="<?php echo htmlspecialchars($servidor['ure_nome']); ?>" readonly>
                                 </div>
                             <?php endif; ?>
 
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Setor da URE <span class="text-danger">*</span></label>
+                                <label class="form-label">Setor<span class="text-danger">*</span></label>
                                 <select name="setor" id="setor" class="form-select" required onchange="atualizarCargos()">
                                     <option value="ASURE" <?php echo ($servidor['setor'] === 'ASURE' || $servidor['setor'] === 'GABINETE') ? 'selected' : ''; ?>>Assistência Técnica (ASURE)</option>
                                     <option value="SEFISC" <?php echo $servidor['setor'] === 'SEFISC' ? 'selected' : ''; ?>>Seção de Fiscalização (SEFISC)</option>
@@ -119,19 +119,11 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                             </div>
 
                             <div class="col-md-5 mb-3">
-                                <label class="form-label">Cargo / Função <span class="text-danger">*</span></label>
+                                <label class="form-label">Cargo <span class="text-danger">*</span></label>
                                 <select name="cargo" id="cargo" class="form-select" required>
                                     <!-- Preenchido via JS -->
                                 </select>
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="ativo" class="form-select">
-                                    <option value="1" <?php echo $servidor['ativo'] == 1 ? 'selected' : ''; ?>>Ativo</option>
-                                    <option value="0" <?php echo $servidor['ativo'] == 0 ? 'selected' : ''; ?>>Inativo</option>
-                                </select>
-                            </div>
+                            </div>                            
 
                             <div class="col-12 mt-2">
                                 <h5 class="mb-3">Contatos</h5>

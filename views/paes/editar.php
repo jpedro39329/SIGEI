@@ -41,7 +41,7 @@ if (!$pae) {
         <div class="col-lg-8">
             <div class="card card-form">
                 <div class="card-body p-4">
-                    <h2 class="mb-4">Editar PAE</h2>
+                    <h2 class="mb-4">Editar Profissional de Apoio Escolar</h2>
 
                     <form action="../../controllers/paes/editar_salvar.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">

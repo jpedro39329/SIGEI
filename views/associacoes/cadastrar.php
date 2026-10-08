@@ -120,7 +120,7 @@ $dataHoje = date('Y-m-d');
                         <div>
                             <h2 class="mb-0">Nova Associação</h2>
                         </div>
-                        <a href="gerenciar.php" class="btn btn-secondary btn-sm">Voltar</a>
+                       
                     </div>
 
                     <?php if (isset($_GET['erro'])): ?>
@@ -134,7 +134,7 @@ $dataHoje = date('Y-m-d');
 
                         <!-- 1. Seleção do Profissional de Apoio (PAE) -->
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Profissional de Apoio Escolar (PAE) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Profissional de Apoio Escolar <span class="text-danger">*</span></label>
                             <select name="id_pae" id="selectPae" class="form-select" required>
                                 <option value="">-- Selecione o profissional de apoio --</option>
                                 <?php foreach ($paesDisponiveis as $pae): ?>

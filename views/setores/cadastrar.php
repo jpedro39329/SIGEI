@@ -34,7 +34,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
         <div class="col-lg-9">
             <div class="card card-form">
                 <div class="card-body p-4">
-                    <h2 class="mb-4">Cadastrar Servidor da URE</h2>
+                    <h2 class="mb-4">Cadastrar Servidor</h2>
 
                     <?php if (isset($_GET['erro'])): ?>
                         <div class="alert alert-danger mb-4"><?php echo htmlspecialchars($_GET['erro']); ?></div>
@@ -64,7 +64,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <?php if ($userPerfil === 'ADMIN' || $userPerfil === 'SEDUC'): ?>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label">Unidade Regional (URE) <span class="text-danger">*</span></label>
+                                    <label class="form-label">Unidade Regional  <span class="text-danger">*</span></label>
                                     <select name="id_ure" class="form-select" required>
                                         <option value="">Selecione...</option>
                                         <?php foreach ($todasUres as $ure): ?>
@@ -76,13 +76,13 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 </div>
                             <?php else: ?>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label">Unidade Regional (URE)</label>
+                                    <label class="form-label">Unidade Regional de Ensino</label>
                                     <input type="text" class="form-control" value="<?php echo htmlspecialchars(nomeUreUsuario($conexao, $userId)); ?>" readonly>
                                 </div>
                             <?php endif; ?>
 
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Setor da URE <span class="text-danger">*</span></label>
+                                <label class="form-label">Setor <span class="text-danger">*</span></label>
                                 <select name="setor" id="setor" class="form-select" required onchange="atualizarCargos()">
                                     <option value="">Selecione o setor...</option>
                                     <?php if ($userPerfil !== 'DIRIGENTE'): ?>
@@ -94,19 +94,11 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                             </div>
 
                             <div class="col-md-5 mb-3">
-                                <label class="form-label">Cargo / Função <span class="text-danger">*</span></label>
+                                <label class="form-label">Cargo<span class="text-danger">*</span></label>
                                 <select name="cargo" id="cargo" class="form-select" required>
                                     <option value="">Selecione o setor primeiro...</option>
                                 </select>
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="ativo" class="form-select">
-                                    <option value="1" selected>Ativo</option>
-                                    <option value="0">Inativo</option>
-                                </select>
-                            </div>
+                            </div>                            
 
                             <div class="col-12 mt-2">
                                 <h5 class="mb-3">Contatos e Credenciais</h5>
