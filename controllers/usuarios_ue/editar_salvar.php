@@ -42,7 +42,6 @@ $nome = trim($_POST['nome'] ?? '');
 $idUe = (int) ($_POST['id_ue'] ?? 0);
 $email = trim($_POST['email'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
-$ativo = (int) ($_POST['ativo'] ?? 1);
 $senha = $_POST['senha'] ?? '';
 $confirmarSenha = $_POST['confirmar_senha'] ?? '';
 
@@ -59,24 +58,23 @@ if ($senha !== '') {
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
     $stmt = $conexao->prepare("
         UPDATE usuarios_ue
-        SET id_ue = ?, nome = ?, email = ?, telefone = ?, ativo = ?, senha = ?
+        SET id_ue = ?, nome = ?, email = ?, telefone = ?, senha = ?
         WHERE id_usuario_ue = ?
     ");
-    $stmt->bind_param("isssisi", $idUe, $nome, $email, $telefone, $ativo, $senhaHash, $idUsuarioUe);
+    $stmt->bind_param("issssi", $idUe, $nome, $email, $telefone, $senhaHash, $idUsuarioUe);
 } else {
     $stmt = $conexao->prepare("
         UPDATE usuarios_ue
-        SET id_ue = ?, nome = ?, email = ?, telefone = ?, ativo = ?
+        SET id_ue = ?, nome = ?, email = ?, telefone = ?
         WHERE id_usuario_ue = ?
     ");
-    $stmt->bind_param("isssii", $idUe, $nome, $email, $telefone, $ativo, $idUsuarioUe);
+    $stmt->bind_param("isssi", $idUe, $nome, $email, $telefone, $idUsuarioUe);
 }
 
 if ($stmt->execute()) {
     registrarAuditoria($conexao, 'USUARIOS', 'EDITAR', 'usuarios_ue', $idUsuarioUe, [
         'nome' => $nome,
         'id_ue' => $idUe,
-        'ativo' => $ativo,
         'email' => $email
     ]);
 

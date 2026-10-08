@@ -14,7 +14,6 @@ $cpf = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
 $idUe = (int) ($_POST['id_ue'] ?? 0);
 $email = trim($_POST['email'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
-$ativo = (int) ($_POST['ativo'] ?? 1);
 $senha = $_POST['senha'] ?? '';
 $confirmarSenha = $_POST['confirmar_senha'] ?? '';
 
@@ -42,14 +41,14 @@ $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
 $stmt = $conexao->prepare(
     "INSERT INTO usuarios_ue (id_ue, nome, cpf, senha, email, telefone, ativo)
-     VALUES (?, ?, ?, ?, ?, ?, ?)"
+     VALUES (?, ?, ?, ?, ?, ?, 1)"
 );
 
 if (!$stmt) {
     die("Erro ao preparar consulta: " . $conexao->error);
 }
 
-$stmt->bind_param("isssssi", $idUe, $nome, $cpf, $senhaHash, $email, $telefone, $ativo);
+$stmt->bind_param("isssss", $idUe, $nome, $cpf, $senhaHash, $email, $telefone);
 
 if ($stmt->execute()) {
     $novoId = $stmt->insert_id;

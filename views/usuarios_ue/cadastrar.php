@@ -94,20 +94,13 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Email Institucional</label>
                         <input type="email" name="email" class="form-control" maxlength="150" placeholder="usuario@escola.sp.gov.br">
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Telefone</label>
                         <input type="text" name="telefone" class="form-control" maxlength="30" placeholder="(11) 9999-1000">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="ativo" class="form-select">
-                            <option value="1" selected>Ativo</option>
-                            <option value="0">Inativo</option>
-                        </select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Senha</label>

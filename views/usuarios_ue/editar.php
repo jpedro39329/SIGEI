@@ -97,14 +97,6 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Status do Acesso</label>
-                                <select name="ativo" class="form-select" required>
-                                    <option value="1" <?php echo $usuario['ativo'] == 1 ? 'selected' : ''; ?>>Ativo</option>
-                                    <option value="0" <?php echo $usuario['ativo'] == 0 ? 'selected' : ''; ?>>Inativo</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
                                 <label class="form-label">E-mail Institucional</label>
                                 <input type="email" name="email" class="form-control" maxlength="150" value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>">
                             </div>
