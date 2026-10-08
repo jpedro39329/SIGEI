@@ -83,6 +83,7 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         <div>
             <h2 class="mb-0">Unidades Escolares</h2>
         </div>
+        <a href="cadastrar.php" class="btn btn-primary btn-sm">Cadastrar Escola</a>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'excluido'): ?>

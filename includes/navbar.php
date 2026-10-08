@@ -38,7 +38,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 </li>
 
                 <!-- SEDUC / ADMIN -->
-                <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) { ?>
+                <?php if ($userPerfil === 'ADMIN') { ?>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'ures/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/ures/listar.php">Unidades Regionais</a>
                     </li>
@@ -54,10 +54,26 @@ $homePage = $baseUrl . 'views/dashboard.php';
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Unidades Escolares</a>
                     </li>
+                <?php } elseif ($userPerfil === 'SEDUC') { ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'ures/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/ures/listar.php">Unidades Regionais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'empresas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/empresas/listar.php">Empresas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'supervisores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/supervisores/listar.php">Supervisores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'gestores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/gestores/listar.php">Gestores</a>
+                    </li>
                 <?php } ?>
 
                 <!-- DIRIGENTE / ASURE URE -->
                 <?php if ($userPerfil === 'DIRIGENTE') { ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'escolas/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/escolas/listar.php">Unidades Escolares</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'setores/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/setores/listar.php">Servidores</a>
                     </li>

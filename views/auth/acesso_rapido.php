@@ -19,35 +19,35 @@ $perfisDisponiveis = [
         'filtro_setor' => null
     ],
     'asure' => [
-        'nome' => 'ASSISTÊNCIA TÉCNICA (ASURE)',
+        'nome' => 'ASURE',
         'desc' => 'Assistência Técnica - ASURE',
         'tabela' => 'usuarios_ure',
         'campo_id' => 'id_usuario_ure',
         'filtro_setor' => ['ASURE', 'GABINETE']
     ],
     'educacao_especial' => [
-        'nome' => 'EDUCAÇÃO ESPECIAL',
-        'desc' => 'PEC - Equipe da Educação Especial (EEC)',
+        'nome' => 'PEC',
+        'desc' => 'Equipe da Educação Especial - EEC',
         'tabela' => 'usuarios_ure',
         'campo_id' => 'id_usuario_ure',
         'filtro_setor' => 'EDU_ESPECIAL'
     ],
     'sefisc' => [
         'nome' => 'SEFISC',
-        'desc' => 'Setor de Fiscalização da Regional',
+        'desc' => 'Seção de Fiscalização',
         'tabela' => 'usuarios_ure',
         'campo_id' => 'id_usuario_ure',
         'filtro_setor' => 'SEFISC'
     ],
     'escola' => [
-        'nome' => 'ESCOLA (UE)',
-        'desc' => 'Equipe Gestora da Unidade Escolar',
+        'nome' => 'UE',
+        'desc' => 'Unidade Escolar',
         'tabela' => 'usuarios_ue',
         'campo_id' => 'id_usuario_ue',
         'filtro_setor' => null
     ],
     'supervisor' => [
-        'nome' => 'SUPERVISOR',
+        'nome' => 'Empresa',
         'desc' => 'Supervisor da Empresa Contratada',
         'tabela' => 'usuarios_supervisor',
         'campo_id' => 'id_usuario_supervisor',
@@ -465,12 +465,8 @@ if ($perfil !== '') {
     <!-- LADO DIREITO -->
     <div class="caixa direita">
       
-      <?php if ($perfil === ''): ?>
-        <!-- ETAPA 1: ESCOLHER PERFIL -->
-        <div style="text-align: center;">
-          <span class="badge-dev">Acesso rápido</span>
-        </div>
-        <h2 class="section-label">Acesso Administrativo</h2>
+      <?php if ($perfil === ''): ?>       
+        <h2 class="section-label">Acesso Rápido</h2>
         <p class="section-sub">Selecione o perfil para entrar diretamente.</p>
 
         <?php foreach ($perfisDisponiveis as $slug => $pInfo): ?>
