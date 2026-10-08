@@ -7,6 +7,9 @@ $userName = $_SESSION['user_name'];
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
 $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+if ($userPerfil === 'DIRIGENTE' && $idUreUsuario <= 0) {
+    $idUreUsuario = idUreUsuario($conexao, $userId);
+}
 
 // Lista as UREs disponíveis para admin/seduc
 $sqlUres = "SELECT * FROM unidades_regionais ORDER BY nome ASC";

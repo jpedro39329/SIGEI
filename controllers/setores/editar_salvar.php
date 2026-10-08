@@ -85,6 +85,13 @@ if (!empty($novaSenha)) {
 }
 
 if ($stmt->execute()) {
+    registrarAuditoria($conexao, 'GESTAO_SETORES', 'EDITAR_SERVIDOR', 'usuarios_ure', $idServidor, [
+        'nome' => $nome,
+        'setor' => $setor,
+        'cargo' => $cargo,
+        'id_ure' => $idUre,
+        'ativo' => $ativo
+    ]);
     header("Location: ../../views/setores/listar.php?msg=atualizado");
     exit();
 }

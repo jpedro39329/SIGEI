@@ -12,6 +12,9 @@ if ($id <= 0) {
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
 $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+if ($userPerfil === 'DIRIGENTE' && $idUreUsuario <= 0) {
+    $idUreUsuario = idUreUsuario($conexao, $userId);
+}
 
 $stmt = $conexao->prepare("
     SELECT ue.*, u.nome AS ure_nome, u.uge AS ure_uge

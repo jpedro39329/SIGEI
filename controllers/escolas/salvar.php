@@ -68,7 +68,13 @@ $stmt->bind_param(
 );
 
 if ($stmt->execute()) {
-    header("Location: ../../views/escolas/listar.php?msg=ok");
+    $idNovaEscola = $stmt->insert_id;
+    registrarAuditoria($conexao, 'GESTAO_ESCOLAS', 'CADASTRAR_ESCOLA', 'unidades_escolares', $idNovaEscola, [
+        'nome' => $nome,
+        'cie' => $cie,
+        'id_ure' => $idUre
+    ]);
+    header("Location: ../../views/escolas/listar.php?msg=cadastrado");
     exit();
 }
 

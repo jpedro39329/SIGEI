@@ -12,6 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
 $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+if ($userPerfil === 'DIRIGENTE' && $idUreUsuario <= 0) {
+    $idUreUsuario = idUreUsuario($conexao, $userId);
+}
 
 $idUe = (int) ($_POST['id_ue'] ?? 0);
 if ($idUe <= 0) {
