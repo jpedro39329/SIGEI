@@ -1,5 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -7,7 +7,10 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+CREATE DATABASE IF NOT EXISTS `wmshpicv_SIGEI` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `wmshpicv_SIGEI`;
 
+DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
   `id_admin` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
@@ -16,9 +19,11 @@ CREATE TABLE `admin` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `admin`;
 INSERT INTO `admin` (`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`) VALUES
 (1, 'Ricardo Augusto Nogueira', '83918234150', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', '2026-09-24 09:00:00');
 
+DROP TABLE IF EXISTS `alunos`;
 CREATE TABLE `alunos` (
   `id_aluno` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
@@ -53,37 +58,38 @@ CREATE TABLE `alunos` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `alunos`;
 INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`, `municipio_nascimento`, `serie`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `termo_responsabilidade_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `motivo_arquivamento`, `data_arquivamento`, `arquivado_por_nome`, `arquivado_por_cpf`, `arquivado_por_perfil`, `deliberado_por_nome`, `deliberado_por_cpf`, `data_deliberacao`, `id_ue`, `id_usuario_ue`, `cadastrado_por_nome`, `cadastrado_por_cpf`, `data_cadastro`) VALUES
-(1, 'Enzo Gabriel de Almeida', '06403706160', '112345678-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '6º ANO', '2014-04-12', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de mediação pedagógica contínua.', 'Renata Cristina de Almeida', '10998616249', 'uploads/fotos/f1.jpg', 'uploads/documentos/t1.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
-(2, 'Sophia Helena Martins', '77184557000', '113987654-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-08-25', 'Paralisia Cerebral Espástica (CID G80.1)', 'Usuária de cadeira de rodas.', 'Cláudia Martins da Silva', '19793723491', NULL, 'uploads/documentos/t2.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
-(3, 'Matheus Henrique Ramos', '74826774613', '114561239-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-11-03', 'Deficiência Intelectual + TDAH (CID F71/F90)', 'Mediação direcionada.', 'Marcos Vinícius Ramos', '63942918544', NULL, 'uploads/documentos/t3.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
-(4, 'Laura Beatriz Santos', '62852031647', '115890234-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '6º ANO', '2014-02-18', 'Mielomeningocele (CID Q05)', 'Andador infantil.', 'Juliana dos Santos Ferraz', '97691385412', NULL, 'uploads/documentos/t4.pdf', 'PENDENTE_CORRECAO', 'Anexar relatório neurológico atualizado.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 09:44:51', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-25 10:30:00'),
-(5, 'Cauã Felipe Nogueira', '53918274601', '116748291-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '9º ANO', '2011-06-14', 'Síndrome de Down (CID Q90.9)', 'Suporte motor fino.', 'Patrícia Nogueira Lopes', '48291049281', NULL, 'uploads/documentos/t5.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-26 14:15:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-26 14:15:00'),
-(6, 'Isabela Cristina Ferreira', '39182740592', '117829304-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Atibaia', '1ª SÉRIE', '2010-09-20', 'TEA severo não verbal (CID F84.0)', 'Comunicação alternativa PECS.', 'Marta Helena Ferreira', '31928401928', NULL, 'uploads/documentos/t6.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-27 10:00:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-27 08:45:00'),
-(7, 'Felipe Gabriel Miranda', '81920394857', '118930491-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '2ª SÉRIE', '2009-12-05', 'Déficit de atenção sem laudo', 'Sem comprovação diagnóstica.', 'Sérgio Miranda Prado', '29384019283', NULL, 'uploads/documentos/t7.pdf', 'REPROVADO', 'Não se enquadra nos critérios de elegibilidade para PAE. Recomendado AEE.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-28 11:20:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-28 11:20:00'),
-(8, 'Beatriz Yasmin Oliveira', '48291039481', '119049281-SP', 'MANHÃ', 'FEMININO', 'PARDA', 'Bragança Paulista', '3ª SÉRIE', '2008-03-30', 'Paralisia Cerebral monoparesia (CID G80)', 'Concluiu Ensino Médio.', 'Tereza Cristina Oliveira', '58192039481', NULL, 'uploads/documentos/t8.pdf', 'ARQUIVADO', NULL, 'Conclusão regular do Ensino Médio.', '2026-09-29 16:00:00', 'Eduardo Pinheiro de Moraes', '38897933980', 'DIRIGENTE', 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
-(9, 'Arthur Henrique Silveira', '40918237461', '122345110-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '7º ANO', '2013-05-14', 'TEA (CID F84.0)', 'Apoio em crises sensoriais.', 'Juliana Silveira Ramos', '81920394857', NULL, 'uploads/documentos/t9.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-12 14:00:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-04-10 08:30:00'),
-(10, 'Helena Beatriz Alcantara', '51029384756', '123456221-SP', 'TARDE', 'FEMININO', 'PARDA', 'Atibaia', '8º ANO', '2012-09-20', 'Paralisia Cerebral Diparética (CID G80.1)', 'Cadeira de rodas.', 'Carlos Eduardo Alcantara', '92039485716', NULL, 'uploads/documentos/t10.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-18 10:30:00', 1, 1, 'Patrícia Helena Prado', '85912099156', '2026-04-15 11:20:00'),
-(11, 'Bernardo Souza Toledo', '62130495867', '124567332-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-01-11', 'Síndrome de Down (CID Q90.9)', 'Apoio motor fino.', 'Mariana Souza Toledo', '03948571625', NULL, 'uploads/documentos/t11.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-05 16:00:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-05-02 09:15:00'),
-(12, 'Valentina Mendes Rocha', '73241506978', '125678443-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '9º ANO', '2011-08-30', 'DI + Epilepsia (CID F71/G40)', 'Supervisão constante.', 'Renata Mendes Rocha', '14059682736', NULL, 'uploads/documentos/t12.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-20 11:00:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-05-18 14:40:00'),
-(13, 'Davi Lucca Farias', '84352617089', '126789554-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2010-03-25', 'TEA severo não verbal (CID F84.0)', 'Cuidador dedicado.', 'Fabiana Farias Lima', '25160793847', NULL, 'uploads/documentos/t13.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-08 09:30:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-06-04 10:00:00'),
-(14, 'Larissa Fernanda Duarte', '95463728190', '127890665-SP', 'INTEGRAL', 'FEMININO', 'BRANCA', 'Bragança Paulista', '2ª SÉRIE', '2009-11-12', 'Mielomeningocele (CID Q05.9)', 'Sondagem vesical.', 'Sandra Mara Duarte', '36271804958', NULL, 'uploads/documentos/t14.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-22 15:45:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-06-19 13:20:00'),
-(15, 'Thiago Emanuel Rezende', '06574839201', '128901776-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-07-08', 'Déficit de atenção', 'Sem dependência funcional.', 'Cláudio Rezende', '47382915069', NULL, 'uploads/documentos/t15.pdf', 'REPROVADO', 'Sem dependência em AVD. Encaminhado para AEE.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-02 11:00:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-06-28 09:00:00'),
-(16, 'Alice Vitória Pinheiro', '17685940312', '129012887-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-10-17', 'TEA (CID F84.0)', 'Laudo antigo.', 'Vanessa Pinheiro', '58493026170', NULL, 'uploads/documentos/t16.pdf', 'PENDENTE_CORRECAO', 'Laudo vencido. Anexar novo com menos de 12 meses.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-15 14:30:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-07-12 10:15:00'),
-(17, 'Gustavo Henrique Vasconcelos', '28796051423', '130123998-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-04-03', 'Deficiência Visual Severa (CID H54.1)', 'Leitor de tela.', 'Rogério Vasconcelos', '69504137281', NULL, 'uploads/documentos/t17.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '68017529520', '2026-10-06 09:52:11', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-09-30 08:45:00'),
-(18, 'Manuela Cristina Barros', '39807162534', '131234009-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2011-12-19', 'TEA com hipersensibilidade (CID F84.0)', 'Suporte em transições.', 'Luciana Barros', '70615248392', NULL, 'uploads/documentos/t18.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-06 10:40:23', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-10-01 11:30:00'),
-(19, 'Gabriel Santos Prado', '40918273645', '132345110-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2010-06-15', 'Paralisia Cerebral Tetraparesia (CID G80.0)', 'Cadeira de rodas + gastrostomia.', 'Simone Santos Prado', '81726354901', NULL, 'uploads/documentos/t19.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-10 14:00:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-05-08 09:00:00'),
-(20, 'Yasmin Vitória Alencar', '10000013837', '100052323-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '2ª SÉRIE', '2009-08-22', 'TEA Nível 3 (CID F84.0)', 'Contenção sensorial.', 'Patrícia Alencar', '10000082337', NULL, 'uploads/documentos/t20.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-15 10:15:00', 2, 2, 'Regina Célia Alcantara', '01630953458', '2026-06-11 15:30:00'),
-(21, 'Pedro Henrique Nogueira', '10000013974', '100052346-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '3ª SÉRIE', '2008-01-30', 'Distrofia Muscular Duchenne (CID G71.0)', 'Cadeira motorizada.', 'Marcos Nogueira', '10000082474', NULL, 'uploads/documentos/t21.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-20 16:30:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-07-16 08:20:00'),
-(22, 'Mariana Clara Fagundes', '10000014111', '100052369-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '6º ANO', '2014-09-05', 'Dificuldade de aprendizagem sem laudo', 'Sem CID.', 'Carla Fagundes', '10000082611', NULL, 'uploads/documentos/t22.pdf', 'REPROVADO', 'Sem critérios para PAE. Reforço e AEE.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-08-05 11:20:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-08-01 10:00:00'),
-(23, 'Samuel Lucas Ferreira', '10000014248', '100052392-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-03-14', 'Síndrome de Down + cardiopatia (CID Q90.0)', 'Locomoção sem esforço.', 'Eliane Ferreira', '10000082748', NULL, 'uploads/documentos/t23.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-09-29 14:00:00'),
-(24, 'Enzo Gabriel Tavares', '10000014385', '100052415-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-04-18', 'TEA com ecolalia (CID F84.0)', 'Rotina estruturada.', 'Daniel Tavares', '10000082885', NULL, 'uploads/documentos/t24.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-15 15:00:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-05-12 09:30:00'),
-(25, 'Júlia Gabriela Rezende', '10000014522', '100052438-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '8º ANO', '2012-07-29', 'Paralisia Cerebral hemiparesia (CID G80.2)', 'Auxílio na escrita.', 'Fernanda Rezende', '10000083022', NULL, 'uploads/documentos/t25.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-25 10:00:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-06-20 11:15:00'),
-(26, 'Nicolas Ferreira Moura', '10000014659', '100052461-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2011-02-14', 'Transtorno Opositor Desafiador', 'Sem deficiência.', 'Paulo Moura', '10000083159', NULL, 'uploads/documentos/t26.pdf', 'REPROVADO', 'Critérios de cuidador não preenchidos.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-08-10 14:00:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-08-04 10:30:00'),
-(27, 'Luiza Vitória Sampaio', '10000014796', '100052484-SP', 'INTEGRAL', 'FEMININO', 'BRANCA', 'Bragança Paulista', '1ª SÉRIE', '2010-10-04', 'TEA Nível 2 (CID F84.0)', 'Suporte alimentar.', 'Cláudia Sampaio', '10000083296', NULL, 'uploads/documentos/t27.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-25 11:00:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-04-20 08:30:00'),
-(28, 'Cauê Fernando Medeiros', '10000014933', '100052507-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '2ª SÉRIE', '2009-05-17', 'Paralisia Cerebral Diplegia (CID G80.1)', 'Andador.', 'Antônio Medeiros', '10000083433', NULL, 'uploads/documentos/t28.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-30 16:20:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-05-26 14:00:00'),
-(29, 'Rafael Silva Fontes', '10000015070', '100052530-SP', 'TARDE', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '3ª SÉRIE', '2008-09-11', 'Transtorno de Ansiedade', 'Sem déficits motores.', 'Aline Fontes', '10000083570', NULL, 'uploads/documentos/t29.pdf', 'REPROVADO', 'Encaminhar para rede psicossocial.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-28 09:40:00', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-07-22 10:00:00'),
-(30, 'Carolina Mendes Guimarães', '10000015207', '100052553-SP', 'MANHÃ', 'FEMININO', 'BRANCA', 'Bragança Paulista', '1ª SÉRIE', '2010-12-03', 'Síndrome de Down (CID Q90.9)', 'Aguardando parecer.', 'Beatriz Guimarães', '10000083707', NULL, 'uploads/documentos/t30.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-08 08:40:38', 3, 3, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-01 09:10:00'),
+(1, 'Enzo Gabriel de Almeida', '06403706160', '112345678-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '6º ANO', '2014-04-12', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de mediação pedagógica contínua.', 'Renata Cristina de Almeida', '10998616249', 'uploads/fotos/f1.jpg', 'uploads/documentos/t1.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
+(2, 'Sophia Helena Martins', '77184557000', '113987654-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-08-25', 'Paralisia Cerebral Espástica (CID G80.1)', 'Usuária de cadeira de rodas.', 'Cláudia Martins da Silva', '19793723491', NULL, 'uploads/documentos/t2.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
+(3, 'Matheus Henrique Ramos', '74826774613', '114561239-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-11-03', 'Deficiência Intelectual + TDAH (CID F71/F90)', 'Mediação direcionada.', 'Marcos Vinícius Ramos', '63942918544', NULL, 'uploads/documentos/t3.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-08 09:49:49', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
+(4, 'Laura Beatriz Santos', '62852031647', '115890234-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '6º ANO', '2014-02-18', 'Mielomeningocele (CID Q05)', 'Andador infantil.', 'Juliana dos Santos Ferraz', '97691385412', NULL, 'uploads/documentos/t4.pdf', 'PENDENTE_CORRECAO', 'Anexar relatório neurológico atualizado.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 09:44:51', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-25 10:30:00'),
+(5, 'Cauã Felipe Nogueira', '53918274601', '116748291-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '9º ANO', '2011-06-14', 'Síndrome de Down (CID Q90.9)', 'Suporte motor fino.', 'Patrícia Nogueira Lopes', '48291049281', NULL, 'uploads/documentos/t5.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-26 14:15:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-26 14:15:00'),
+(6, 'Isabela Cristina Ferreira', '39182740592', '117829304-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Atibaia', '1ª SÉRIE', '2010-09-20', 'TEA severo não verbal (CID F84.0)', 'Comunicação alternativa PECS.', 'Marta Helena Ferreira', '31928401928', NULL, 'uploads/documentos/t6.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-27 10:00:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-27 08:45:00'),
+(7, 'Felipe Gabriel Miranda', '81920394857', '118930491-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '2ª SÉRIE', '2009-12-05', 'Déficit de atenção sem laudo', 'Sem comprovação diagnóstica.', 'Sérgio Miranda Prado', '29384019283', NULL, 'uploads/documentos/t7.pdf', 'REPROVADO', 'Não se enquadra nos critérios de elegibilidade para PAE. Recomendado AEE.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-28 11:20:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-28 11:20:00'),
+(8, 'Beatriz Yasmin Oliveira', '48291039481', '119049281-SP', 'MANHÃ', 'FEMININO', 'PARDA', 'Bragança Paulista', '3ª SÉRIE', '2008-03-30', 'Paralisia Cerebral monoparesia (CID G80)', 'Concluiu Ensino Médio.', 'Tereza Cristina Oliveira', '58192039481', NULL, 'uploads/documentos/t8.pdf', 'ARQUIVADO', NULL, 'Conclusão regular do Ensino Médio.', '2026-09-29 16:00:00', 'Eduardo Pinheiro de Moraes', '38897933980', 'DIRIGENTE', 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
+(9, 'Arthur Henrique Silveira', '40918237461', '122345110-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '7º ANO', '2013-05-14', 'TEA (CID F84.0)', 'Apoio em crises sensoriais.', 'Juliana Silveira Ramos', '81920394857', NULL, 'uploads/documentos/t9.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-12 14:00:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-04-10 08:30:00'),
+(10, 'Helena Beatriz Alcantara', '51029384756', '123456221-SP', 'TARDE', 'FEMININO', 'PARDA', 'Atibaia', '8º ANO', '2012-09-20', 'Paralisia Cerebral Diparética (CID G80.1)', 'Cadeira de rodas.', 'Carlos Eduardo Alcantara', '92039485716', NULL, 'uploads/documentos/t10.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-18 10:30:00', 1, NULL, 'Patrícia Helena Prado', '85912099156', '2026-04-15 11:20:00'),
+(11, 'Bernardo Souza Toledo', '62130495867', '124567332-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-01-11', 'Síndrome de Down (CID Q90.9)', 'Apoio motor fino.', 'Mariana Souza Toledo', '03948571625', NULL, 'uploads/documentos/t11.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-05 16:00:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-05-02 09:15:00'),
+(12, 'Valentina Mendes Rocha', '73241506978', '125678443-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '9º ANO', '2011-08-30', 'DI + Epilepsia (CID F71/G40)', 'Supervisão constante.', 'Renata Mendes Rocha', '14059682736', NULL, 'uploads/documentos/t12.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-20 11:00:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-05-18 14:40:00'),
+(13, 'Davi Lucca Farias', '84352617089', '126789554-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2010-03-25', 'TEA severo não verbal (CID F84.0)', 'Cuidador dedicado.', 'Fabiana Farias Lima', '25160793847', NULL, 'uploads/documentos/t13.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-08 09:30:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-06-04 10:00:00'),
+(14, 'Larissa Fernanda Duarte', '95463728190', '127890665-SP', 'INTEGRAL', 'FEMININO', 'BRANCA', 'Bragança Paulista', '2ª SÉRIE', '2009-11-12', 'Mielomeningocele (CID Q05.9)', 'Sondagem vesical.', 'Sandra Mara Duarte', '36271804958', NULL, 'uploads/documentos/t14.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-22 15:45:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-06-19 13:20:00'),
+(15, 'Thiago Emanuel Rezende', '06574839201', '128901776-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-07-08', 'Déficit de atenção', 'Sem dependência funcional.', 'Cláudio Rezende', '47382915069', NULL, 'uploads/documentos/t15.pdf', 'REPROVADO', 'Sem dependência em AVD. Encaminhado para AEE.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-02 11:00:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-06-28 09:00:00'),
+(16, 'Alice Vitória Pinheiro', '17685940312', '129012887-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-10-17', 'TEA (CID F84.0)', 'Laudo antigo.', 'Vanessa Pinheiro', '58493026170', NULL, 'uploads/documentos/t16.pdf', 'PENDENTE_CORRECAO', 'Laudo vencido. Anexar novo com menos de 12 meses.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-15 14:30:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-07-12 10:15:00'),
+(17, 'Gustavo Henrique Vasconcelos', '28796051423', '130123998-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-04-03', 'Deficiência Visual Severa (CID H54.1)', 'Leitor de tela.', 'Rogério Vasconcelos', '69504137281', NULL, 'uploads/documentos/t17.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '68017529520', '2026-10-06 09:52:11', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-09-30 08:45:00'),
+(18, 'Manuela Cristina Barros', '39807162534', '131234009-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2011-12-19', 'TEA com hipersensibilidade (CID F84.0)', 'Suporte em transições.', 'Luciana Barros', '70615248392', NULL, 'uploads/documentos/t18.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-06 10:40:23', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-01 11:30:00'),
+(19, 'Gabriel Santos Prado', '40918273645', '132345110-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2010-06-15', 'Paralisia Cerebral Tetraparesia (CID G80.0)', 'Cadeira de rodas + gastrostomia.', 'Simone Santos Prado', '81726354901', NULL, 'uploads/documentos/t19.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-10 14:00:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-05-08 09:00:00'),
+(20, 'Yasmin Vitória Alencar', '10000013837', '100052323-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '2ª SÉRIE', '2009-08-22', 'TEA Nível 3 (CID F84.0)', 'Contenção sensorial.', 'Patrícia Alencar', '10000082337', NULL, 'uploads/documentos/t20.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-15 10:15:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-06-11 15:30:00'),
+(21, 'Pedro Henrique Nogueira', '10000013974', '100052346-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '3ª SÉRIE', '2008-01-30', 'Distrofia Muscular Duchenne (CID G71.0)', 'Cadeira motorizada.', 'Marcos Nogueira', '10000082474', NULL, 'uploads/documentos/t21.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-20 16:30:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-07-16 08:20:00'),
+(22, 'Mariana Clara Fagundes', '10000014111', '100052369-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '6º ANO', '2014-09-05', 'Dificuldade de aprendizagem sem laudo', 'Sem CID.', 'Carla Fagundes', '10000082611', NULL, 'uploads/documentos/t22.pdf', 'REPROVADO', 'Sem critérios para PAE. Reforço e AEE.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-08-05 11:20:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-08-01 10:00:00'),
+(23, 'Samuel Lucas Ferreira', '10000014248', '100052392-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-03-14', 'Síndrome de Down + cardiopatia (CID Q90.0)', 'Locomoção sem esforço.', 'Eliane Ferreira', '10000082748', NULL, 'uploads/documentos/t23.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-08 09:41:32', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-09-29 14:00:00'),
+(24, 'Enzo Gabriel Tavares', '10000014385', '100052415-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-04-18', 'TEA com ecolalia (CID F84.0)', 'Rotina estruturada.', 'Daniel Tavares', '10000082885', NULL, 'uploads/documentos/t24.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-15 15:00:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-05-12 09:30:00'),
+(25, 'Júlia Gabriela Rezende', '10000014522', '100052438-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '8º ANO', '2012-07-29', 'Paralisia Cerebral hemiparesia (CID G80.2)', 'Auxílio na escrita.', 'Fernanda Rezende', '10000083022', NULL, 'uploads/documentos/t25.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-25 10:00:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-06-20 11:15:00'),
+(26, 'Nicolas Ferreira Moura', '10000014659', '100052461-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2011-02-14', 'Transtorno Opositor Desafiador', 'Sem deficiência.', 'Paulo Moura', '10000083159', NULL, 'uploads/documentos/t26.pdf', 'REPROVADO', 'Critérios de cuidador não preenchidos.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-08-10 14:00:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-08-04 10:30:00'),
+(27, 'Luiza Vitória Sampaio', '10000014796', '100052484-SP', 'INTEGRAL', 'FEMININO', 'BRANCA', 'Bragança Paulista', '1ª SÉRIE', '2010-10-04', 'TEA Nível 2 (CID F84.0)', 'Suporte alimentar.', 'Cláudia Sampaio', '10000083296', NULL, 'uploads/documentos/t27.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-25 11:00:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-04-20 08:30:00'),
+(28, 'Cauê Fernando Medeiros', '10000014933', '100052507-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '2ª SÉRIE', '2009-05-17', 'Paralisia Cerebral Diplegia (CID G80.1)', 'Andador.', 'Antônio Medeiros', '10000083433', NULL, 'uploads/documentos/t28.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-30 16:20:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-05-26 14:00:00'),
+(29, 'Rafael Silva Fontes', '10000015070', '100052530-SP', 'TARDE', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '3ª SÉRIE', '2008-09-11', 'Transtorno de Ansiedade', 'Sem déficits motores.', 'Aline Fontes', '10000083570', NULL, 'uploads/documentos/t29.pdf', 'REPROVADO', 'Encaminhar para rede psicossocial.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-28 09:40:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-07-22 10:00:00'),
+(30, 'Carolina Mendes Guimarães', '10000015207', '100052553-SP', 'MANHÃ', 'FEMININO', 'BRANCA', 'Bragança Paulista', '1ª SÉRIE', '2010-12-03', 'Síndrome de Down (CID Q90.9)', 'Aguardando parecer.', 'Beatriz Guimarães', '10000083707', NULL, 'uploads/documentos/t30.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-08 08:40:38', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-01 09:10:00'),
 (31, 'Felipe Augusto Barreto', '10000015344', '100052576-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '8º ANO', '2012-06-20', 'TEA Severo (CID F84.0)', 'Comunicação alternativa.', 'Ricardo Barreto', '10000083844', NULL, 'uploads/documentos/t31.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-30 11:30:00', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-04-26 10:00:00'),
 (32, 'Isadora Luiza Morais', '10000015481', '100052599-SP', 'TARDE', 'FEMININO', 'PARDA', 'Atibaia', '9º ANO', '2011-04-15', 'Paralisia Cerebral Atáxica (CID G80.4)', 'Instabilidade na marcha.', 'Marta Morais', '10000083981', NULL, 'uploads/documentos/t32.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-18 14:00:00', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-06-12 11:45:00'),
 (33, 'Lucas Vinícius Meirelles', '10000015618', '100052622-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '2ª SÉRIE', '2009-10-28', 'Transtorno de Conduta', 'Sem déficits motores.', 'Sérgio Meirelles', '10000084118', NULL, 'uploads/documentos/t33.pdf', 'REPROVADO', 'Apoio escolar não se aplica.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-08-14 10:30:00', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-08-08 09:00:00'),
@@ -92,19 +98,20 @@ INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `
 (36, 'Lorena Gabrielly Santos', '10000016029', '100052691-SP', 'MANHÃ', 'FEMININO', 'PRETA', 'Atibaia', '9º ANO', '2011-01-18', 'Síndrome de Down (CID Q90.9)', 'Mediação em sala.', 'Patrícia Santos', '10000084529', NULL, 'uploads/documentos/t36.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-30 11:30:00', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-06-25 09:20:00'),
 (37, 'Enzo Gabriel Fagundes', '10000016166', '100052714-SP', 'TARDE', 'MASCULINO', 'BRANCA', 'Atibaia', '1ª SÉRIE', '2010-07-14', 'Deficiência Visual - Cegueira Total (CID H54.0)', 'Guia vidente.', 'Marcos Fagundes', '10000084666', NULL, 'uploads/documentos/t37.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-22 15:00:00', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-07-18 10:00:00'),
 (38, 'Camila Vitória Queiroz', '10000016303', '100052737-SP', 'MANHÃ', 'FEMININO', 'PARDA', 'Atibaia', '2ª SÉRIE', '2009-02-27', 'Transtorno Bipolar', 'Acompanhamento ambulatorial.', 'Helena Queiroz', '10000084803', NULL, 'uploads/documentos/t38.pdf', 'REPROVADO', 'Atendimento pela rede de saúde mental.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-08-20 14:30:00', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-08-15 08:30:00'),
-(39, 'Kauan Felipe Medeiros', '10000016440', '100052760-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '3ª SÉRIE', '2008-05-19', 'TEA (CID F84.0)', 'Suporte em provas.', 'Valéria Medeiros', '10000084940', NULL, 'uploads/documentos/t39.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 08:00:00'),
+(39, 'Kauan Felipe Medeiros', '10000016440', '100052760-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '3ª SÉRIE', '2008-05-19', 'TEA (CID F84.0)', 'Suporte em provas.', 'Valéria Medeiros', '10000084940', NULL, 'uploads/documentos/t39.pdf', 'PENDENTE_CORRECAO', 'Arruma.', NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-08 09:49:56', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 08:00:00'),
 (40, 'Gabriel Henrique Souza', '10000016577', '100052783-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '6º ANO', '2014-10-02', 'TEA (CID F84.0)', 'Suporte pedagógico.', 'Responsável do Aluno 40', '10000085077', NULL, 'uploads/documentos/t40.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 10:12:36', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
-(41, 'Maria Eduarda Lima', '10000016714', '100052806-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Suporte pedagógico.', 'Responsável do Aluno 41', '10000085214', NULL, 'uploads/documentos/t41.pdf', 'ARQUIVADO', NULL, 'Processo encerrado.', '2026-10-06 10:40:46', 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', NULL, NULL, NULL, 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(42, 'Lucas Miguel Rocha', '10000016851', '100052829-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Suporte pedagógico.', 'Responsável do Aluno 42', '10000085351', NULL, 'uploads/documentos/t42.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(43, 'Ana Carolina Dias', '10000016988', '100052852-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Suporte pedagógico.', 'Responsável do Aluno 43', '10000085488', NULL, 'uploads/documentos/t43.pdf', 'ARQUIVADO', NULL, 'Processo encerrado.', '2026-10-07 07:21:50', 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(44, 'Miguel Gabriel Costa', '10000017125', '100052875-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Suporte pedagógico.', 'Responsável do Aluno 44', '10000085525', NULL, 'uploads/documentos/t44.pdf', 'REPROVADO', 'Documentação não atende aos critérios.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 10:12:36', 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(45, 'Julia Fernanda Alves', '10000017262', '100052898-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '2ª SÉRIE', '2010-10-02', 'TEA (CID F84.0)', 'Suporte pedagógico.', 'Responsável do Aluno 45', '10000085662', NULL, 'uploads/documentos/t45.pdf', 'REPROVADO', 'Documentação não atende aos critérios.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 10:12:36', 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(46, 'Arthur Oliveira Neto', '10000017399', '100052921-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Suporte pedagógico.', 'Responsável do Aluno 46', '10000085799', NULL, 'uploads/documentos/t46.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(47, 'Beatriz Santos Rocha', '10000017536', '100052944-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Suporte pedagógico.', 'Responsável do Aluno 47', '10000085936', NULL, 'uploads/documentos/t47.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(48, 'Rafael Augusto Pinto', '10000017673', '100052967-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Suporte pedagógico.', 'Responsável do Aluno 48', '10000086073', NULL, 'uploads/documentos/t48.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para testes.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(49, 'Laura Beatriz Castro', '10000017810', '100052990-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Suporte pedagógico.', 'Responsável do Aluno 49', '10000086110', NULL, 'uploads/documentos/t49.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para testes.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
-(50, 'Diego Henrique Moraes', '10000017947', '100053013-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '9º ANO', '2005-10-02', 'TEA (CID F84.0)', 'Suporte pedagógico.', 'Responsável do Aluno 50', '10000086247', NULL, 'uploads/documentos/t50.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 10:12:36', 5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36');
+(41, 'Maria Eduarda Lima', '10000016714', '100052806-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Suporte pedagógico.', 'Responsável do Aluno 41', '10000085214', NULL, 'uploads/documentos/t41.pdf', 'ARQUIVADO', NULL, 'Processo encerrado.', '2026-10-06 10:40:46', 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', NULL, NULL, NULL, 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(42, 'Lucas Miguel Rocha Moli', '10000016851', '100052829-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Suporte pedagógico.', 'Responsável do Aluno 42', '10000085351', NULL, 'uploads/documentos/t42.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(43, 'Ana Carolina Dias', '10000016988', '100052852-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Suporte pedagógico.', 'Responsável do Aluno 43', '10000085488', NULL, 'uploads/documentos/t43.pdf', 'ARQUIVADO', NULL, 'Processo encerrado.', '2026-10-07 07:21:50', 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(44, 'Miguel Gabriel Costa', '10000017125', '100052875-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Suporte pedagógico.', 'Responsável do Aluno 44', '10000085525', NULL, 'uploads/documentos/t44.pdf', 'REPROVADO', 'Não', NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-08 09:50:04', 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(45, 'Julia Fernanda Alves', '10000017262', '100052898-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '2ª SÉRIE', '2010-10-02', 'TEA (CID F84.0)', 'Suporte pedagógico.', 'Responsável do Aluno 45', '10000085662', NULL, 'uploads/documentos/t45.pdf', 'REPROVADO', 'Documentação não atende aos critérios.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 10:12:36', 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(46, 'Arthur Oliveira Neto Toma', '10000017399', '100052921-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Suporte pedagógico.', 'Responsável do Aluno 46', '10000085799', NULL, 'uploads/documentos/t46.pdf', 'PENDENTE', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(47, 'Beatriz Santos Rocha', '10000017536', '100052944-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Suporte pedagógico.', 'Responsável do Aluno 47', '10000085936', NULL, 'uploads/documentos/t47.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(48, 'Rafael Augusto Pinto', '10000017673', '100052967-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Suporte pedagógico.', 'Responsável do Aluno 48', '10000086073', NULL, 'uploads/documentos/t48.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para testes.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(49, 'Laura Beatriz Castro', '10000017810', '100052990-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Suporte pedagógico.', 'Responsável do Aluno 49', '10000086110', NULL, 'uploads/documentos/t49.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para testes.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36'),
+(50, 'Diego Henrique Moraes', '10000017947', '100053013-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '9º ANO', '2005-10-02', 'TEA (CID F84.0)', 'Suporte pedagógico.', 'Responsável do Aluno 50', '10000086247', NULL, 'uploads/documentos/t50.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-10-02 10:12:36', 5, NULL, 'Fernanda Lopes Ribeiro', '71293846501', '2026-10-02 10:12:36');
 
+DROP TABLE IF EXISTS `associacoes`;
 CREATE TABLE `associacoes` (
   `id_associacao` int(11) NOT NULL,
   `id_aluno` int(11) NOT NULL,
@@ -114,6 +121,7 @@ CREATE TABLE `associacoes` (
   `data_fim` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `associacoes`;
 INSERT INTO `associacoes` (`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`, `data_fim`) VALUES
 (1, 1, 1, 1, '2026-09-24', NULL),
 (2, 2, 2, 1, '2026-09-24', NULL),
@@ -122,25 +130,28 @@ INSERT INTO `associacoes` (`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data
 (5, 5, 1, 1, '2026-05-01', NULL),
 (6, 6, 2, 1, '2026-05-01', NULL),
 (7, 7, 3, 1, '2026-05-01', NULL),
-(8, 8, 1, 1, '2026-05-01', NULL),
-(9, 9, 2, 1, '2026-05-01', NULL),
+(8, 8, 1, 0, '2026-05-01', NULL),
+(9, 9, 2, 0, '2026-05-01', '2026-08-30'),
 (10, 10, 3, 1, '2026-05-01', NULL),
-(11, 11, 1, 1, '2026-05-01', NULL),
-(12, 12, 2, 1, '2026-05-01', NULL),
-(13, 13, 3, 1, '2026-06-11', NULL),
-(14, 14, 1, 1, '2026-05-01', NULL),
-(15, 15, 2, 0, '2026-07-16', NULL),
-(16, 16, 3, 1, '2026-05-12', NULL),
-(17, 17, 1, 1, '2026-06-20', NULL),
-(18, 18, 2, 1, '2026-04-20', NULL),
-(19, 19, 3, 1, '2026-05-26', NULL),
-(20, 20, 1, 1, '2026-04-26', NULL),
-(21, 21, 2, 1, '2026-06-12', NULL),
-(22, 22, 3, 1, '2026-04-10', NULL),
-(23, 23, 1, 1, '2026-05-24', NULL),
-(24, 24, 2, 1, '2026-06-25', NULL),
-(25, 25, 3, 1, '2026-07-18', NULL);
+(11, 11, 1, 0, '2026-05-01', '2026-08-30'),
+(12, 12, 2, 0, '2026-05-01', '2026-08-30'),
+(13, 13, 3, 0, '2026-06-11', '2026-08-30'),
+(14, 14, 1, 0, '2026-05-01', '2026-08-30'),
+(15, 15, 2, 0, '2026-07-16', '2026-08-30'),
+(16, 16, 3, 0, '2026-05-12', '2026-08-30'),
+(17, 17, 1, 0, '2026-06-20', '2026-08-30'),
+(18, 18, 2, 0, '2026-04-20', '2026-08-30'),
+(19, 19, 3, 0, '2026-05-26', '2026-08-30'),
+(20, 20, 1, 0, '2026-04-26', '2026-08-30'),
+(21, 21, 2, 0, '2026-06-12', '2026-08-30'),
+(22, 22, 3, 0, '2026-04-10', '2026-08-30'),
+(23, 23, 1, 0, '2026-05-24', '2026-08-30'),
+(24, 24, 2, 0, '2026-06-25', '2026-08-30'),
+(25, 25, 3, 0, '2026-07-18', '2026-08-30'),
+(26, 11, 1, 0, '2026-10-08', NULL),
+(27, 11, 1, 1, '2026-10-08', NULL);
 
+DROP TABLE IF EXISTS `auditoria`;
 CREATE TABLE `auditoria` (
   `id_auditoria` int(11) NOT NULL,
   `id_usuario` int(11) DEFAULT NULL,
@@ -157,6 +168,7 @@ CREATE TABLE `auditoria` (
   `criado_em` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `auditoria`;
 INSERT INTO `auditoria` (`id_auditoria`, `id_usuario`, `usuario_nome`, `usuario_cpf`, `usuario_perfil`, `modulo`, `acao`, `entidade`, `id_registro`, `detalhes`, `ip_origem`, `user_agent`, `criado_em`) VALUES
 (1, 1, 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', 'ALUNOS', 'DELIBERAR', 'alunos', 1, '', '201.55.31.121', 'Mozilla/5.0', '2026-10-07 08:23:51'),
 (2, 3, 'André Luiz Barbosa', '68017529520', 'USUARIO_EDUCACAO_ESPECIAL', 'ALUNOS', 'DELIBERAR', 'alunos', 7, '', '201.55.31.121', 'Mozilla/5.0', '2026-10-07 09:00:00'),
@@ -188,8 +200,45 @@ INSERT INTO `auditoria` (`id_auditoria`, `id_usuario`, `usuario_nome`, `usuario_
 (28, 5, 'Matheus Marques Molisani', '', 'DIRIGENTE', 'AUTH', 'LOGOUT', 'sessao', 5, '{\"perfil\":\"DIRIGENTE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 08:56:44'),
 (29, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 08:57:59'),
 (30, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 08:59:50'),
-(31, 3, 'Clarisse Bueno de Camargo', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:00:44');
+(31, 3, 'Clarisse Bueno de Camargo', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:00:44'),
+(32, 1, 'Marcelo Antunes Ribeiro', '', 'SUPERVISOR', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"SUPERVISOR\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:03:08'),
+(33, 1, 'Aline Cristina Silveira', '', 'PAE', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"PAE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:05:13'),
+(34, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 2, '{\"usuario_excluido_nome\":\"Regina Célia Alcantara\",\"usuario_excluido_cpf\":\"01630953458\",\"usuario_excluido_email\":\"regina.alcantara@educacao.sp.gov.br\",\"id_ue\":2}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:05:33'),
+(35, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 5, '{\"usuario_excluido_nome\":\"Fernanda Lopes Ribeiro\",\"usuario_excluido_cpf\":\"71293846501\",\"usuario_excluido_email\":\"fernanda.ribeiro@educacao.sp.gov.br\",\"id_ue\":5}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:05:38'),
+(36, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:05:48'),
+(37, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 1, '{\"usuario_excluido_nome\":\"Patrícia Helena Prado\",\"usuario_excluido_cpf\":\"85912099156\",\"usuario_excluido_email\":\"patricia.prado@educacao.sp.gov.br\",\"id_ue\":1}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:06:34'),
+(38, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'CRIAR', 'usuarios_ue', 6, '{\"nome\":\"Yasmin Vitoria Mello\",\"cpf\":\"21432453453\",\"id_ue\":5,\"email\":\"yasmin.mello@gmail.com\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:07:09'),
+(39, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 3, '{\"usuario_excluido_nome\":\"Clarisse Bueno de Camargo\",\"usuario_excluido_cpf\":\"31294857201\",\"usuario_excluido_email\":\"clarisse.camargo@educacao.sp.gov.br\",\"id_ue\":3}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:07:31'),
+(40, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'CRIAR', 'usuarios_ue', 7, '{\"nome\":\"Ronaldo Gabriel Gomes\",\"cpf\":\"20424523452\",\"id_ue\":3,\"email\":\"rony.gomes@gmail.com\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:08:12'),
+(41, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:08:24'),
+(42, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:23:44'),
+(43, 5, 'Matheus Marques Molisani', '', 'DIRIGENTE', 'AUTH', 'LOGOUT', 'sessao', 5, '{\"perfil\":\"DIRIGENTE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:24:52'),
+(44, 1, 'Aline Cristina Silveira', '', 'PAE', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"PAE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:25:09'),
+(45, 2, 'Luciana Cristina Campos', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 2, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:26:01'),
+(46, 1, 'Marcelo Antunes Ribeiro', '', 'SUPERVISOR', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"SUPERVISOR\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:37:57'),
+(47, 1, 'Marcelo Antunes Ribeiro', '', 'SUPERVISOR', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"SUPERVISOR\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:39:14'),
+(48, 5, 'Matheus Marques Molisani', '', 'DIRIGENTE', 'AUTH', 'LOGOUT', 'sessao', 5, '{\"perfil\":\"DIRIGENTE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:41:20'),
+(49, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'ALUNOS', 'DELIBERAR', 'alunos', 23, '{\"status\":\"APROVADO\",\"motivo\":null,\"deliberado_por\":\"André Luiz Barbosa\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:41:32'),
+(50, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:44:15'),
+(51, 1, 'Aline Cristina Silveira', '', 'PAE', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"PAE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:44:47'),
+(52, 1, 'Marcelo Antunes Ribeiro', '', 'SUPERVISOR', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"SUPERVISOR\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:45:43'),
+(53, 6, 'Yasmin Vitoria Mello', '', 'USUARIO_ESCOLA', 'ALUNOS', 'ARQUIVAR', 'alunos', 42, '{\"motivo\":\"Saiu.\",\"arquivado_por\":\"Yasmin Vitoria Mello\",\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:45:59'),
+(54, 6, 'Yasmin Vitoria Mello', '', 'USUARIO_ESCOLA', 'ALUNOS', 'REATIVAR', 'alunos', 42, '{\"aluno_id\":42,\"reativado_por\":\"Yasmin Vitoria Mello\",\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:46:05'),
+(55, 6, 'Yasmin Vitoria Mello', '', 'USUARIO_ESCOLA', 'ALUNOS', 'EDITAR', 'alunos', 42, '{\"nome\":\"Lucas Miguel Rocha Moli\",\"ra\":\"100052829-SP\",\"status_pos_edicao\":\"APROVADO\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:46:32'),
+(56, 6, 'Yasmin Vitoria Mello', '', 'USUARIO_ESCOLA', 'ALUNOS', 'EDITAR', 'alunos', 46, '{\"nome\":\"Arthur Oliveira Neto Toma\",\"ra\":\"100052921-SP\",\"status_pos_edicao\":\"PENDENTE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:46:46'),
+(57, 6, 'Yasmin Vitoria Mello', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 6, '{\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:48:51'),
+(58, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EDITAR', 'usuarios_ue', 7, '{\"nome\":\"Ronaldo Gabriel Gomess\",\"id_ue\":3,\"email\":\"rony.gomes@gmail.com\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:49:07'),
+(59, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'CRIAR', 'usuarios_ue', 8, '{\"nome\":\"João Pedro Pereira\",\"cpf\":\"68786786786\",\"id_ue\":4,\"email\":\"rony.gomes@gmail.com\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:49:24'),
+(60, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 8, '{\"usuario_excluido_nome\":\"João Pedro Pereira\",\"usuario_excluido_cpf\":\"68786786786\",\"usuario_excluido_email\":\"rony.gomes@gmail.com\",\"id_ue\":4}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:49:28'),
+(61, 1, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:49:41'),
+(62, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'ALUNOS', 'DELIBERAR', 'alunos', 3, '{\"status\":\"APROVADO\",\"motivo\":null,\"deliberado_por\":\"André Luiz Barbosa\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:49:49'),
+(63, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'ALUNOS', 'DELIBERAR', 'alunos', 39, '{\"status\":\"PENDENTE_CORRECAO\",\"motivo\":\"Arruma.\",\"deliberado_por\":\"André Luiz Barbosa\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:49:56'),
+(64, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'ALUNOS', 'DELIBERAR', 'alunos', 44, '{\"status\":\"REPROVADO\",\"motivo\":\"Não\",\"deliberado_por\":\"André Luiz Barbosa\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:50:04'),
+(65, 3, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 09:50:12'),
+(66, 5, 'Matheus Marques Molisani', '', 'DIRIGENTE', 'AUTH', 'LOGOUT', 'sessao', 5, '{\"perfil\":\"DIRIGENTE\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 10:06:07'),
+(67, 5, 'Matheus Marques Molisani', '', 'DIRIGENTE', 'GESTAO_ESCOLAS', 'CADASTRAR_ESCOLA', 'unidades_escolares', 6, '{\"nome\":\"E.E. Cásper Líbero Alves\",\"cie\":\"222222\",\"id_ure\":1}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 10:18:17');
 
+DROP TABLE IF EXISTS `empresas`;
 CREATE TABLE `empresas` (
   `id_empresa` int(11) NOT NULL,
   `nome` varchar(200) NOT NULL,
@@ -209,17 +258,21 @@ CREATE TABLE `empresas` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `empresas`;
 INSERT INTO `empresas` (`id_empresa`, `nome`, `cnpj`, `endereco`, `numero`, `bairro`, `municipio`, `cep`, `telefone`, `email`, `numero_contrato`, `data_inicio_contrato`, `data_fim_contrato`, `contrato_arquivo`, `ativo`, `data_cadastro`) VALUES
 (1, 'Plena Serviços de Apoio Escolar Ltda.', '70.430.408/0001-89', 'Rua Coronel Teófilo Leme', '845', 'Centro', 'Bragança Paulista', '12900-005', '(11) 4034-2187', 'contato@plenaservicos.com.br', 'CTR-014/2026', '2026-01-15', '2026-12-31', 'uploads/contratos/contrato_plena_servicos_ctr014_2026.pdf', 1, '2026-09-24 09:00:00');
 
+DROP TABLE IF EXISTS `empresa_ure`;
 CREATE TABLE `empresa_ure` (
   `id_empresa` int(11) NOT NULL,
   `id_ure` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `empresa_ure`;
 INSERT INTO `empresa_ure` (`id_empresa`, `id_ure`) VALUES
 (1, 1);
 
+DROP TABLE IF EXISTS `laudos`;
 CREATE TABLE `laudos` (
   `id_laudo` int(11) NOT NULL,
   `id_aluno` int(11) NOT NULL,
@@ -230,6 +283,7 @@ CREATE TABLE `laudos` (
   `data_envio` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `laudos`;
 INSERT INTO `laudos` (`id_laudo`, `id_aluno`, `caminho_arquivo`, `tipo`, `nome_arquivo`, `descricao`, `data_envio`) VALUES
 (1, 1, 'uploads/laudos/l1.pdf', 'LAUDO', 'Laudo Neuropediátrico TEA', 'CID F84.0 confirmando mediador.', '2026-09-24 09:10:00'),
 (2, 2, 'uploads/laudos/l2.pdf', 'LAUDO', 'Laudo Fisiátrico PC', 'CID G80.1 cadeira de rodas.', '2026-09-24 09:30:00'),
@@ -252,6 +306,7 @@ INSERT INTO `laudos` (`id_laudo`, `id_aluno`, `caminho_arquivo`, `tipo`, `nome_a
 (19, 19, 'uploads/laudos/l19.pdf', 'LAUDO', 'Laudo PC Tetraparesia', 'CID G80.0.', '2026-05-08 09:00:00'),
 (20, 20, 'uploads/laudos/l20.pdf', 'LAUDO', 'Laudo TEA Nível 3', 'CID F84.0.', '2026-06-11 15:30:00');
 
+DROP TABLE IF EXISTS `notificacoes_lidas`;
 CREATE TABLE `notificacoes_lidas` (
   `id_leitura` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
@@ -260,14 +315,17 @@ CREATE TABLE `notificacoes_lidas` (
   `data_leitura` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `notificacoes_lidas`;
 INSERT INTO `notificacoes_lidas` (`id_leitura`, `id_usuario`, `perfil`, `notificacao_key`, `data_leitura`) VALUES
 (1, 1, 'USUARIO_SEFISC', 'd8ac39af91c1b9e15ca784a25b320031', '2026-10-02 09:33:00'),
 (2, 1, 'USUARIO_ESCOLA', '806c3ac1237b71e0ea427d36bb3e0e29', '2026-10-02 09:36:03'),
 (3, 3, 'USUARIO_EDUCACAO_ESPECIAL', 'ed849db0591e7ee2d4d7672d930c197a', '2026-10-02 09:37:28'),
 (4, 1, 'USUARIO_ESCOLA', '090a33ffa01e286366ca96b3d3ab946e', '2026-10-02 09:48:04'),
 (5, 3, 'USUARIO_ESCOLA', 'b48eab983c0ea7f3ecf2f2f9345d9045', '2026-10-08 08:40:58'),
-(6, 3, 'USUARIO_ESCOLA', '1c4ef6c07ad9dad3c02acce8008cbbc8', '2026-10-08 08:41:40');
+(6, 3, 'USUARIO_ESCOLA', '1c4ef6c07ad9dad3c02acce8008cbbc8', '2026-10-08 08:41:40'),
+(7, 5, 'DIRIGENTE', 'd8ac39af91c1b9e15ca784a25b320031', '2026-10-08 10:18:26');
 
+DROP TABLE IF EXISTS `recuperacao_senha`;
 CREATE TABLE `recuperacao_senha` (
   `id_recuperacao` int(11) NOT NULL,
   `tipo_perfil` varchar(50) NOT NULL,
@@ -281,10 +339,12 @@ CREATE TABLE `recuperacao_senha` (
   `data_criacao` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `recuperacao_senha`;
 INSERT INTO `recuperacao_senha` (`id_recuperacao`, `tipo_perfil`, `id_referencia`, `token`, `codigo`, `tipo_contato`, `contato`, `expira_em`, `usado`, `data_criacao`) VALUES
 (1, 'ESCOLA', 1, '1838db07e6249fd2c625ac197d050be332774eb56551bfe1c637f5f91b1dc341', '122780', 'EMAIL', 'patricia.prado@educacao.sp.gov.br', '2026-10-02 17:27:45', 1, '2026-10-02 11:27:45'),
 (2, 'URE', 1, '0d6c2da8dd91c9f089cd5033363f582b3ef193d1ba418757de7df47d4c6c079c', '352908', 'EMAIL', 'rodrigo.cavalcante@educacao.sp.gov.br', '2026-10-02 17:27:47', 1, '2026-10-02 11:27:47');
 
+DROP TABLE IF EXISTS `relatorios`;
 CREATE TABLE `relatorios` (
   `id_relatorio` int(11) NOT NULL,
   `id_associacao` int(11) NOT NULL,
@@ -298,13 +358,11 @@ CREATE TABLE `relatorios` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `relatorios`;
 INSERT INTO `relatorios` (`id_relatorio`, `id_associacao`, `tipo`, `mes_competencia`, `descricao`, `conteudo`, `arquivo_relatorio`, `status`, `data_envio`, `data_cadastro`) VALUES
-(1, 1, 'DIARIO', '2026-09', 'Acompanhamento diário do aluno com mediação pedagógica.', 'Rotina.', NULL, 'ENVIADO', '2026-09-25 12:15:00', '2026-09-25 12:15:00'),
-(2, 2, 'DIARIO', '2026-09', 'Suporte motor nas transferências.', 'Rotina.', NULL, 'ENVIADO', '2026-09-25 17:30:00', '2026-09-25 17:30:00'),
-(3, 1, 'MENSAL', '2026-09', 'Evolução mensal satisfatória.', 'Fechamento.', NULL, 'ENVIADO', '2026-09-30 16:45:00', '2026-09-30 16:45:00'),
-(4, 4, 'DIARIO', '2026-09', 'Acompanhamento na entrada e artes.', 'Rotina.', NULL, 'ENVIADO', '2026-09-28 11:45:00', '2026-09-28 11:45:00'),
-(5, 5, 'DIARIO', '2026-09', 'Auxílio em tecnologia assistiva.', 'Rotina.', NULL, 'ENVIADO', '2026-09-29 15:20:00', '2026-09-29 15:20:00');
+(6, 26, 'DIARIO', NULL, 'Aula normal.', NULL, NULL, 'ENVIADO', '2026-10-08 09:44:42', '2026-10-08 09:44:42');
 
+DROP TABLE IF EXISTS `seduc`;
 CREATE TABLE `seduc` (
   `id_seduc` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
@@ -318,9 +376,11 @@ CREATE TABLE `seduc` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `seduc`;
 INSERT INTO `seduc` (`id_seduc`, `nome`, `cpf`, `senha`, `email`, `telefone`, `setor`, `cargo`, `ativo`, `data_cadastro`) VALUES
 (1, 'Mariana Siqueira Fontes', '30483697834', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'mariana.fontes@educacao.sp.gov.br', '11981245566', 'Coordenadoria Pedagógica (COPED)', 'Especialista em Educação Especial', 1, '2026-09-24 09:00:00');
 
+DROP TABLE IF EXISTS `termos_aceite`;
 CREATE TABLE `termos_aceite` (
   `id` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
@@ -330,6 +390,7 @@ CREATE TABLE `termos_aceite` (
   `data_aceite` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `termos_aceite`;
 INSERT INTO `termos_aceite` (`id`, `id_usuario`, `perfil`, `ip`, `ip_usuario`, `data_aceite`) VALUES
 (1, 1, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 07:50:06'),
 (2, 3, 'USUARIO_EDUCACAO_ESPECIAL', '::1', NULL, '2026-10-02 07:51:06'),
@@ -343,8 +404,10 @@ INSERT INTO `termos_aceite` (`id`, `id_usuario`, `perfil`, `ip`, `ip_usuario`, `
 (10, 3, 'PAE', '201.55.31.121', NULL, '2026-10-08 08:48:17'),
 (11, 1, 'ADMIN', '201.55.31.121', NULL, '2026-10-08 08:48:48'),
 (12, 5, 'USUARIO_ESCOLA', '201.55.31.121', NULL, '2026-10-08 08:50:33'),
-(13, 1, 'SUPERVISOR', '201.55.31.121', NULL, '2026-10-08 09:00:50');
+(13, 1, 'SUPERVISOR', '201.55.31.121', NULL, '2026-10-08 09:00:50'),
+(14, 6, 'USUARIO_ESCOLA', '201.55.31.121', NULL, '2026-10-08 09:45:49');
 
+DROP TABLE IF EXISTS `unidades_escolares`;
 CREATE TABLE `unidades_escolares` (
   `id_ue` int(11) NOT NULL,
   `cie` varchar(10) NOT NULL,
@@ -365,13 +428,16 @@ CREATE TABLE `unidades_escolares` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `unidades_escolares`;
 INSERT INTO `unidades_escolares` (`id_ue`, `cie`, `ua`, `nome`, `modalidade`, `tipo_ue`, `endereco`, `numero`, `bairro`, `municipio`, `cidade`, `cep`, `telefone`, `email`, `id_ure`, `ativo`, `data_cadastro`) VALUES
 (1, '012489', '41250', 'E.E. Cásper Líbero', 'Ensino Fundamental Anos Finais e Médio', 'ESCOLA', 'Rua Alziro de Oliveira', '120', 'Jardim Cerejeiras', 'Atibaia', 'Atibaia', '12951-240', '(11) 4412-3040', 'ee.casperlibero@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
 (2, '012502', '41255', 'E.E. Professor José Fernando Paschoal', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua Maestro Danzi', '55', 'Vila Municipal', 'Bragança Paulista', 'Bragança Paulista', '12908-120', '(11) 4033-8822', 'ee.josefernando@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
 (3, '012514', '41260', 'E.E. Silvio de Almeida', 'Ensino Médio Integral', 'ESCOLA', 'Rua Coronel Leme', '420', 'Centro', 'Bragança Paulista', 'Bragança Paulista', '12900-220', '(11) 4034-0199', 'ee.silvioalmeida@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
 (4, '012526', '41265', 'E.E. Major Juvenal Alvim', 'Ensino Fundamental Anos Iniciais e Finais', 'ESCOLA', 'Praça Guilherme Gonçalves', '100', 'Centro', 'Atibaia', 'Atibaia', '12940-020', '(11) 4411-2010', 'ee.juvenalalvim@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
-(5, '012538', '41270', 'E.E. Padre Aldo Bolini', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua João Ramalho', '800', 'Centro', 'Atibaia', 'Atibaia', '12945-000', '(11) 4413-5050', 'ee.padrealdo@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00');
+(5, '012538', '41270', 'E.E. Padre Aldo Bolini', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua João Ramalho', '800', 'Centro', 'Atibaia', 'Atibaia', '12945-000', '(11) 4413-5050', 'ee.padrealdo@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(6, '222222', '11111', 'E.E. Cásper Líbero Alves', 'REGULAR', 'ESCOLA', 'Rua Alziro de Oliveira', '120', 'Jardim Cerejeiras', 'Bragança Paulista', 'Bragança Paulista', '12951240', '(11) 4412-3040', 'ee.casperlibero@educacao.sp.gov.br', 1, 1, '2026-10-08 10:18:17');
 
+DROP TABLE IF EXISTS `unidades_regionais`;
 CREATE TABLE `unidades_regionais` (
   `id_ure` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
@@ -388,9 +454,11 @@ CREATE TABLE `unidades_regionais` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `unidades_regionais`;
 INSERT INTO `unidades_regionais` (`id_ure`, `nome`, `uge`, `codigo`, `endereco`, `numero`, `bairro`, `municipio`, `cidade`, `cep`, `telefone`, `email`, `data_cadastro`) VALUES
 (1, 'Unidade Regional de Ensino Região de Bragança Paulista', '081240', 'DE-BP', 'Avenida José Gomes da Rocha Leão', '450', 'Centro', 'Bragança Paulista', 'Bragança Paulista', '12900-300', '(11) 4034-7100', 'debraganca@educacao.sp.gov.br', '2026-09-24 09:00:00');
 
+DROP TABLE IF EXISTS `usuarios_pae`;
 CREATE TABLE `usuarios_pae` (
   `id_pae` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
@@ -404,11 +472,13 @@ CREATE TABLE `usuarios_pae` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `usuarios_pae`;
 INSERT INTO `usuarios_pae` (`id_pae`, `nome`, `cpf`, `senha`, `email`, `telefone`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`) VALUES
-(1, 'Aline Cristina Silveira', '92105689078', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'aline.silveira@plenaservicos.com.br', '(11) 98642-1098', NULL, 1, 1, '2026-09-24 09:00:00'),
+(1, 'Aline Cristina Silveira Carla', '92105689078', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'aline.silveira@plenaservicos.com.br', '(11) 9 8642-1098', NULL, 1, 1, '2026-09-24 09:00:00'),
 (2, 'Rafael Henrique Duarte', '89839629174', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'rafael.duarte@plenaservicos.com.br', '(11) 97519-3420', NULL, 1, 1, '2026-09-24 09:00:00'),
 (3, 'Simone Aparecida Cunha', '51294837261', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'simone.cunha@plenaservicos.com.br', '(11) 99182-7364', NULL, 1, 1, '2026-09-24 09:00:00');
 
+DROP TABLE IF EXISTS `usuarios_supervisor`;
 CREATE TABLE `usuarios_supervisor` (
   `id_usuario_supervisor` int(11) NOT NULL,
   `id_empresa` int(11) NOT NULL,
@@ -421,9 +491,11 @@ CREATE TABLE `usuarios_supervisor` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `usuarios_supervisor`;
 INSERT INTO `usuarios_supervisor` (`id_usuario_supervisor`, `id_empresa`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
 (1, 1, 'Marcelo Antunes Ribeiro', '57967958802', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'marcelo.ribeiro@plenaservicos.com.br', '(11) 97824-1590', 1, '2026-09-24 09:00:00');
 
+DROP TABLE IF EXISTS `usuarios_ue`;
 CREATE TABLE `usuarios_ue` (
   `id_usuario_ue` int(11) NOT NULL,
   `id_ue` int(11) NOT NULL,
@@ -437,12 +509,12 @@ CREATE TABLE `usuarios_ue` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `usuarios_ue`;
 INSERT INTO `usuarios_ue` (`id_usuario_ue`, `id_ue`, `nome`, `cpf`, `senha`, `cargo`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
-(1, 1, 'Patrícia Helena Prado', '85912099156', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'patricia.prado@educacao.sp.gov.br', '(11) 98765-4321', 1, '2026-09-24 09:00:00'),
-(2, 2, 'Regina Célia Alcantara', '01630953458', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'VICE_DIRETOR', 'regina.alcantara@educacao.sp.gov.br', '(11) 97654-3210', 1, '2026-09-24 09:00:00'),
-(3, 3, 'Clarisse Bueno de Camargo', '31294857201', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'COORDENADOR', 'clarisse.camargo@educacao.sp.gov.br', '(11) 96543-2109', 1, '2026-09-24 09:00:00'),
-(5, 5, 'Fernanda Lopes Ribeiro', '71293846501', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'fernanda.ribeiro@educacao.sp.gov.br', '(11) 94321-0987', 1, '2026-09-24 09:00:00');
+(6, 5, 'Yasmin Vitoria Mello', '21432453453', '$2y$10$HEQzyp4HvmCYr4L7v4MDaOfiFxmjCF33Z5jcIqVyRXS8RO9wD/wQO', 'DIRETOR', 'yasmin.mello@gmail.com', '(45) 2 4532-4534', 1, '2026-10-08 09:07:09'),
+(7, 3, 'Ronaldo Gabriel Gomess', '20424523452', '$2y$10$hy88.jz5A38MGt4sZnqdZ.pX6BzAQnPAdVaMjbhx5eUxv3cpwNCoa', 'DIRETOR', 'rony.gomes@gmail.com', '(12) 4 5234-5323', 1, '2026-10-08 09:08:12');
 
+DROP TABLE IF EXISTS `usuarios_ure`;
 CREATE TABLE `usuarios_ure` (
   `id_usuario_ure` int(11) NOT NULL,
   `id_ure` int(11) NOT NULL,
@@ -457,12 +529,13 @@ CREATE TABLE `usuarios_ure` (
   `data_cadastro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+TRUNCATE TABLE `usuarios_ure`;
 INSERT INTO `usuarios_ure` (`id_usuario_ure`, `id_ure`, `nome`, `cpf`, `senha`, `setor`, `cargo`, `nivel_acesso`, `email`, `ativo`, `data_cadastro`) VALUES
 (1, 1, 'Rodrigo Mendes Cavalcante', '16973929460', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'SEFISC', 'Supervisor de Fiscalização de Contratos', 2, 'rodrigo.cavalcante@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
 (2, 1, 'Luciana Cristina Campos', '34568254639', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'SEFISC', 'Oficial Administrativo', 1, 'luciana.campos@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
 (3, 1, 'André Luiz Barbosa', '68017529520', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Professor Especialista em Currículo', 2, 'andre.barbosa@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
-(4, 1, 'Camila Fernanda Moreira', '06974141246', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Professor Especialista em Educação Especial', 2, 'camila.moreira@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
-(5, 1, 'Matheus Marques Molisani', '46421354646', '$2y$10$UQ6i2BHuQn1akILjf1mCPeMixyzE5et3j7w/2tygrDrSJDSPRb7sC', 'ASURE', 'Assistente Técnico II', 3, 'mm.matheus@gmail.com', 1, '2026-10-08 08:45:28');
+(5, 1, 'Matheus Marques Molisani', '46421354646', '$2y$10$UQ6i2BHuQn1akILjf1mCPeMixyzE5et3j7w/2tygrDrSJDSPRb7sC', 'ASURE', 'Assistente Técnico II', 3, 'mm.matheus@gmail.com', 1, '2026-10-08 08:45:28'),
+(6, 1, 'João Pedro Pereira', '24345234524', '$2y$10$/lFBM3IzZrVSUChYuwIXM.pcBi8uNznCZ8uh6efe6DYw1v48nh9XG', 'EDU_ESPECIAL', 'Professor Especialista em Currículo', 2, 'joaopedropereira5576@gmail.com', 1, '2026-10-08 09:51:05');
 
 
 ALTER TABLE `admin`
@@ -552,10 +625,10 @@ ALTER TABLE `alunos`
   MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 ALTER TABLE `associacoes`
-  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 ALTER TABLE `auditoria`
-  MODIFY `id_auditoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id_auditoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 ALTER TABLE `empresas`
   MODIFY `id_empresa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
@@ -564,22 +637,22 @@ ALTER TABLE `laudos`
   MODIFY `id_laudo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 ALTER TABLE `notificacoes_lidas`
-  MODIFY `id_leitura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_leitura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 ALTER TABLE `recuperacao_senha`
   MODIFY `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 ALTER TABLE `relatorios`
-  MODIFY `id_relatorio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_relatorio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 ALTER TABLE `seduc`
   MODIFY `id_seduc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 ALTER TABLE `termos_aceite`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 ALTER TABLE `unidades_escolares`
-  MODIFY `id_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 ALTER TABLE `unidades_regionais`
   MODIFY `id_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
@@ -591,10 +664,10 @@ ALTER TABLE `usuarios_supervisor`
   MODIFY `id_usuario_supervisor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 ALTER TABLE `usuarios_ue`
-  MODIFY `id_usuario_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_usuario_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 ALTER TABLE `usuarios_ure`
-  MODIFY `id_usuario_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_usuario_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 
 ALTER TABLE `alunos`
@@ -629,7 +702,7 @@ ALTER TABLE `usuarios_ue`
 
 ALTER TABLE `usuarios_ure`
   ADD CONSTRAINT `fk_usuario_ure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
-COMMIT;
+SET FOREIGN_KEY_CHECKS=1;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

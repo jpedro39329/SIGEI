@@ -9,6 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/error_handler.php';
 require_once __DIR__ . '/database.php';
 if (isset($conexao) && $conexao instanceof mysqli) {
     $conexao->set_charset('utf8mb4');

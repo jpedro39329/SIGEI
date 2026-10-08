@@ -1,25 +1,34 @@
 <?php
 // ============================================================
-// SIGEI - PÁGINA DE ERRO AMIGÁVEL (404 / 500)
-// Autossuficiente: não depende de CSS/JS externos do projeto,
-// funciona em qualquer profundidade de URL.
+// SIGEI - PÁGINA DE ERRO AMIGÁVEL COM CARD (404 / 500)
+// Exibe mensagem clara com o erro ocorrido, local e botão fechar/voltar
 // ============================================================
 
-function sigei_pagina_erro(int $codigo = 500, string $urlInicio = ''): void
+function sigei_pagina_erro(int $codigo = 500, string $urlInicio = '', ?string $mensagemErro = null, ?string $arquivoErro = null, ?int $linhaErro = null): void
 {
     $is404 = ($codigo === 404);
 
-    $titulo = $is404 ? 'Página não encontrada' : 'Ocorreu um problema';
+    $titulo = $is404 ? 'Página não encontrada' : 'Erro no Sistema';
     $texto  = $is404
         ? 'A página que você procura não existe ou foi removida.'
-        : 'Não foi possível concluir esta operação.';
+        : 'Ocorreu um problema ao processar a sua solicitação.';
 
-    $metodoPost = (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST');
     $inicio = $urlInicio !== '' ? $urlInicio : '/';
 
-    $icone = $is404
-        ? '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8.5" y1="11" x2="13.5" y2="11"/></svg>'
-        : '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7.5" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor"/></svg>';
+    // Se temos arquivo, exibir apenas o caminho relativo limpo
+    $localLimpo = '';
+    if ($arquivoErro) {
+        $arquivoErroNorm = str_replace('\\', '/', $arquivoErro);
+        $pos = strpos($arquivoErroNorm, 'SIGEI/');
+        if ($pos !== false) {
+            $localLimpo = substr($arquivoErroNorm, $pos);
+        } else {
+            $localLimpo = basename($arquivoErro);
+        }
+        if ($linhaErro) {
+            $localLimpo .= ' (linha ' . $linhaErro . ')';
+        }
+    }
     ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -33,53 +42,86 @@ function sigei_pagina_erro(int $codigo = 500, string $urlInicio = ''): void
     * { box-sizing: border-box; }
     body {
       margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      padding: 24px; background: #f4f8ff; color: #1e293b;
+      padding: 24px; background: #f8fafc; color: #1e293b;
       font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
     }
-    .card {
-      width: 100%; max-width: 420px; background: #fff; border: 1px solid #dbe6f5;
-      border-radius: 14px; box-shadow: 0 8px 24px rgba(17, 78, 207, 0.08);
-      padding: 36px 28px; text-align: center;
+    .card-erro {
+      width: 100%; max-width: 520px; background: #fff; border: 1px solid #fee2e2;
+      border-radius: 16px; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.08);
+      padding: 32px 28px; text-align: center; position: relative;
     }
-    .icone {
-      width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 50%;
+    .icone-erro {
+      width: 60px; height: 60px; margin: 0 auto 16px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      background: #eef3fd; color: #114ecf;
+      background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2;
     }
-    .marca { font-size: .8rem; font-weight: 800; letter-spacing: .12em; color: #114ecf; margin-bottom: 6px; }
-    h1 { font-size: 1.35rem; font-weight: 800; margin: 0 0 8px; }
-    p { margin: 0 0 24px; color: #52637a; font-size: .95rem; line-height: 1.5; }
-    .btn {
-      display: inline-block; border: 0; cursor: pointer; text-decoration: none;
-      background: #114ecf; color: #fff; font: inherit; font-weight: 700; font-size: .95rem;
-      padding: 10px 26px; border-radius: 8px;
+    .marca { font-size: .8rem; font-weight: 800; letter-spacing: .12em; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
+    h1 { font-size: 1.35rem; font-weight: 800; margin: 0 0 8px; color: #0f172a; }
+    .subtexto { margin: 0 0 20px; color: #64748b; font-size: .95rem; line-height: 1.5; }
+    .detalhe-box {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+      padding: 14px 16px; text-align: left; margin-bottom: 24px; font-size: .88rem;
     }
-    .btn:hover { background: #0038bb; }
-    .btn:focus-visible { outline: 3px solid rgba(0, 56, 187, 0.25); outline-offset: 2px; }
+    .detalhe-item { margin-bottom: 8px; word-break: break-word; }
+    .detalhe-item:last-child { margin-bottom: 0; }
+    .detalhe-label { font-weight: 700; color: #475569; display: block; font-size: .78rem; text-transform: uppercase; margin-bottom: 2px; }
+    .detalhe-valor { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #b91c1c; font-size: .85rem; }
+    .detalhe-onde { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #334155; font-size: .85rem; }
+    .acoes { display: flex; gap: 10px; justify-content: center; }
+    .btn-fechar {
+      display: inline-flex; align-items: center; justify-content: center; border: 0; cursor: pointer; text-decoration: none;
+      background: #0f172a; color: #fff; font: inherit; font-weight: 700; font-size: .95rem;
+      padding: 10px 24px; border-radius: 8px; transition: background .15s ease;
+    }
+    .btn-fechar:hover { background: #334155; }
+    .btn-voltar {
+      display: inline-flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1; cursor: pointer; text-decoration: none;
+      background: #ffffff; color: #334155; font: inherit; font-weight: 700; font-size: .95rem;
+      padding: 10px 20px; border-radius: 8px; transition: background .15s ease;
+    }
+    .btn-voltar:hover { background: #f1f5f9; }
   </style>
 </head>
 <body>
-  <main class="card" role="alert">
-    <div class="icone" aria-hidden="true"><?php echo $icone; ?></div>
+  <main class="card-erro" role="alert">
+    <div class="icone-erro" aria-hidden="true">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
     <div class="marca">SIGEI</div>
     <h1><?php echo htmlspecialchars($titulo); ?></h1>
-    <p><?php echo htmlspecialchars($texto); ?></p>
-    <?php if (!$is404): ?>
-      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: -16px; margin-bottom: 22px; font-family: monospace;">
-        Código: SIGEI-ERR-<?php echo (int)$codigo; ?>
+    <p class="subtexto"><?php echo htmlspecialchars($texto); ?></p>
+
+    <?php if (!$is404 && ($mensagemErro || $localLimpo)): ?>
+      <div class="detalhe-box">
+        <?php if ($mensagemErro): ?>
+          <div class="detalhe-item">
+            <span class="detalhe-label">Erro Identificado</span>
+            <span class="detalhe-valor"><?php echo htmlspecialchars($mensagemErro); ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ($localLimpo): ?>
+          <div class="detalhe-item">
+            <span class="detalhe-label">Onde Ocorreu</span>
+            <span class="detalhe-onde"><?php echo htmlspecialchars($localLimpo); ?></span>
+          </div>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
-    <?php if ($is404): ?>
-      <a class="btn" href="<?php echo htmlspecialchars($inicio); ?>"
-         onclick="if (history.length > 1) { history.back(); return false; }">Voltar</a>
-    <?php elseif ($metodoPost): ?>
-      <button class="btn" type="button" onclick="history.back()">Tentar novamente</button>
-    <?php else: ?>
-      <button class="btn" type="button" onclick="location.reload()">Tentar novamente</button>
-    <?php endif; ?>
+
+    <div class="acoes">
+      <button class="btn-fechar" type="button" onclick="window.history.length > 1 ? window.history.back() : window.location.href = '<?php echo htmlspecialchars($inicio); ?>'">
+        Fechar
+      </button>
+      <button class="btn-voltar" type="button" onclick="window.location.reload()">
+        Tentar Novamente
+      </button>
+    </div>
   </main>
 </body>
 </html>
 <?php
 }
-

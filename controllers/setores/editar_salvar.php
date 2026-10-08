@@ -81,7 +81,7 @@ if (!empty($novaSenha)) {
         SET id_ure = ?, nome = ?, cpf = ?, setor = ?, cargo = ?, nivel_acesso = ?, email = ?, ativo = ?
         WHERE id_usuario_ure = ?
     ");
-    $stmt->bind_param("issssissii", $idUre, $nome, $cpf, $setor, $cargo, $nivelAcesso, $email, $ativo, $idServidor);
+    $stmt->bind_param("issssisii", $idUre, $nome, $cpf, $setor, $cargo, $nivelAcesso, $email, $ativo, $idServidor);
 }
 
 if ($stmt->execute()) {
