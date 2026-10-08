@@ -106,7 +106,7 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    "sssssssssssssssiss",
+    "sssssssssssssssiiss",
     $nome,
     $cpf,
     $ra,

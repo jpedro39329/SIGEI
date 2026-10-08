@@ -100,12 +100,9 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                     <input type="text" class="form-control" value="<?php echo htmlspecialchars(nomeUreUsuario($conexao, $userId)); ?>" readonly>
                                 </div>
                             <?php endif; ?>
+                        </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Horário de Funcionamento</label>
-                                <input type="text" name="horario_funcionamento" class="form-control" maxlength="100" placeholder="Ex.: 07:00 às 17:00">
-                            </div>
-
+                        <div class="row">
                             <div class="col-12 mt-2">
                                 <h5 class="mb-3">Localização e Contatos</h5>
                             </div>

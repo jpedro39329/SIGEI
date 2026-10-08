@@ -53,8 +53,8 @@ $endereco = trim($_POST['endereco'] ?? '');
 $numero = trim($_POST['numero'] ?? '');
 $bairro = trim($_POST['bairro'] ?? '');
 $municipio = trim($_POST['municipio'] ?? '');
+$cidade = $municipio;
 $cep = preg_replace('/\D/', '', $_POST['cep'] ?? '');
-$horario = trim($_POST['horario_funcionamento'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $email = trim($_POST['email'] ?? '');
 
@@ -75,8 +75,8 @@ $stmtVerifica->close();
 
 $stmt = $conexao->prepare(
     "UPDATE unidades_escolares SET
-        nome = ?, cie = ?, ua = ?, endereco = ?, numero = ?, bairro = ?, municipio = ?, cep = ?,
-        modalidade = ?, id_ure = ?, horario_funcionamento = ?, telefone = ?, email = ?
+        nome = ?, cie = ?, ua = ?, endereco = ?, numero = ?, bairro = ?, municipio = ?, cidade = ?, cep = ?,
+        modalidade = ?, id_ure = ?, telefone = ?, email = ?
     WHERE id_ue = ?"
 );
 
@@ -86,7 +86,7 @@ if (!$stmt) {
 }
 
 $stmt->bind_param(
-    "sssssssssisssi",
+    "ssssssssssissi",
     $nome,
     $cie,
     $ua,
@@ -94,10 +94,10 @@ $stmt->bind_param(
     $numero,
     $bairro,
     $municipio,
+    $cidade,
     $cep,
     $modalidade,
     $idUre,
-    $horario,
     $telefone,
     $email,
     $idUe

@@ -119,10 +119,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 </div>
                             <?php endif; ?>
 
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Horário de Funcionamento</label>
-                                <input type="text" name="horario_funcionamento" class="form-control" maxlength="100" value="<?php echo htmlspecialchars($escola['horario_funcionamento'] ?? ''); ?>">
-                            </div>
+
 
                             <div class="col-12 mt-2">
                                 <h5 class="mb-3">Localização e Contatos</h5>
