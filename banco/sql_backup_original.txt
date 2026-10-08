@@ -1,0 +1,1230 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.3
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Tempo de geração: 08/10/2026 às 07:56
+-- Versão do servidor: 10.11.19-MariaDB-cll-lve
+-- Versão do PHP: 8.3.33
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `wmshpicv_SIGEI`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `admin`
+--
+
+CREATE TABLE `admin` (
+  `id_admin` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `admin`
+--
+
+INSERT INTO `admin` (`id_admin`, `nome`, `cpf`, `senha`, `data_cadastro`) VALUES
+(1, 'Ricardo Augusto Nogueira', '83918234150', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `alunos`
+--
+
+CREATE TABLE `alunos` (
+  `id_aluno` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) DEFAULT NULL,
+  `ra` varchar(30) DEFAULT NULL,
+  `turno_aula` enum('MANHÃ','TARDE','NOITE','INTEGRAL') DEFAULT NULL,
+  `genero` varchar(50) DEFAULT NULL,
+  `raca` varchar(50) DEFAULT NULL,
+  `municipio_nascimento` varchar(100) DEFAULT NULL,
+  `serie` varchar(50) DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `descricao_deficiencia` text DEFAULT NULL,
+  `descricao_cuidados` text DEFAULT NULL,
+  `nome_responsavel` varchar(150) DEFAULT NULL,
+  `cpf_responsavel` char(11) DEFAULT NULL,
+  `foto_arquivo` varchar(255) DEFAULT NULL,
+  `termo_responsabilidade_arquivo` varchar(255) DEFAULT NULL,
+  `status_aprovacao` enum('PENDENTE','APROVADO','REPROVADO','PENDENTE_CORRECAO','ARQUIVADO') DEFAULT 'PENDENTE',
+  `motivo_reprovacao` text DEFAULT NULL,
+  `motivo_arquivamento` text DEFAULT NULL,
+  `data_arquivamento` datetime DEFAULT NULL,
+  `arquivado_por_nome` varchar(150) DEFAULT NULL,
+  `arquivado_por_cpf` char(11) DEFAULT NULL,
+  `arquivado_por_perfil` varchar(50) DEFAULT NULL,
+  `deliberado_por_nome` varchar(150) DEFAULT NULL,
+  `deliberado_por_cpf` char(11) DEFAULT NULL,
+  `data_deliberacao` datetime DEFAULT NULL,
+  `id_ue` int(11) DEFAULT NULL,
+  `id_usuario_ue` int(11) DEFAULT NULL,
+  `cadastrado_por_nome` varchar(150) DEFAULT NULL,
+  `cadastrado_por_cpf` varchar(20) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `alunos`
+--
+
+INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`, `municipio_nascimento`, `serie`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `termo_responsabilidade_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `motivo_arquivamento`, `data_arquivamento`, `arquivado_por_nome`, `arquivado_por_cpf`, `arquivado_por_perfil`, `deliberado_por_nome`, `deliberado_por_cpf`, `data_deliberacao`, `id_ue`, `id_usuario_ue`, `cadastrado_por_nome`, `cadastrado_por_cpf`, `data_cadastro`) VALUES
+(1, 'Enzo Gabriel de Almeida', '06403706160', '112345678-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '6º ANO', '2014-04-12', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de mediação pedagógica contínua, suporte em momentos de sobrecarga sensorial e apoio na organização da rotina e transição de aulas.', 'Renata Cristina de Almeida', '10998616249', 'uploads/fotos/20260928141943_7be9c17807c9.jpg', 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-09-24 09:00:00'),
+(2, 'Sophia Helena Martins', '77184557000', '113987654-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-08-25', 'Paralisia Cerebral Espástica com diplegia motora (CID G80.1)', 'Usuária de cadeira de rodas; necessita de auxílio para locomoção pelo prédio escolar, uso de sanitários e transferências posturais.', 'Cláudia Martins da Silva', '19793723491', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-09-24 09:00:00'),
+(3, 'Matheus Henrique Ramos', '74826774613', '114561239-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-11-03', 'Deficiência Intelectual Moderada associada a TDAH (CID F71 / F90)', 'Requer mediação direcionada na realização de atividades pedagógicas, supervisão durante intervalos e suporte nas relações sociais interpessoais.', 'Marcos Vinícius Ramos', '63942918544', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-09-24 09:00:00'),
+(4, 'Laura Beatriz Santos', '62852031647', '115890234-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '6º ANO', '2014-02-18', 'Mielomeningocele com paraparesia e hidrocefalia corrigida (CID Q05)', 'Locomoção assistida com uso de andador infantil, necessidade de auxílio na higienização periódica e verificação de postura em sala.', 'Juliana dos Santos Ferraz', '97691385412', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '', '2026-10-02 09:44:51', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-09-25 10:30:00'),
+(5, 'Cauã Felipe Nogueira', '53918274601', '116748291-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '9º ANO', '2011-06-14', 'Síndrome de Down com atraso motor e fonoaudiológico (CID Q90.9)', 'Suporte em atividades com motricidade fina, apoio na alimentação e estímulo à autonomia para participação em projetos coletivos.', 'Patrícia Nogueira Lopes', '48291049281', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', 'Favor anexar relatório neurológico atualizado com carimbo e assinatura legíveis do médico especialista.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-26 14:15:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-09-26 14:15:00'),
+(6, 'Isabela Cristina Ferreira', '39182740592', '117829304-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Campinas', '1ª SÉRIE', '2010-09-20', 'Transtorno do Espectro Autista severo não verbal (CID F84.0)', 'Comunicação alternativa por pranchas pictográficas (PECS), suporte intensivo de contenção afetiva e mediação em tempo integral.', 'Marta Helena Ferreira', '31928401928', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-27 10:00:00', 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-09-27 08:45:00'),
+(7, 'Felipe Gabriel Miranda', '81920394857', '118930491-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Campinas', '2ª SÉRIE', '2009-12-05', 'Déficit de atenção sem diagnóstico de deficiência comprovada por laudo', 'Solicitação submetida sem comprovação diagnóstica de elegibilidade para serviço de profissional de apoio escolar.', 'Sérgio Miranda Prado', '29384019283', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'O estudante não se enquadra nos critérios de elegibilidade para Profissional de Apoio Escolar conforme Deliberação CEE/SP e Instrução Normativa da SEDUC. Recomendado acompanhamento pedagógico via Sala de Recursos (AEE).', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-28 11:20:00', 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-09-28 11:20:00'),
+(8, 'Beatriz Yasmin Oliveira', '48291039481', '119049281-SP', 'MANHÃ', 'FEMININO', 'PARDA', 'Bragança Paulista', '3ª SÉRIE', '2008-03-30', 'Paralisia Cerebral com monoparesia braquial direita (CID G80)', 'Estudante concluiu o Ensino Médio com êxito e autonomia estabelecida.', 'Tereza Cristina Oliveira', '58192039481', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Conclusão regular do Ensino Médio pelo estudante. Encerramento do ciclo de apoio escolar no SIGEI.', '2026-09-29 16:00:00', 'Eduardo Pinheiro de Moraes', '38897933980', 'DIRIGENTE', 'Camila Fernanda Moreira', '06974141246', '2026-09-24 15:30:00', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-09-24 09:00:00'),
+(9, 'Lucas Gabriel da Silveira', '28190394812', '120192830-SP', 'INTEGRAL', 'MASCULINO', 'BRANCA', 'São José dos Campos', '1ª SÉRIE', '2010-05-18', 'Deficiência Visual - Baixa Visão Severa (CID H54.2)', 'Necessita de ampliação de materiais gráficos, suporte para locomoção em escadarias e espaços amplos, além de tecnologia assistiva.', 'Marilene da Silveira Costa', '69182039481', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-28 10:30:00', 8, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-09-28 09:30:00'),
+(10, 'Gabriela Medeiros Lima', '19283049182', '121928304-SP', 'MANHÃ', 'FEMININO', 'BRANCA', 'Ribeirão Preto', '8º ANO', '2012-07-22', 'Transtorno do Espectro Autista Nível 2 (CID F84.0)', 'Acompanhamento nas trocas de salas de aula, apoio alimentar e suporte pedagógico mediado.', 'Valquíria Medeiros Lima', '48192039482', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-09-29 11:00:00', 9, NULL, 'Regina Célia Alcantara', '01630953458', '2026-09-29 10:00:00'),
+(11, 'Arthur Henrique Silveira', '40918237461', '122345110-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '7º ANO', '2013-05-14', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de apoio na mediação pedagógica, contenção em crises sensoriais e acompanhamento no intervalo.', 'Juliana Silveira Ramos', '81920394857', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-12 14:00:00', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-04-10 08:30:00'),
+(12, 'Helena Beatriz Alcantara', '51029384756', '123456221-SP', 'TARDE', 'FEMININO', 'PARDA', 'Atibaia', '8º ANO', '2012-09-20', 'Paralisia Cerebral Espástica Diparética (CID G80.1)', 'Cadeira de rodas manual; suporte para transferências, uso do sanitário e transporte até salas de aula.', 'Carlos Eduardo Alcantara', '92039485716', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-04-18 10:30:00', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-04-15 11:20:00'),
+(13, 'Bernardo Souza Toledo', '62130495867', '124567332-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2014-01-11', 'Síndrome de Down com atraso psicomotor (CID Q90.9)', 'Apoio na motricidade fina, organização do material escolar e estimulação à fala.', 'Mariana Souza Toledo', '03948571625', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-05 16:00:00', 2, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-05-02 09:15:00'),
+(14, 'Valentina Mendes Rocha', '73241506978', '125678443-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '9º ANO', '2011-08-30', 'Deficiência Intelectual Moderada associada a Epilepsia (CID F71 / G40)', 'Supervisão constante em locais abertos e suporte pedagógico individualizado.', 'Renata Mendes Rocha', '14059682736', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-05-20 11:00:00', 2, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-05-18 14:40:00'),
+(15, 'Davi Lucca Farias', '84352617089', '126789554-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2010-03-25', 'Transtorno do Espectro Autista Severo Não Verbal (CID F84.0)', 'Necessidade de cuidador dedicado para alimentação, higienização e comunicação alternativa.', 'Fabiana Farias Lima', '25160793847', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-08 09:30:00', 3, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-04 10:00:00'),
+(16, 'Larissa Fernanda Duarte', '95463728190', '127890665-SP', 'INTEGRAL', 'FEMININO', 'BRANCA', 'Atibaia', '2ª SÉRIE', '2009-11-12', 'Mielomeningocele com Bexiga Neurogênica (CID Q05.9)', 'Uso de cadeira de rodas; necessidade de sondagem vesical e auxílio integral na locomoção escolar.', 'Sandra Mara Duarte', '36271804958', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-06-22 15:45:00', 4, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-19 13:20:00'),
+(17, 'Thiago Emanuel Rezende', '06574839201', '128901776-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Atibaia', '6º ANO', '2014-07-08', 'Déficit de atenção com desatenção pontual em sala', 'Solicitação enviada pela escola sem comprovação de dependência funcional.', 'Cláudio Rezende', '47382915069', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Estudante não apresenta dependência em atividades de vida diária ou locomoção. Recomendado encaminhamento para Sala de Recursos (AEE).', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-02 11:00:00', 4, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-28 09:00:00'),
+(18, 'Alice Vitória Pinheiro', '17685940312', '129012887-SP', 'TARDE', 'FEMININO', 'PARDA', 'Bragança Paulista', '7º ANO', '2013-10-17', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Laudo antigo anexado. Necessita de reavaliação médica circunstanciada.', 'Vanessa Pinheiro', '58493026170', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', 'Anexar laudo com data de emissão inferior a 12 meses e parecer pedagógico inicial da escola.', NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '06974141246', '2026-07-15 14:30:00', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-07-12 10:15:00'),
+(19, 'Gustavo Henrique Vasconcelos', '28796051423', '130123998-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Bragança Paulista', '8º ANO', '2012-04-03', 'Deficiência Visual Severa (CID H54.1)', 'Necessita de leitor de tela, guia em escadarias e ampliação de provas.', 'Rogério Vasconcelos', '69504137281', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-06 09:52:11', 2, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-09-30 08:45:00'),
+(20, 'Manuela Cristina Barros', '39807162534', '131234009-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2011-12-19', 'Transtorno do Espectro Autista com hipersensibilidade auditiva (CID F84.0)', 'Suporte em transições de sala e auxílio na comunicação.', 'Luciana Barros', '70615248392', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Camila Fernanda Moreira', '', '2026-10-06 10:40:23', 3, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-01 11:30:00'),
+(21, 'Gabriel Santos Prado', '40918273645', '132345110-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '1ª SÉRIE', '2010-06-15', 'Paralisia Cerebral com tetraparesia espástica (CID G80.0)', 'Uso de cadeira de rodas postural; alimentação por gastrostomia e auxílio em tempo integral.', 'Simone Santos Prado', '81726354901', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Helena Rios Peixoto', '18293049182', '2026-05-10 14:00:00', 5, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-05-08 09:00:00'),
+(22, 'Yasmin Vitória Alencar', '10000013837', '100052323-SP', 'TARDE', 'FEMININO', 'BRANCA', 'Campinas', '2ª SÉRIE', '2009-08-22', 'Transtorno do Espectro Autista Nível 3 (CID F84.0)', 'Apoio contínuo em contenção sensorial, rotina de sala e alimentação assistida.', 'Patrícia Alencar', '10000082337', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Helena Rios Peixoto', '18293049182', '2026-06-15 10:15:00', 5, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-11 15:30:00'),
+(23, 'Pedro Henrique Nogueira', '10000013974', '100052346-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Campinas', '3ª SÉRIE', '2008-01-30', 'Distrofia Muscular de Duchenne (CID G71.0)', 'Cadeira de rodas motorizada; necessita de apoio nas transferências e manipulação de cadernos.', 'Marcos Nogueira', '10000082474', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Helena Rios Peixoto', '18293049182', '2026-07-20 16:30:00', 6, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-07-16 08:20:00'),
+(24, 'Mariana Clara Fagundes', '10000014111', '100052369-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '6º ANO', '2014-09-05', 'Dificuldade de aprendizagem sem comprovação clínica de deficiência', 'Solicitação sem laudo com CID.', 'Carla Fagundes', '10000082611', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Não atende aos critérios normativos da Educação Especial para PAE. Recomendado reforço e Sala de Recursos.', NULL, NULL, NULL, NULL, NULL, 'Helena Rios Peixoto', '18293049182', '2026-08-05 11:20:00', 6, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-08-01 10:00:00'),
+(25, 'Samuel Lucas Ferreira', '10000014248', '100052392-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '7º ANO', '2013-03-14', 'Síndrome de Down com cardiopatia congênita (CID Q90.0)', 'Apoio nas atividades de locomoção sem esforço físico excessivo.', 'Eliane Ferreira', '10000082748', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-09-29 14:00:00'),
+(26, 'Enzo Gabriel Tavares', '10000014385', '100052415-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Campinas', '6º ANO', '2014-04-18', 'Transtorno do Espectro Autista com ecolalia (CID F84.0)', 'Apoio em rotina pedagógica estruturada e acompanhamento nas transições.', 'Daniel Tavares', '10000082885', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Campinas Oeste', '18293049182', '2026-05-15 15:00:00', 7, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-05-12 09:30:00'),
+(27, 'Júlia Gabriela Rezende', '10000014522', '100052438-SP', 'TARDE', 'FEMININO', 'PARDA', 'Campinas', '8º ANO', '2012-07-29', 'Paralisia Cerebral com hemiparesia esquerda (CID G80.2)', 'Auxílio na escrita e transporte de livros e materiais.', 'Fernanda Rezende', '10000083022', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Campinas Oeste', '18293049182', '2026-06-25 10:00:00', 7, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-20 11:15:00'),
+(28, 'Nicolas Ferreira Moura', '10000014659', '100052461-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Campinas', '9º ANO', '2011-02-14', 'Transtorno Opositor Desafiador isolado', 'Sem deficiência física ou sensorial.', 'Paulo Moura', '10000083159', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Critérios para contratação de cuidador não preenchidos. Aluno elegível para apoio pelo Professor Especialista em Educação Especial.', NULL, NULL, NULL, NULL, NULL, 'Educação Especial Campinas Oeste', '18293049182', '2026-08-10 14:00:00', 7, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-08-04 10:30:00'),
+(29, 'Luiza Vitória Sampaio', '10000014796', '100052484-SP', 'INTEGRAL', 'FEMININO', 'BRANCA', 'São José dos Campos', '1ª SÉRIE', '2010-10-04', 'Transtorno do Espectro Autista Nível 2 (CID F84.0)', 'Suporte alimentar no refeitório, organização de materiais e mediação social.', 'Cláudia Sampaio', '10000083296', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial SJC', '41298765432', '2026-04-25 11:00:00', 8, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-04-20 08:30:00'),
+(30, 'Cauê Fernando Medeiros', '10000014933', '100052507-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'São José dos Campos', '2ª SÉRIE', '2009-05-17', 'Paralisia Cerebral com Diplegia Espástica (CID G80.1)', 'Uso de andador e apoio nas transferências e sanitários.', 'Antônio Medeiros', '10000083433', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial SJC', '41298765432', '2026-05-30 16:20:00', 8, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-05-26 14:00:00'),
+(31, 'Rafael Silva Fontes', '10000015070', '100052530-SP', 'TARDE', 'MASCULINO', 'BRANCA', 'São José dos Campos', '3ª SÉRIE', '2008-09-11', 'Transtorno de Ansiedade sem déficits motores', 'Apoio emocional.', 'Aline Fontes', '10000083570', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Apoio psicológico deve ser conduzido pela rede de atenção psicossocial. Não elegível para cuidador.', NULL, NULL, NULL, NULL, NULL, 'Educação Especial SJC', '41298765432', '2026-07-28 09:40:00', 8, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-07-22 10:00:00'),
+(32, 'Carolina Mendes Guimarães', '10000015207', '100052553-SP', 'MANHÃ', 'FEMININO', 'BRANCA', 'São José dos Campos', '1ª SÉRIE', '2010-12-03', 'Síndrome de Down (CID Q90.9)', 'Aguardando parecer da equipe médica especialista.', 'Beatriz Guimarães', '10000083707', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-01 09:10:00'),
+(33, 'Felipe Augusto Barreto', '10000015344', '100052576-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Ribeirão Preto', '8º ANO', '2012-06-20', 'Transtorno do Espectro Autista Severo (CID F84.0)', 'Comunicação alternativa, apoio na contenção sensorial e alimentação.', 'Ricardo Barreto', '10000083844', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Ribeirão Preto', '49281734890', '2026-04-30 11:30:00', 9, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-04-26 10:00:00'),
+(34, 'Isadora Luiza Morais', '10000015481', '100052599-SP', 'TARDE', 'FEMININO', 'PARDA', 'Ribeirão Preto', '9º ANO', '2011-04-15', 'Paralisia Cerebral Atáxica (CID G80.4)', 'Instabilidade na marcha; apoio na locomoção pelas dependências escolares e escadas.', 'Marta Morais', '10000083981', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Ribeirão Preto', '49281734890', '2026-06-18 14:00:00', 9, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-12 11:45:00'),
+(35, 'Lucas Vinícius Meirelles', '10000015618', '100052622-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Ribeirão Preto', '2ª SÉRIE', '2009-10-28', 'Transtorno de Conduta sem déficits motores', 'Solicitação de acompanhante por indisciplina.', 'Sérgio Meirelles', '10000084118', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Apoio escolar destina-se a auxílio em alimentação, higiene e locomoção ou mediação em autismo severo.', NULL, NULL, NULL, NULL, NULL, 'Educação Especial Ribeirão Preto', '49281734890', '2026-08-14 10:30:00', 9, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-08-08 09:00:00'),
+(36, 'Bárbara Cristina Lins', '10000015755', '100052645-SP', 'MANHÃ', 'FEMININO', 'BRANCA', 'Santos', '6º ANO', '2014-03-21', 'Transtorno do Espectro Autista Nível 3 (CID F84.0)', 'Acompanhamento nas refeições, estímulo na transição de aulas e contenção sensorial.', 'Denise Lins', '10000084255', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Santos', '41879320001', '2026-04-14 16:00:00', 10, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-04-10 10:30:00'),
+(37, 'Murilo Henrique Neves', '10000015892', '100052668-SP', 'TARDE', 'MASCULINO', 'PARDA', 'Santos', '8º ANO', '2012-08-09', 'Paralisia Cerebral Espástica com Monoparesia (CID G80.0)', 'Cadeira de rodas e andador; apoio na condução aos laboratórios e sanitário adaptado.', 'Roberto Neves', '10000084392', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Santos', '41879320001', '2026-05-28 10:00:00', 10, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-05-24 14:15:00'),
+(38, 'Lorena Gabrielly Santos', '10000016029', '100052691-SP', 'MANHÃ', 'FEMININO', 'PRETA', 'Santos', '9º ANO', '2011-01-18', 'Síndrome de Down com atraso na linguagem (CID Q90.9)', 'Mediação em sala de aula e estímulo à autonomia.', 'Patrícia Santos', '10000084529', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Santos', '41879320001', '2026-06-30 11:30:00', 10, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-06-25 09:20:00'),
+(39, 'Enzo Gabriel Fagundes', '10000016166', '100052714-SP', 'TARDE', 'MASCULINO', 'BRANCA', 'Santos', '1ª SÉRIE', '2010-07-14', 'Deficiência Visual - Cegueira Total (CID H54.0)', 'Guia vidente para deslocamentos em áreas externas e orientação espacial.', 'Marcos Fagundes', '10000084666', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Educação Especial Santos', '41879320001', '2026-07-22 15:00:00', 10, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-07-18 10:00:00'),
+(40, 'Camila Vitória Queiroz', '10000016303', '100052737-SP', 'MANHÃ', 'FEMININO', 'PARDA', 'Santos', '2ª SÉRIE', '2009-02-27', 'Transtorno Bipolar da Adolescência', 'Acompanhamento ambulatorial.', 'Helena Queiroz', '10000084803', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Não atende aos critérios normativos da Educação Especial para cuidador. Recomendado atendimento pela rede de saúde mental.', NULL, NULL, NULL, NULL, NULL, 'Educação Especial Santos', '41879320001', '2026-08-20 14:30:00', 10, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-08-15 08:30:00'),
+(41, 'Kauan Felipe Medeiros', '10000016440', '100052760-SP', 'MANHÃ', 'MASCULINO', 'BRANCA', 'Santos', '3ª SÉRIE', '2008-05-19', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Suporte em provas e intervalos.', 'Valéria Medeiros', '10000084940', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 08:00:00'),
+(42, 'Gabriel Henrique - UE 1', '10000000101', '90000101-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-1', '20000000101', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(43, 'Gabriel Henrique - UE 2', '10000000201', '90000201-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-1', '20000000201', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'André Luiz Barbosa', '', '2026-10-07 08:23:51', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(44, 'Gabriel Henrique - UE 3', '10000000301', '90000301-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-1', '20000000301', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(45, 'Gabriel Henrique - UE 4', '10000000401', '90000401-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-1', '20000000401', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'hlhl', '2026-10-07 07:23:13', 'Jorge Luiz Antunes', '49182736450', 'USUARIO_ESCOLA', NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(46, 'Gabriel Henrique - UE 5', '10000000501', '90000501-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-1', '20000000501', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(47, 'Gabriel Henrique - UE 6', '10000000601', '90000601-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-1', '20000000601', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(48, 'Gabriel Henrique - UE 7', '10000000701', '90000701-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-1', '20000000701', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(49, 'Gabriel Henrique - UE 8', '10000000801', '90000801-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'São José dos Campos', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-1', '20000000801', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(50, 'Gabriel Henrique - UE 9', '10000000901', '90000901-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Ribeirão Preto', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-1', '20000000901', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(51, 'Gabriel Henrique - UE 10', '10000001001', '90001001-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Santos', '6º ANO', '2015-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-1', '20000001001', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(52, 'Maria Eduarda - UE 1', '10000000102', '90000102-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-2', '20000000102', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'hhgyt', '2026-10-06 10:40:46', 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(53, 'Maria Eduarda - UE 2', '10000000202', '90000202-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-2', '20000000202', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(54, 'Maria Eduarda - UE 3', '10000000302', '90000302-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-2', '20000000302', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(55, 'Maria Eduarda - UE 4', '10000000402', '90000402-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-2', '20000000402', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(56, 'Maria Eduarda - UE 5', '10000000502', '90000502-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-2', '20000000502', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(57, 'Maria Eduarda - UE 6', '10000000602', '90000602-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-2', '20000000602', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(58, 'Maria Eduarda - UE 7', '10000000702', '90000702-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-2', '20000000702', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(59, 'Maria Eduarda - UE 8', '10000000802', '90000802-SP', 'TARDE', 'FEMININO', 'PRETA', 'São José dos Campos', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-2', '20000000802', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(60, 'Maria Eduarda - UE 9', '10000000902', '90000902-SP', 'TARDE', 'FEMININO', 'PRETA', 'Ribeirão Preto', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-2', '20000000902', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(61, 'Maria Eduarda - UE 10', '10000001002', '90001002-SP', 'TARDE', 'FEMININO', 'PRETA', 'Santos', '7º ANO', '2014-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-2', '20000001002', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(62, 'Lucas Miguel - UE 1', '10000000103', '90000103-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-3', '20000000103', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(63, 'Lucas Miguel - UE 2', '10000000203', '90000203-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Bragança Paulista', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-3', '20000000203', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(64, 'Lucas Miguel - UE 3', '10000000303', '90000303-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Bragança Paulista', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-3', '20000000303', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(65, 'Lucas Miguel - UE 4', '10000000403', '90000403-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-3', '20000000403', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(66, 'Lucas Miguel - UE 5', '10000000503', '90000503-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Campinas', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-3', '20000000503', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(67, 'Lucas Miguel - UE 6', '10000000603', '90000603-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Campinas', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-3', '20000000603', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(68, 'Lucas Miguel - UE 7', '10000000703', '90000703-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Campinas', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-3', '20000000703', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(69, 'Lucas Miguel - UE 8', '10000000803', '90000803-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'São José dos Campos', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-3', '20000000803', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(70, 'Lucas Miguel - UE 9', '10000000903', '90000903-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Ribeirão Preto', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-3', '20000000903', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(71, 'Lucas Miguel - UE 10', '10000001003', '90001003-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Santos', '8º ANO', '2013-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-3', '20000001003', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(72, 'Ana Carolina - UE 1', '10000000104', '90000104-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-4', '20000000104', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'k,gl', '2026-10-07 07:21:50', 'Rodrigo Mendes Cavalcante', '16973929460', 'USUARIO_SEFISC', 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(73, 'Ana Carolina - UE 2', '10000000204', '90000204-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-4', '20000000204', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(74, 'Ana Carolina - UE 3', '10000000304', '90000304-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-4', '20000000304', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(75, 'Ana Carolina - UE 4', '10000000404', '90000404-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-4', '20000000404', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(76, 'Ana Carolina - UE 5', '10000000504', '90000504-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Campinas', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-4', '20000000504', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(77, 'Ana Carolina - UE 6', '10000000604', '90000604-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Campinas', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-4', '20000000604', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(78, 'Ana Carolina - UE 7', '10000000704', '90000704-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Campinas', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-4', '20000000704', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(79, 'Ana Carolina - UE 8', '10000000804', '90000804-SP', 'NOITE', 'FEMININO', 'BRANCA', 'São José dos Campos', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-4', '20000000804', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(80, 'Ana Carolina - UE 9', '10000000904', '90000904-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Ribeirão Preto', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-4', '20000000904', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(81, 'Ana Carolina - UE 10', '10000001004', '90001004-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Santos', '9º ANO', '2012-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-4', '20000001004', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'APROVADO', NULL, NULL, NULL, NULL, NULL, NULL, 'Administrador do Sistema', '83918234150', '2026-10-02 10:12:36', 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(82, 'Miguel Gabriel - UE 1', '10000000105', '90000105-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-5', '20000000105', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(83, 'Miguel Gabriel - UE 2', '10000000205', '90000205-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-5', '20000000205', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(84, 'Miguel Gabriel - UE 3', '10000000305', '90000305-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-5', '20000000305', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(85, 'Miguel Gabriel - UE 4', '10000000405', '90000405-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-5', '20000000405', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(86, 'Miguel Gabriel - UE 5', '10000000505', '90000505-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-5', '20000000505', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(87, 'Miguel Gabriel - UE 6', '10000000605', '90000605-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-5', '20000000605', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(88, 'Miguel Gabriel - UE 7', '10000000705', '90000705-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-5', '20000000705', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36');
+INSERT INTO `alunos` (`id_aluno`, `nome`, `cpf`, `ra`, `turno_aula`, `genero`, `raca`, `municipio_nascimento`, `serie`, `data_nascimento`, `descricao_deficiencia`, `descricao_cuidados`, `nome_responsavel`, `cpf_responsavel`, `foto_arquivo`, `termo_responsabilidade_arquivo`, `status_aprovacao`, `motivo_reprovacao`, `motivo_arquivamento`, `data_arquivamento`, `arquivado_por_nome`, `arquivado_por_cpf`, `arquivado_por_perfil`, `deliberado_por_nome`, `deliberado_por_cpf`, `data_deliberacao`, `id_ue`, `id_usuario_ue`, `cadastrado_por_nome`, `cadastrado_por_cpf`, `data_cadastro`) VALUES
+(89, 'Miguel Gabriel - UE 8', '10000000805', '90000805-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'São José dos Campos', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-5', '20000000805', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(90, 'Miguel Gabriel - UE 9', '10000000905', '90000905-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Ribeirão Preto', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-5', '20000000905', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(91, 'Miguel Gabriel - UE 10', '10000001005', '90001005-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Santos', '1ª SÉRIE', '2011-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-5', '20000001005', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(92, 'Julia Fernanda - UE 1', '10000000106', '90000106-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-6', '20000000106', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(93, 'Julia Fernanda - UE 2', '10000000206', '90000206-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-6', '20000000206', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(94, 'Julia Fernanda - UE 3', '10000000306', '90000306-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-6', '20000000306', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(95, 'Julia Fernanda - UE 4', '10000000406', '90000406-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-6', '20000000406', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(96, 'Julia Fernanda - UE 5', '10000000506', '90000506-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-6', '20000000506', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(97, 'Julia Fernanda - UE 6', '10000000606', '90000606-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-6', '20000000606', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(98, 'Julia Fernanda - UE 7', '10000000706', '90000706-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-6', '20000000706', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(99, 'Julia Fernanda - UE 8', '10000000806', '90000806-SP', 'TARDE', 'FEMININO', 'PRETA', 'São José dos Campos', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-6', '20000000806', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(100, 'Julia Fernanda - UE 9', '10000000906', '90000906-SP', 'TARDE', 'FEMININO', 'PRETA', 'Ribeirão Preto', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-6', '20000000906', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(101, 'Julia Fernanda - UE 10', '10000001006', '90001006-SP', 'TARDE', 'FEMININO', 'PRETA', 'Santos', '2ª SÉRIE', '2010-10-02', 'Transtorno do Espectro Autista (TEA - CID F84.0)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-6', '20000001006', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'REPROVADO', 'Documentação apresentada não atende aos critérios necessários para aprovação.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(102, 'Arthur Oliveira - UE 1', '10000000107', '90000107-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-7', '20000000107', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(103, 'Arthur Oliveira - UE 2', '10000000207', '90000207-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Bragança Paulista', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-7', '20000000207', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(104, 'Arthur Oliveira - UE 3', '10000000307', '90000307-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Bragança Paulista', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-7', '20000000307', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(105, 'Arthur Oliveira - UE 4', '10000000407', '90000407-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Atibaia', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-7', '20000000407', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(106, 'Arthur Oliveira - UE 5', '10000000507', '90000507-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Campinas', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-7', '20000000507', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(107, 'Arthur Oliveira - UE 6', '10000000607', '90000607-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Campinas', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-7', '20000000607', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(108, 'Arthur Oliveira - UE 7', '10000000707', '90000707-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Campinas', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-7', '20000000707', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(109, 'Arthur Oliveira - UE 8', '10000000807', '90000807-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'São José dos Campos', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-7', '20000000807', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(110, 'Arthur Oliveira - UE 9', '10000000907', '90000907-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Ribeirão Preto', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-7', '20000000907', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(111, 'Arthur Oliveira - UE 10', '10000001007', '90001007-SP', 'INTEGRAL', 'MASCULINO', 'AMARELA', 'Santos', '3ª SÉRIE', '2009-10-02', 'Paralisia Cerebral (CID G80.1)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-7', '20000001007', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(112, 'Beatriz Santos - UE 1', '10000000108', '90000108-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-8', '20000000108', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(113, 'Beatriz Santos - UE 2', '10000000208', '90000208-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-8', '20000000208', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(114, 'Beatriz Santos - UE 3', '10000000308', '90000308-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Bragança Paulista', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-8', '20000000308', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(115, 'Beatriz Santos - UE 4', '10000000408', '90000408-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Atibaia', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-8', '20000000408', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(116, 'Beatriz Santos - UE 5', '10000000508', '90000508-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Campinas', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-8', '20000000508', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(117, 'Beatriz Santos - UE 6', '10000000608', '90000608-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Campinas', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-8', '20000000608', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(118, 'Beatriz Santos - UE 7', '10000000708', '90000708-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Campinas', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-8', '20000000708', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(119, 'Beatriz Santos - UE 8', '10000000808', '90000808-SP', 'NOITE', 'FEMININO', 'BRANCA', 'São José dos Campos', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-8', '20000000808', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(120, 'Beatriz Santos - UE 9', '10000000908', '90000908-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Ribeirão Preto', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-8', '20000000908', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(121, 'Beatriz Santos - UE 10', '10000001008', '90001008-SP', 'NOITE', 'FEMININO', 'BRANCA', 'Santos', '6º ANO', '2008-10-02', 'Síndrome de Down (CID Q90.9)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-8', '20000001008', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'PENDENTE_CORRECAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(122, 'Rafael Augusto - UE 1', '10000000109', '90000109-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-9', '20000000109', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(123, 'Rafael Augusto - UE 2', '10000000209', '90000209-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-9', '20000000209', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(124, 'Rafael Augusto - UE 3', '10000000309', '90000309-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Bragança Paulista', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-9', '20000000309', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(125, 'Rafael Augusto - UE 4', '10000000409', '90000409-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Atibaia', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-9', '20000000409', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(126, 'Rafael Augusto - UE 5', '10000000509', '90000509-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-9', '20000000509', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(127, 'Rafael Augusto - UE 6', '10000000609', '90000609-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-9', '20000000609', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(128, 'Rafael Augusto - UE 7', '10000000709', '90000709-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Campinas', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-9', '20000000709', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(129, 'Rafael Augusto - UE 8', '10000000809', '90000809-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'São José dos Campos', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-9', '20000000809', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(130, 'Rafael Augusto - UE 9', '10000000909', '90000909-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Ribeirão Preto', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-9', '20000000909', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(131, 'Rafael Augusto - UE 10', '10000001009', '90001009-SP', 'MANHÃ', 'MASCULINO', 'PARDA', 'Santos', '7º ANO', '2007-10-02', 'Deficiência Intelectual (CID F71)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-9', '20000001009', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(132, 'Laura Beatriz - UE 1', '10000000110', '90000110-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 1-10', '20000000110', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 1, NULL, 'Patrï¿½cia Helena Prado', '85912099156', '2026-10-02 10:12:36'),
+(133, 'Laura Beatriz - UE 2', '10000000210', '90000210-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 2-10', '20000000210', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 2, NULL, 'Regina Célia Alcantara', '01630953458', '2026-10-02 10:12:36'),
+(134, 'Laura Beatriz - UE 3', '10000000310', '90000310-SP', 'TARDE', 'FEMININO', 'PRETA', 'Bragança Paulista', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 3-10', '20000000310', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 3, NULL, 'Clarisse Bueno de Camargo', '31294857201', '2026-10-02 10:12:36'),
+(135, 'Laura Beatriz - UE 4', '10000000410', '90000410-SP', 'TARDE', 'FEMININO', 'PRETA', 'Atibaia', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 4-10', '20000000410', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 4, NULL, 'Jorge Luiz Antunes', '49182736450', '2026-10-02 10:12:36'),
+(136, 'Laura Beatriz - UE 5', '10000000510', '90000510-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 5-10', '20000000510', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 5, 7, 'Maria Teresa Mendonça', '71293846501', '2026-10-02 10:12:36'),
+(137, 'Laura Beatriz - UE 6', '10000000610', '90000610-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 6-10', '20000000610', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 6, 8, 'Gustavo Henrique Pires', '82910394857', '2026-10-02 10:12:36'),
+(138, 'Laura Beatriz - UE 7', '10000000710', '90000710-SP', 'TARDE', 'FEMININO', 'PRETA', 'Campinas', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 7-10', '20000000710', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 7, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(139, 'Laura Beatriz - UE 8', '10000000810', '90000810-SP', 'TARDE', 'FEMININO', 'PRETA', 'São José dos Campos', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 8-10', '20000000810', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 8, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(140, 'Laura Beatriz - UE 9', '10000000910', '90000910-SP', 'TARDE', 'FEMININO', 'PRETA', 'Ribeirão Preto', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 9-10', '20000000910', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 9, NULL, NULL, NULL, '2026-10-02 10:12:36'),
+(141, 'Laura Beatriz - UE 10', '10000001010', '90001010-SP', 'TARDE', 'FEMININO', 'PRETA', 'Santos', '8º ANO', '2006-10-02', 'Deficiência Visual (CID H54.2)', 'Necessita de acompanhamento e suporte pedagógico conforme as necessidades apresentadas pelo estudante.', 'Responsável do Aluno 10-10', '20000001010', NULL, 'uploads/documentos/20260928141943_6ff2423d9338.pdf', 'ARQUIVADO', NULL, 'Processo encerrado para fins de teste do sistema.', '2026-10-02 10:12:36', 'Administrador do Sistema', '83918234150', 'ADMIN', NULL, NULL, NULL, 10, NULL, NULL, NULL, '2026-10-02 10:12:36');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `associacoes`
+--
+
+CREATE TABLE `associacoes` (
+  `id_associacao` int(11) NOT NULL,
+  `id_aluno` int(11) NOT NULL,
+  `id_pae` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_inicio` date NOT NULL,
+  `data_fim` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `associacoes`
+--
+
+INSERT INTO `associacoes` (`id_associacao`, `id_aluno`, `id_pae`, `ativo`, `data_inicio`, `data_fim`) VALUES
+(1, 1, 1, 1, '2026-09-24', NULL),
+(2, 2, 2, 1, '2026-09-24', NULL),
+(3, 3, 2, 1, '2026-09-24', NULL),
+(4, 6, 3, 1, '2026-09-27', NULL),
+(5, 9, 6, 1, '2026-09-28', NULL),
+(6, 4, 8, 1, '2026-05-01', NULL),
+(7, 11, 4, 1, '2026-05-01', NULL),
+(8, 12, 9, 1, '2026-05-01', NULL),
+(9, 13, 7, 1, '2026-05-01', NULL),
+(10, 14, 4, 1, '2026-05-01', NULL),
+(11, 15, 7, 1, '2026-05-01', NULL),
+(12, 16, 9, 1, '2026-05-01', NULL),
+(13, 21, 10, 1, '2026-05-01', NULL),
+(14, 10, 12, 1, '2026-05-01', NULL),
+(15, 22, 11, 1, '2026-06-11', NULL),
+(16, 23, 5, 0, '2026-07-16', NULL),
+(17, 26, 11, 1, '2026-05-12', NULL),
+(18, 27, 5, 0, '2026-06-20', NULL),
+(19, 29, 13, 1, '2026-04-20', NULL),
+(20, 30, 12, 1, '2026-05-26', NULL),
+(21, 33, 13, 1, '2026-04-26', NULL),
+(22, 34, 6, 1, '2026-06-12', NULL),
+(23, 36, 15, 1, '2026-04-10', NULL),
+(24, 37, 14, 1, '2026-05-24', NULL),
+(25, 38, 15, 1, '2026-06-25', NULL),
+(26, 39, 14, 1, '2026-07-18', NULL);
+
+--
+-- Acionadores `associacoes`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_limite_pae` BEFORE INSERT ON `associacoes` FOR EACH ROW BEGIN
+    DECLARE qtd INT DEFAULT 0;
+    IF NEW.ativo = 1 THEN
+        SELECT COUNT(*) INTO qtd
+        FROM associacoes
+        WHERE id_pae = NEW.id_pae AND ativo = 1;
+        IF qtd >= 3 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Este PAE já possui o limite de 3 alunos ativos.';
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `auditoria`
+--
+
+CREATE TABLE `auditoria` (
+  `id_auditoria` int(11) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `usuario_nome` varchar(150) NOT NULL,
+  `usuario_cpf` varchar(20) DEFAULT NULL,
+  `usuario_perfil` varchar(50) NOT NULL,
+  `modulo` varchar(50) NOT NULL,
+  `acao` varchar(50) NOT NULL,
+  `entidade` varchar(50) NOT NULL,
+  `id_registro` int(11) DEFAULT NULL,
+  `detalhes` longtext DEFAULT NULL,
+  `ip_origem` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Despejando dados para a tabela `auditoria`
+--
+
+INSERT INTO `auditoria` (`id_auditoria`, `id_usuario`, `usuario_nome`, `usuario_cpf`, `usuario_perfil`, `modulo`, `acao`, `entidade`, `id_registro`, `detalhes`, `ip_origem`, `user_agent`, `criado_em`) VALUES
+(1, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 1, '{\"usuario_excluido_nome\":\"Patrï¿½cia Helena Prado\",\"usuario_excluido_cpf\":\"85912099156\",\"usuario_excluido_email\":\"patricia.prado@educacao.sp.gov.br\",\"id_ue\":1}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:05:59'),
+(2, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 3, '', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:06:23'),
+(3, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 6, '{\"usuario_excluido_nome\":\"Jorge Luiz Antunes\",\"usuario_excluido_cpf\":\"49182736450\",\"usuario_excluido_email\":\"jorge.antunes@educacao.sp.gov.br\",\"id_ue\":4}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:06:25'),
+(4, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 5, '{\"usuario_excluido_nome\":\"Clarisse Bueno de Camargo\",\"usuario_excluido_cpf\":\"31294857201\",\"usuario_excluido_email\":\"clarisse.camargo@educacao.sp.gov.br\",\"id_ue\":3}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:06:27'),
+(5, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'CRIAR', 'usuarios_ue', 11, '{\"nome\":\"JoÃ£o Pedro Pereira\",\"cpf\":\"22375357327\",\"id_ue\":1,\"email\":\"joaopedropereira5576@gmail.com\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:07:49'),
+(6, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:19:48'),
+(7, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 11, '{\"usuario_excluido_nome\":\"JoÃ£o Pedro Pereira\",\"usuario_excluido_cpf\":\"22375357327\",\"usuario_excluido_email\":\"joaopedropereira5576@gmail.com\",\"id_ue\":1}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:19:54'),
+(8, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:23:41'),
+(9, 6, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'ALUNOS', 'DELIBERAR', 'alunos', 43, '', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:23:51'),
+(10, 6, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 6, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:24:31'),
+(11, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'CRIAR', 'usuarios_ue', 12, '{\"nome\":\"Matheus\",\"cpf\":\"2745357274\",\"id_ue\":4,\"email\":\"mm.nasdnj@gmail.com\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:32:38'),
+(12, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'INATIVAR', 'usuarios_ue', 12, '{\"nome\":\"Matheus\",\"cpf\":\"2745357274\",\"novo_status\":0}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:32:41'),
+(13, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'ATIVAR', 'usuarios_ue', 12, '{\"nome\":\"Matheus\",\"cpf\":\"2745357274\",\"novo_status\":1}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 08:32:43'),
+(14, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:49:09'),
+(15, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:49:23'),
+(16, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:49:58'),
+(17, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:50:23'),
+(18, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'INATIVAR', 'usuarios_ue', 12, '{\"nome\":\"Matheus\",\"cpf\":\"2745357274\",\"novo_status\":0}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:50:39'),
+(19, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:51:20'),
+(20, 2, 'Beatriz Vasconcelos Lima', '', 'DIRIGENTE', 'AUTH', 'LOGOUT', 'sessao', 2, '{\"perfil\":\"DIRIGENTE\"}', '189.98.242.195', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Mobile Safari/537.36', '2026-10-07 15:51:34'),
+(21, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:14:58'),
+(22, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:15:19'),
+(23, 9, 'Helena Rios Peixoto', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 9, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:15:45'),
+(24, 1, 'Ricardo Augusto Nogueira', '', 'ADMIN', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"ADMIN\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:29:33'),
+(25, 9, 'Helena Rios Peixoto', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 9, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:29:58'),
+(26, 1, 'Eduardo Pinheiro de Moraes', '', 'DIRIGENTE', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"DIRIGENTE\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:46:13'),
+(27, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:53:40'),
+(28, 9, 'Helena Rios Peixoto', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 9, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 16:54:34'),
+(29, 1, 'Ricardo Augusto Nogueira', '', 'ADMIN', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"ADMIN\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:00:11'),
+(30, 1, 'Mariana Siqueira Fontes', '', 'SEDUC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"SEDUC\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:10:00'),
+(31, 4, 'Luciana Cristina Campos', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 4, '{\"perfil\":\"USUARIO_SEFISC\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:11:47'),
+(32, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:16:25'),
+(33, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:17:00'),
+(34, 6, 'André Luiz Barbosa', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 6, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:17:25'),
+(35, 1, 'Mariana Siqueira Fontes', '', 'SEDUC', 'AUTH', 'LOGOUT', 'sessao', 1, '{\"perfil\":\"SEDUC\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:17:35'),
+(36, 9, 'Helena Rios Peixoto', '', 'USUARIO_EDUCACAO_ESPECIAL', 'AUTH', 'LOGOUT', 'sessao', 9, '{\"perfil\":\"USUARIO_EDUCACAO_ESPECIAL\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:18:22'),
+(37, 7, 'Maria Teresa Mendonça', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 7, '{\"perfil\":\"USUARIO_ESCOLA\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:18:50'),
+(38, 7, 'Maria Teresa Mendonça', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 7, '{\"perfil\":\"USUARIO_ESCOLA\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:21:39'),
+(39, 3, 'Tiago Gonçalves Neves', '', 'SUPERVISOR', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"SUPERVISOR\"}', '107.173.9.70', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-07 17:22:47'),
+(40, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'USUARIOS', 'EXCLUIR', 'usuarios_ue', 12, '{\"usuario_excluido_nome\":\"Matheus\",\"usuario_excluido_cpf\":\"2745357274\",\"usuario_excluido_email\":\"mm.nasdnj@gmail.com\",\"id_ue\":4}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:03:10'),
+(41, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:23:38'),
+(42, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:25:22'),
+(43, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:45:43'),
+(44, 7, 'Maria Teresa Mendonça', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 7, '{\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:45:50'),
+(45, 8, 'Gustavo Henrique Pires', '', 'USUARIO_ESCOLA', 'AUTH', 'LOGOUT', 'sessao', 8, '{\"perfil\":\"USUARIO_ESCOLA\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:46:55'),
+(46, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:53:27'),
+(47, 3, 'Rodrigo Mendes Cavalcante', '', 'USUARIO_SEFISC', 'AUTH', 'LOGOUT', 'sessao', 3, '{\"perfil\":\"USUARIO_SEFISC\"}', '201.55.31.121', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0', '2026-10-08 07:53:34');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `empresas`
+--
+
+CREATE TABLE `empresas` (
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(200) NOT NULL,
+  `cnpj` varchar(18) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `numero_contrato` varchar(100) DEFAULT NULL,
+  `data_inicio_contrato` date DEFAULT NULL,
+  `data_fim_contrato` date DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `empresas`
+--
+
+INSERT INTO `empresas` (`id_empresa`, `nome`, `cnpj`, `endereco`, `numero`, `bairro`, `municipio`, `cep`, `telefone`, `email`, `numero_contrato`, `data_inicio_contrato`, `data_fim_contrato`, `contrato_arquivo`, `ativo`, `data_cadastro`) VALUES
+(1, 'Plena Serviços de Apoio Escolar Ltda.', '70.430.408/0001-89', 'Rua Coronel Teófilo Leme', '845', 'Centro', 'Bragança Paulista', '12900-005', '(11) 4034-2187', 'contato@plenaservicos.com.br', 'CTR-014/2026', '2026-01-15', '2026-12-31', 'uploads/contratos/contrato_plena_servicos_ctr014_2026.pdf', 1, '2026-09-24 09:00:00'),
+(2, 'Inova Apoio Educacional Especializado S/A', '86.034.389/0001-01', 'Avenida Francisco Glicério', '1520', 'Guanabara', 'Campinas', '13012-100', '(19) 3232-4411', 'atendimento@inovaapoio.com.br', 'CTR-029/2026', '2026-02-01', '2027-01-31', NULL, 1, '2026-09-24 09:00:00'),
+(3, 'Integração Apoio e Cuidados Inclusivos Ltda.', '54.128.963/0001-44', 'Rua Rubião Júnior', '340', 'Centro', 'São José dos Campos', '12210-180', '(12) 3941-8890', 'contato@integracaoapoio.com.br', 'CTR-038/2026', '2026-03-01', '2027-02-28', NULL, 1, '2026-09-24 09:00:00'),
+(4, 'Viver Bem Serviços Educacionais Terceirizados', '41.879.320/0001-62', 'Avenida Senador Feijó', '405', 'Vila Mathias', 'Santos', '11015-505', '(13) 3224-6010', 'administracao@viverbemapoio.com.br', 'CTR-042/2026', '2026-01-01', '2026-12-31', NULL, 1, '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `empresa_ure`
+--
+
+CREATE TABLE `empresa_ure` (
+  `id_empresa` int(11) NOT NULL,
+  `id_ure` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `empresa_ure`
+--
+
+INSERT INTO `empresa_ure` (`id_empresa`, `id_ure`) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3),
+(3, 4),
+(3, 5),
+(4, 6);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `laudos`
+--
+
+CREATE TABLE `laudos` (
+  `id_laudo` int(11) NOT NULL,
+  `id_aluno` int(11) NOT NULL,
+  `caminho_arquivo` varchar(255) NOT NULL,
+  `tipo` enum('LAUDO','DOCUMENTO') DEFAULT 'LAUDO',
+  `nome_arquivo` varchar(255) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_envio` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `laudos`
+--
+
+INSERT INTO `laudos` (`id_laudo`, `id_aluno`, `caminho_arquivo`, `tipo`, `nome_arquivo`, `descricao`, `data_envio`) VALUES
+(1, 1, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico TEA - 2026', 'Avaliação neurológica com CID F84.0 confirmando necessidade de mediador escolar.', '2026-09-24 09:10:00'),
+(2, 1, 'uploads/laudos/20260928141943_05e0427c3da3.pdf', 'LAUDO', 'Avaliação Fonoaudiológica', 'Exame fonoaudiológico indicando necessidade de comunicação aumentativa.', '2026-09-24 09:12:00'),
+(3, 1, 'uploads/laudos/20260928141943_8f042e61df3e.pdf', 'DOCUMENTO', 'Certidão de Nascimento do Estudante', 'Documento de identificação civil civil complementar.', '2026-09-24 09:15:00'),
+(4, 2, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Fisiátrico - Paralisia Cerebral', 'Relatório ortopédico e fisiátrico apontando dependência de cadeira de rodas.', '2026-09-24 09:30:00'),
+(5, 3, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropsicológico - DI', 'Avaliação de funções cognitivas e inteligência global.', '2026-09-24 09:40:00'),
+(6, 6, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Psiquiátrico Infantil - TEA Não Verbal', 'Atestado médico circunstanciado indicando suporte de apoio contínuo.', '2026-09-27 09:00:00'),
+(7, 9, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Oftalmológico Baixa Visão', 'Exame acuidade visual comprovando baixa visão severa.', '2026-09-28 09:45:00'),
+(8, 11, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-04-10 08:30:00'),
+(9, 12, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-04-15 11:20:00'),
+(10, 13, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-05-02 09:15:00'),
+(11, 14, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-05-18 14:40:00'),
+(12, 15, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-06-04 10:00:00'),
+(13, 16, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-06-19 13:20:00'),
+(14, 17, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-06-28 09:00:00'),
+(15, 18, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-07-12 10:15:00'),
+(16, 19, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-09-30 08:45:00'),
+(17, 20, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-10-01 11:30:00'),
+(18, 21, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Médico Especializado', 'Avaliação médica com diagnóstico conclusivo e CID.', '2026-05-08 09:00:00'),
+(19, 22, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-06-11 15:30:00'),
+(20, 23, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-07-16 08:20:00'),
+(21, 24, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-08-01 10:00:00'),
+(22, 25, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-09-29 14:00:00'),
+(23, 26, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-05-12 09:30:00'),
+(24, 27, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-06-20 11:15:00'),
+(25, 28, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-08-04 10:30:00'),
+(26, 29, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-04-20 08:30:00'),
+(27, 30, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-05-26 14:00:00'),
+(28, 31, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-07-22 10:00:00'),
+(29, 32, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-10-01 09:10:00'),
+(30, 33, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-04-26 10:00:00'),
+(31, 34, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-06-12 11:45:00'),
+(32, 35, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-08-08 09:00:00'),
+(33, 36, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-04-10 10:30:00'),
+(34, 37, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-05-24 14:15:00'),
+(35, 38, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-06-25 09:20:00'),
+(36, 39, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-07-18 10:00:00'),
+(37, 40, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-08-15 08:30:00'),
+(38, 41, 'uploads/laudos/20260928141943_95f26ebfcb41.pdf', 'LAUDO', 'Laudo Neuropediátrico / Fisiátrico', 'Documento oficial comprobatório com CID.', '2026-10-02 08:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `notificacoes_lidas`
+--
+
+CREATE TABLE `notificacoes_lidas` (
+  `id_leitura` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `perfil` varchar(50) NOT NULL,
+  `notificacao_key` varchar(100) NOT NULL,
+  `data_leitura` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `notificacoes_lidas`
+--
+
+INSERT INTO `notificacoes_lidas` (`id_leitura`, `id_usuario`, `perfil`, `notificacao_key`, `data_leitura`) VALUES
+(1, 3, 'USUARIO_SEFISC', 'd8ac39af91c1b9e15ca784a25b320031', '2026-10-02 09:33:00'),
+(2, 1, 'USUARIO_ESCOLA', '806c3ac1237b71e0ea427d36bb3e0e29', '2026-10-02 09:36:03'),
+(3, 5, 'USUARIO_EDUCACAO_ESPECIAL', 'ed849db0591e7ee2d4d7672d930c197a', '2026-10-02 09:37:28'),
+(4, 1, 'USUARIO_ESCOLA', '090a33ffa01e286366ca96b3d3ab946e', '2026-10-02 09:48:04'),
+(5, 10, 'USUARIO_ESCOLA', 'ba4cf113b02284910cfa257b63b99d22', '2026-10-02 11:30:55'),
+(6, 6, 'USUARIO_EDUCACAO_ESPECIAL', '9b8e2448942c8416a009f9c9929c255d', '2026-10-06 09:47:38'),
+(7, 1, 'DIRIGENTE', 'd8ac39af91c1b9e15ca784a25b320031', '2026-10-07 07:12:46'),
+(8, 6, 'USUARIO_EDUCACAO_ESPECIAL', 'b86866d62de43114f2760ccd813cb968', '2026-10-07 08:24:27'),
+(9, 1, 'ADMIN', '5b98a5c2260fcdc4d6a9f44a431d5408', '2026-10-07 16:57:31'),
+(10, 1, 'ADMIN', '5c7852097e0c55814b0136671acf4679', '2026-10-07 16:57:43'),
+(11, 1, 'SEDUC', '5b98a5c2260fcdc4d6a9f44a431d5408', '2026-10-07 17:09:43');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `recuperacao_senha`
+--
+
+CREATE TABLE `recuperacao_senha` (
+  `id_recuperacao` int(11) NOT NULL,
+  `tipo_perfil` varchar(50) NOT NULL,
+  `id_referencia` int(11) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `codigo` char(6) NOT NULL,
+  `tipo_contato` enum('EMAIL','TELEFONE') NOT NULL,
+  `contato` varchar(150) NOT NULL,
+  `expira_em` datetime NOT NULL,
+  `usado` tinyint(1) DEFAULT 0,
+  `data_criacao` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `recuperacao_senha`
+--
+
+INSERT INTO `recuperacao_senha` (`id_recuperacao`, `tipo_perfil`, `id_referencia`, `token`, `codigo`, `tipo_contato`, `contato`, `expira_em`, `usado`, `data_criacao`) VALUES
+(1, 'ESCOLA', 10, '1838db07e6249fd2c625ac197d050be332774eb56551bfe1c637f5f91b1dc341', '122780', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-02 17:27:45', 1, '2026-10-02 11:27:45'),
+(2, 'ESCOLA', 10, '0d6c2da8dd91c9f089cd5033363f582b3ef193d1ba418757de7df47d4c6c079c', '352908', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-02 17:27:47', 1, '2026-10-02 11:27:47'),
+(3, 'ESCOLA', 10, '620ece7ed49254e26a41019d7441699a9da7bc0a5531babcaa7899c1d4d45737', '558729', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-02 17:27:54', 1, '2026-10-02 11:27:54'),
+(4, 'URE', 5, '585146487ac9994f29167092147c27c82125967303173adf17a911d893672fe4', '826205', 'EMAIL', 'camila.moreira@educacao.sp.gov.br', '2026-10-06 14:54:45', 0, '2026-10-06 08:54:45'),
+(5, 'URE', 5, 'ab4f4c122c6266b26228d8da6b47bcdd36c1896d68b352b28a4888525872123f', '817662', 'EMAIL', 'camila.moreira@educacao.sp.gov.br', '2026-10-06 14:54:53', 0, '2026-10-06 08:54:53'),
+(6, 'URE', 5, '658d86f0d6186ffc9ef43259a9789e3c952ade81884d32e7a3d988c39461c638', '173560', 'EMAIL', 'camila.moreira@educacao.sp.gov.br', '2026-10-06 14:54:53', 0, '2026-10-06 08:54:53'),
+(7, 'URE', 5, '401cf786306cbc79b480678d8efbc5e455355c6536ed17d1c530c30a16e2b021', '730582', 'EMAIL', 'camila.moreira@educacao.sp.gov.br', '2026-10-06 14:54:53', 0, '2026-10-06 08:54:53'),
+(8, 'URE', 5, '007083239cd570902e0543e1d7981238878e7031afdb423618381b0abd972fd2', '849335', 'EMAIL', 'camila.moreira@educacao.sp.gov.br', '2026-10-06 14:54:53', 0, '2026-10-06 08:54:53'),
+(9, 'ESCOLA', 10, 'd0e073fb1adb180132c12a3f75207f51d4e87aca926f2230639ee5e3955b433a', '137472', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:44:49', 1, '2026-10-06 09:44:49'),
+(10, 'ESCOLA', 10, '97ef4f7f3a605cb198ee2d10475b4a01b471906b1d793c77fd1b945f60bfc32d', '692149', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:47:08', 1, '2026-10-06 09:47:08'),
+(11, 'ESCOLA', 10, 'e0c9d2ae721d488330b0b2d18e5d0f8c9a3e5ac3013cb5904758bc9fe49e67a4', '936315', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:57:05', 1, '2026-10-06 09:57:05'),
+(12, 'ESCOLA', 10, '694dcae6ca9f53b5128ad50b3d066cc80b36e604496fc8246a5c58c00b16ae6c', '961733', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:58:20', 1, '2026-10-06 09:58:20'),
+(13, 'ESCOLA', 10, '3debe35dc03678e41d25c2d4c5fa44f087c085dcf3431a14d7220bd21681d8f0', '064393', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:58:46', 1, '2026-10-06 09:58:46'),
+(14, 'ESCOLA', 10, '5eb2a169169e9bcdd532e22a118b5a17107fdfaae3d5c61185b2f450ffed451e', '840712', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:58:49', 1, '2026-10-06 09:58:49'),
+(15, 'ESCOLA', 10, '1a6f655d473a1a6dbe0a908df76b1c554829cc25706d86a3c3d51c7bc728d45e', '373990', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:59:32', 1, '2026-10-06 09:59:32'),
+(16, 'ESCOLA', 10, '3ec28a35eb4adc576413cb9c9fbc965364b136d54f214dfa88b5512bc1ed8bea', '226113', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:18:15', 1, '2026-10-06 10:03:15'),
+(17, 'ESCOLA', 10, '3ca427f7dba8dfec4f0eb26f3608b702dc2e20c69981f8f8b075be4427ee5046', '065220', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:18:58', 1, '2026-10-06 10:03:58'),
+(18, 'ESCOLA', 10, '1a808fee1255ffde129e89793558ff9d85ccf39fa5ab3119f485ed8a7c45e16d', '089808', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:19:46', 1, '2026-10-06 10:04:46'),
+(19, 'ESCOLA', 10, '568c786eda46a94958d223b668cc6b31a53b3e04cf2abdc2ae845121c87785f6', '654560', 'EMAIL', 'joaopedropereira5576@gmail.com', '2026-10-06 10:26:46', 0, '2026-10-06 10:11:46');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `relatorios`
+--
+
+CREATE TABLE `relatorios` (
+  `id_relatorio` int(11) NOT NULL,
+  `id_associacao` int(11) NOT NULL,
+  `tipo` enum('DIARIO','MENSAL') NOT NULL,
+  `mes_competencia` varchar(7) DEFAULT NULL,
+  `descricao` text NOT NULL,
+  `conteudo` text DEFAULT NULL,
+  `arquivo_relatorio` varchar(255) DEFAULT NULL,
+  `status` enum('PENDENTE','ENVIADO','APROVADO','REJEITADO') DEFAULT 'ENVIADO',
+  `data_envio` datetime DEFAULT current_timestamp(),
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `relatorios`
+--
+
+INSERT INTO `relatorios` (`id_relatorio`, `id_associacao`, `tipo`, `mes_competencia`, `descricao`, `conteudo`, `arquivo_relatorio`, `status`, `data_envio`, `data_cadastro`) VALUES
+(1, 1, 'DIARIO', '2026-09', 'O estudante participou com tranquilidade das atividades da manhã. Foi mediado na organização dos cadernos e na compreensão dos enunciados de Língua Portuguesa e História. Na hora do intervalo, lanchou adequadamente com auxílio e interagiu de forma positiva com os colegas de sala no pátio.', 'Relatório diário de rotina e acompanhamento escolar.', NULL, 'ENVIADO', '2026-09-25 12:15:00', '2026-09-25 12:15:00'),
+(2, 2, 'DIARIO', '2026-09', 'Suporte motor realizado com sucesso em todas as transferências necessárias. A estudante foi acompanhada até a sala de informática e o laboratório de ciências. Participou ativamente das tarefas em grupo com boa postura na cadeira de rodas.', 'Relatório diário de suporte motor e acessibilidade.', NULL, 'ENVIADO', '2026-09-25 17:30:00', '2026-09-25 17:30:00'),
+(3, 1, 'MENSAL', '2026-09', 'Evolução mensal extremamente satisfatória no mês de setembro. Observou-se redução significativa nos episódios de desorganização sensorial, maior autonomia na alimentação e avanço expressivo na socialização com os pares da turma.', 'Fechamento mensal de atendimento pedagógico inclusivo.', NULL, 'ENVIADO', '2026-09-30 16:45:00', '2026-09-30 16:45:00'),
+(4, 4, 'DIARIO', '2026-09', 'Acompanhamento na recepção e entrada da escola. Utilização das pranchas de comunicação alternativa para escolha de atividades. A estudante manteve-se focada e confortável durante todo o período da aula de artes.', 'Acompanhamento de aluna não verbal com comunicação alternativa.', NULL, 'ENVIADO', '2026-09-28 11:45:00', '2026-09-28 11:45:00'),
+(5, 5, 'DIARIO', '2026-09', 'Auxílio na adaptação e iluminação da bancada de estudo. O aluno utilizou os livros com fonte ampliada e participou da aula de matemática com apoio de lupa eletrônica.', 'Apoio em tecnologia assistiva e acessibilidade visual.', NULL, 'ENVIADO', '2026-09-29 15:20:00', '2026-09-29 15:20:00'),
+(6, 6, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(7, 6, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(8, 7, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(9, 7, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(10, 8, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(11, 8, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(12, 9, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(13, 9, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(14, 10, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(15, 10, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(16, 11, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(17, 11, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(18, 12, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(19, 12, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(20, 13, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(21, 13, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(22, 14, 'DIARIO', '2026-09', 'O estudante participou ativamente das aulas com mediação pedagógica contínua. Alimentação e locomoção realizadas com segurança e bom engajamento.', 'Registro diário de rotina.', NULL, 'ENVIADO', '2026-09-20 12:00:00', '2026-09-20 12:00:00'),
+(23, 14, 'MENSAL', '2026-09', 'Fechamento mensal de atendimento inclusivo. O estudante demonstrou expressivo ganho de autonomia nas atividades diárias e integração com o grupo escolar.', 'Relatório mensal de acompanhamento.', NULL, 'ENVIADO', '2026-09-30 17:00:00', '2026-09-30 17:00:00'),
+(24, 15, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(25, 15, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(26, 16, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(27, 16, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(28, 17, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(29, 17, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(30, 18, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(31, 18, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(32, 19, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(33, 19, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(34, 20, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(35, 20, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(36, 21, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(37, 21, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(38, 22, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(39, 22, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(40, 23, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(41, 23, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(42, 24, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(43, 24, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(44, 25, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(45, 25, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00'),
+(46, 26, 'DIARIO', '2026-09', 'Acompanhamento de rotina escolar com excelente evolução na interação social e mobilidade.', 'Rotina diária cumprida com sucesso.', NULL, 'ENVIADO', '2026-09-25 14:00:00', '2026-09-25 14:00:00'),
+(47, 26, 'MENSAL', '2026-09', 'Consolidado mensal de atendimento inclusivo com objetivos pedagógicos atingidos.', 'Relatório de fechamento mensal.', NULL, 'ENVIADO', '2026-09-30 16:30:00', '2026-09-30 16:30:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `seduc`
+--
+
+CREATE TABLE `seduc` (
+  `id_seduc` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `setor` varchar(100) DEFAULT NULL,
+  `cargo` varchar(100) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `seduc`
+--
+
+INSERT INTO `seduc` (`id_seduc`, `nome`, `cpf`, `senha`, `email`, `telefone`, `setor`, `cargo`, `ativo`, `data_cadastro`) VALUES
+(1, 'Mariana Siqueira Fontes', '30483697834', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'mariana.fontes@educacao.sp.gov.br', '11981245566', 'Coordenadoria Pedagógica (COPED)', 'Especialista em Educação Especial', 1, '2026-09-24 09:00:00'),
+(2, 'Carlos Alberto Guimarães', '49281734890', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'carlos.guimaraes@educacao.sp.gov.br', '11982334455', 'Departamento de Contratos e Convênios', 'Diretor de Fiscalização de Contratos', 1, '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `termos_aceite`
+--
+
+CREATE TABLE `termos_aceite` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `perfil` varchar(50) NOT NULL,
+  `ip` varchar(45) DEFAULT NULL,
+  `ip_usuario` varchar(45) DEFAULT NULL,
+  `data_aceite` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `termos_aceite`
+--
+
+INSERT INTO `termos_aceite` (`id`, `id_usuario`, `perfil`, `ip`, `ip_usuario`, `data_aceite`) VALUES
+(1, 2, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 07:50:06'),
+(2, 5, 'USUARIO_EDUCACAO_ESPECIAL', '::1', NULL, '2026-10-02 07:51:06'),
+(3, 3, 'USUARIO_SEFISC', '::1', NULL, '2026-10-02 08:22:51'),
+(4, 9, 'USUARIO_EDUCACAO_ESPECIAL', '::1', NULL, '2026-10-02 09:29:07'),
+(5, 1, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 09:34:48'),
+(6, 5, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 09:44:41'),
+(7, 3, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 10:08:14'),
+(8, 1, 'SUPERVISOR', '::1', NULL, '2026-10-02 10:23:21'),
+(9, 9, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 11:25:02'),
+(10, 10, 'USUARIO_ESCOLA', '::1', NULL, '2026-10-02 11:27:10'),
+(11, 7, 'PAE', '::1', NULL, '2026-10-06 09:05:24'),
+(12, 5, 'PAE', '::1', NULL, '2026-10-06 09:06:26'),
+(13, 10, 'PAE', '::1', NULL, '2026-10-06 09:06:46'),
+(14, 1, 'SEDUC', '201.55.31.121', NULL, '2026-10-06 09:12:55'),
+(15, 2, 'SUPERVISOR', '201.55.31.121', NULL, '2026-10-06 09:13:10'),
+(16, 1, 'ADMIN', '201.55.31.124', NULL, '2026-10-06 09:34:49'),
+(17, 6, 'USUARIO_EDUCACAO_ESPECIAL', '201.55.31.124', NULL, '2026-10-06 09:47:37'),
+(18, 4, 'USUARIO_SEFISC', '201.55.31.120', NULL, '2026-10-07 07:09:23'),
+(19, 1, 'DIRIGENTE', '201.55.31.124', NULL, '2026-10-07 07:12:26'),
+(20, 6, 'USUARIO_ESCOLA', '201.55.31.121', NULL, '2026-10-07 07:23:07'),
+(21, 8, 'USUARIO_ESCOLA', '189.98.242.195', NULL, '2026-10-07 15:49:06'),
+(22, 2, 'DIRIGENTE', '189.98.242.195', NULL, '2026-10-07 15:51:27'),
+(23, 7, 'USUARIO_ESCOLA', '107.173.9.70', NULL, '2026-10-07 17:18:47');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `unidades_escolares`
+--
+
+CREATE TABLE `unidades_escolares` (
+  `id_ue` int(11) NOT NULL,
+  `cie` varchar(10) NOT NULL,
+  `ua` varchar(30) DEFAULT NULL,
+  `nome` varchar(150) NOT NULL,
+  `modalidade` varchar(100) DEFAULT 'Ensino Fundamental e Médio',
+  `tipo_ue` enum('ESCOLA','CRECHE','CENTRO_EDUCACIONAL') NOT NULL DEFAULT 'ESCOLA',
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `id_ure` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `unidades_escolares`
+--
+
+INSERT INTO `unidades_escolares` (`id_ue`, `cie`, `ua`, `nome`, `modalidade`, `tipo_ue`, `endereco`, `numero`, `bairro`, `municipio`, `cidade`, `cep`, `telefone`, `email`, `id_ure`, `ativo`, `data_cadastro`) VALUES
+(1, '012489', '41250', 'EE Cásper Líbero', 'Ensino Fundamental Anos Finais e Médio', 'ESCOLA', 'Rua Alziro de Oliveira', '120', 'Jardim Cerejeiras', 'Atibaia', 'Atibaia', '12951-240', '(11) 4412-3040', 'ee.casperlibero@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(2, '012502', '41255', 'EE Professor José Fernando Paschoal', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua Maestro Danzi', '55', 'Vila Municipal', 'Bragança Paulista', 'Bragança Paulista', '12908-120', '(11) 4033-8822', 'ee.josefernando@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(3, '012514', '41260', 'EE Silvio de Almeida', 'Ensino Médio Integral', 'ESCOLA', 'Rua Coronel Leme', '420', 'Centro', 'Bragança Paulista', 'Bragança Paulista', '12900-220', '(11) 4034-0199', 'ee.silvioalmeida@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(4, '012526', '41265', 'EE Major Juvenal Alvim', 'Ensino Fundamental Anos Iniciais e Finais', 'ESCOLA', 'Praça Guilherme Gonçalves', '100', 'Centro', 'Atibaia', 'Atibaia', '12940-020', '(11) 4411-2010', 'ee.juvenalalvim@educacao.sp.gov.br', 1, 1, '2026-09-24 09:00:00'),
+(5, '013401', '42100', 'EE Carlos Gomes', 'Ensino Fundamental e Médio', 'ESCOLA', 'Avenida Anchieta', '200', 'Centro', 'Campinas', 'Campinas', '13015-100', '(19) 3231-5088', 'ee.carlosgomes@educacao.sp.gov.br', 2, 1, '2026-09-24 09:00:00'),
+(6, '013415', '42110', 'EE Professor Milton da Silva Rodrigues', 'Ensino Médio e Técnico', 'ESCOLA', 'Rua Culto à Ciência', '310', 'Botafogo', 'Campinas', 'Campinas', '13020-060', '(19) 3232-7744', 'ee.miltonrodrigues@educacao.sp.gov.br', 2, 1, '2026-09-24 09:00:00'),
+(7, '013428', '42125', 'EE Adalberto Nascimento', 'Ensino Fundamental Anos Finais', 'ESCOLA', 'Rua Mogi Guaçu', '850', 'Chácara da Barra', 'Campinas', 'Campinas', '13090-605', '(19) 3251-1120', 'ee.adalbertonascimento@educacao.sp.gov.br', 3, 1, '2026-09-24 09:00:00'),
+(8, '014502', '43200', 'EE Nelson do Nascimento Monteiro', 'Ensino Fundamental e Médio', 'ESCOLA', 'Avenida Andrômeda', '1400', 'Jardim Satélite', 'São José dos Campos', 'São José dos Campos', '12230-001', '(12) 3931-4050', 'ee.nelsonmonteiro@educacao.sp.gov.br', 4, 1, '2026-09-24 09:00:00'),
+(9, '015603', '44100', 'EE Professor Alberto Santos Dumont', 'Ensino Médio Regular', 'ESCOLA', 'Rua Saldanha Marinho', '980', 'Centro', 'Ribeirão Preto', 'Ribeirão Preto', '14010-060', '(16) 3625-3311', 'ee.santosdumont@educacao.sp.gov.br', 5, 1, '2026-09-24 09:00:00'),
+(10, '016704', '45150', 'EE Barnabé', 'Ensino Fundamental e Médio', 'ESCOLA', 'Rua Marechal Pego Júnior', '15', 'Encruzilhada', 'Santos', 'Santos', '11050-080', '(13) 3221-7890', 'ee.barnabe@educacao.sp.gov.br', 6, 1, '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `unidades_regionais`
+--
+
+CREATE TABLE `unidades_regionais` (
+  `id_ure` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `uge` varchar(20) DEFAULT NULL,
+  `codigo` varchar(20) DEFAULT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `numero` varchar(20) DEFAULT NULL,
+  `bairro` varchar(100) DEFAULT NULL,
+  `municipio` varchar(100) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `unidades_regionais`
+--
+
+INSERT INTO `unidades_regionais` (`id_ure`, `nome`, `uge`, `codigo`, `endereco`, `numero`, `bairro`, `municipio`, `cidade`, `cep`, `telefone`, `email`, `data_cadastro`) VALUES
+(1, 'Diretoria de Ensino de Bragança Paulista', '081240', 'DE-BP', 'Avenida José Gomes da Rocha Leão', '450', 'Centro', 'Bragança Paulista', 'Bragança Paulista', '12900-300', '(11) 4034-7100', 'debraganca@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(2, 'Diretoria de Ensino de Campinas Leste', '081350', 'DE-CL', 'Rua Barão de Jaguara', '1280', 'Centro', 'Campinas', 'Campinas', '13015-002', '(19) 3737-2500', 'decampinas@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(3, 'Diretoria de Ensino de Campinas Oeste', '081360', 'DE-CO', 'Rua Regente Feijó', '870', 'Centro', 'Campinas', 'Campinas', '13013-051', '(19) 3731-1800', 'decampinasoeste@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(4, 'Diretoria de Ensino de São José dos Campos', '081450', 'DE-SJC', 'Rua Euclides Miragaia', '525', 'Centro', 'São José dos Campos', 'São José dos Campos', '12245-820', '(12) 3925-1000', 'desjcampos@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(5, 'Diretoria de Ensino de Ribeirão Preto', '081560', 'DE-RP', 'Avenida Nove de Julho', '378', 'Higienópolis', 'Ribeirão Preto', 'Ribeirão Preto', '14015-170', '(16) 3605-1200', 'deribeiraopreto@educacao.sp.gov.br', '2026-09-24 09:00:00'),
+(6, 'Diretoria de Ensino de Santos', '081670', 'DE-SAN', 'Rua Guedes Coelho', '107', 'Encruzilhada', 'Santos', 'Santos', '11050-241', '(13) 3226-5500', 'desantos@educacao.sp.gov.br', '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_pae`
+--
+
+CREATE TABLE `usuarios_pae` (
+  `id_pae` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `contrato_arquivo` varchar(255) DEFAULT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_pae`
+--
+
+INSERT INTO `usuarios_pae` (`id_pae`, `nome`, `cpf`, `senha`, `email`, `telefone`, `contrato_arquivo`, `id_empresa`, `ativo`, `data_cadastro`) VALUES
+(1, 'Aline Cristina Silveira', '92105689078', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'aline.silveira@plenaservicos.com.br', '(11) 98642-1098', NULL, 1, 1, '2026-09-24 09:00:00'),
+(2, 'Rafael Henrique Duarte', '89839629174', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'rafael.duarte@plenaservicos.com.br', '(11) 97519-3420', NULL, 1, 1, '2026-09-24 09:00:00'),
+(3, 'Juliana Mendes Ferraz', '67806795693', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'juliana.ferraz@inovaapoio.com.br', '(19) 98765-4321', NULL, 2, 1, '2026-09-24 09:00:00'),
+(4, 'Simone Aparecida Cunha', '51294837261', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'simone.cunha@plenaservicos.com.br', '(11) 99182-7364', NULL, 1, 1, '2026-09-24 09:00:00'),
+(5, 'Diego Rodrigues de Paula', '72381940562', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'diego.paula@inovaapoio.com.br', '(19) 99345-8761', NULL, 2, 0, '2026-09-24 09:00:00'),
+(6, 'Priscila Vasconcelos Prado', '83920194857', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'priscila.prado@integracaoapoio.com.br', '(12) 98112-9988', NULL, 3, 1, '2026-09-24 09:00:00'),
+(7, 'Bruno César Guimarães', '64918273019', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'bruno.guimaraes@plenaservicos.com.br', '(11) 98122-4455', NULL, 1, 1, '2026-03-10 09:00:00'),
+(8, 'Camila Rocha Nogueira', '71928304918', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'camila.rocha@plenaservicos.com.br', '(11) 97233-1122', NULL, 1, 1, '2026-03-10 09:00:00'),
+(9, 'Marcos Paulo Farias', '82930419283', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'marcos.farias@plenaservicos.com.br', '(11) 99344-8877', NULL, 1, 1, '2026-03-10 09:00:00'),
+(10, 'Larissa Moreira Santos', '91827364501', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'larissa.moreira@inovaapoio.com.br', '(19) 98211-9988', NULL, 2, 1, '2026-03-10 09:00:00'),
+(11, 'Rodrigo Toledo Lima', '19283746502', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'rodrigo.toledo@inovaapoio.com.br', '(19) 99122-3344', NULL, 2, 1, '2026-03-10 09:00:00'),
+(12, 'Tatiane Barbosa Ribeiro', '28374650192', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'tatiane.barbosa@integracaoapoio.com.br', '(12) 98455-6677', NULL, 3, 1, '2026-03-10 09:00:00'),
+(13, 'Fernando Henrique Costa', '37465019283', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'fernando.costa@integracaoapoio.com.br', '(16) 99233-5566', NULL, 3, 1, '2026-03-10 09:00:00'),
+(14, 'Vanessa Cristina Santana', '46501928374', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'vanessa.santana@viverbemapoio.com.br', '(13) 98144-2233', NULL, 4, 1, '2026-03-10 09:00:00'),
+(15, 'Lucas Vinícius Prado', '50192837465', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'lucas.prado@viverbemapoio.com.br', '(13) 99755-1100', NULL, 4, 1, '2026-03-10 09:00:00'),
+(18, 'JoÃ£o Pedro Pereira', '43827015898', '$2y$10$hwG4xk1kN0ey/MvlCR9cqOZabh586Jyli7r4Ygy1sRtlKgQJq2QtK', 'joaopedropereira5576@gmail.com', '(11) 4034-7706', NULL, 1, 0, '2026-10-06 09:44:34');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_supervisor`
+--
+
+CREATE TABLE `usuarios_supervisor` (
+  `id_usuario_supervisor` int(11) NOT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_supervisor`
+--
+
+INSERT INTO `usuarios_supervisor` (`id_usuario_supervisor`, `id_empresa`, `nome`, `cpf`, `senha`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Marcelo Antunes Ribeiro', '57967958802', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'marcelo.ribeiro@plenaservicos.com.br', '(11) 97824-1590', 1, '2026-09-24 09:00:00'),
+(2, 2, 'Fernanda Helena Dias', '78673551030', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'fernanda.dias@inovaapoio.com.br', '(19) 98311-2200', 1, '2026-09-24 09:00:00'),
+(3, 3, 'Tiago Gonçalves Neves', '41298765432', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'tiago.neves@integracaoapoio.com.br', '(12) 99122-3344', 1, '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_ue`
+--
+
+CREATE TABLE `usuarios_ue` (
+  `id_usuario_ue` int(11) NOT NULL,
+  `id_ue` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `cargo` enum('DIRETOR','VICE_DIRETOR','COORDENADOR','SECRETARIO','GOE') NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(30) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_ue`
+--
+
+INSERT INTO `usuarios_ue` (`id_usuario_ue`, `id_ue`, `nome`, `cpf`, `senha`, `cargo`, `email`, `telefone`, `ativo`, `data_cadastro`) VALUES
+(7, 5, 'Maria Teresa Mendonça', '71293846501', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'DIRETOR', 'maria.mendonca@educacao.sp.gov.br', '(19) 99234-5678', 1, '2026-09-24 09:00:00'),
+(8, 6, 'Gustavo Henrique Pires', '82910394857', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'COORDENADOR', 'gustavo.pires@educacao.sp.gov.br', '(19) 98877-6655', 1, '2026-09-24 09:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios_ure`
+--
+
+CREATE TABLE `usuarios_ure` (
+  `id_usuario_ure` int(11) NOT NULL,
+  `id_ure` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `cpf` char(11) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `setor` enum('ASURE','SEFISC','EDU_ESPECIAL','GABINETE') NOT NULL,
+  `cargo` varchar(100) DEFAULT NULL,
+  `nivel_acesso` int(11) DEFAULT 1,
+  `email` varchar(150) DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1,
+  `data_cadastro` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `usuarios_ure`
+--
+
+INSERT INTO `usuarios_ure` (`id_usuario_ure`, `id_ure`, `nome`, `cpf`, `senha`, `setor`, `cargo`, `nivel_acesso`, `email`, `ativo`, `data_cadastro`) VALUES
+(1, 1, 'Eduardo Pinheiro de Moraes', '38897933980', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'GABINETE', 'Dirigente Regional de Ensino', 3, 'eduardo.moraes@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(2, 1, 'Beatriz Vasconcelos Lima', '08905621058', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'ASURE', 'Assistente Técnico de URE', 2, 'beatriz.vasconcelos@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(3, 1, 'Rodrigo Mendes Cavalcante', '16973929460', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'SEFISC', 'Supervisor de Fiscalização de Contratos', 2, 'rodrigo.cavalcante@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(4, 1, 'Luciana Cristina Campos', '34568254639', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'SEFISC', 'Oficial Administrativo', 1, 'luciana.campos@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(6, 1, 'André Luiz Barbosa', '68017529520', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Auxiliar Administrativo', 1, 'andre.barbosa@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(7, 2, 'Valéria Toledo de Castro', '52819034912', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'GABINETE', 'Dirigente Regional de Ensino', 3, 'valeria.castro@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(8, 2, 'Renato Faria Alencar', '29384719203', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'ASURE', 'Assistente Técnico de URE', 2, 'renato.alencar@educacao.sp.gov.br', 1, '2026-09-24 09:00:00'),
+(9, 2, 'Helena Rios Peixoto', '18293049182', '$2y$10$8vWfqgj1YXUvjF/XlHacbe/.jqlZljtgL2gMlgeamIcFiwUSl5TfS', 'EDU_ESPECIAL', 'Professor Especialista em Currículo', 2, 'helena.peixoto@educacao.sp.gov.br', 1, '2026-09-24 09:00:00');
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id_admin`),
+  ADD UNIQUE KEY `uk_admin_cpf` (`cpf`);
+
+--
+-- Índices de tabela `alunos`
+--
+ALTER TABLE `alunos`
+  ADD PRIMARY KEY (`id_aluno`),
+  ADD KEY `fk_aluno_ue` (`id_ue`),
+  ADD KEY `fk_aluno_usuario_ue` (`id_usuario_ue`);
+
+--
+-- Índices de tabela `associacoes`
+--
+ALTER TABLE `associacoes`
+  ADD PRIMARY KEY (`id_associacao`),
+  ADD KEY `fk_associacao_aluno` (`id_aluno`),
+  ADD KEY `fk_associacao_pae` (`id_pae`);
+
+--
+-- Índices de tabela `auditoria`
+--
+ALTER TABLE `auditoria`
+  ADD PRIMARY KEY (`id_auditoria`),
+  ADD KEY `idx_modulo_acao` (`modulo`,`acao`),
+  ADD KEY `idx_usuario` (`id_usuario`),
+  ADD KEY `idx_entidade_reg` (`entidade`,`id_registro`),
+  ADD KEY `idx_criado_em` (`criado_em`);
+
+--
+-- Índices de tabela `empresas`
+--
+ALTER TABLE `empresas`
+  ADD PRIMARY KEY (`id_empresa`),
+  ADD UNIQUE KEY `uk_empresa_cnpj` (`cnpj`);
+
+--
+-- Índices de tabela `empresa_ure`
+--
+ALTER TABLE `empresa_ure`
+  ADD PRIMARY KEY (`id_empresa`,`id_ure`),
+  ADD KEY `fk_empresa_ure_ure` (`id_ure`);
+
+--
+-- Índices de tabela `laudos`
+--
+ALTER TABLE `laudos`
+  ADD PRIMARY KEY (`id_laudo`),
+  ADD KEY `fk_laudo_aluno` (`id_aluno`);
+
+--
+-- Índices de tabela `notificacoes_lidas`
+--
+ALTER TABLE `notificacoes_lidas`
+  ADD PRIMARY KEY (`id_leitura`),
+  ADD UNIQUE KEY `uk_notif_lida` (`id_usuario`,`perfil`,`notificacao_key`);
+
+--
+-- Índices de tabela `recuperacao_senha`
+--
+ALTER TABLE `recuperacao_senha`
+  ADD PRIMARY KEY (`id_recuperacao`);
+
+--
+-- Índices de tabela `relatorios`
+--
+ALTER TABLE `relatorios`
+  ADD PRIMARY KEY (`id_relatorio`),
+  ADD KEY `fk_relatorio_associacao` (`id_associacao`);
+
+--
+-- Índices de tabela `seduc`
+--
+ALTER TABLE `seduc`
+  ADD PRIMARY KEY (`id_seduc`),
+  ADD UNIQUE KEY `uk_seduc_cpf` (`cpf`);
+
+--
+-- Índices de tabela `termos_aceite`
+--
+ALTER TABLE `termos_aceite`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `unidades_escolares`
+--
+ALTER TABLE `unidades_escolares`
+  ADD PRIMARY KEY (`id_ue`),
+  ADD UNIQUE KEY `uk_ue_cie` (`cie`),
+  ADD KEY `fk_ue_ure` (`id_ure`);
+
+--
+-- Índices de tabela `unidades_regionais`
+--
+ALTER TABLE `unidades_regionais`
+  ADD PRIMARY KEY (`id_ure`),
+  ADD UNIQUE KEY `uk_ure_codigo` (`codigo`);
+
+--
+-- Índices de tabela `usuarios_pae`
+--
+ALTER TABLE `usuarios_pae`
+  ADD PRIMARY KEY (`id_pae`),
+  ADD UNIQUE KEY `uk_pae_cpf` (`cpf`),
+  ADD KEY `fk_pae_empresa` (`id_empresa`);
+
+--
+-- Índices de tabela `usuarios_supervisor`
+--
+ALTER TABLE `usuarios_supervisor`
+  ADD PRIMARY KEY (`id_usuario_supervisor`),
+  ADD UNIQUE KEY `uk_sup_cpf` (`cpf`),
+  ADD KEY `fk_supervisor_empresa` (`id_empresa`);
+
+--
+-- Índices de tabela `usuarios_ue`
+--
+ALTER TABLE `usuarios_ue`
+  ADD PRIMARY KEY (`id_usuario_ue`),
+  ADD UNIQUE KEY `uk_ue_user_cpf` (`cpf`),
+  ADD KEY `fk_usuario_ue` (`id_ue`);
+
+--
+-- Índices de tabela `usuarios_ure`
+--
+ALTER TABLE `usuarios_ure`
+  ADD PRIMARY KEY (`id_usuario_ure`),
+  ADD UNIQUE KEY `uk_ure_user_cpf` (`cpf`),
+  ADD KEY `fk_usuario_ure_ure` (`id_ure`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `alunos`
+--
+ALTER TABLE `alunos`
+  MODIFY `id_aluno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=174;
+
+--
+-- AUTO_INCREMENT de tabela `associacoes`
+--
+ALTER TABLE `associacoes`
+  MODIFY `id_associacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT de tabela `auditoria`
+--
+ALTER TABLE `auditoria`
+  MODIFY `id_auditoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+
+--
+-- AUTO_INCREMENT de tabela `empresas`
+--
+ALTER TABLE `empresas`
+  MODIFY `id_empresa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de tabela `laudos`
+--
+ALTER TABLE `laudos`
+  MODIFY `id_laudo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
+-- AUTO_INCREMENT de tabela `notificacoes_lidas`
+--
+ALTER TABLE `notificacoes_lidas`
+  MODIFY `id_leitura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de tabela `recuperacao_senha`
+--
+ALTER TABLE `recuperacao_senha`
+  MODIFY `id_recuperacao` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT de tabela `relatorios`
+--
+ALTER TABLE `relatorios`
+  MODIFY `id_relatorio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+
+--
+-- AUTO_INCREMENT de tabela `seduc`
+--
+ALTER TABLE `seduc`
+  MODIFY `id_seduc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `termos_aceite`
+--
+ALTER TABLE `termos_aceite`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT de tabela `unidades_escolares`
+--
+ALTER TABLE `unidades_escolares`
+  MODIFY `id_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT de tabela `unidades_regionais`
+--
+ALTER TABLE `unidades_regionais`
+  MODIFY `id_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_pae`
+--
+ALTER TABLE `usuarios_pae`
+  MODIFY `id_pae` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_supervisor`
+--
+ALTER TABLE `usuarios_supervisor`
+  MODIFY `id_usuario_supervisor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_ue`
+--
+ALTER TABLE `usuarios_ue`
+  MODIFY `id_usuario_ue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios_ure`
+--
+ALTER TABLE `usuarios_ure`
+  MODIFY `id_usuario_ure` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `alunos`
+--
+ALTER TABLE `alunos`
+  ADD CONSTRAINT `fk_aluno_ue` FOREIGN KEY (`id_ue`) REFERENCES `unidades_escolares` (`id_ue`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_aluno_usuario_ue` FOREIGN KEY (`id_usuario_ue`) REFERENCES `usuarios_ue` (`id_usuario_ue`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `associacoes`
+--
+ALTER TABLE `associacoes`
+  ADD CONSTRAINT `fk_associacao_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_associacao_pae` FOREIGN KEY (`id_pae`) REFERENCES `usuarios_pae` (`id_pae`) ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `empresa_ure`
+--
+ALTER TABLE `empresa_ure`
+  ADD CONSTRAINT `fk_empresa_ure_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_empresa_ure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `laudos`
+--
+ALTER TABLE `laudos`
+  ADD CONSTRAINT `fk_laudo_aluno` FOREIGN KEY (`id_aluno`) REFERENCES `alunos` (`id_aluno`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `relatorios`
+--
+ALTER TABLE `relatorios`
+  ADD CONSTRAINT `fk_relatorio_associacao` FOREIGN KEY (`id_associacao`) REFERENCES `associacoes` (`id_associacao`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `unidades_escolares`
+--
+ALTER TABLE `unidades_escolares`
+  ADD CONSTRAINT `fk_ue_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
+
+--
+-- Restrições para tabelas `usuarios_pae`
+--
+ALTER TABLE `usuarios_pae`
+  ADD CONSTRAINT `fk_pae_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `usuarios_supervisor`
+--
+ALTER TABLE `usuarios_supervisor`
+  ADD CONSTRAINT `fk_supervisor_empresa` FOREIGN KEY (`id_empresa`) REFERENCES `empresas` (`id_empresa`) ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `usuarios_ue`
+--
+ALTER TABLE `usuarios_ue`
+  ADD CONSTRAINT `fk_usuario_ue` FOREIGN KEY (`id_ue`) REFERENCES `unidades_escolares` (`id_ue`);
+
+--
+-- Restrições para tabelas `usuarios_ure`
+--
+ALTER TABLE `usuarios_ure`
+  ADD CONSTRAINT `fk_usuario_ure_ure` FOREIGN KEY (`id_ure`) REFERENCES `unidades_regionais` (`id_ure`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
