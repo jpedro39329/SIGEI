@@ -23,18 +23,6 @@ if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0) {
 
 $resultEscolas = mysqli_query($conexao, $sqlEscolas);
 $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
-
-// Lista os usuários de escola
-$sqlUsuarios = "
-    SELECT uue.*, ue.nome AS escola_nome, ue.cie, u.nome AS ure_nome
-    FROM usuarios_ue uue
-    JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
-    JOIN unidades_regionais u ON ue.id_ure = u.id_ure
-    $whereLista
-    ORDER BY uue.data_cadastro DESC
-";
-$result = mysqli_query($conexao, $sqlUsuarios);
-$usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>

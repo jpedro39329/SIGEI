@@ -61,8 +61,8 @@ $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 $sqlUsuarios = "
     SELECT uue.*, ue.nome AS escola_nome, ue.ua, ue.cie, u.nome AS ure_nome, u.uge AS ure_uge
     FROM usuarios_ue uue
-    JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
-    JOIN unidades_regionais u ON ue.id_ure = u.id_ure
+    LEFT JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
+    LEFT JOIN unidades_regionais u ON ue.id_ure = u.id_ure
     $whereSql
     ORDER BY uue.data_cadastro DESC
 ";
