@@ -86,6 +86,14 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
         <a href="cadastrar.php" class="btn btn-primary btn-sm">Cadastrar Escola</a>
     </div>
 
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'atualizado'): ?>
+        <div class="alert alert-success">Escola atualizada com sucesso!</div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'cadastrado'): ?>
+        <div class="alert alert-success">Escola cadastrada com sucesso!</div>
+    <?php endif; ?>
+
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'excluido'): ?>
         <div class="alert alert-success">Escola excluída com sucesso!</div>
     <?php endif; ?>
@@ -161,6 +169,9 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars($esc['municipio'] ?: '-'); ?></td>
                                     <td>
                                         <div class="acoes-cell">
+                                            <a href="editar.php?id=<?php echo $esc['id_ue']; ?>"
+                                               class="btn btn-sm btn-outline-warning"
+                                               title="Editar Escola">Editar</a>
                                             <a href="../../controllers/escolas/excluir.php?id=<?php echo $esc['id_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir Escola"

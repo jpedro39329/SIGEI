@@ -85,7 +85,9 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                                 <label class="form-label">Setor da URE <span class="text-danger">*</span></label>
                                 <select name="setor" id="setor" class="form-select" required onchange="atualizarCargos()">
                                     <option value="">Selecione o setor...</option>
-                                    <option value="ASURE">Assistência Técnica (ASURE)</option>
+                                    <?php if ($userPerfil !== 'DIRIGENTE'): ?>
+                                        <option value="ASURE">Assistência Técnica (ASURE)</option>
+                                    <?php endif; ?>
                                     <option value="SEFISC">Seção de Fiscalização (SEFISC)</option>
                                     <option value="EDU_ESPECIAL">Educação Especial</option>
                                 </select>

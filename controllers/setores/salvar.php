@@ -41,6 +41,11 @@ if (!in_array($setor, ['SEFISC', 'EDU_ESPECIAL', 'ASURE', 'GABINETE'])) {
     exit();
 }
 
+if ($userPerfil === 'DIRIGENTE' && in_array($setor, ['ASURE', 'GABINETE'])) {
+    header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("O Dirigente da regional não pode cadastrar novos servidores do setor ASURE."));
+    exit();
+}
+
 if ($senha !== $confirmarSenha) {
     header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("As senhas não coincidem."));
     exit();

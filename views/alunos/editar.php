@@ -22,6 +22,10 @@ if (!$aluno) {
     die("Aluno não encontrado ou não pertence à sua escola.");
 }
 
+if ($aluno['status_aprovacao'] === 'PENDENTE') {
+    die("Solicitações pendentes de análise técnica não podem ser editadas enquanto aguardam avaliação.");
+}
+
 // Busca laudos e documentos do aluno
 $sqlLaudos = "SELECT * FROM laudos WHERE id_aluno = $id_aluno ORDER BY data_envio DESC";
 $resultLaudos = mysqli_query($conexao, $sqlLaudos);

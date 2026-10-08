@@ -139,6 +139,11 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
         <div>
             <h2 class="mb-0"><?php echo ($userPerfil === 'PAE') ? 'Relatórios de Atendimento' : 'Relatórios dos Profissionais de Apoio'; ?></h2>
         </div>
+        <?php if ($userPerfil === 'PAE'): ?>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoRelatorio">
+                <i class="bi bi-plus-lg me-1"></i> Registrar Relatório
+            </button>
+        <?php endif; ?>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] == 'ok'): ?>
@@ -149,50 +154,59 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
         <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['erro']); ?></div>
     <?php endif; ?>
 
-    <!-- Formulário de Novo Relatório (Apenas Perfil PAE) -->
+    <!-- Modal de Registro de Relatório (Apenas Perfil PAE) -->
     <?php if ($userPerfil === 'PAE'): ?>
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <h5 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">Registrar Atendimento</h5>
-                
-                <?php if (count($alunos) > 0): ?>
+        <div class="modal fade" id="modalNovoRelatorio" tabindex="-1" aria-labelledby="modalNovoRelatorioLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
                     <form action="../../controllers/relatorios/salvar.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Estudante Atendido <span class="text-danger">*</span></label>
-                                <select name="id_aluno" class="form-select" required>
-                                    <option value="">Selecione o aluno...</option>
-                                    <?php foreach ($alunos as $aluno): ?>
-                                        <option value="<?php echo $aluno['id_aluno']; ?>">
-                                            <?php echo htmlspecialchars($aluno['nome']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Tipo de Relatório <span class="text-danger">*</span></label>
-                                <select name="tipo" class="form-select" required>
-                                    <option value="DIARIO">Diário (Atividades e Rotina do Dia)</option>
-                                    <option value="MENSAL">Mensal (Evolução / Fechamento Periódico)</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Descrição do Atendimento e Observações <span class="text-danger">*</span></label>
-                                <textarea name="descricao" rows="4" class="form-control" maxlength="5000" placeholder="Relate o acompanhamento pedagógico, locomoção, higiene, alimentação e interação do aluno..." required></textarea>
-                            </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="modalNovoRelatorioLabel">Registrar Atendimento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-primary">Registrar Relatório</button>
+                        <div class="modal-body p-4">
+                            <?php if (count($alunos) > 0): ?>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Estudante Atendido <span class="text-danger">*</span></label>
+                                        <select name="id_aluno" class="form-select" required>
+                                            <option value="">Selecione o aluno...</option>
+                                            <?php foreach ($alunos as $aluno): ?>
+                                                <option value="<?php echo $aluno['id_aluno']; ?>">
+                                                    <?php echo htmlspecialchars($aluno['nome']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Tipo de Relatório <span class="text-danger">*</span></label>
+                                        <select name="tipo" class="form-select" required>
+                                            <option value="DIARIO">Diário (Atividades e Rotina do Dia)</option>
+                                            <option value="MENSAL">Mensal (Evolução / Fechamento Periódico)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-semibold">Descrição do Atendimento e Observações <span class="text-danger">*</span></label>
+                                        <textarea name="descricao" rows="5" class="form-control" maxlength="5000" placeholder="Relate o acompanhamento pedagógico, locomoção, higiene, alimentação e interação do aluno..." required></textarea>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="p-3 text-center text-muted small bg-light rounded">
+                                    Você não possui alunos vinculados no momento para registrar relatórios.
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <?php if (count($alunos) > 0): ?>
+                                <button type="submit" class="btn btn-primary">Salvar e Registrar</button>
+                            <?php endif; ?>
                         </div>
                     </form>
-                <?php else: ?>
-                    <div class="p-3 text-center text-muted small bg-light rounded">
-                        Você não possui alunos vinculados no momento para registrar relatórios.
-                    </div>
-                <?php endif; ?>
+                </div>
             </div>
         </div>
     <?php endif; ?>

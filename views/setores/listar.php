@@ -175,10 +175,15 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars($s['ure_uge'] ?: 'N/D'); ?></td>
                                     <td>
                                         <div class="acoes-cell">
-                                            <a href="../../controllers/setores/excluir.php?id=<?php echo $s['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
-                                               title="Excluir Servidor"
-                                               data-msg="Tem certeza que deseja excluir este usuário dos serviços da regional?">Excluir</a>
+                                            <a href="editar.php?id=<?php echo $s['id_usuario_ure']; ?>"
+                                               class="btn btn-sm btn-outline-warning"
+                                               title="Editar Servidor">Editar</a>
+                                            <?php if ((int)$s['id_usuario_ure'] !== $userId): ?>
+                                                <a href="../../controllers/setores/excluir.php?id=<?php echo $s['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                                   class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                                   title="Excluir Servidor"
+                                                   data-msg="Tem certeza que deseja excluir este usuário dos serviços da regional?">Excluir</a>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>

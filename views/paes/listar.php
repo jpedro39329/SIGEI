@@ -184,14 +184,13 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <div class="acoes-cell">
                                             <a href="visualizar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-primary" title="Ver Detalhes do PAE">Ver</a>
-                                            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+                                            <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN'])): ?>
+                                                <a href="editar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-warning" title="Editar PAE">Editar</a>
                                                 <?php if ($pae['ativo']): ?>
-                                               <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
-                                               class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
-                                               title="Inativar PAE"
-                                               data-msg="Tem certeza que deseja inativar este PAE?">Inativar</a>
-                                                <?php else: ?>
-                                                <a href="editar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-secondary" title="Editar ou reativar PAE">Editar</a>
+                                                    <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                                       class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
+                                                       title="Excluir PAE"
+                                                       data-msg="Tem certeza que deseja excluir/inativar este Profissional de Apoio Escolar?">Excluir</a>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         </div>

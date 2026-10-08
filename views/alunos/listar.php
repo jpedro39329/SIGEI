@@ -133,7 +133,7 @@ $sqlFinal = "$baseSelect $whereAbaSql ORDER BY a.data_cadastro DESC";
 $result = mysqli_query($conexao, $sqlFinal);
 $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
-$podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC']);
+$podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'ADMIN']);
 ?>
 
 <!DOCTYPE html>
@@ -355,7 +355,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                         <div class="d-flex gap-1 flex-wrap align-items-center">
                                             <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Ver</a>
 
-                                            <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && $aluno['status_aprovacao'] !== 'ARQUIVADO'): ?>
+                                            <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && !in_array($aluno['status_aprovacao'], ['ARQUIVADO', 'PENDENTE'])): ?>
                                                 <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Aluno">Editar</a>
                                             <?php endif; ?>
 

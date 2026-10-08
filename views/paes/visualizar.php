@@ -55,7 +55,7 @@ $alunos = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
 
 <div class="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Detalhes do PAE</h2>
+        <h2 class="mb-0">Detalhes do Profissional de Apoio Escolar</h2>
         <a href="listar.php" class="btn btn-secondary">Voltar</a>
     </div>
 

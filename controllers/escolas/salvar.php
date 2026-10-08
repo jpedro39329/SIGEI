@@ -1,7 +1,6 @@
-<?php
 require_once "../../config/init.php";
 
-exigirPerfil(array('DIRIGENTE', 'ADMIN', 'SEDUC'));
+exigirPerfil(array('DIRIGENTE', 'ADMIN'));
 exigirTokenCSRF();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
