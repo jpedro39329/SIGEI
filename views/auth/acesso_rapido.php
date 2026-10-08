@@ -113,7 +113,7 @@ if ($perfil !== '') {
                 LEFT JOIN empresas e ON us.id_empresa = e.id_empresa
                 WHERE us.ativo = 1";
     } elseif ($tabela === 'usuarios_ue') {
-        $sql = "SELECT uue.id_usuario_ue, uue.nome, ue.nome AS vinculo_nome, '' AS setor, 'Gestor Escolar' AS cargo, CONCAT('CIE: ', ue.cie) AS extra 
+        $sql = "SELECT uue.id_usuario_ue, uue.nome, ue.nome AS vinculo_nome, '' AS setor, '' AS cargo, '' AS extra 
                 FROM usuarios_ue uue
                 LEFT JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
                 WHERE uue.ativo = 1";
@@ -279,7 +279,7 @@ if ($perfil !== '') {
       margin-bottom: 0;
     }
 
-    /* ===== LINKS DE PERFIL / USUÁRIOS ===== */
+    /* ===== LINKS DE PERFIL / USUÁRIOS (REFLEXO DO INDEX) ===== */
     .profile-link {
       display: flex;
       justify-content: space-between;
@@ -295,31 +295,31 @@ if ($perfil !== '') {
 
     .profile-info {
       display: flex;
-      flex-direction: column;
-      gap: 2px;
-      align-items: flex-start;
-    }
-
-    .profile-header-row {
-      display: flex;
       gap: 8px;
       align-items: baseline;
       flex-wrap: wrap;
     }
 
+    .profile-info.user-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: flex-start;
+    }
+
     .profile-prefix {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #666666;
     }
 
     .profile-name {
       font-weight: 800;
-      font-size: 1.15rem;
+      font-size: 1.3rem;
       color: #0d47a1;
     }
 
     .profile-desc {
-      font-size: 0.82rem;
+      font-size: 0.88rem;
       color: #555555;
     }
 
@@ -330,7 +330,7 @@ if ($perfil !== '') {
       padding: 2px 8px;
       border-radius: 6px;
       font-weight: 700;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .arrow {
@@ -516,8 +516,8 @@ if ($perfil !== '') {
               $detalhesTexto = implode(" — ", $detalhes);
             ?>
             <a href="../../controllers/auth/acesso_rapido.php?tabela=<?php echo urlencode($tabela); ?>&id=<?php echo $idUsuario; ?>" class="profile-link">
-              <div class="profile-info">
-                <span class="profile-name" style="font-size: 1.05rem;"><?php echo htmlspecialchars($nome); ?></span>
+              <div class="profile-info user-card-info">
+                <span class="profile-name" style="font-size: 1.15rem;"><?php echo htmlspecialchars($nome); ?></span>
                 <?php if ($detalhesTexto): ?>
                   <span class="profile-desc"><?php echo htmlspecialchars($detalhesTexto); ?></span>
                 <?php endif; ?>

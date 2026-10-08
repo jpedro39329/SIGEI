@@ -186,11 +186,11 @@
 
     /**
      * Interceptador Automático com Delegação de Eventos
-     * Captura qualquer link, botão ou formulário com data-confirm="true"
+     * Captura qualquer link, botão ou formulário com data-confirm="true" OU .btn-confirmar-exclusao
      */
     document.addEventListener('click', async function (e) {
-        // Busca elemento com data-confirm ou elemento pai clicável
-        const trigger = e.target.closest('[data-confirm="true"]');
+        // Busca elemento com data-confirm="true" ou classe .btn-confirmar-exclusao
+        const trigger = e.target.closest('[data-confirm="true"], .btn-confirmar-exclusao');
         if (!trigger) return;
 
         // Se for um link <a>
@@ -259,10 +259,10 @@
      */
     function extrairEConfirmar(el) {
         const type = el.dataset.confirmType || el.dataset.confirmVariant || 'danger';
-        const title = el.dataset.confirmTitle || '';
-        const message = el.dataset.confirmMessage || '';
-        const actionText = el.dataset.confirmAction || el.dataset.confirmBtn || '';
-        const cancelText = el.dataset.confirmCancel || '';
+        const title = el.dataset.confirmTitle || (el.getAttribute('title') && el.getAttribute('title') !== 'Excluir' ? el.getAttribute('title') : 'Confirmar exclusão');
+        const message = el.dataset.confirmMessage || el.dataset.msg || 'Tem certeza de que deseja excluir este registro?<br><small class="text-muted">Esta ação não poderá ser desfeita.</small>';
+        const actionText = el.dataset.confirmAction || el.dataset.confirmBtn || 'Sim, excluir';
+        const cancelText = el.dataset.confirmCancel || 'Cancelar';
         const icon = el.dataset.confirmIcon || '';
 
         return window.confirmarAcao({

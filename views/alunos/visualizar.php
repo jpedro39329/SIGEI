@@ -371,7 +371,10 @@ $foto = $aluno['foto_arquivo'] ?? '';
                                             </button>
                                         <?php endif; ?>
                                         <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
-                                            <form method="POST" action="../../controllers/alunos/remover_laudo.php" class="d-inline" onsubmit="return confirm('Deseja realmente remover este documento?')">
+                                            <form method="POST" action="../../controllers/alunos/remover_laudo.php" class="d-inline"
+                                                  data-confirm="true"
+                                                  data-confirm-title="Remover Documento"
+                                                  data-confirm-message="Deseja realmente remover este documento anexado?">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                                                 <input type="hidden" name="id_laudo" value="<?php echo $laudo['id_laudo']; ?>">
                                                 <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
