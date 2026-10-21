@@ -51,6 +51,7 @@ $sqlAssinatura = "
         COALESCE(MAX(a.data_cadastro), '') AS max_cadastro,
         COALESCE(MAX(a.data_deliberacao), '') AS max_deliberacao,
         COALESCE(MAX(a.data_arquivamento), '') AS max_arquivamento,
+        (SELECT COALESCE(MAX(aud.id_auditoria), 0) FROM auditoria aud WHERE aud.entidade = 'alunos') AS max_auditoria,
         MD5(COALESCE(GROUP_CONCAT(
             CONCAT_WS(':', a.id_aluno, a.status_aprovacao, COALESCE(a.nome, ''), COALESCE(a.motivo_reprovacao, ''), COALESCE(a.motivo_arquivamento, ''),
                 (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1),

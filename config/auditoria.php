@@ -37,6 +37,28 @@ function registrarAuditoria(
             $usuarioNome = 'Sistema';
         }
 
+        if ($usuarioCpf === '' && $idUsuario > 0) {
+            $perfilNorm = strtoupper($usuarioPerfil);
+            $qCpf = null;
+            if ($perfilNorm === 'ADMIN') {
+                $qCpf = $conexao->query("SELECT cpf FROM admin WHERE id_admin = $idUsuario LIMIT 1");
+            } elseif ($perfilNorm === 'SEDUC') {
+                $qCpf = $conexao->query("SELECT cpf FROM seduc WHERE id_seduc = $idUsuario LIMIT 1");
+            } elseif (in_array($perfilNorm, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'], true)) {
+                $qCpf = $conexao->query("SELECT cpf FROM usuarios_ue WHERE id_usuario_ue = $idUsuario LIMIT 1");
+            } elseif (in_array($perfilNorm, ['SUPERVISOR', 'USUARIO_EMPRESA', 'EMPRESA'], true)) {
+                $qCpf = $conexao->query("SELECT cpf FROM usuarios_supervisor WHERE id_usuario_supervisor = $idUsuario LIMIT 1");
+            } elseif ($perfilNorm === 'PAE') {
+                $qCpf = $conexao->query("SELECT cpf FROM usuarios_pae WHERE id_pae = $idUsuario LIMIT 1");
+            } else {
+                $qCpf = $conexao->query("SELECT cpf FROM usuarios_ure WHERE id_usuario_ure = $idUsuario LIMIT 1");
+            }
+            if ($qCpf && ($rCpf = $qCpf->fetch_assoc())) {
+                $usuarioCpf = preg_replace('/\D/', '', $rCpf['cpf'] ?? '');
+                $_SESSION['user_cpf'] = $usuarioCpf;
+            }
+        }
+
         $detalhesStr = null;
         if (is_array($detalhes) || is_object($detalhes)) {
             $detalhesStr = json_encode($detalhes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

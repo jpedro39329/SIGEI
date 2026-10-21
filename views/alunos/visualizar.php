@@ -126,7 +126,10 @@ $foto = $aluno['foto_arquivo'] ?? '';
             <h2 class="mb-0 fw-bold text-dark">Detalhes do Aluno</h2>
             <span class="text-muted small">Prontuário e histórico de atendimento especializado</span>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, '<?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
+                <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+            </button>
             <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
                 <a href="pendentes.php?aba=<?php echo ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO' ? 'correcao' : ($aluno['status_aprovacao'] === 'REPROVADO' ? 'reprovados' : 'analise')); ?>" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
                     Voltar
@@ -496,111 +499,34 @@ $foto = $aluno['foto_arquivo'] ?? '';
             </div>
 
             <!-- 3. Card de Histórico da Solicitação -->
+            <?php $historicoEventos = obterHistoricoSolicitacaoAluno($conexao, $aluno); ?>
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Histórico da Solicitação</h5>
 
                     <div class="d-flex flex-column gap-3">
-                        <!-- 1. Envio / Cadastro -->
-                        <div class="p-3 rounded-3 bg-light border">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <strong class="text-dark small">Solicitação Enviada</strong>
-                                <span class="text-muted" style="font-size: 0.78rem;">
-                                    <?php echo !empty($aluno['data_cadastro']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_cadastro'])) : '-'; ?>
-                                </span>
-                            </div>
-                            <div class="small text-muted">
-                                Enviado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['cadastrado_por_nome'] ?: 'Equipe Escolar'); ?></strong>
-                                <?php if (!empty($aluno['cadastrado_por_cpf'])): ?>
-                                    <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['cadastrado_por_cpf'])); ?></div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- 2. Deliberação / Parecer Técnico -->
-                        <?php if ($aluno['status_aprovacao'] === 'APROVADO'): ?>
+                        <?php foreach ($historicoEventos as $ev): ?>
                             <div class="p-3 rounded-3 bg-light border">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong class="text-dark small">Atendimento Aprovado</strong>
+                                    <strong class="text-dark small"><?php echo htmlspecialchars($ev['titulo']); ?></strong>
                                     <span class="text-muted" style="font-size: 0.78rem;">
-                                        <?php echo !empty($aluno['data_deliberacao']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])) : '-'; ?>
+                                        <?php echo htmlspecialchars($ev['data']); ?>
                                     </span>
                                 </div>
                                 <div class="small text-muted">
-                                    Aprovado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Educação Especial'); ?></strong>
-                                    <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
-                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?></div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                        <?php elseif ($aluno['status_aprovacao'] === 'PENDENTE_CORRECAO'): ?>
-                            <div class="p-3 rounded-3 bg-light border">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong class="text-dark small">Ajustes Solicitados</strong>
-                                    <span class="text-muted" style="font-size: 0.78rem;">
-                                        <?php echo !empty($aluno['data_deliberacao']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])) : '-'; ?>
-                                    </span>
-                                </div>
-                                <div class="small text-muted">
-                                    Solicitado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Educação Especial'); ?></strong>
-                                    <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
-                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($aluno['motivo_reprovacao'])): ?>
+                                    <div>Nome: <strong class="text-dark"><?php echo htmlspecialchars($ev['nome']); ?></strong></div>
+                                    <div class="mt-1">CPF: <?php echo htmlspecialchars($ev['cpf']); ?></div>
+                                    <?php if (!empty($ev['motivo'])): ?>
                                         <div class="mt-2 pt-2 border-top text-dark">
-                                            <strong class="d-block mb-1">Orientações de Correção:</strong>
-                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($aluno['motivo_reprovacao'])); ?></p>
+                                            <strong class="d-block mb-1"><?php echo htmlspecialchars($ev['motivo_label'] ?: 'Motivo:'); ?></strong>
+                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($ev['motivo'])); ?></p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
+                        <?php endforeach; ?>
 
-                        <?php elseif ($aluno['status_aprovacao'] === 'REPROVADO'): ?>
-                            <div class="p-3 rounded-3 bg-light border">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong class="text-dark small">Solicitação Recusada</strong>
-                                    <span class="text-muted" style="font-size: 0.78rem;">
-                                        <?php echo !empty($aluno['data_deliberacao']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_deliberacao'])) : '-'; ?>
-                                    </span>
-                                </div>
-                                <div class="small text-muted">
-                                    Recusado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['deliberado_por_nome'] ?: 'Educação Especial'); ?></strong>
-                                    <?php if (!empty($aluno['deliberado_por_cpf'])): ?>
-                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['deliberado_por_cpf'])); ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($aluno['motivo_reprovacao'])): ?>
-                                        <div class="mt-2 pt-2 border-top text-dark">
-                                            <strong class="d-block mb-1">Motivo:</strong>
-                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($aluno['motivo_reprovacao'])); ?></p>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                        <?php elseif ($aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
-                            <div class="p-3 rounded-3 bg-light border">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong class="text-dark small">Aluno Arquivado</strong>
-                                    <span class="text-muted" style="font-size: 0.78rem;">
-                                        <?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>
-                                    </span>
-                                </div>
-                                <div class="small text-muted">
-                                    Arquivado por: <strong class="text-dark"><?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?: 'Usuário'); ?></strong>
-                                    <?php if (!empty($aluno['arquivado_por_cpf'])): ?>
-                                        <div class="mt-1">CPF: <?php echo htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])); ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($aluno['motivo_arquivamento'])): ?>
-                                        <div class="mt-2 pt-2 border-top text-dark">
-                                            <strong class="d-block mb-1">Motivo:</strong>
-                                            <p class="mb-0 text-secondary"><?php echo nl2br(htmlspecialchars($aluno['motivo_arquivamento'])); ?></p>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                        <?php else: ?>
+                        <?php if ($aluno['status_aprovacao'] === 'PENDENTE'): ?>
                             <div class="p-3 rounded-3 bg-light border">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <strong class="text-dark small">Em Análise Técnica</strong>

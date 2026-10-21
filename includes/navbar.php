@@ -305,6 +305,54 @@ $homePage = $baseUrl . 'views/dashboard.php';
     </div>
 </nav>
 
+<!-- Modal Global de Exportação / Impressão da Ficha do Aluno (SIGEI) -->
+<div class="modal fade" id="modalExportarFichaPDF" tabindex="-1" aria-labelledby="modalExportarFichaPDFLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90vw; margin: 1.5rem auto;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" style="height: 88vh;">
+            <div class="modal-header bg-light py-3 px-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modalExportarFichaPDFLabel">Exportar Ficha do Aluno</h5>
+                        <small class="text-muted">Escolha o tamanho da folha e selecione entre baixar o PDF ou imprimir</small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div class="d-flex align-items-center gap-1">
+                        <label for="selectFormatoPdfGlobal" class="small fw-semibold text-secondary mb-0 me-1">Tamanho:</label>
+                        <select id="selectFormatoPdfGlobal" class="form-select form-select-sm rounded-2" style="width: auto; min-width: 115px;" onchange="atualizarFormatoFichaPreview()">
+                            <option value="a4" selected>A4 (Padrão)</option>
+                            <option value="letter">Carta (Letter)</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-1">
+                        <label for="selectOrientacaoPdfGlobal" class="small fw-semibold text-secondary mb-0 me-1">Orientação:</label>
+                        <select id="selectOrientacaoPdfGlobal" class="form-select form-select-sm rounded-2" style="width: auto; min-width: 120px;" onchange="atualizarFormatoFichaPreview()">
+                            <option value="portrait" selected>Retrato</option>
+                            <option value="landscape">Paisagem</option>
+                        </select>
+                    </div>
+
+                    <button type="button" id="btnImprimirFichaGlobal" class="btn btn-sm btn-outline-secondary fw-semibold d-flex align-items-center gap-1 px-3 rounded-2" onclick="acaoImprimirFichaModal()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+
+                    <button type="button" id="btnSalvarPdfFichaGlobal" class="btn btn-sm btn-danger fw-semibold d-flex align-items-center gap-1 px-3 rounded-2" onclick="acaoBaixarPdfFichaModal()">
+                        <i class="bi bi-download"></i> Salvar PDF
+                    </button>
+
+                    <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0 position-relative bg-secondary-subtle" style="height: calc(88vh - 72px); min-height: 460px;">
+                <iframe id="iframeFichaPdfGlobal" src="about:blank" style="width: 100%; height: 100%; border: 0;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Global de Visualização de Documentos e Laudos (SIGEI) -->
 <div class="modal fade" id="modalVisualizarDocumentoGlobal" tabindex="-1" aria-labelledby="modalVisualizarDocumentoGlobalLabel" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90vw; margin: 1.75rem auto;">
@@ -462,6 +510,80 @@ document.getElementById('modalVisualizarDocumentoGlobal')?.addEventListener('hid
     if (img) img.src = '';
     const backdrop = document.getElementById('fallback-modal-backdrop');
     if (backdrop) backdrop.remove();
+});
+
+window.abrirModalExportarFicha = function (idAluno, nomeAluno) {
+    if (!idAluno) return;
+    const baseUrl = window.SIGEI_CONFIG?.baseUrl || '../../';
+    const urlFicha = baseUrl + 'controllers/alunos/exportar_pdf.php?id=' + encodeURIComponent(idAluno);
+    const iframe = document.getElementById('iframeFichaPdfGlobal');
+    const label = document.getElementById('modalExportarFichaPDFLabel');
+    const selFormato = document.getElementById('selectFormatoPdfGlobal');
+    const selOrientacao = document.getElementById('selectOrientacaoPdfGlobal');
+
+    if (label) {
+        label.innerText = nomeAluno ? ('Exportar Ficha — ' + nomeAluno) : 'Exportar Ficha do Aluno';
+    }
+    if (selFormato) selFormato.value = 'a4';
+    if (selOrientacao) selOrientacao.value = 'portrait';
+    if (iframe) {
+        iframe.src = urlFicha;
+    }
+
+    const modalEl = document.getElementById('modalExportarFichaPDF');
+    if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+};
+
+window.atualizarFormatoFichaPreview = function () {
+    const iframe = document.getElementById('iframeFichaPdfGlobal');
+    const formato = document.getElementById('selectFormatoPdfGlobal')?.value || 'a4';
+    const orientacao = document.getElementById('selectOrientacaoPdfGlobal')?.value || 'portrait';
+    if (iframe && iframe.contentWindow && typeof iframe.contentWindow.configurarFormatoFicha === 'function') {
+        iframe.contentWindow.configurarFormatoFicha(formato, orientacao);
+    }
+};
+
+window.acaoBaixarPdfFichaModal = function () {
+    const iframe = document.getElementById('iframeFichaPdfGlobal');
+    const btnSalvar = document.getElementById('btnSalvarPdfFichaGlobal');
+    const formato = document.getElementById('selectFormatoPdfGlobal')?.value || 'a4';
+    const orientacao = document.getElementById('selectOrientacaoPdfGlobal')?.value || 'portrait';
+
+    if (iframe && iframe.contentWindow && typeof iframe.contentWindow.baixarFichaPDF === 'function') {
+        const htmlOriginal = btnSalvar ? btnSalvar.innerHTML : '';
+        if (btnSalvar) {
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Gerando...';
+        }
+        Promise.resolve(iframe.contentWindow.baixarFichaPDF(formato, orientacao)).finally(function () {
+            if (btnSalvar) {
+                btnSalvar.disabled = false;
+                btnSalvar.innerHTML = htmlOriginal;
+            }
+            const modalEl = document.getElementById('modalExportarFichaPDF');
+            if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+        });
+    }
+};
+
+window.acaoImprimirFichaModal = function () {
+    const iframe = document.getElementById('iframeFichaPdfGlobal');
+    const formato = document.getElementById('selectFormatoPdfGlobal')?.value || 'a4';
+    const orientacao = document.getElementById('selectOrientacaoPdfGlobal')?.value || 'portrait';
+    if (iframe && iframe.contentWindow && typeof iframe.contentWindow.imprimirFichaDireto === 'function') {
+        iframe.contentWindow.imprimirFichaDireto(formato, orientacao);
+    }
+};
+
+document.getElementById('modalExportarFichaPDF')?.addEventListener('hidden.bs.modal', function () {
+    const iframe = document.getElementById('iframeFichaPdfGlobal');
+    if (iframe) iframe.src = 'about:blank';
 });
 </script>
 <?php 

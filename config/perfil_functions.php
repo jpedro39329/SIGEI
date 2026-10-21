@@ -545,47 +545,90 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
         $idUre = idUreUsuario($conexao, $userId);
         $whereUre = ($idUre > 0) ? "AND ue.id_ure = $idUre" : "";
 
-        // Solicitações pendentes há mais de 3 dias (urgentes)
-        $sqlUrgentes = "
-            SELECT a.id_aluno, a.nome, DATEDIFF(NOW(), a.data_cadastro) AS dias_pendente
+        // Solicitações devolvidas / reenviadas para reanálise pela escola
+        $sqlReanalise = "
+            SELECT a.id_aluno, a.nome,
+                   COALESCE(
+                       (SELECT MAX(aud.criado_em)
+                        FROM auditoria aud
+                        WHERE aud.entidade = 'alunos'
+                          AND aud.id_registro = a.id_aluno
+                          AND (aud.acao = 'REENVIAR' OR (aud.acao = 'EDITAR' AND aud.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))),
+                       a.data_deliberacao,
+                       a.data_cadastro
+                   ) AS ref_data
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE a.status_aprovacao = 'PENDENTE' AND DATEDIFF(NOW(), a.data_cadastro) >= 3 $whereUre
-            ORDER BY a.data_cadastro ASC LIMIT 3
+            WHERE a.status_aprovacao = 'PENDENTE'
+              AND (
+                  a.data_deliberacao IS NOT NULL
+                  OR EXISTS (
+                      SELECT 1 FROM auditoria aud2
+                      WHERE aud2.entidade = 'alunos'
+                        AND aud2.id_registro = a.id_aluno
+                        AND (aud2.acao = 'REENVIAR' OR (aud2.acao = 'EDITAR' AND aud2.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))
+                  )
+              )
+              $whereUre
+            ORDER BY ref_data DESC LIMIT 5
         ";
-        $resUrgentes = mysqli_query($conexao, $sqlUrgentes);
-        if ($resUrgentes) {
-            while ($row = mysqli_fetch_assoc($resUrgentes)) {
-                $dias = (int) $row['dias_pendente'];
+        $resReanalise = mysqli_query($conexao, $sqlReanalise);
+        if ($resReanalise) {
+            while ($row = mysqli_fetch_assoc($resReanalise)) {
                 $notificacoes[] = [
-                    'tipo' => 'danger',
-                    'icone' => 'bi-clock-history',
-                    'titulo' => 'Solicitação Pendente Crítica',
-                    'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise há {$dias} dias.",
+                    'tipo' => 'info',
+                    'icone' => 'bi-arrow-repeat',
+                    'titulo' => 'Devolvido para Reanálise',
+                    'mensagem' => "A solicitação do aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi devolvida pela escola para reanálise.",
                     'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
-                    'tempo' => "Há {$dias} dias"
+                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Reanálise",
+                    'ref_time' => $row['ref_data'] ?? ''
                 ];
             }
         }
 
-        // Novas solicitações recentes (menos de 3 dias)
-        $sqlRecentes = "
-            SELECT COUNT(*) AS total
+        // Solicitações novas pendentes (ainda não deliberadas/reenviadas)
+        $sqlPendentesNovos = "
+            SELECT a.id_aluno, a.nome, a.data_cadastro, DATEDIFF(NOW(), a.data_cadastro) AS dias_pendente
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE a.status_aprovacao = 'PENDENTE' AND DATEDIFF(NOW(), a.data_cadastro) < 3 $whereUre
+            WHERE a.status_aprovacao = 'PENDENTE'
+              AND a.data_deliberacao IS NULL
+              AND NOT EXISTS (
+                  SELECT 1 FROM auditoria aud2
+                  WHERE aud2.entidade = 'alunos'
+                    AND aud2.id_registro = a.id_aluno
+                    AND (aud2.acao = 'REENVIAR' OR (aud2.acao = 'EDITAR' AND aud2.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))
+              )
+              $whereUre
+            ORDER BY a.data_cadastro DESC LIMIT 5
         ";
-        $resRec = mysqli_query($conexao, $sqlRecentes);
-        $totalRec = $resRec ? (int) mysqli_fetch_assoc($resRec)['total'] : 0;
-        if ($totalRec > 0) {
-            $notificacoes[] = [
-                'tipo' => 'warning',
-                'icone' => 'bi-inbox-fill',
-                'titulo' => 'Novas Solicitações',
-                'mensagem' => "Você possui <strong>{$totalRec}</strong> solicitação(ões) recente(s) para analisar.",
-                'link' => $baseUrl . "views/solicitacoes/listar.php",
-                'tempo' => "Fila da URE"
-            ];
+        $resNovos = mysqli_query($conexao, $sqlPendentesNovos);
+        if ($resNovos) {
+            while ($row = mysqli_fetch_assoc($resNovos)) {
+                $dias = (int) $row['dias_pendente'];
+                if ($dias >= 3) {
+                    $notificacoes[] = [
+                        'tipo' => 'danger',
+                        'icone' => 'bi-clock-history',
+                        'titulo' => 'Solicitação Pendente Crítica',
+                        'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise há {$dias} dias.",
+                        'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
+                        'tempo' => "Há {$dias} dias",
+                        'ref_time' => $row['data_cadastro'] ?? ''
+                    ];
+                } else {
+                    $notificacoes[] = [
+                        'tipo' => 'warning',
+                        'icone' => 'bi-inbox-fill',
+                        'titulo' => 'Nova Solicitação para Análise',
+                        'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise técnica.",
+                        'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
+                        'tempo' => !empty($row['data_cadastro']) ? date('d/m/Y', strtotime($row['data_cadastro'])) : "Nova",
+                        'ref_time' => $row['data_cadastro'] ?? ''
+                    ];
+                }
+            }
         }
     }
 
@@ -595,10 +638,10 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
 
         // Alunos aprovados recentemente pela Educação Especial
         $sqlAprovados = "
-            SELECT id_aluno, nome
+            SELECT id_aluno, nome, COALESCE(data_deliberacao, data_cadastro) AS ref_data
             FROM alunos
             WHERE id_ue = $idEscola AND status_aprovacao = 'APROVADO'
-            ORDER BY data_cadastro DESC LIMIT 2
+            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC LIMIT 4
         ";
         $resApr = mysqli_query($conexao, $sqlAprovados);
         if ($resApr) {
@@ -609,17 +652,40 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
                     'titulo' => 'Solicitação Aprovada',
                     'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi aprovado pela Educação Especial.",
                     'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
-                    'tempo' => "Aprovado"
+                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Aprovado",
+                    'ref_time' => $row['ref_data'] ?? ''
+                ];
+            }
+        }
+
+        // Alunos com ajustes solicitados (PENDENTE_CORRECAO)
+        $sqlCorrecao = "
+            SELECT id_aluno, nome, COALESCE(data_deliberacao, data_cadastro) AS ref_data
+            FROM alunos
+            WHERE id_ue = $idEscola AND status_aprovacao = 'PENDENTE_CORRECAO'
+            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC LIMIT 4
+        ";
+        $resCorr = mysqli_query($conexao, $sqlCorrecao);
+        if ($resCorr) {
+            while ($row = mysqli_fetch_assoc($resCorr)) {
+                $notificacoes[] = [
+                    'tipo' => 'warning',
+                    'icone' => 'bi-exclamation-circle-fill',
+                    'titulo' => 'Ajustes Solicitados',
+                    'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> teve ajustes solicitados pela Educação Especial.",
+                    'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
+                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Ajuste",
+                    'ref_time' => $row['ref_data'] ?? ''
                 ];
             }
         }
 
         // Alunos reprovados que precisam de atenção/ajuste
         $sqlReprovados = "
-            SELECT id_aluno, nome, motivo_reprovacao
+            SELECT id_aluno, nome, motivo_reprovacao, COALESCE(data_deliberacao, data_cadastro) AS ref_data
             FROM alunos
             WHERE id_ue = $idEscola AND status_aprovacao = 'REPROVADO'
-            ORDER BY data_cadastro DESC LIMIT 2
+            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC LIMIT 4
         ";
         $resRep = mysqli_query($conexao, $sqlReprovados);
         if ($resRep) {
@@ -628,9 +694,10 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
                     'tipo' => 'danger',
                     'icone' => 'bi-x-circle-fill',
                     'titulo' => 'Solicitação Reprovada',
-                    'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi reprovado. Verifique os motivos.",
-                    'link' => $baseUrl . "views/alunos/pendentes.php?aba=reprovados",
-                    'tempo' => "Atenção"
+                    'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi reprovado pela Educação Especial. Verifique os motivos.",
+                    'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
+                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Atenção",
+                    'ref_time' => $row['ref_data'] ?? ''
                 ];
             }
         }
@@ -800,7 +867,8 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
     foreach ($notificacoes as &$n) {
         $rotaRelativa = preg_replace('#^(\.\./)+#', '', $n['link']);
         $n['rota'] = $rotaRelativa;
-        $n['key'] = md5($n['titulo'] . '|' . $rotaRelativa);
+        $refTime = $n['ref_time'] ?? '';
+        $n['key'] = md5($n['titulo'] . '|' . $rotaRelativa . ($refTime !== '' ? '|' . $refTime : ''));
     }
     unset($n);
 
@@ -827,6 +895,250 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
     }
 
     return $notificacoes;
+}
+
+/**
+ * Obtém a linha do tempo completa do histórico da solicitação do aluno
+ * (envio inicial, reprovações, solicitações de ajustes, reenvios, aprovações, arquivamentos e reativações).
+ * Todas as datas são formatadas no padrão brasileiro DD/MM/YYYY e os dados de autoria contêm apenas Nome e CPF.
+ */
+function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
+    $idAluno = (int) ($aluno['id_aluno'] ?? 0);
+    $eventos = [];
+
+    // Helper interno para buscar CPF de um usuário pelo nome ou ID se o registro antigo estiver sem CPF
+    $resolverCpfUsuario = function($nome, $idUsuario = 0, $perfil = '') use ($conexao) {
+        $nomeEsc = mysqli_real_escape_string($conexao, trim((string) $nome));
+        $idUsuario = (int) $idUsuario;
+        $perfil = strtoupper(trim((string) $perfil));
+
+        if ($idUsuario > 0) {
+            if ($perfil === 'ADMIN') {
+                $r = mysqli_query($conexao, "SELECT cpf FROM admin WHERE id_admin = $idUsuario LIMIT 1");
+            } elseif ($perfil === 'SEDUC') {
+                $r = mysqli_query($conexao, "SELECT cpf FROM seduc WHERE id_seduc = $idUsuario LIMIT 1");
+            } elseif (in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'], true)) {
+                $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_ue WHERE id_usuario_ue = $idUsuario LIMIT 1");
+            } else {
+                $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_ure WHERE id_usuario_ure = $idUsuario LIMIT 1");
+            }
+            if (!empty($r) && ($row = mysqli_fetch_assoc($r)) && !empty($row['cpf'])) {
+                return formatarCPF($row['cpf']);
+            }
+        }
+
+        if ($nomeEsc !== '') {
+            $tabelasBusca = ['usuarios_ure', 'usuarios_ue', 'admin', 'seduc'];
+            foreach ($tabelasBusca as $tb) {
+                $r = mysqli_query($conexao, "SELECT cpf FROM `$tb` WHERE nome = '$nomeEsc' LIMIT 1");
+                if ($r && ($row = mysqli_fetch_assoc($r)) && !empty($row['cpf'])) {
+                    return formatarCPF($row['cpf']);
+                }
+            }
+        }
+        return 'Não informado';
+    };
+
+    // 1. Solicitação Enviada (Cadastro Inicial)
+    $cadNome = trim($aluno['cadastrado_por_nome'] ?? '') ?: 'Equipe Escolar';
+    $cadCpfRaw = preg_replace('/\D/', '', $aluno['cadastrado_por_cpf'] ?? '');
+    $cadCpf = $cadCpfRaw !== '' ? formatarCPF($cadCpfRaw) : $resolverCpfUsuario($cadNome, (int) ($aluno['id_usuario_ue'] ?? 0), 'USUARIO_ESCOLA');
+
+    $eventos[] = [
+        'titulo' => 'Solicitação Enviada',
+        'data' => !empty($aluno['data_cadastro']) ? date('d/m/Y', strtotime($aluno['data_cadastro'])) : '-',
+        'timestamp' => !empty($aluno['data_cadastro']) ? strtotime($aluno['data_cadastro']) : 0,
+        'nome' => $cadNome,
+        'cpf' => $cadCpf,
+        'motivo_label' => null,
+        'motivo' => null
+    ];
+
+    // 2. Busca registros de auditoria para este aluno (DELIBERAR, APROVAR, REENVIAR, EDITAR c/ reenvio, ARQUIVAR, REATIVAR)
+    $temDeliberacaoAuditoria = false;
+    $temArquivamentoAuditoria = false;
+
+    if ($idAluno > 0) {
+        $sqlAudit = "
+            SELECT id_auditoria, id_usuario, usuario_nome, usuario_cpf, usuario_perfil, acao, detalhes, criado_em
+            FROM auditoria
+            WHERE entidade = 'alunos' AND id_registro = $idAluno
+            ORDER BY criado_em ASC, id_auditoria ASC
+        ";
+        $resAudit = mysqli_query($conexao, $sqlAudit);
+        if ($resAudit) {
+            while ($aud = mysqli_fetch_assoc($resAudit)) {
+                $acao = strtoupper(trim($aud['acao'] ?? ''));
+                $det = json_decode($aud['detalhes'] ?? '', true);
+                if (!is_array($det)) {
+                    $det = [];
+                }
+
+                $autorNome = trim($aud['usuario_nome'] ?? '') ?: 'Usuário';
+                $autorCpfRaw = preg_replace('/\D/', '', $aud['usuario_cpf'] ?? '');
+                $autorCpf = $autorCpfRaw !== ''
+                    ? formatarCPF($autorCpfRaw)
+                    : $resolverCpfUsuario($autorNome, (int) ($aud['id_usuario'] ?? 0), $aud['usuario_perfil'] ?? '');
+
+                $dataBr = !empty($aud['criado_em']) ? date('d/m/Y', strtotime($aud['criado_em'])) : '-';
+                $ts = !empty($aud['criado_em']) ? strtotime($aud['criado_em']) : 0;
+
+                if ($acao === 'DELIBERAR' || $acao === 'APROVAR') {
+                    $temDeliberacaoAuditoria = true;
+                    $st = strtoupper(trim($det['status'] ?? ($acao === 'APROVAR' ? 'APROVADO' : '')));
+                    $motivo = trim($det['motivo'] ?? '');
+
+                    if ($st === 'APROVADO') {
+                        $eventos[] = [
+                            'titulo' => 'Atendimento Aprovado',
+                            'data' => $dataBr,
+                            'timestamp' => $ts,
+                            'nome' => $autorNome,
+                            'cpf' => $autorCpf,
+                            'motivo_label' => null,
+                            'motivo' => null
+                        ];
+                    } elseif ($st === 'PENDENTE_CORRECAO') {
+                        $eventos[] = [
+                            'titulo' => 'Ajustes Solicitados',
+                            'data' => $dataBr,
+                            'timestamp' => $ts,
+                            'nome' => $autorNome,
+                            'cpf' => $autorCpf,
+                            'motivo_label' => 'Orientações de Correção:',
+                            'motivo' => $motivo !== '' ? $motivo : null
+                        ];
+                    } elseif ($st === 'REPROVADO') {
+                        $eventos[] = [
+                            'titulo' => 'Solicitação Recusada',
+                            'data' => $dataBr,
+                            'timestamp' => $ts,
+                            'nome' => $autorNome,
+                            'cpf' => $autorCpf,
+                            'motivo_label' => 'Motivo:',
+                            'motivo' => $motivo !== '' ? $motivo : null
+                        ];
+                    }
+                } elseif ($acao === 'REENVIAR' || ($acao === 'EDITAR' && ($det['status_pos_edicao'] ?? '') === 'PENDENTE' && isset($det['status_anterior']))) {
+                    $eventos[] = [
+                        'titulo' => 'Solicitação Reenviada para Análise',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'motivo_label' => null,
+                        'motivo' => null
+                    ];
+                } elseif ($acao === 'ARQUIVAR') {
+                    $temArquivamentoAuditoria = true;
+                    $motivoArq = trim($det['motivo'] ?? '');
+                    $eventos[] = [
+                        'titulo' => 'Aluno Arquivado',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'motivo_label' => $motivoArq !== '' ? 'Motivo:' : null,
+                        'motivo' => $motivoArq !== '' ? $motivoArq : null
+                    ];
+                } elseif ($acao === 'REATIVAR') {
+                    $eventos[] = [
+                        'titulo' => 'Aluno Reativado',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'motivo_label' => null,
+                        'motivo' => null
+                    ];
+                }
+            }
+        }
+    }
+
+    // 3. Fallback para dados diretos na tabela `alunos` caso não haja log em `auditoria` (registros anteriores/seed)
+    if (!$temDeliberacaoAuditoria && !empty($aluno['data_deliberacao'])) {
+        $delibNome = trim($aluno['deliberado_por_nome'] ?? '') ?: 'Educação Especial';
+        $delibCpfRaw = preg_replace('/\D/', '', $aluno['deliberado_por_cpf'] ?? '');
+        $delibCpf = $delibCpfRaw !== '' ? formatarCPF($delibCpfRaw) : $resolverCpfUsuario($delibNome, 0, 'USUARIO_EDUCACAO_ESPECIAL');
+        $dataDelibBr = date('d/m/Y', strtotime($aluno['data_deliberacao']));
+        $tsDelib = strtotime($aluno['data_deliberacao']);
+        $stAtual = $aluno['status_aprovacao'] ?? '';
+
+        if ($stAtual === 'PENDENTE_CORRECAO') {
+            $eventos[] = [
+                'titulo' => 'Ajustes Solicitados',
+                'data' => $dataDelibBr,
+                'timestamp' => $tsDelib,
+                'nome' => $delibNome,
+                'cpf' => $delibCpf,
+                'motivo_label' => !empty($aluno['motivo_reprovacao']) ? 'Orientações de Correção:' : null,
+                'motivo' => !empty($aluno['motivo_reprovacao']) ? $aluno['motivo_reprovacao'] : null
+            ];
+        } elseif ($stAtual === 'REPROVADO') {
+            $eventos[] = [
+                'titulo' => 'Solicitação Recusada',
+                'data' => $dataDelibBr,
+                'timestamp' => $tsDelib,
+                'nome' => $delibNome,
+                'cpf' => $delibCpf,
+                'motivo_label' => !empty($aluno['motivo_reprovacao']) ? 'Motivo:' : null,
+                'motivo' => !empty($aluno['motivo_reprovacao']) ? $aluno['motivo_reprovacao'] : null
+            ];
+        } elseif ($stAtual === 'APROVADO' || $stAtual === 'ARQUIVADO') {
+            $eventos[] = [
+                'titulo' => 'Atendimento Aprovado',
+                'data' => $dataDelibBr,
+                'timestamp' => $tsDelib,
+                'nome' => $delibNome,
+                'cpf' => $delibCpf,
+                'motivo_label' => null,
+                'motivo' => null
+            ];
+        } elseif ($stAtual === 'PENDENTE') {
+            // Se já teve data_deliberacao e está PENDENTE sem auditoria, houve reprovação/ajuste anterior e posterior reenvio
+            $eventos[] = [
+                'titulo' => 'Solicitação Analisada Anteriormente',
+                'data' => $dataDelibBr,
+                'timestamp' => $tsDelib,
+                'nome' => $delibNome,
+                'cpf' => $delibCpf,
+                'motivo_label' => null,
+                'motivo' => null
+            ];
+            $eventos[] = [
+                'titulo' => 'Solicitação Reenviada para Análise',
+                'data' => $dataDelibBr,
+                'timestamp' => $tsDelib + 1,
+                'nome' => $cadNome,
+                'cpf' => $cadCpf,
+                'motivo_label' => null,
+                'motivo' => null
+            ];
+        }
+    }
+
+    if (!$temArquivamentoAuditoria && ($aluno['status_aprovacao'] ?? '') === 'ARQUIVADO' && !empty($aluno['data_arquivamento'])) {
+        $arqNome = trim($aluno['arquivado_por_nome'] ?? '') ?: 'Usuário';
+        $arqCpfRaw = preg_replace('/\D/', '', $aluno['arquivado_por_cpf'] ?? '');
+        $arqCpf = $arqCpfRaw !== '' ? formatarCPF($arqCpfRaw) : $resolverCpfUsuario($arqNome, 0, $aluno['arquivado_por_perfil'] ?? '');
+        $eventos[] = [
+            'titulo' => 'Aluno Arquivado',
+            'data' => date('d/m/Y', strtotime($aluno['data_arquivamento'])),
+            'timestamp' => strtotime($aluno['data_arquivamento']),
+            'nome' => $arqNome,
+            'cpf' => $arqCpf,
+            'motivo_label' => !empty($aluno['motivo_arquivamento']) ? 'Motivo:' : null,
+            'motivo' => !empty($aluno['motivo_arquivamento']) ? $aluno['motivo_arquivamento'] : null
+        ];
+    }
+
+    // Ordena cronologicamente
+    usort($eventos, function($a, $b) {
+        return ($a['timestamp'] ?? 0) <=> ($b['timestamp'] ?? 0);
+    });
+
+    return $eventos;
 }
 
 /**

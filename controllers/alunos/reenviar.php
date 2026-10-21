@@ -18,7 +18,7 @@ if ($id_aluno <= 0 || $id_escola <= 0) {
 }
 
 $stmtVerifica = $conexao->prepare(
-    "SELECT id_aluno
+    "SELECT id_aluno, nome, status_aprovacao
      FROM alunos
      WHERE id_aluno = ?
        AND id_ue = ?
@@ -26,11 +26,13 @@ $stmtVerifica = $conexao->prepare(
 );
 $stmtVerifica->bind_param("ii", $id_aluno, $id_escola);
 $stmtVerifica->execute();
+$resVerifica = $stmtVerifica->get_result();
 
-if ($stmtVerifica->get_result()->num_rows == 0) {
+if ($resVerifica->num_rows == 0) {
     die("Aluno não encontrado, não pertence à sua escola ou não está pendente de reenvio.");
 }
 
+$alunoDados = $resVerifica->fetch_assoc();
 $stmtVerifica->close();
 
 $stmt = $conexao->prepare(
@@ -43,6 +45,12 @@ $stmt = $conexao->prepare(
 $stmt->bind_param("ii", $id_aluno, $id_escola);
 
 if ($stmt->execute()) {
+    registrarAuditoria($conexao, 'ALUNOS', 'REENVIAR', 'alunos', $id_aluno, [
+        'nome' => $alunoDados['nome'] ?? '',
+        'status_anterior' => $alunoDados['status_aprovacao'] ?? '',
+        'status_pos_reenvio' => 'PENDENTE'
+    ]);
+
     header("Location: ../../views/alunos/pendentes.php?msg=reenviado");
     exit();
 }

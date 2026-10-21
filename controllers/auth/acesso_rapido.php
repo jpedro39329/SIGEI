@@ -70,6 +70,7 @@ if ($result && $result->num_rows === 1) {
 
     $_SESSION['user_id']   = (int) $user[$campoId];
     $_SESSION['user_name'] = $user['nome'];
+    $_SESSION['user_cpf']  = preg_replace('/\D/', '', $user['cpf'] ?? '');
 
     if ($tabela === 'usuarios_ure') {
         $setor = $user['setor'] ?? '';

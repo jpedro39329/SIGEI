@@ -216,11 +216,20 @@ if ($stmt->execute()) {
         }
     }
 
-    registrarAuditoria($conexao, 'ALUNOS', 'EDITAR', 'alunos', $id_aluno, [
-        'nome' => $nome,
-        'ra' => $ra,
-        'status_pos_edicao' => $isAjusteOuReprovado ? 'PENDENTE' : $statusAtual
-    ]);
+    if ($isAjusteOuReprovado) {
+        registrarAuditoria($conexao, 'ALUNOS', 'REENVIAR', 'alunos', $id_aluno, [
+            'nome' => $nome,
+            'ra' => $ra,
+            'status_anterior' => $statusAtual,
+            'status_pos_edicao' => 'PENDENTE'
+        ]);
+    } else {
+        registrarAuditoria($conexao, 'ALUNOS', 'EDITAR', 'alunos', $id_aluno, [
+            'nome' => $nome,
+            'ra' => $ra,
+            'status_pos_edicao' => $statusAtual
+        ]);
+    }
 
     if ($isAjusteOuReprovado) {
         header("Location: ../../views/alunos/pendentes.php?msg=reenviado&aba=analise");

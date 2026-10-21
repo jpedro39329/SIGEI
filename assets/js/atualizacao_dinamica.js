@@ -155,7 +155,7 @@
             }
 
             // 4. Tela de Análise ou Visualização de Aluno (views/solicitacoes/analisar.php e views/alunos/visualizar.php)
-            if (document.body.classList.contains('page-solicitacao-analisar') || document.body.classList.contains('page-aluno-visualizar')) {
+            if (document.body.classList.contains('page-solicitacao-analisar') || document.body.classList.contains('page-alunos-visualizar') || document.body.classList.contains('page-aluno-visualizar')) {
                 const gridAtual = document.querySelector('.content .row.g-4');
                 const gridNovo = docNovo.querySelector('.content .row.g-4');
                 if (gridAtual && gridNovo && gridAtual.innerHTML !== gridNovo.innerHTML) {

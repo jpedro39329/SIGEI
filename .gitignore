@@ -21,3 +21,5 @@ Desktop.ini
 node_modules/
 vendor/
 
+.graphify/
+.venv/

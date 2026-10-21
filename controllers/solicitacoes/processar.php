@@ -79,6 +79,22 @@ if (isset($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {
 $deliberadorNome = $_SESSION['user_name'] ?? 'Educação Especial';
 $deliberadorCpf = preg_replace('/\D/', '', $_SESSION['user_cpf'] ?? '');
 
+if ($deliberadorCpf === '' && !empty($_SESSION['user_id'])) {
+    $uidDelib = (int) $_SESSION['user_id'];
+    $perfDelib = $_SESSION['user_perfil'] ?? '';
+    if ($perfDelib === 'ADMIN') {
+        $qD = $conexao->query("SELECT cpf FROM admin WHERE id_admin = $uidDelib LIMIT 1");
+    } elseif ($perfDelib === 'SEDUC') {
+        $qD = $conexao->query("SELECT cpf FROM seduc WHERE id_seduc = $uidDelib LIMIT 1");
+    } else {
+        $qD = $conexao->query("SELECT cpf FROM usuarios_ure WHERE id_usuario_ure = $uidDelib LIMIT 1");
+    }
+    if (!empty($qD) && ($rD = $qD->fetch_assoc())) {
+        $deliberadorCpf = preg_replace('/\D/', '', $rD['cpf'] ?? '');
+        $_SESSION['user_cpf'] = $deliberadorCpf;
+    }
+}
+
 $stmt = $conexao->prepare(
     "UPDATE alunos SET status_aprovacao = ?, motivo_reprovacao = ?, deliberado_por_nome = ?, deliberado_por_cpf = ?, data_deliberacao = NOW() WHERE id_aluno = ?"
 );
