@@ -239,7 +239,7 @@ unset($_SESSION['recuperacao_msg_erro']);
     }
   </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=<?php echo @filemtime(__DIR__ . '/../../assets/css/style.css') ?: '1'; ?>">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body>
@@ -318,6 +318,6 @@ unset($_SESSION['recuperacao_msg_erro']);
 
   </section>
 
-  <script src="../../assets/js/acessibilidade.js?v=2"></script>
+  <script src="../../assets/js/acessibilidade.js?v=<?php echo @filemtime(__DIR__ . '/../../assets/js/acessibilidade.js') ?: '1'; ?>"></script>
 </body>
 </html>

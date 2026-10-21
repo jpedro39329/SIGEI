@@ -148,7 +148,7 @@ if ($perfil !== '') {
   <title>SIGEI — Acesso Rápido de Desenvolvimento</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="../../assets/css/style.css?v=2">
+  <link rel="stylesheet" href="<?php echo assetUrl('assets/css/style.css', '../../'); ?>">
   <style>
     /* ===== RESET E BASE ===== */
     * { box-sizing: border-box; }
@@ -537,7 +537,7 @@ if ($perfil !== '') {
 
   </section>
 
-  <script src="../../assets/js/acessibilidade.js?v=2"></script>
+  <script src="<?php echo assetUrl('assets/js/acessibilidade.js', '../../'); ?>"></script>
 </body>
 </html>
 

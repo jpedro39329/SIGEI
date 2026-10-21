@@ -829,4 +829,16 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
     return $notificacoes;
 }
 
+/**
+ * Retorna a URL de um arquivo estático local (CSS/JS) com versionamento automático baseado em filemtime().
+ * Garante que alterações nos arquivos atualizem automaticamente a URL para invalidar o cache do navegador.
+ */
+function assetUrl($caminhoRelativo, $prefixoUrl = '') {
+    $caminhoRelativoLimpo = preg_replace('/\?.*$/', '', ltrim(str_replace('\\', '/', $caminhoRelativo), './'));
+    $caminhoFisico = dirname(__DIR__) . '/' . $caminhoRelativoLimpo;
+    $versao = is_file($caminhoFisico) ? @filemtime($caminhoFisico) : false;
+    $url = $prefixoUrl . $caminhoRelativoLimpo;
+    return $versao ? ($url . '?v=' . $versao) : $url;
+}
+
 ?>

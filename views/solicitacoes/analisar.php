@@ -61,7 +61,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analisar Solicitação — <?php echo htmlspecialchars($aluno['nome']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo assetUrl('assets/css/style.css', '../../'); ?>">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body class="page-solicitacao-analisar">
