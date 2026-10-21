@@ -23,6 +23,21 @@ if ($nome === '' || $cpf === '' || $idEmpresa <= 0 || $senha === '') {
     exit();
 }
 
+if (!validarCPF($cpf, true)) {
+    header("Location: ../../views/supervisores/cadastrar.php?erro=" . urlencode("CPF inválido. Informe 11 dígitos numéricos válidos."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/supervisores/cadastrar.php?erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/supervisores/cadastrar.php?erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
 if ($senha !== $confirmarSenha) {
     header("Location: ../../views/supervisores/cadastrar.php?erro=" . urlencode("As senhas digitadas não conferem."));
     exit();

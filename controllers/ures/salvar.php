@@ -25,6 +25,21 @@ if ($uge === '') {
     exit();
 }
 
+if (!validarCampoNumerico($uge, true, 1, 20)) {
+    header("Location: ../../views/ures/cadastrar.php?erro=" . urlencode("O código UGE deve conter apenas números."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/ures/cadastrar.php?erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/ures/cadastrar.php?erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
 $stmt = $conexao->prepare(
     "INSERT INTO unidades_regionais (nome, uge, endereco, telefone, email) VALUES (?, ?, ?, ?, ?)"
 );

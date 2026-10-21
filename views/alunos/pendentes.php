@@ -114,42 +114,44 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
         <div class="card-body p-3">
             <form method="GET" action="pendentes.php" id="formFiltroPendentes">
                 <input type="hidden" name="aba" id="inputAbaAtiva" value="<?php echo htmlspecialchars($abaAtiva); ?>">
-                <div class="row g-2 align-items-center">
-                    <!-- 1. Campo para digitar -->
-                    <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
-                    </div>
+                <?php $filtrosAvancadosAtivos = ($campoFiltro !== '0' || $tipoFiltro !== '1'); ?>
+                <div class="sigei-search-bar">
+                    <input type="text" name="busca" class="form-control sigei-search-input" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                    <button type="button" class="btn sigei-search-btn sigei-search-btn-filter" data-bs-toggle="collapse" data-bs-target="#filtrosAvancadosPendentes" aria-expanded="<?php echo $filtrosAvancadosAtivos ? 'true' : 'false'; ?>" aria-controls="filtrosAvancadosPendentes" title="Filtros avançados">
+                        <i class="bi bi-sliders"></i>
+                    </button>
+                    <button type="submit" class="btn sigei-search-btn sigei-search-btn-submit" title="Pesquisar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
 
-                    <!-- 2. Tipo (Contém / Igual a) -->
-                    <div class="col-md-2 col-sm-6 col-12">
-                        <div class="form-group" id="tpFiltro">
-                            <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
-                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
-                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
-                            </select>
+                <div class="collapse sigei-search-advanced <?php echo $filtrosAvancadosAtivos ? 'show' : ''; ?>" id="filtrosAvancadosPendentes">
+                    <div class="row g-2 align-items-center pt-2 mt-1">
+                        <div class="col-md-4 col-sm-6 col-12">
+                            <div class="form-group" id="tpFiltro">
+                                <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
+                                    <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                                    <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 3. Campo de filtro -->
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="form-group">
-                            <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
-                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
-                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
-                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>RA</option>
-                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>CPF</option>
-                                <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Deficiência</option>
-                            </select>
+                        <div class="col-md-6 col-sm-6 col-12">
+                            <div class="form-group">
+                                <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
+                                    <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                                    <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
+                                    <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>RA</option>
+                                    <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>CPF</option>
+                                    <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Deficiência</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 4. Botões de ação -->
-                    <div class="col-md-2 col-12 d-flex gap-2">
-                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
-                            Filtrar
-                        </button>
                         <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
-                            <a href="pendentes.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
+                            <div class="col-md-2 col-12">
+                                <a href="pendentes.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm w-100" title="Limpar filtros">Limpar</a>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

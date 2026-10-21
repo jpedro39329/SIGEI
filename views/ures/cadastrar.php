@@ -44,7 +44,7 @@ $userPerfil = $_SESSION['user_perfil'];
 
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Código UGE <span class="text-danger">*</span></label>
-                                <input type="text" name="uge" class="form-control font-monospace" maxlength="20" placeholder="Ex.: 081240" required>
+                                <input type="text" name="uge" class="form-control font-monospace" maxlength="20" inputmode="numeric" pattern="\d+" placeholder="Ex.: 081240" required>
                             </div>
 
                             <div class="col-md-12 mb-3">

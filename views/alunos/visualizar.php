@@ -336,13 +336,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                         <!-- Termo de Responsabilidade Obrigatório -->
                         <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                             <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <strong class="text-dark small">Termo de Responsabilidade</strong>
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill py-0 px-2" style="font-size: 0.72rem;">Obrigatório</span>
-                                    </div>
-                                    <span class="text-muted d-block" style="font-size: 0.78rem;">Documento anexado pela escola</span>
-                                </div>
+                                <span class="text-dark small fw-semibold"><?php echo htmlspecialchars(basename($aluno['termo_responsabilidade_arquivo'])); ?></span>
                                 <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade — <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')">
                                     Visualizar
                                 </button>
@@ -353,17 +347,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                         <?php if (count($laudos) > 0): ?>
                             <?php foreach ($laudos as $laudo): ?>
                                 <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <strong class="text-dark small"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?: 'Documento Anexo'); ?></strong>
-                                            <span class="badge bg-light text-secondary border rounded-pill py-0 px-2" style="font-size: 0.72rem;">
-                                                <?php echo ($laudo['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento' : 'Laudo Médico'; ?>
-                                            </span>
-                                        </div>
-                                        <?php if (!empty($laudo['data_envio'])): ?>
-                                            <span class="text-muted d-block" style="font-size: 0.78rem;">Enviado em <?php echo date('d/m/Y \à\s H:i', strtotime($laudo['data_envio'])); ?></span>
-                                        <?php endif; ?>
-                                    </div>
+                                    <span class="text-dark small fw-semibold"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?: basename($laudo['caminho_arquivo'] ?? 'Documento')); ?></span>
                                     <div class="d-inline-flex gap-2 align-items-center">
                                         <?php if (!empty($laudo['caminho_arquivo'])): ?>
                                             <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?: 'Documento')); ?>')">

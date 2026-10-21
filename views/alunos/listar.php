@@ -191,44 +191,50 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
         <div class="card-body p-3">
             <form method="GET" action="listar.php">
                 <input type="hidden" name="aba" value="<?php echo htmlspecialchars($abaAtiva); ?>">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
-                    </div>
+                <?php $filtrosAvancadosAtivos = ($campoFiltro !== '0' || $tipoFiltro !== '1'); ?>
+                <div class="sigei-search-bar">
+                    <input type="text" name="busca" class="form-control sigei-search-input" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                    <button type="button" class="btn sigei-search-btn sigei-search-btn-filter" data-bs-toggle="collapse" data-bs-target="#filtrosAvancadosAlunos" aria-expanded="<?php echo $filtrosAvancadosAtivos ? 'true' : 'false'; ?>" aria-controls="filtrosAvancadosAlunos" title="Filtros avançados">
+                        <i class="bi bi-sliders"></i>
+                    </button>
+                    <button type="submit" class="btn sigei-search-btn sigei-search-btn-submit" title="Pesquisar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
 
-                    <div class="col-md-2 col-sm-6 col-12">
-                        <div class="form-group" id="tpFiltro">
-                            <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
-                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
-                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
-                            </select>
+                <div class="collapse sigei-search-advanced <?php echo $filtrosAvancadosAtivos ? 'show' : ''; ?>" id="filtrosAvancadosAlunos">
+                    <div class="row g-2 align-items-center pt-2 mt-1">
+                        <div class="col-md-4 col-sm-6 col-12">
+                            <div class="form-group" id="tpFiltro">
+                                <select class="form-select form-select-sm cbTpFiltros" id="cbTpFiltros" name="tp_filtro">
+                                    <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                                    <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <div class="form-group">
-                            <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
-                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
-                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
-                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>RA</option>
-                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>CPF</option>
-                                <?php if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
-                                    <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Escola</option>
-                                <?php endif; ?>
-                                <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Deficiência</option>
-                                <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
-                                    <option value="6" <?php echo $campoFiltro === '6' ? 'selected' : ''; ?>>Status</option>
-                                <?php endif; ?>
-                            </select>
+                        <div class="col-md-6 col-sm-6 col-12">
+                            <div class="form-group">
+                                <select class="form-select form-select-sm cbFiltros" id="cbFiltros" name="campo_filtro">
+                                    <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                                    <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Nome</option>
+                                    <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>RA</option>
+                                    <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>CPF</option>
+                                    <?php if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
+                                        <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Escola</option>
+                                    <?php endif; ?>
+                                    <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Deficiência</option>
+                                    <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
+                                        <option value="6" <?php echo $campoFiltro === '6' ? 'selected' : ''; ?>>Status</option>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-2 col-12 d-flex gap-2">
-                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
-                            Filtrar
-                        </button>
                         <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
-                            <a href="listar.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
+                            <div class="col-md-2 col-12">
+                                <a href="listar.php?aba=<?php echo htmlspecialchars($abaAtiva); ?>" class="btn btn-outline-secondary btn-sm w-100" title="Limpar filtros">Limpar</a>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -273,12 +279,12 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                             <th>RA</th>
                             <th>CPF</th>
                             <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
-                                <th>Escola</th>
+                                <th>Unidade Escolar</th>
                             <?php endif; ?>
                             <th>Deficiência</th>
                             <?php if ($abaAtiva === 'arquivados'): ?>
-                                <th>Data Inativação</th>
-                                <th>Inativado Por (CPF)</th>
+                                <th>Inativação</th>
+                                <th>Inativado Por</th>
                                 <th>Motivo</th>
                             <?php else: ?>
                                 <th>Status</th>
@@ -522,63 +528,59 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Modal Arquivar
-    const modalArquivarEl = document.getElementById('modalArquivarAluno');
-    if (modalArquivarEl) {
-        const modalArquivar = new bootstrap.Modal(modalArquivarEl);
-        const inputId = document.getElementById('arquivar_id_aluno');
-        const spanNome = document.getElementById('arquivar_nome_aluno');
-        const txtMotivo = document.getElementById('motivo_arquivamento');
-
-        document.querySelectorAll('.btn-abrir-arquivamento').forEach(btn => {
-            btn.addEventListener('click', function () {
-                inputId.value = this.getAttribute('data-id');
-                spanNome.textContent = this.getAttribute('data-nome');
+    // Delegação de eventos para funcionar também após atualizações dinâmicas da tabela
+    document.addEventListener('click', function (e) {
+        const btnArquivar = e.target.closest('.btn-abrir-arquivamento');
+        if (btnArquivar) {
+            const modalArquivarEl = document.getElementById('modalArquivarAluno');
+            if (modalArquivarEl) {
+                const modalArquivar = bootstrap.Modal.getOrCreateInstance(modalArquivarEl);
+                const inputId = document.getElementById('arquivar_id_aluno');
+                const spanNome = document.getElementById('arquivar_nome_aluno');
+                const txtMotivo = document.getElementById('motivo_arquivamento');
+                if (inputId) inputId.value = btnArquivar.getAttribute('data-id');
+                if (spanNome) spanNome.textContent = btnArquivar.getAttribute('data-nome');
                 if (txtMotivo) txtMotivo.value = '';
                 modalArquivar.show();
-            });
-        });
-    }
+            }
+            return;
+        }
 
-    // Modal Reativar
-    const modalReativarEl = document.getElementById('modalReativarAluno');
-    if (modalReativarEl) {
-        const modalReativar = new bootstrap.Modal(modalReativarEl);
-        const inputReativarId = document.getElementById('reativar_id_aluno');
-        const spanReativarNome = document.getElementById('reativar_nome_aluno');
-
-        document.querySelectorAll('.btn-abrir-reativacao').forEach(btn => {
-            btn.addEventListener('click', function () {
-                inputReativarId.value = this.getAttribute('data-id');
-                spanReativarNome.textContent = this.getAttribute('data-nome');
+        const btnReativar = e.target.closest('.btn-abrir-reativacao');
+        if (btnReativar) {
+            const modalReativarEl = document.getElementById('modalReativarAluno');
+            if (modalReativarEl) {
+                const modalReativar = bootstrap.Modal.getOrCreateInstance(modalReativarEl);
+                const inputReativarId = document.getElementById('reativar_id_aluno');
+                const spanReativarNome = document.getElementById('reativar_nome_aluno');
+                if (inputReativarId) inputReativarId.value = btnReativar.getAttribute('data-id');
+                if (spanReativarNome) spanReativarNome.textContent = btnReativar.getAttribute('data-nome');
                 modalReativar.show();
-            });
-        });
-    }
+            }
+            return;
+        }
 
-    // Modal Detalhes da Inativação (Card Clean)
-    const modalDetalhesEl = document.getElementById('modalDetalhesInativacao');
-    if (modalDetalhesEl) {
-        const modalDetalhes = new bootstrap.Modal(modalDetalhesEl);
-        const elAluno = document.getElementById('detalhe_aluno_nome');
-        const elNome = document.getElementById('detalhe_resp_nome');
-        const elCpf = document.getElementById('detalhe_resp_cpf');
-        const elPerfil = document.getElementById('detalhe_resp_perfil');
-        const elData = document.getElementById('detalhe_data');
-        const elMotivo = document.getElementById('detalhe_motivo');
-
-        document.querySelectorAll('.btn-detalhes-inativacao').forEach(btn => {
-            btn.addEventListener('click', function () {
-                elAluno.textContent = this.getAttribute('data-nome-aluno');
-                elNome.textContent = this.getAttribute('data-resp-nome');
-                elCpf.textContent = this.getAttribute('data-resp-cpf');
-                elPerfil.textContent = this.getAttribute('data-resp-perfil');
-                elData.textContent = this.getAttribute('data-data');
-                elMotivo.textContent = this.getAttribute('data-motivo');
+        const btnDetalhes = e.target.closest('.btn-detalhes-inativacao');
+        if (btnDetalhes) {
+            const modalDetalhesEl = document.getElementById('modalDetalhesInativacao');
+            if (modalDetalhesEl) {
+                const modalDetalhes = bootstrap.Modal.getOrCreateInstance(modalDetalhesEl);
+                const elAluno = document.getElementById('detalhe_aluno_nome');
+                const elNome = document.getElementById('detalhe_resp_nome');
+                const elCpf = document.getElementById('detalhe_resp_cpf');
+                const elPerfil = document.getElementById('detalhe_resp_perfil');
+                const elData = document.getElementById('detalhe_data');
+                const elMotivo = document.getElementById('detalhe_motivo');
+                if (elAluno) elAluno.textContent = btnDetalhes.getAttribute('data-nome-aluno');
+                if (elNome) elNome.textContent = btnDetalhes.getAttribute('data-resp-nome');
+                if (elCpf) elCpf.textContent = btnDetalhes.getAttribute('data-resp-cpf');
+                if (elPerfil) elPerfil.textContent = btnDetalhes.getAttribute('data-resp-perfil');
+                if (elData) elData.textContent = btnDetalhes.getAttribute('data-data');
+                if (elMotivo) elMotivo.textContent = btnDetalhes.getAttribute('data-motivo');
                 modalDetalhes.show();
-            });
-        });
-    }
+            }
+        }
+    });
 });
 </script>
 

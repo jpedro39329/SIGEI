@@ -34,8 +34,33 @@ $cep = preg_replace('/\D/', '', $_POST['cep'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $email = trim($_POST['email'] ?? '');
 
-if ($nome === '' || $cie === '' || $idUre <= 0 || !in_array($modalidade, array('PEI', 'REGULAR'))) {
+if ($nome === '' || $cie === '' || $idUre <= 0) {
     header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("Preencha o nome, o CIE, a modalidade e a URE da escola."));
+    exit();
+}
+
+if (!validarCampoNumerico($cie, true, 1, 10)) {
+    header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("O código CIE deve conter apenas números (até 10 dígitos)."));
+    exit();
+}
+
+if ($ua !== '' && !validarCampoNumerico($ua, false, 1, 20)) {
+    header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("O código UA deve conter apenas números."));
+    exit();
+}
+
+if ($cep !== '' && !validarCEP($cep, false)) {
+    header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("CEP inválido. Informe 8 dígitos numéricos."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/escolas/cadastrar.php?erro=" . urlencode("Endereço de e-mail inválido."));
     exit();
 }
 

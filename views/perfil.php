@@ -87,6 +87,20 @@ if ($tabela === 'usuarios_ure') {
 }
 
 $homePage = 'dashboard.php';
+
+// Consulta informações de aceite do Termo de Uso (somente leitura)
+$dadosAceiteTermo = null;
+$stmtTermo = $conexao->prepare("SELECT data_aceite FROM termos_aceite WHERE id_usuario = ? AND perfil = ? ORDER BY data_aceite DESC LIMIT 1");
+if ($stmtTermo) {
+    $idUsuarioInt = (int) $userId;
+    $stmtTermo->bind_param("is", $idUsuarioInt, $userPerfil);
+    $stmtTermo->execute();
+    $resTermo = $stmtTermo->get_result();
+    if ($resTermo && $resTermo->num_rows > 0) {
+        $dadosAceiteTermo = $resTermo->fetch_assoc();
+    }
+    $stmtTermo->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -95,6 +109,7 @@ $homePage = 'dashboard.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil - SIGEI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="icon" type="image/png" href="../assets/imgs/favicon.png">
 </head>
@@ -149,6 +164,17 @@ $homePage = 'dashboard.php';
                             <span><?php echo htmlspecialchars(formatarTelefone($usuario['telefone'] ?? '') ?: 'Não informado'); ?></span>
                         </li>
                     </ul>
+
+                    <div class="mt-4 pt-3 border-top d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                        <div>
+                            <strong class="text-dark d-block">LGPD - Termos de Uso e Privacidade</strong>
+                            
+                               
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="window.exibirModalTermosConsulta && window.exibirModalTermosConsulta()">
+                            Consultar Termo Completo
+                        </button>
+                    </div>
 
                     <div class="d-flex gap-2 mt-4">
                         <a href="<?php echo $homePage; ?>" class="btn btn-secondary flex-grow-1">Voltar ao Painel</a>

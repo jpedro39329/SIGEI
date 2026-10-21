@@ -188,6 +188,128 @@ function formatarTelefone($tel) {
     return $tel;
 }
 
+// ============================================================
+// FUNÇÕES CENTRALIZADAS DE VALIDAÇÃO DE CAMPOS (BACK-END)
+// ============================================================
+
+/**
+ * Valida formato e consistência de CPF (11 dígitos numéricos, não todos iguais).
+ */
+function validarCPF($cpf, $obrigatorio = true) {
+    $limpo = preg_replace('/\D/', '', (string) $cpf);
+    if ($limpo === '') {
+        return !$obrigatorio;
+    }
+    if (strlen($limpo) !== 11) {
+        return false;
+    }
+    if (preg_match('/^(\d)\1{10}$/', $limpo)) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Valida formato e consistência de CNPJ (14 dígitos numéricos, não todos iguais).
+ */
+function validarCNPJ($cnpj, $obrigatorio = true) {
+    $limpo = preg_replace('/\D/', '', (string) $cnpj);
+    if ($limpo === '') {
+        return !$obrigatorio;
+    }
+    if (strlen($limpo) !== 14) {
+        return false;
+    }
+    if (preg_match('/^(\d)\1{13}$/', $limpo)) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Valida telefone (10 ou 11 dígitos numéricos com DDD).
+ */
+function validarTelefone($telefone, $obrigatorio = false) {
+    $limpo = preg_replace('/\D/', '', (string) $telefone);
+    if ($limpo === '') {
+        return !$obrigatorio;
+    }
+    $len = strlen($limpo);
+    if ($len < 10 || $len > 11) {
+        return false;
+    }
+    if (preg_match('/^(\d)\1+$/', $limpo)) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Valida CEP (8 dígitos numéricos).
+ */
+function validarCEP($cep, $obrigatorio = false) {
+    $limpo = preg_replace('/\D/', '', (string) $cep);
+    if ($limpo === '') {
+        return !$obrigatorio;
+    }
+    if (strlen($limpo) !== 8 || preg_match('/^(\d)\1{7}$/', $limpo)) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Valida endereço de e-mail e limite de tamanho.
+ */
+function validarEmail($email, $obrigatorio = false, $maxLen = 150) {
+    $email = trim((string) $email);
+    if ($email === '') {
+        return !$obrigatorio;
+    }
+    if (mb_strlen($email, 'UTF-8') > $maxLen) {
+        return false;
+    }
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+}
+
+/**
+ * Valida data no formato YYYY-MM-DD, verificando se existe no calendário e limites opcionais.
+ */
+function validarDataISO($data, $obrigatorio = false, $naoFutura = false, $anoMinimo = 1900) {
+    $data = trim((string) $data);
+    if ($data === '') {
+        return !$obrigatorio;
+    }
+    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $data, $m)) {
+        return false;
+    }
+    $ano = (int) $m[1];
+    $mes = (int) $m[2];
+    $dia = (int) $m[3];
+    if ($ano < $anoMinimo || $ano > 2100 || !checkdate($mes, $dia, $ano)) {
+        return false;
+    }
+    if ($naoFutura && $data > date('Y-m-d')) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Valida campo estritamente numérico com limites de quantidade de dígitos.
+ */
+function validarCampoNumerico($valor, $obrigatorio = false, $minDigitos = 1, $maxDigitos = 20) {
+    $valor = trim((string) $valor);
+    if ($valor === '') {
+        return !$obrigatorio;
+    }
+    if (!preg_match('/^\d+$/', $valor)) {
+        return false;
+    }
+    $len = strlen($valor);
+    return ($len >= $minDigitos && $len <= $maxDigitos);
+}
+
 // Retorna o nome amigável do perfil
 function nomePerfil($perfil) {
     $nomes = array(

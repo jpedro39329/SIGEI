@@ -215,39 +215,43 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="listar.php">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-5 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" maxlength="150" placeholder="Pesquisar por texto, aluno, descrição..." value="<?php echo htmlspecialchars($busca); ?>">
-                    </div>
+                <?php $filtrosAvancadosAtivos = ($campoFiltro !== '0' || $tipoFiltro !== '1'); ?>
+                <div class="sigei-search-bar">
+                    <input type="text" name="busca" class="form-control sigei-search-input" maxlength="150" placeholder="Pesquisar por texto, aluno, descrição..." value="<?php echo htmlspecialchars($busca); ?>">
+                    <button type="button" class="btn sigei-search-btn sigei-search-btn-filter" data-bs-toggle="collapse" data-bs-target="#filtrosAvancadosRelatorios" aria-expanded="<?php echo $filtrosAvancadosAtivos ? 'true' : 'false'; ?>" aria-controls="filtrosAvancadosRelatorios" title="Filtros avançados">
+                        <i class="bi bi-sliders"></i>
+                    </button>
+                    <button type="submit" class="btn sigei-search-btn sigei-search-btn-submit" title="Pesquisar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
 
-                    <div class="col-md-2 col-6">
-                        <select class="form-select form-select-sm" name="tp_filtro">
-                            <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
-                            <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-3 col-6">
-                        <select class="form-select form-select-sm" name="campo_filtro">
-                            <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
-                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Aluno</option>
-                            <?php if ($userPerfil !== 'PAE'): ?>
-                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>PAE</option>
-                            <?php endif; ?>
-                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Tipo (Diário/Mensal)</option>
-                            <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Descrição</option>
-                            <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'PAE'])): ?>
-                                <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Empresa</option>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 col-12 d-flex gap-2">
-                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit">
-                            Filtrar
-                        </button>
+                <div class="collapse sigei-search-advanced <?php echo $filtrosAvancadosAtivos ? 'show' : ''; ?>" id="filtrosAvancadosRelatorios">
+                    <div class="row g-2 align-items-center pt-2 mt-1">
+                        <div class="col-md-4 col-6">
+                            <select class="form-select form-select-sm" name="tp_filtro">
+                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-6">
+                            <select class="form-select form-select-sm" name="campo_filtro">
+                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Aluno</option>
+                                <?php if ($userPerfil !== 'PAE'): ?>
+                                    <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>PAE</option>
+                                <?php endif; ?>
+                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Tipo (Diário/Mensal)</option>
+                                <option value="4" <?php echo $campoFiltro === '4' ? 'selected' : ''; ?>>Descrição</option>
+                                <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'PAE'])): ?>
+                                    <option value="5" <?php echo $campoFiltro === '5' ? 'selected' : ''; ?>>Empresa</option>
+                                <?php endif; ?>
+                            </select>
+                        </div>
                         <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
-                            <a href="listar.php" class="btn btn-outline-secondary btn-sm">Limpar</a>
+                            <div class="col-md-2 col-12">
+                                <a href="listar.php" class="btn btn-outline-secondary btn-sm w-100" title="Limpar filtros">Limpar</a>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

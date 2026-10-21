@@ -50,6 +50,16 @@ if ($nome === '' || $idUe <= 0) {
     exit();
 }
 
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/usuarios_ue/editar.php?id=$idUsuarioUe&erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/usuarios_ue/editar.php?id=$idUsuarioUe&erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
 if ($senha !== '') {
     if ($senha !== $confirmarSenha) {
         header("Location: ../../views/usuarios_ue/editar.php?id=$idUsuarioUe&erro=" . urlencode("As senhas não coincidem."));

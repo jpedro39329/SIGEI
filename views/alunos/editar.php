@@ -167,6 +167,8 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                     type="date"
                                     name="data_nascimento"
                                     class="form-control"
+                                    min="1900-01-01"
+                                    max="<?php echo date('Y-m-d'); ?>"
                                     value="<?php echo htmlspecialchars($aluno['data_nascimento'] ?? ''); ?>"
                                     required
                                 >
@@ -345,9 +347,10 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Termo de Responsabilidade</label>
                                 <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
-                                    <div class="mb-2">
+                                    <div class="mb-2 d-flex justify-content-between align-items-center p-2 border rounded bg-light">
+                                        <span class="small fw-semibold"><?php echo htmlspecialchars(basename($aluno['termo_responsabilidade_arquivo'])); ?></span>
                                         <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
-                                            📄 Ver termo atual
+                                            Visualizar
                                         </button>
                                     </div>
                                 <?php endif; ?>
@@ -366,16 +369,10 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                             <?php if (count($laudos) > 0): ?>
                                 <div class="col-12 mb-3">
                                     <label class="form-label fw-semibold">Arquivos e Laudos Anexados</label>
-                                    <div class="list-group list-group-flush border rounded-3 p-2 bg-light">
+                                    <div class="d-flex flex-column gap-2">
                                         <?php foreach ($laudos as $l): ?>
-                                            <div class="list-group-item d-flex justify-content-between align-items-center bg-white rounded-2 mb-1 border">
-                                                <div>
-                                                    <span class="badge <?php echo ($l['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'bg-secondary' : 'bg-primary'; ?> me-1">
-                                                        <?php echo ($l['tipo'] ?? 'LAUDO') === 'DOCUMENTO' ? 'Documento Geral' : 'Laudo Médico'; ?>
-                                                    </span>
-                                                    <span class="fw-semibold"><?php echo htmlspecialchars($l['nome_arquivo'] ?? 'Documento'); ?></span>
-                                                    <small class="text-muted d-block"><?php echo date('d/m/Y H:i', strtotime($l['data_envio'])); ?> <?php echo !empty($l['descricao']) ? '— ' . htmlspecialchars($l['descricao']) : ''; ?></small>
-                                                </div>
+                                            <div class="d-flex justify-content-between align-items-center p-2 px-3 bg-light rounded border">
+                                                <span class="small fw-semibold"><?php echo htmlspecialchars($l['nome_arquivo'] ?? basename($l['caminho_arquivo'] ?? 'Documento')); ?></span>
                                                 <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($l['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($l['nome_arquivo'] ?? 'Documento')); ?>')" class="btn btn-sm btn-outline-primary">
                                                     Visualizar
                                                 </button>

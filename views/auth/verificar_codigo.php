@@ -253,6 +253,8 @@ $codigoTeste = $_SESSION['recuperacao_codigo_teste'] ?? '';
       }
     }
   </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=2">
     <link rel="icon" type="image/png" href="../../assets/imgs/favicon.png">
 </head>
 <body>
@@ -342,5 +344,6 @@ $codigoTeste = $_SESSION['recuperacao_codigo_teste'] ?? '';
 
   </section>
 
+  <script src="../../assets/js/acessibilidade.js?v=2"></script>
 </body>
 </html>

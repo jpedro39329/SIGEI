@@ -13,6 +13,10 @@ if ($id_aluno <= 0 || !in_array($tipo, array('DIARIO', 'MENSAL')) || $descricao 
     die("Dados do relatório inválidos.");
 }
 
+if (mb_strlen($descricao, 'UTF-8') > 5000) {
+    die("A descrição do relatório excede o limite de 5000 caracteres.");
+}
+
 // Verifica se o aluno está associado a este PAE
 $stmtVerifica = $conexao->prepare(
     "SELECT id_associacao FROM associacoes

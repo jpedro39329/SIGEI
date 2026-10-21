@@ -53,6 +53,41 @@ if ($nome === '' || $cnpj === '') {
     exit();
 }
 
+if (!validarCNPJ($cnpj, true)) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("CNPJ inválido. Informe os 14 dígitos numéricos válidos."));
+    exit();
+}
+
+if ($cep !== '' && !validarCEP($cep, false)) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("CEP inválido. Informe os 8 dígitos numéricos."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($dataInicio !== null && !validarDataISO($dataInicio, false, false, 1990)) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Data de início do contrato inválida."));
+    exit();
+}
+
+if ($dataFim !== null && !validarDataISO($dataFim, false, false, 1990)) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("Data de término do contrato inválida."));
+    exit();
+}
+
+if ($dataInicio !== null && $dataFim !== null && $dataFim < $dataInicio) {
+    header("Location: ../../views/empresas/editar.php?id=$id_empresa&erro=" . urlencode("A data de fim do contrato deve ser igual ou posterior à data de início."));
+    exit();
+}
+
 // Verifica duplicidade de CNPJ em outras empresas
 $stmtVerifica = $conexao->prepare("SELECT id_empresa FROM empresas WHERE cnpj = ? AND id_empresa != ?");
 $stmtVerifica->bind_param("si", $cnpj, $id_empresa);

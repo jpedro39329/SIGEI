@@ -59,7 +59,7 @@ if (!$ure) {
                             
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Código UGE <span class="text-danger">*</span></label>
-                                <input type="text" name="uge" class="form-control" value="<?php echo htmlspecialchars($ure['uge'] ?? ''); ?>" maxlength="20" required>
+                                <input type="text" name="uge" class="form-control font-monospace" value="<?php echo htmlspecialchars($ure['uge'] ?? ''); ?>" maxlength="20" inputmode="numeric" pattern="\d+" required>
                             </div>
 
                             <div class="col-md-12 mb-3">

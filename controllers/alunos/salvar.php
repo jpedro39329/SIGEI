@@ -32,8 +32,29 @@ if ($nome === '' || $cpf === '' || $dataNascimento === '' || $deficiencia === ''
     die("Preencha os campos obrigatórios do aluno.");
 }
 
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dataNascimento)) {
-    die("Data de nascimento inválida.");
+if (mb_strlen($nome, 'UTF-8') > 150) {
+    die("O nome do aluno deve ter no máximo 150 caracteres.");
+}
+
+if (!validarCPF($cpf, true)) {
+    die("CPF do aluno inválido. Informe 11 dígitos numéricos válidos.");
+}
+
+if (!validarDataISO($dataNascimento, true, true, 1900)) {
+    die("Data de nascimento inválida ou futura.");
+}
+
+if ($cpfResponsavel !== '' && !validarCPF($cpfResponsavel, false)) {
+    die("CPF do responsável inválido. Informe 11 dígitos numéricos válidos.");
+}
+
+if ($ra !== '' && mb_strlen($ra, 'UTF-8') > 30) {
+    die("O RA deve ter no máximo 30 caracteres.");
+}
+
+$turnosPermitidos = ['MANHÃ', 'TARDE', 'NOITE', 'INTEGRAL', ''];
+if (!in_array($turnoAula, $turnosPermitidos, true)) {
+    die("Turno de aula inválido.");
 }
 
 // Upload da foto (opcional)

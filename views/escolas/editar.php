@@ -84,12 +84,12 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Código CIE <span class="text-danger">*</span></label>
-                                <input type="text" name="cie" class="form-control font-monospace" maxlength="10" value="<?php echo htmlspecialchars($escola['cie']); ?>" required>
+                                <input type="text" name="cie" class="form-control font-monospace" maxlength="10" inputmode="numeric" pattern="\d+" value="<?php echo htmlspecialchars($escola['cie']); ?>" required>
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Código UA</label>
-                                <input type="text" name="ua" class="form-control font-monospace" maxlength="20" value="<?php echo htmlspecialchars($escola['ua'] ?? ''); ?>">
+                                <input type="text" name="ua" class="form-control font-monospace" maxlength="20" inputmode="numeric" pattern="\d*" value="<?php echo htmlspecialchars($escola['ua'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-4 mb-3">

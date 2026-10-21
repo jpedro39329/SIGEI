@@ -127,10 +127,10 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
                                 <label class="form-label">Arquivo do Contrato (PDF, JPG ou PNG)</label>
                                 <input type="file" name="contrato_arquivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
                                 <?php if (!empty($empresa['contrato_arquivo'])): ?>
-                                    <div class="mt-2">
-                                        <small class="text-muted">Arquivo atual: </small>
-                                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($empresa['contrato_arquivo'], '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['nome'])); ?>')">
-                                            <i class="bi bi-file-earmark-pdf"></i> Ver Contrato Atual
+                                    <div class="mt-2 d-flex justify-content-between align-items-center p-2 border rounded bg-light">
+                                        <span class="small fw-semibold"><?php echo htmlspecialchars(basename($empresa['contrato_arquivo'])); ?></span>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($empresa['contrato_arquivo'], '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['nome'])); ?>')">
+                                            Visualizar
                                         </button>
                                     </div>
                                 <?php else: ?>

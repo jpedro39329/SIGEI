@@ -107,33 +107,37 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-3">
             <form method="GET" action="gerenciar.php">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-5 col-sm-12 col-12">
-                        <input type="text" name="busca" class="form-control form-control-sm" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
-                    </div>
+                <?php $filtrosAvancadosAtivos = ($campoFiltro !== '0' || $tipoFiltro !== '1'); ?>
+                <div class="sigei-search-bar">
+                    <input type="text" name="busca" class="form-control sigei-search-input" maxlength="150" placeholder="Digite o termo para filtrar..." value="<?php echo htmlspecialchars($busca); ?>">
+                    <button type="button" class="btn sigei-search-btn sigei-search-btn-filter" data-bs-toggle="collapse" data-bs-target="#filtrosAvancadosAssociacoes" aria-expanded="<?php echo $filtrosAvancadosAtivos ? 'true' : 'false'; ?>" aria-controls="filtrosAvancadosAssociacoes" title="Filtros avançados">
+                        <i class="bi bi-sliders"></i>
+                    </button>
+                    <button type="submit" class="btn sigei-search-btn sigei-search-btn-submit" title="Pesquisar">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
 
-                    <div class="col-md-2 col-sm-6 col-12">
-                        <select class="form-select form-select-sm" name="tp_filtro">
-                            <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
-                            <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-3 col-sm-6 col-12">
-                        <select class="form-select form-select-sm" name="campo_filtro">
-                            <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
-                            <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Profissional de Apoio Escolar</option>
-                            <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>Unidade Escolar</option>
-                            <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Alunos</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 col-12 d-flex gap-2">
-                        <button class="btn btn-dark btn-sm flex-grow-1" type="submit" title="Filtrar">
-                            Filtrar
-                        </button>
+                <div class="collapse sigei-search-advanced <?php echo $filtrosAvancadosAtivos ? 'show' : ''; ?>" id="filtrosAvancadosAssociacoes">
+                    <div class="row g-2 align-items-center pt-2 mt-1">
+                        <div class="col-md-4 col-sm-6 col-12">
+                            <select class="form-select form-select-sm" name="tp_filtro">
+                                <option value="1" <?php echo $tipoFiltro === '1' ? 'selected' : ''; ?>>Contém</option>
+                                <option value="0" <?php echo $tipoFiltro === '0' ? 'selected' : ''; ?>>Igual a</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-12">
+                            <select class="form-select form-select-sm" name="campo_filtro">
+                                <option value="0" <?php echo $campoFiltro === '0' ? 'selected' : ''; ?>>Todos os campos...</option>
+                                <option value="1" <?php echo $campoFiltro === '1' ? 'selected' : ''; ?>>Profissional de Apoio Escolar</option>
+                                <option value="2" <?php echo $campoFiltro === '2' ? 'selected' : ''; ?>>Unidade Escolar</option>
+                                <option value="3" <?php echo $campoFiltro === '3' ? 'selected' : ''; ?>>Alunos</option>
+                            </select>
+                        </div>
                         <?php if ($busca !== '' || $campoFiltro !== '0' || $tipoFiltro !== '1'): ?>
-                            <a href="gerenciar.php" class="btn btn-outline-secondary btn-sm" title="Limpar filtros">Limpar</a>
+                            <div class="col-md-2 col-12">
+                                <a href="gerenciar.php" class="btn btn-outline-secondary btn-sm w-100" title="Limpar filtros">Limpar</a>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -178,11 +182,6 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
                                 <td colspan="4" class="text-center text-muted">Nenhuma associação ativa encontrada.</td>
                             </tr>
                         <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
                     </tbody>
                 </table>
             </div>

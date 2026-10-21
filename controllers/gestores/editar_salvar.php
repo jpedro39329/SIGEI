@@ -30,6 +30,21 @@ if ($nome === '' || $cpf === '' || $idUre <= 0) {
     exit();
 }
 
+if (!validarCPF($cpf, true)) {
+    header("Location: ../../views/gestores/editar.php?id=$idDirigente&erro=" . urlencode("CPF inválido. Informe 11 dígitos numéricos válidos."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/gestores/editar.php?id=$idDirigente&erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/gestores/editar.php?id=$idDirigente&erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
 // Verifica se o CPF pertence a outro usuário
 $stmtVerifica = $conexao->prepare("SELECT id_usuario_ure FROM usuarios_ure WHERE cpf = ? AND id_usuario_ure != ?");
 $stmtVerifica->bind_param("si", $cpf, $idDirigente);

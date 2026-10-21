@@ -484,8 +484,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 <?php endif; ?>
 </script>
-<script src="<?php echo $baseUrl; ?>assets/js/termos.js"></script>
-<script src="<?php echo $baseUrl; ?>assets/js/confirmacao.js"></script>
-<script src="<?php echo $baseUrl; ?>assets/js/mascaras.js"></script>
-<script src="<?php echo $baseUrl; ?>assets/js/erros.js"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/acessibilidade.js?v=2"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/termos.js?v=2"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/confirmacao.js?v=2"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/mascaras.js?v=2"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/erros.js?v=2"></script>
+<script src="<?php echo $baseUrl; ?>assets/js/atualizacao_dinamica.js?v=2"></script>
 

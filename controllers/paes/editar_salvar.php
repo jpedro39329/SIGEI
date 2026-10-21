@@ -22,6 +22,14 @@ if ($idPae <= 0 || $nome === '') {
     die("Dados inválidos.");
 }
 
+if ($email !== '' && !validarEmail($email, false)) {
+    die("Endereço de e-mail inválido.");
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    die("Telefone inválido. Informe com DDD (10 ou 11 dígitos).");
+}
+
 if (!in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
     $idEmpresa = idEmpresaSupervisor($conexao, $userId);
     $stmtVerifica = $conexao->prepare("SELECT id_pae FROM usuarios_pae WHERE id_pae = ? AND id_empresa = ?");

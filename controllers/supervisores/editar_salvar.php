@@ -29,6 +29,21 @@ if ($nome === '' || $cpf === '' || $idEmpresa <= 0) {
     exit();
 }
 
+if (!validarCPF($cpf, true)) {
+    header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("CPF inválido. Informe 11 dígitos numéricos válidos."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
 // Verifica se o CPF pertence a outro usuário
 $stmtVerifica = $conexao->prepare("SELECT id_usuario_supervisor FROM usuarios_supervisor WHERE cpf = ? AND id_usuario_supervisor != ?");
 $stmtVerifica->bind_param("si", $cpf, $idSupervisor);

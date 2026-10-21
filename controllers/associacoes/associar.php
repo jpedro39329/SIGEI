@@ -14,6 +14,10 @@ if ($id_aluno <= 0 || $id_pae <= 0) {
     die("Dados inválidos.");
 }
 
+if (!validarDataISO($data_inicio, true, false, 2000)) {
+    die("Data de início da associação inválida.");
+}
+
 // Verifica se o aluno existe e está APROVADO
 $stmtAluno = $conexao->prepare(
     "SELECT a.id_aluno, ue.id_ure FROM alunos a

@@ -72,7 +72,6 @@ $ures = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                     <form action="../../controllers/gestores/editar_salvar.php" method="POST" id="formDirigente">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
                         <input type="hidden" name="id_usuario_ure" value="<?php echo $dirigente['id_usuario_ure']; ?>">
-                        <input type="hidden" name="id_ure" id="id_ure_input" value="<?php echo $dirigente['id_ure']; ?>" required>
 
                         <div class="row">
                             <div class="col-12">

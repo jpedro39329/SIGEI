@@ -22,6 +22,26 @@ if ($nome === '' || $cpf === '' || $idUe <= 0 || $senha === '') {
     exit();
 }
 
+if (!validarCPF($cpf, true)) {
+    header("Location: ../../views/usuarios_ue/cadastrar.php?erro=" . urlencode("CPF inválido. Informe 11 dígitos numéricos válidos."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/usuarios_ue/cadastrar.php?erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/usuarios_ue/cadastrar.php?erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
+if (strlen($senha) < 6) {
+    header("Location: ../../views/usuarios_ue/cadastrar.php?erro=" . urlencode("A senha deve ter pelo menos 6 caracteres."));
+    exit();
+}
+
 if ($senha !== $confirmarSenha) {
     header("Location: ../../views/usuarios_ue/cadastrar.php?erro=" . urlencode("As senhas não coincidem."));
     exit();

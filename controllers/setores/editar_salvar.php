@@ -42,6 +42,21 @@ if ($nome === '' || $cpf === '' || $idUre <= 0 || $setor === '' || $cargo === ''
     exit();
 }
 
+if (!validarCPF($cpf, true)) {
+    header("Location: ../../views/setores/editar.php?id=$idServidor&erro=" . urlencode("CPF inválido. Informe 11 dígitos numéricos válidos."));
+    exit();
+}
+
+if ($email !== '' && !validarEmail($email, false)) {
+    header("Location: ../../views/setores/editar.php?id=$idServidor&erro=" . urlencode("Endereço de e-mail inválido."));
+    exit();
+}
+
+if ($telefone !== '' && !validarTelefone($telefone, false)) {
+    header("Location: ../../views/setores/editar.php?id=$idServidor&erro=" . urlencode("Telefone inválido. Informe com DDD (10 ou 11 dígitos)."));
+    exit();
+}
+
 if (!in_array($setor, ['SEFISC', 'EDU_ESPECIAL', 'ASURE', 'GABINETE'])) {
     header("Location: ../../views/setores/editar.php?id=$idServidor&erro=" . urlencode("Setor inválido."));
     exit();

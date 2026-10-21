@@ -48,7 +48,7 @@ $escolaNome = $_SESSION['escola_nome'] ?? 'Escola vinculada ao usuário';
 
                             <div class="col-md-4">
                                 <label class="form-label">CPF <span class="text-danger">*</span></label>
-                                <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" placeholder="000.000.000-00" required>
+                                <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" inputmode="numeric" placeholder="000.000.000-00" required>
                             </div>
 
                             <div class="col-md-4">
@@ -58,7 +58,7 @@ $escolaNome = $_SESSION['escola_nome'] ?? 'Escola vinculada ao usuário';
 
                             <div class="col-md-4">
                                 <label class="form-label">Data de Nascimento <span class="text-danger">*</span></label>
-                                <input type="date" name="data_nascimento" class="form-control" required>
+                                <input type="date" name="data_nascimento" class="form-control" min="1900-01-01" max="<?php echo date('Y-m-d'); ?>" required>
                             </div>
 
                             <div class="col-md-4">
