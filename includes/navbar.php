@@ -296,11 +296,9 @@ $homePage = $baseUrl . 'views/dashboard.php';
                                 <strong class="text-dark text-truncate fs-6" style="font-weight: 700; line-height: 1.25;">
                                     <?php echo htmlspecialchars($userName); ?>
                                 </strong>
-                                <span class="text-muted text-truncate small mt-1" style="font-size: 0.8rem;">
-                                    <?php echo htmlspecialchars(nomePerfil($userPerfil)); ?>
-                                </span>
+                            
                                 <?php if ($vinculoSubtituloNavbar !== ''): ?>
-                                    <span class="text-primary text-truncate small fw-semibold" style="font-size: 0.76rem;" title="<?php echo htmlspecialchars($vinculoSubtituloNavbar); ?>">
+                                    <span class="text-muted text-truncate small mt-1" style="font-size: 0.8rem;" title="<?php echo htmlspecialchars($vinculoSubtituloNavbar); ?>">
                                         <?php echo htmlspecialchars($vinculoSubtituloNavbar); ?>
                                     </span>
                                 <?php endif; ?>
