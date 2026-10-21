@@ -271,6 +271,27 @@ $homePage = $baseUrl . 'views/dashboard.php';
                                 </div>
                             <?php endif; ?>
 
+                            <?php
+                            $vinculoSubtituloNavbar = '';
+                            if (isset($conexao) && $currentUserId > 0) {
+                                if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && function_exists('nomeEscolaUsuario')) {
+                                    $vinculoSubtituloNavbar = nomeEscolaUsuario($conexao, $currentUserId);
+                                } elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL']) && function_exists('nomeUreUsuario')) {
+                                    $vinculoSubtituloNavbar = nomeUreUsuario($conexao, $currentUserId);
+                                } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA']) && function_exists('nomeEmpresaSupervisor')) {
+                                    $vinculoSubtituloNavbar = nomeEmpresaSupervisor($conexao, $currentUserId);
+                                } elseif ($userPerfil === 'PAE') {
+                                    $resEscNav = mysqli_query($conexao, "SELECT DISTINCT ue.nome FROM associacoes ass JOIN alunos a ON ass.id_aluno = a.id_aluno JOIN unidades_escolares ue ON a.id_ue = ue.id_ue WHERE ass.id_pae = $currentUserId AND ass.ativo = 1 LIMIT 2");
+                                    if ($resEscNav) {
+                                        $escsNav = [];
+                                        while ($rn = mysqli_fetch_assoc($resEscNav)) {
+                                            if (!empty($rn['nome'])) $escsNav[] = $rn['nome'];
+                                        }
+                                        $vinculoSubtituloNavbar = implode(', ', $escsNav);
+                                    }
+                                }
+                            }
+                            ?>
                             <div class="d-flex flex-column text-start overflow-hidden">
                                 <strong class="text-dark text-truncate fs-6" style="font-weight: 700; line-height: 1.25;">
                                     <?php echo htmlspecialchars($userName); ?>
@@ -278,6 +299,11 @@ $homePage = $baseUrl . 'views/dashboard.php';
                                 <span class="text-muted text-truncate small mt-1" style="font-size: 0.8rem;">
                                     <?php echo htmlspecialchars(nomePerfil($userPerfil)); ?>
                                 </span>
+                                <?php if ($vinculoSubtituloNavbar !== ''): ?>
+                                    <span class="text-primary text-truncate small fw-semibold" style="font-size: 0.76rem;" title="<?php echo htmlspecialchars($vinculoSubtituloNavbar); ?>">
+                                        <?php echo htmlspecialchars($vinculoSubtituloNavbar); ?>
+                                    </span>
+                                <?php endif; ?>
                             </div>
                         </div>
 

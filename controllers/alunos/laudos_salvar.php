@@ -38,6 +38,7 @@ $descricao = trim($_POST['descricao'] ?? '');
 $nomeInformado = trim($_POST['nome_arquivo'] ?? '');
 
 $enviados = 0;
+$arquivosNomes = [];
 
 // Trata múltiplos arquivos enviados pelo campo 'arquivos[]'
 if (isset($_FILES['arquivos']) && is_array($_FILES['arquivos']['name'])) {
@@ -65,6 +66,7 @@ if (isset($_FILES['arquivos']) && is_array($_FILES['arquivos']['name'])) {
             $stmt->bind_param("issss", $id_aluno, $tipo, $nomeFinal, $caminhoArquivo, $descricao);
             $stmt->execute();
             $enviados++;
+            $arquivosNomes[] = $nomeFinal;
         }
     }
 
@@ -85,10 +87,16 @@ elseif (isset($_FILES['laudo']) && $_FILES['laudo']['error'] === UPLOAD_ERR_OK) 
         $stmt->execute();
         $stmt->close();
         $enviados++;
+        $arquivosNomes[] = $nomeArquivo;
     }
 }
 
 if ($enviados > 0) {
+    registrarAuditoria($conexao, 'DOCUMENTOS', 'ANEXAR_DOCUMENTO', 'alunos', $id_aluno, [
+        'tipo' => $tipo,
+        'arquivos' => implode(', ', $arquivosNomes)
+    ]);
+
     header("Location: ../../views/alunos/visualizar.php?id=$id_aluno&msg=laudo_ok");
     exit();
 }

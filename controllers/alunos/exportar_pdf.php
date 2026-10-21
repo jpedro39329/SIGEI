@@ -328,6 +328,9 @@ $nomeArquivoPdf = "ficha_aluno_" . ($nomeSlug ?: $id_aluno) . ".pdf";
                     <span><?php echo htmlspecialchars($ev['data']); ?></span>
                 </div>
                 <div>Nome: <strong><?php echo htmlspecialchars($ev['nome']); ?></strong> | CPF: <?php echo htmlspecialchars($ev['cpf']); ?></div>
+                <?php if (!empty($ev['pae_nome'])): ?>
+                    <div style="margin-top: 3px;">PAE: <strong><?php echo htmlspecialchars($ev['pae_nome']); ?></strong> | CPF do PAE: <?php echo htmlspecialchars($ev['pae_cpf'] ?: 'Não informado'); ?></div>
+                <?php endif; ?>
                 <?php if (!empty($ev['motivo'])): ?>
                     <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed #cbd5e1;">
                         <strong><?php echo htmlspecialchars($ev['motivo_label'] ?: 'Motivo:'); ?></strong>

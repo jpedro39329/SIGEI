@@ -16,8 +16,8 @@ if ($id_aluno <= 0 || $id_escola <= 0) {
     die("Aluno ou escola inválidos.");
 }
 
-// Verifica se o aluno pertence à escola do usuário e obtém status atual
-$stmtAluno = $conexao->prepare("SELECT id_aluno, status_aprovacao FROM alunos WHERE id_aluno = ? AND id_ue = ?");
+// Verifica se o aluno pertence à escola do usuário e obtém dados atuais para comparar alterações
+$stmtAluno = $conexao->prepare("SELECT * FROM alunos WHERE id_aluno = ? AND id_ue = ?");
 $stmtAluno->bind_param("ii", $id_aluno, $id_escola);
 $stmtAluno->execute();
 $resultAluno = $stmtAluno->get_result();
@@ -216,18 +216,49 @@ if ($stmt->execute()) {
         }
     }
 
+    $camposAlterados = [];
+    $mapaCamposComparacao = [
+        'nome' => ['Nome', $nome],
+        'ra' => ['RA', $ra],
+        'data_nascimento' => ['Data de Nascimento', $dataNascimento],
+        'genero' => ['Gênero', $genero],
+        'raca' => ['Raça/Cor', $raca],
+        'municipio_nascimento' => ['Município de Nascimento', $municipioNascimento],
+        'serie' => ['Série', $serie],
+        'turno_aula' => ['Turno', $turnoAula],
+        'descricao_deficiencia' => ['Diagnóstico Clínico', $deficiencia],
+        'descricao_cuidados' => ['Cuidados Necessários', $cuidados],
+        'nome_responsavel' => ['Nome do Responsável', $nomeResponsavel],
+        'cpf_responsavel' => ['CPF do Responsável', $cpfResponsavel]
+    ];
+    foreach ($mapaCamposComparacao as $col => $info) {
+        $valAntigo = trim((string) ($alunoAtual[$col] ?? ''));
+        $valNovo = trim((string) $info[1]);
+        if ($valAntigo !== $valNovo) {
+            $camposAlterados[] = $info[0];
+        }
+    }
+    if ($fotoArquivo !== null) {
+        $camposAlterados[] = 'Foto';
+    }
+    if ($termoArquivo !== null) {
+        $camposAlterados[] = 'Termo de Responsabilidade';
+    }
+
     if ($isAjusteOuReprovado) {
         registrarAuditoria($conexao, 'ALUNOS', 'REENVIAR', 'alunos', $id_aluno, [
             'nome' => $nome,
             'ra' => $ra,
             'status_anterior' => $statusAtual,
-            'status_pos_edicao' => 'PENDENTE'
+            'status_pos_edicao' => 'PENDENTE',
+            'campos_alterados' => !empty($camposAlterados) ? implode(', ', $camposAlterados) : 'Ajuste e reenvio de solicitação'
         ]);
     } else {
         registrarAuditoria($conexao, 'ALUNOS', 'EDITAR', 'alunos', $id_aluno, [
             'nome' => $nome,
             'ra' => $ra,
-            'status_pos_edicao' => $statusAtual
+            'status_pos_edicao' => $statusAtual,
+            'campos_alterados' => !empty($camposAlterados) ? implode(', ', $camposAlterados) : 'Dados cadastrais revisados'
         ]);
     }
 

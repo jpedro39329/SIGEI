@@ -348,6 +348,12 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
                                 <div class="small text-muted">
                                     <div>Nome: <strong class="text-dark"><?php echo htmlspecialchars($ev['nome']); ?></strong></div>
                                     <div class="mt-1">CPF: <?php echo htmlspecialchars($ev['cpf']); ?></div>
+                                    <?php if (!empty($ev['pae_nome'])): ?>
+                                        <div class="mt-2 pt-2 border-top">
+                                            <div>PAE: <strong class="text-dark"><?php echo htmlspecialchars($ev['pae_nome']); ?></strong></div>
+                                            <div class="mt-1">CPF do PAE: <?php echo htmlspecialchars($ev['pae_cpf'] ?: 'Não informado'); ?></div>
+                                        </div>
+                                    <?php endif; ?>
                                     <?php if (!empty($ev['motivo'])): ?>
                                         <div class="mt-2 pt-2 border-top text-dark">
                                             <strong class="d-block mb-1"><?php echo htmlspecialchars($ev['motivo_label'] ?: 'Motivo:'); ?></strong>

@@ -42,10 +42,12 @@ if (strlen($cpf) === 11) {
     $cpf = substr($cpf, 0, 3) . '.' . substr($cpf, 3, 3) . '.' . substr($cpf, 6, 3) . '-' . substr($cpf, 9, 2);
 }
 
-// Determina cargo, setor e vínculo UGE
+// Determina cargo, setor, unidade escolar e vínculo UGE
 $cargo = '';
 $setor = '';
 $ugeFormatada = '';
+$unidadeEscolarFormatada = '';
+$escolasAtendidasPae = '';
 
 if ($tabela === 'usuarios_ure') {
     $cargo = !empty($usuario['cargo']) ? $usuario['cargo'] : 'Assistente Técnico';
@@ -66,6 +68,7 @@ if ($tabela === 'usuarios_ure') {
             WHERE ue.id_ue = " . (int)$usuario['id_ue']
         );
         if ($rUe && $ueRow = mysqli_fetch_assoc($rUe)) {
+            $unidadeEscolarFormatada = $ueRow['nome'] . (!empty($ueRow['cie']) ? ' (CIE: ' . $ueRow['cie'] . ')' : '');
             $ugeFormatada = ($ueRow['ure_uge'] ? $ueRow['ure_uge'] . ' - ' : '') . $ueRow['ure_nome'];
         }
     }
@@ -75,6 +78,24 @@ if ($tabela === 'usuarios_ure') {
         $rEmp = mysqli_query($conexao, "SELECT nome FROM empresas WHERE id_empresa = " . (int)$usuario['id_empresa']);
         if ($rEmp && $empRow = mysqli_fetch_assoc($rEmp)) {
             $ugeFormatada = $empRow['nome'];
+        }
+    }
+    if ($tabela === 'usuarios_pae') {
+        $rEscPae = mysqli_query($conexao, "
+            SELECT DISTINCT ue.nome
+            FROM associacoes ass
+            JOIN alunos a ON ass.id_aluno = a.id_aluno
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ass.id_pae = " . (int)$userId . " AND ass.ativo = 1
+        ");
+        if ($rEscPae) {
+            $nomesEsc = [];
+            while ($er = mysqli_fetch_assoc($rEscPae)) {
+                if (!empty($er['nome'])) $nomesEsc[] = $er['nome'];
+            }
+            if (!empty($nomesEsc)) {
+                $escolasAtendidasPae = implode(', ', $nomesEsc);
+            }
         }
     }
 } elseif ($tabela === 'seduc') {
@@ -126,10 +147,6 @@ if ($stmtTermo) {
 
                     <h2 class="mb-3">Meu Perfil</h2>
 
-                    <p class="text-muted mb-4">
-                        Olá, <strong><?php echo htmlspecialchars($userName); ?></strong> — estas são as informações cadastradas da sua conta no SIGEI.
-                    </p>
-
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center py-3">
                             <span class="text-muted">Nome</span>
@@ -153,9 +170,21 @@ if ($stmtTermo) {
                             <span><?php echo htmlspecialchars($setor); ?></span>
                         </li>
                         <?php endif; ?>
+                        <?php if ($unidadeEscolarFormatada): ?>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="text-muted">Unidade Escolar</span>
+                            <span class="text-end fw-semibold"><?php echo htmlspecialchars($unidadeEscolarFormatada); ?></span>
+                        </li>
+                        <?php endif; ?>
+                        <?php if ($escolasAtendidasPae): ?>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="text-muted">Unidade(s) Escolar(es) Atendida(s)</span>
+                            <span class="text-end fw-semibold"><?php echo htmlspecialchars($escolasAtendidasPae); ?></span>
+                        </li>
+                        <?php endif; ?>
                         <?php if ($ugeFormatada): ?>
                         <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <span class="text-muted">UGE</span>
+                            <span class="text-muted"><?php echo ($tabela === 'usuarios_supervisor' || $tabela === 'usuarios_pae') ? 'Empresa Vinculada' : 'UGE'; ?></span>
                             <span class="text-end fw-semibold"><?php echo htmlspecialchars($ugeFormatada); ?></span>
                         </li>
                         <?php endif; ?>

@@ -630,11 +630,145 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
                 }
             }
         }
+        // Eventos recentes de alunos na URE (edição de dados, documentos anexados, arquivamento, reativação)
+        $sqlEventosUre = "
+            SELECT aud.id_auditoria, aud.acao, aud.id_registro, aud.detalhes, aud.criado_em, a.nome AS aluno_nome
+            FROM auditoria aud
+            JOIN alunos a ON aud.id_registro = a.id_aluno
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE aud.entidade = 'alunos'
+              AND aud.id_usuario != $userId
+              AND aud.acao IN ('EDITAR', 'ANEXAR_DOCUMENTO', 'ARQUIVAR', 'REATIVAR')
+              $whereUre
+            ORDER BY aud.criado_em DESC LIMIT 4
+        ";
+        $resEvUre = mysqli_query($conexao, $sqlEventosUre);
+        if ($resEvUre) {
+            while ($ev = mysqli_fetch_assoc($resEvUre)) {
+                $acaoEv = $ev['acao'];
+                $nomeAl = htmlspecialchars($ev['aluno_nome'] ?? 'Aluno');
+                $detEv = json_decode($ev['detalhes'] ?? '', true) ?: [];
+                if ($acaoEv === 'ANEXAR_DOCUMENTO') {
+                    $notificacoes[] = [
+                        'tipo' => 'info',
+                        'icone' => 'bi-paperclip',
+                        'titulo' => 'Novo Documento Anexado',
+                        'mensagem' => "Novo documento anexado na ficha do aluno <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'EDITAR' && ($detEv['status_pos_edicao'] ?? '') !== 'PENDENTE') {
+                    $notificacoes[] = [
+                        'tipo' => 'info',
+                        'icone' => 'bi-pencil-square',
+                        'titulo' => 'Ficha de Aluno Atualizada',
+                        'mensagem' => "Dados cadastrais do aluno <strong>{$nomeAl}</strong> foram atualizados pela escola.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'ARQUIVAR') {
+                    $notificacoes[] = [
+                        'tipo' => 'secondary',
+                        'icone' => 'bi-archive-fill',
+                        'titulo' => 'Aluno Arquivado',
+                        'mensagem' => "O cadastro do aluno <strong>{$nomeAl}</strong> foi arquivado.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'REATIVAR') {
+                    $notificacoes[] = [
+                        'tipo' => 'success',
+                        'icone' => 'bi-arrow-counterclockwise',
+                        'titulo' => 'Aluno Reativado',
+                        'mensagem' => "O cadastro do aluno <strong>{$nomeAl}</strong> foi reativado.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                }
+            }
+        }
     }
 
     // 2. UNIDADE ESCOLAR (USUARIO_ESCOLA / UE)
     elseif (in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
         $idEscola = idEscolaUsuario($conexao, $userId);
+
+        // Eventos recentes de PAE, relatórios, documentos e status dos alunos da escola (via auditoria)
+        $sqlEventosUe = "
+            SELECT aud.id_auditoria, aud.acao, aud.id_registro, aud.detalhes, aud.criado_em, a.nome AS aluno_nome
+            FROM auditoria aud
+            JOIN alunos a ON aud.id_registro = a.id_aluno
+            WHERE aud.entidade = 'alunos'
+              AND a.id_ue = $idEscola
+              AND aud.id_usuario != $userId
+              AND aud.acao IN ('ASSOCIAR_PAE', 'DESASSOCIAR_PAE', 'REGISTRAR_RELATORIO', 'ARQUIVAR', 'REATIVAR', 'ANEXAR_DOCUMENTO')
+            ORDER BY aud.criado_em DESC LIMIT 6
+        ";
+        $resEvUe = mysqli_query($conexao, $sqlEventosUe);
+        if ($resEvUe) {
+            while ($ev = mysqli_fetch_assoc($resEvUe)) {
+                $acaoEv = $ev['acao'];
+                $nomeAl = htmlspecialchars($ev['aluno_nome'] ?? 'Aluno');
+                $detEv = json_decode($ev['detalhes'] ?? '', true) ?: [];
+                $paeNomeEv = htmlspecialchars($detEv['pae_nome'] ?? 'Profissional');
+
+                if ($acaoEv === 'ASSOCIAR_PAE') {
+                    $notificacoes[] = [
+                        'tipo' => 'success',
+                        'icone' => 'bi-person-check-fill',
+                        'titulo' => 'PAE Associado ao Aluno',
+                        'mensagem' => "O PAE <strong>{$paeNomeEv}</strong> foi vinculado ao aluno <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'DESASSOCIAR_PAE') {
+                    $notificacoes[] = [
+                        'tipo' => 'warning',
+                        'icone' => 'bi-person-dash-fill',
+                        'titulo' => 'PAE Desassociado',
+                        'mensagem' => "O PAE <strong>{$paeNomeEv}</strong> foi desvinculado do aluno <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'REGISTRAR_RELATORIO') {
+                    $notificacoes[] = [
+                        'tipo' => 'info',
+                        'icone' => 'bi-journal-text',
+                        'titulo' => 'Novo Relatório de PAE',
+                        'mensagem' => "Novo relatório de atendimento registrado para o aluno <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'ARQUIVAR') {
+                    $notificacoes[] = [
+                        'tipo' => 'secondary',
+                        'icone' => 'bi-archive-fill',
+                        'titulo' => 'Aluno Arquivado',
+                        'mensagem' => "O aluno <strong>{$nomeAl}</strong> foi arquivado no sistema.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'REATIVAR') {
+                    $notificacoes[] = [
+                        'tipo' => 'success',
+                        'icone' => 'bi-arrow-counterclockwise',
+                        'titulo' => 'Aluno Reativado',
+                        'mensagem' => "O cadastro do aluno <strong>{$nomeAl}</strong> foi reativado.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $ev['id_registro'],
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                }
+            }
+        }
 
         // Alunos aprovados recentemente pela Educação Especial
         $sqlAprovados = "
@@ -844,6 +978,76 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
 
     // 6. PAE (CUIDADOR)
     elseif ($perfil === 'PAE') {
+        // Eventos diretos de vinculação / desvinculação deste PAE registrados em auditoria
+        $sqlAuditPae = "
+            SELECT aud.id_auditoria, aud.acao, aud.id_registro, aud.detalhes, aud.criado_em, a.nome AS aluno_nome
+            FROM auditoria aud
+            LEFT JOIN alunos a ON aud.id_registro = a.id_aluno
+            WHERE aud.entidade = 'alunos'
+              AND aud.acao IN ('ASSOCIAR_PAE', 'DESASSOCIAR_PAE', 'EDITAR', 'ANEXAR_DOCUMENTO', 'ARQUIVAR')
+            ORDER BY aud.criado_em DESC LIMIT 15
+        ";
+        $resAudPae = mysqli_query($conexao, $sqlAuditPae);
+        $idsAlunosAtivosPae = [];
+        $resAtivosPae = mysqli_query($conexao, "SELECT id_aluno FROM associacoes WHERE id_pae = $userId AND ativo = 1");
+        if ($resAtivosPae) {
+            while ($rAt = mysqli_fetch_assoc($resAtivosPae)) {
+                $idsAlunosAtivosPae[(int) $rAt['id_aluno']] = true;
+            }
+        }
+
+        if ($resAudPae) {
+            while ($ev = mysqli_fetch_assoc($resAudPae)) {
+                $acaoEv = $ev['acao'];
+                $idAl = (int) ($ev['id_registro'] ?? 0);
+                $detEv = json_decode($ev['detalhes'] ?? '', true) ?: [];
+                $idPaeEv = (int) ($detEv['id_pae'] ?? 0);
+                $nomeAl = htmlspecialchars($ev['aluno_nome'] ?? ($detEv['aluno_nome'] ?? 'Aluno'));
+
+                if ($acaoEv === 'ASSOCIAR_PAE' && $idPaeEv === $userId) {
+                    $notificacoes[] = [
+                        'tipo' => 'success',
+                        'icone' => 'bi-person-check-fill',
+                        'titulo' => 'Novo Aluno Associado',
+                        'mensagem' => "Você foi associado ao atendimento do aluno <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $idAl,
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif ($acaoEv === 'DESASSOCIAR_PAE' && $idPaeEv === $userId) {
+                    $notificacoes[] = [
+                        'tipo' => 'warning',
+                        'icone' => 'bi-person-dash-fill',
+                        'titulo' => 'Associação Encerrada',
+                        'mensagem' => "Você foi desvinculado do atendimento do aluno <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/relatorios/listar.php",
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif (isset($idsAlunosAtivosPae[$idAl]) && $acaoEv === 'EDITAR') {
+                    $notificacoes[] = [
+                        'tipo' => 'info',
+                        'icone' => 'bi-pencil-square',
+                        'titulo' => 'Ficha do Aluno Atualizada',
+                        'mensagem' => "Os dados do aluno <strong>{$nomeAl}</strong> foram atualizados.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $idAl,
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                } elseif (isset($idsAlunosAtivosPae[$idAl]) && $acaoEv === 'ANEXAR_DOCUMENTO') {
+                    $notificacoes[] = [
+                        'tipo' => 'info',
+                        'icone' => 'bi-paperclip',
+                        'titulo' => 'Novo Documento do Aluno',
+                        'mensagem' => "Um novo documento foi anexado à ficha de <strong>{$nomeAl}</strong>.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $idAl,
+                        'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
+                        'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
+                    ];
+                }
+            }
+        }
+
         // Alunos em atendimento
         $sqlMeusAlunos = "
             SELECT COUNT(*) AS total
@@ -919,6 +1123,10 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                 $r = mysqli_query($conexao, "SELECT cpf FROM seduc WHERE id_seduc = $idUsuario LIMIT 1");
             } elseif (in_array($perfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'], true)) {
                 $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_ue WHERE id_usuario_ue = $idUsuario LIMIT 1");
+            } elseif (in_array($perfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'EMPRESA'], true)) {
+                $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_supervisor WHERE id_usuario_supervisor = $idUsuario LIMIT 1");
+            } elseif ($perfil === 'PAE') {
+                $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_pae WHERE id_pae = $idUsuario LIMIT 1");
             } else {
                 $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_ure WHERE id_usuario_ure = $idUsuario LIMIT 1");
             }
@@ -928,7 +1136,7 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
         }
 
         if ($nomeEsc !== '') {
-            $tabelasBusca = ['usuarios_ure', 'usuarios_ue', 'admin', 'seduc'];
+            $tabelasBusca = ['usuarios_ure', 'usuarios_ue', 'usuarios_supervisor', 'usuarios_pae', 'admin', 'seduc'];
             foreach ($tabelasBusca as $tb) {
                 $r = mysqli_query($conexao, "SELECT cpf FROM `$tb` WHERE nome = '$nomeEsc' LIMIT 1");
                 if ($r && ($row = mysqli_fetch_assoc($r)) && !empty($row['cpf'])) {
@@ -950,13 +1158,16 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
         'timestamp' => !empty($aluno['data_cadastro']) ? strtotime($aluno['data_cadastro']) : 0,
         'nome' => $cadNome,
         'cpf' => $cadCpf,
+        'pae_nome' => null,
+        'pae_cpf' => null,
         'motivo_label' => null,
         'motivo' => null
     ];
 
-    // 2. Busca registros de auditoria para este aluno (DELIBERAR, APROVAR, REENVIAR, EDITAR c/ reenvio, ARQUIVAR, REATIVAR)
+    // 2. Busca registros de auditoria para este aluno
     $temDeliberacaoAuditoria = false;
     $temArquivamentoAuditoria = false;
+    $temAssociacaoAuditoria = false;
 
     if ($idAluno > 0) {
         $sqlAudit = "
@@ -995,6 +1206,8 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                             'timestamp' => $ts,
                             'nome' => $autorNome,
                             'cpf' => $autorCpf,
+                            'pae_nome' => null,
+                            'pae_cpf' => null,
                             'motivo_label' => null,
                             'motivo' => null
                         ];
@@ -1005,6 +1218,8 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                             'timestamp' => $ts,
                             'nome' => $autorNome,
                             'cpf' => $autorCpf,
+                            'pae_nome' => null,
+                            'pae_cpf' => null,
                             'motivo_label' => 'Orientações de Correção:',
                             'motivo' => $motivo !== '' ? $motivo : null
                         ];
@@ -1015,19 +1230,108 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                             'timestamp' => $ts,
                             'nome' => $autorNome,
                             'cpf' => $autorCpf,
+                            'pae_nome' => null,
+                            'pae_cpf' => null,
                             'motivo_label' => 'Motivo:',
                             'motivo' => $motivo !== '' ? $motivo : null
                         ];
                     }
                 } elseif ($acao === 'REENVIAR' || ($acao === 'EDITAR' && ($det['status_pos_edicao'] ?? '') === 'PENDENTE' && isset($det['status_anterior']))) {
+                    $camposAlt = trim($det['campos_alterados'] ?? '');
                     $eventos[] = [
                         'titulo' => 'Solicitação Reenviada para Análise',
                         'data' => $dataBr,
                         'timestamp' => $ts,
                         'nome' => $autorNome,
                         'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
+                        'motivo_label' => $camposAlt !== '' ? 'Alterações:' : null,
+                        'motivo' => $camposAlt !== '' ? $camposAlt : null
+                    ];
+                } elseif ($acao === 'EDITAR') {
+                    $camposAlt = trim($det['campos_alterados'] ?? '');
+                    $eventos[] = [
+                        'titulo' => 'Dados Cadastrais Atualizados',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
+                        'motivo_label' => $camposAlt !== '' ? 'Campos alterados:' : null,
+                        'motivo' => $camposAlt !== '' ? $camposAlt : null
+                    ];
+                } elseif ($acao === 'ASSOCIAR_PAE') {
+                    $temAssociacaoAuditoria = true;
+                    $paeNome = trim($det['pae_nome'] ?? '') ?: 'Profissional de Apoio';
+                    $paeCpfRaw = preg_replace('/\D/', '', $det['pae_cpf'] ?? '');
+                    $paeCpf = $paeCpfRaw !== '' ? formatarCPF($paeCpfRaw) : $resolverCpfUsuario($paeNome, (int) ($det['id_pae'] ?? 0), 'PAE');
+                    $eventos[] = [
+                        'titulo' => 'PAE Associado ao Aluno',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'pae_nome' => $paeNome,
+                        'pae_cpf' => $paeCpf,
                         'motivo_label' => null,
                         'motivo' => null
+                    ];
+                } elseif ($acao === 'DESASSOCIAR_PAE') {
+                    $temAssociacaoAuditoria = true;
+                    $paeNome = trim($det['pae_nome'] ?? '') ?: 'Profissional de Apoio';
+                    $paeCpfRaw = preg_replace('/\D/', '', $det['pae_cpf'] ?? '');
+                    $paeCpf = $paeCpfRaw !== '' ? formatarCPF($paeCpfRaw) : $resolverCpfUsuario($paeNome, (int) ($det['id_pae'] ?? 0), 'PAE');
+                    $eventos[] = [
+                        'titulo' => 'PAE Desassociado do Aluno',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'pae_nome' => $paeNome,
+                        'pae_cpf' => $paeCpf,
+                        'motivo_label' => null,
+                        'motivo' => null
+                    ];
+                } elseif ($acao === 'ANEXAR_DOCUMENTO') {
+                    $arqs = trim($det['arquivos'] ?? '');
+                    $eventos[] = [
+                        'titulo' => 'Documento Anexado',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
+                        'motivo_label' => $arqs !== '' ? 'Arquivo(s):' : null,
+                        'motivo' => $arqs !== '' ? $arqs : null
+                    ];
+                } elseif ($acao === 'REMOVER_DOCUMENTO') {
+                    $arq = trim($det['arquivo'] ?? '');
+                    $eventos[] = [
+                        'titulo' => 'Documento Removido',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
+                        'motivo_label' => $arq !== '' ? 'Arquivo:' : null,
+                        'motivo' => $arq !== '' ? $arq : null
+                    ];
+                } elseif ($acao === 'REGISTRAR_RELATORIO') {
+                    $tpRel = trim($det['tipo'] ?? 'Atendimento');
+                    $eventos[] = [
+                        'titulo' => 'Relatório de Atendimento Registrado',
+                        'data' => $dataBr,
+                        'timestamp' => $ts,
+                        'nome' => $autorNome,
+                        'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
+                        'motivo_label' => 'Tipo:',
+                        'motivo' => 'Relatório ' . $tpRel
                     ];
                 } elseif ($acao === 'ARQUIVAR') {
                     $temArquivamentoAuditoria = true;
@@ -1038,6 +1342,8 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                         'timestamp' => $ts,
                         'nome' => $autorNome,
                         'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
                         'motivo_label' => $motivoArq !== '' ? 'Motivo:' : null,
                         'motivo' => $motivoArq !== '' ? $motivoArq : null
                     ];
@@ -1048,6 +1354,63 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                         'timestamp' => $ts,
                         'nome' => $autorNome,
                         'cpf' => $autorCpf,
+                        'pae_nome' => null,
+                        'pae_cpf' => null,
+                        'motivo_label' => null,
+                        'motivo' => null
+                    ];
+                }
+            }
+        }
+    }
+
+    // 2.1 Fallback para associações existentes na tabela `associacoes` caso não tenham log em `auditoria`
+    if (!$temAssociacaoAuditoria && $idAluno > 0) {
+        $sqlAssocHist = "
+            SELECT ass.id_associacao, ass.id_pae, ass.ativo, ass.data_inicio, ass.data_fim,
+                   p.nome AS pae_nome, p.cpf AS pae_cpf, p.id_empresa,
+                   sup.nome AS sup_nome, sup.cpf AS sup_cpf
+            FROM associacoes ass
+            JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+            LEFT JOIN usuarios_supervisor sup ON p.id_empresa = sup.id_empresa AND sup.ativo = 1
+            WHERE ass.id_aluno = $idAluno
+            ORDER BY ass.data_inicio ASC, ass.id_associacao ASC
+        ";
+        $resAssocHist = mysqli_query($conexao, $sqlAssocHist);
+        if ($resAssocHist) {
+            while ($assRow = mysqli_fetch_assoc($resAssocHist)) {
+                $respNome = trim($assRow['sup_nome'] ?? '') ?: 'Supervisor da Empresa';
+                $respCpfRaw = preg_replace('/\D/', '', $assRow['sup_cpf'] ?? '');
+                $respCpf = $respCpfRaw !== '' ? formatarCPF($respCpfRaw) : 'Não informado';
+                $paeNome = trim($assRow['pae_nome'] ?? '');
+                $paeCpf = formatarCPF($assRow['pae_cpf'] ?? '');
+
+                $dtIni = !empty($assRow['data_inicio']) ? date('d/m/Y', strtotime($assRow['data_inicio'])) : '-';
+                $tsIni = !empty($assRow['data_inicio']) ? strtotime($assRow['data_inicio'] . ' 12:00:00') : 0;
+
+                $eventos[] = [
+                    'titulo' => 'PAE Associado ao Aluno',
+                    'data' => $dtIni,
+                    'timestamp' => $tsIni,
+                    'nome' => $respNome,
+                    'cpf' => $respCpf,
+                    'pae_nome' => $paeNome,
+                    'pae_cpf' => $paeCpf,
+                    'motivo_label' => null,
+                    'motivo' => null
+                ];
+
+                if ((int) ($assRow['ativo'] ?? 1) === 0 && !empty($assRow['data_fim'])) {
+                    $dtFim = date('d/m/Y', strtotime($assRow['data_fim']));
+                    $tsFim = strtotime($assRow['data_fim'] . ' 18:00:00');
+                    $eventos[] = [
+                        'titulo' => 'PAE Desassociado do Aluno',
+                        'data' => $dtFim,
+                        'timestamp' => $tsFim,
+                        'nome' => $respNome,
+                        'cpf' => $respCpf,
+                        'pae_nome' => $paeNome,
+                        'pae_cpf' => $paeCpf,
                         'motivo_label' => null,
                         'motivo' => null
                     ];

@@ -43,6 +43,11 @@ $stmt = $conexao->prepare(
 $stmt->bind_param("iss", $id_associacao, $tipo, $descricao);
 
 if ($stmt->execute()) {
+    registrarAuditoria($conexao, 'PAE', 'REGISTRAR_RELATORIO', 'alunos', $id_aluno, [
+        'tipo' => $tipo === 'DIARIO' ? 'Diário' : 'Mensal',
+        'id_associacao' => $id_associacao
+    ]);
+
     header("Location: ../../views/relatorios/listar.php?msg=ok");
     exit();
 }

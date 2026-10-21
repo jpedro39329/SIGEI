@@ -29,7 +29,7 @@ if ($id_laudo <= 0 || $id_aluno <= 0) {
 }
 
 // Busca o laudo para verificar se pertence ao aluno e pegar o caminho
-$sqlBusca = "SELECT id_laudo, caminho_arquivo, id_aluno FROM laudos WHERE id_laudo = $id_laudo AND id_aluno = $id_aluno";
+$sqlBusca = "SELECT id_laudo, tipo, nome_arquivo, caminho_arquivo, id_aluno FROM laudos WHERE id_laudo = $id_laudo AND id_aluno = $id_aluno";
 $resBusca = mysqli_query($conexao, $sqlBusca);
 $laudo = mysqli_fetch_assoc($resBusca);
 
@@ -61,6 +61,11 @@ if (!empty($caminhoArquivo)) {
 // Remove do banco
 $sqlDelete = "DELETE FROM laudos WHERE id_laudo = $id_laudo AND id_aluno = $id_aluno";
 mysqli_query($conexao, $sqlDelete);
+
+registrarAuditoria($conexao, 'DOCUMENTOS', 'REMOVER_DOCUMENTO', 'alunos', $id_aluno, [
+    'tipo' => $laudo['tipo'] ?? 'LAUDO',
+    'arquivo' => $laudo['nome_arquivo'] ?: basename($laudo['caminho_arquivo'] ?? 'Documento')
+]);
 
 header("Location: ../../views/alunos/visualizar.php?id=$id_aluno&msg=laudo_removido");
 exit();

@@ -20,7 +20,7 @@ if (!validarDataISO($data_inicio, true, false, 2000)) {
 
 // Verifica se o aluno existe e está APROVADO
 $stmtAluno = $conexao->prepare(
-    "SELECT a.id_aluno, ue.id_ure FROM alunos a
+    "SELECT a.id_aluno, a.nome, ue.id_ure FROM alunos a
      JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
      WHERE a.id_aluno = ? AND a.status_aprovacao = 'APROVADO'"
 );
@@ -35,7 +35,7 @@ $alunoData = $resAluno->fetch_assoc();
 $stmtAluno->close();
 
 // Verifica se o PAE existe e está ativo
-$stmtPae = $conexao->prepare("SELECT id_pae, id_empresa FROM usuarios_pae WHERE id_pae = ? AND ativo = 1");
+$stmtPae = $conexao->prepare("SELECT id_pae, nome, cpf, id_empresa FROM usuarios_pae WHERE id_pae = ? AND ativo = 1");
 $stmtPae->bind_param("i", $id_pae);
 $stmtPae->execute();
 $resPae = $stmtPae->get_result();
@@ -90,6 +90,14 @@ $stmt = $conexao->prepare(
 $stmt->bind_param("iis", $id_aluno, $id_pae, $data_inicio);
 
 if ($stmt->execute()) {
+    registrarAuditoria($conexao, 'PAE', 'ASSOCIAR_PAE', 'alunos', $id_aluno, [
+        'id_pae' => (int) $paeData['id_pae'],
+        'pae_nome' => $paeData['nome'] ?? '',
+        'pae_cpf' => preg_replace('/\D/', '', $paeData['cpf'] ?? ''),
+        'aluno_nome' => $alunoData['nome'] ?? '',
+        'data_inicio' => $data_inicio
+    ]);
+
     header("Location: ../../views/associacoes/gerenciar.php?msg=ok");
     exit();
 }
