@@ -467,13 +467,13 @@ $foto = $aluno['foto_arquivo'] ?? '';
                         <?php endif; ?>
 
                         <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC']) && $aluno['status_aprovacao'] === 'ARQUIVADO'): ?>
-                            <form action="../../controllers/alunos/reativar.php" method="POST" class="d-grid" onsubmit="return confirm('Deseja realmente reativar este aluno?');">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
-                                <input type="hidden" name="id_aluno" value="<?php echo $aluno['id_aluno']; ?>">
-                                <button type="submit" class="btn btn-success py-2 rounded-3 fw-semibold">
-                                    Reativar Aluno
-                                </button>
-                            </form>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-success btn-abrir-reativacao"
+                                    data-id="<?php echo $aluno['id_aluno']; ?>"
+                                    data-nome="<?php echo htmlspecialchars($aluno['nome']); ?>"
+                                    title="Reativar Aluno">
+                                Reativar
+                            </button>
                         <?php endif; ?>
                     </div>
 
@@ -553,6 +553,57 @@ $foto = $aluno['foto_arquivo'] ?? '';
     </div>
 
 </div>
+
+<div class="modal fade" id="modalReativarAluno" tabindex="-1" aria-labelledby="modalReativarAlunoLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form action="../../controllers/alunos/reativar.php" method="POST" id="formReativarAluno">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(gerarTokenCSRF()); ?>">
+                <input type="hidden" name="id_aluno" id="reativar_id_aluno" value="">
+
+                <div class="modal-body p-4 text-center">
+                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 48px; height: 48px; border-radius: 50%; background: #ecfdf5; color: #059669; font-size: 1.4rem;">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </div>
+
+                    <h5 class="fw-bold mb-1 text-dark" id="modalReativarAlunoLabel">Reativar Aluno</h5>
+                    <p class="text-muted small mb-0">
+                        Deseja reativar o cadastro de <strong id="reativar_nome_aluno" class="text-dark">-</strong>? O aluno voltará a constar como ativo no sistema.
+                    </p>
+                </div>
+
+                <div class="modal-footer border-0 bg-light px-4 py-3 gap-2 d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2 rounded-2 fw-medium" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-success px-3 py-2 rounded-2 fw-medium shadow-sm">
+                        Confirmar Reativação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('click', function (e) {
+        const btnReativar = e.target.closest('.btn-abrir-reativacao');
+        if (!btnReativar) return;
+
+        const modalReativarEl = document.getElementById('modalReativarAluno');
+        if (!modalReativarEl) return;
+
+        const modalReativar = bootstrap.Modal.getOrCreateInstance(modalReativarEl);
+        const inputReativarId = document.getElementById('reativar_id_aluno');
+        const spanReativarNome = document.getElementById('reativar_nome_aluno');
+        if (inputReativarId) inputReativarId.value = btnReativar.getAttribute('data-id');
+        if (spanReativarNome) spanReativarNome.textContent = btnReativar.getAttribute('data-nome');
+        modalReativar.show();
+    });
+});
+</script>
 
 </body>
 </html>
