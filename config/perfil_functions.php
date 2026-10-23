@@ -93,12 +93,46 @@ function urlLogin() {
     return 'views/auth/login.php';
 }
 
+// Retorna o caminho correto para o dashboard conforme a localização do script
+function urlDashboard() {
+    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+
+    // Se estiver dentro de subpasta de views (ex: views/alunos/listar.php)
+    if (preg_match('#/views/[^/]+/[^/]+$#', $script)) {
+        return '../dashboard.php';
+    }
+    // Se estiver diretamente em views (ex: views/dashboard.php)
+    if (preg_match('#/views/[^/]+$#', $script)) {
+        return 'dashboard.php';
+    }
+    // Se estiver em subpasta de controllers
+    if (preg_match('#/controllers/[^/]+/[^/]+$#', $script)) {
+        return '../../views/dashboard.php';
+    }
+    // Se estiver diretamente em controllers
+    if (preg_match('#/controllers/[^/]+$#', $script)) {
+        return '../views/dashboard.php';
+    }
+
+    return 'views/dashboard.php';
+}
+
 // Redireciona para o login se não estiver logado
 function exigirLogin() {
     if (!estaLogado()) {
         header("Location: " . urlLogin());
         exit();
     }
+}
+
+// Redireciona usuário em caso de acesso não autorizado (para dashboard se logado, para login se deslogado)
+function redirecionarAcessoNegado() {
+    if (!estaLogado()) {
+        header("Location: " . urlLogin());
+        exit();
+    }
+    header("Location: " . urlDashboard() . "?erro=acesso_negado");
+    exit();
 }
 
 // ============================================================
@@ -139,7 +173,7 @@ function exigirTokenCSRF() {
 function exigirPerfil($perfisPermitidos) {
     exigirLogin();
     if (!temPermissao($_SESSION['user_perfil'], $perfisPermitidos)) {
-        die("Acesso negado.");
+        redirecionarAcessoNegado();
     }
 }
 
@@ -1106,8 +1140,9 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
  * (envio inicial, reprovações, solicitações de ajustes, reenvios, aprovações, arquivamentos e reativações).
  * Todas as datas são formatadas no padrão brasileiro DD/MM/YYYY e os dados de autoria contêm apenas Nome e CPF.
  */
-function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
+function obterHistoricoSolicitacaoAluno($conexao, array $aluno, $filtroPaeId = 0): array {
     $idAluno = (int) ($aluno['id_aluno'] ?? 0);
+    $filtroPaeId = (int) $filtroPaeId;
     $eventos = [];
 
     // Helper interno para buscar CPF de um usuário pelo nome ou ID se o registro antigo estiver sem CPF
@@ -1273,6 +1308,7 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                         'timestamp' => $ts,
                         'nome' => $autorNome,
                         'cpf' => $autorCpf,
+                        'id_pae' => (int) ($det['id_pae'] ?? 0),
                         'pae_nome' => $paeNome,
                         'pae_cpf' => $paeCpf,
                         'motivo_label' => null,
@@ -1289,6 +1325,7 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                         'timestamp' => $ts,
                         'nome' => $autorNome,
                         'cpf' => $autorCpf,
+                        'id_pae' => (int) ($det['id_pae'] ?? 0),
                         'pae_nome' => $paeNome,
                         'pae_cpf' => $paeCpf,
                         'motivo_label' => null,
@@ -1394,6 +1431,7 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                     'timestamp' => $tsIni,
                     'nome' => $respNome,
                     'cpf' => $respCpf,
+                    'id_pae' => (int) ($assRow['id_pae'] ?? 0),
                     'pae_nome' => $paeNome,
                     'pae_cpf' => $paeCpf,
                     'motivo_label' => null,
@@ -1409,6 +1447,7 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
                         'timestamp' => $tsFim,
                         'nome' => $respNome,
                         'cpf' => $respCpf,
+                        'id_pae' => (int) ($assRow['id_pae'] ?? 0),
                         'pae_nome' => $paeNome,
                         'pae_cpf' => $paeCpf,
                         'motivo_label' => null,
@@ -1494,6 +1533,17 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno): array {
             'motivo_label' => !empty($aluno['motivo_arquivamento']) ? 'Motivo:' : null,
             'motivo' => !empty($aluno['motivo_arquivamento']) ? $aluno['motivo_arquivamento'] : null
         ];
+    }
+
+    // Se foi informado filtro de PAE (ex: PAE logado visualizando a ficha), filtra para ver apenas quando foi associado a ele
+    if ($filtroPaeId > 0) {
+        $eventos = array_values(array_filter($eventos, function($ev) use ($filtroPaeId) {
+            // Mostra apenas o evento de associação (ou desassociação) referente a esse PAE
+            if (isset($ev['id_pae'])) {
+                return (int) $ev['id_pae'] === $filtroPaeId;
+            }
+            return false;
+        }));
     }
 
     // Ordena cronologicamente

@@ -9,7 +9,7 @@ $userId = (int) $_SESSION['user_id'];
 $id_aluno = (int) ($_GET['id'] ?? 0);
 
 if ($id_aluno <= 0) {
-    die("Aluno não informado.");
+    redirecionarAcessoNegado();
 }
 
 // Busca os dados completos do aluno, escola e quem cadastrou
@@ -24,34 +24,34 @@ $sqlAluno = "
     WHERE a.id_aluno = $id_aluno
 ";
 $resultAluno = mysqli_query($conexao, $sqlAluno);
-$aluno = mysqli_fetch_assoc($resultAluno);
+$aluno = $resultAluno ? mysqli_fetch_assoc($resultAluno) : null;
 
 if (!$aluno) {
-    die("Aluno não encontrado.");
+    redirecionarAcessoNegado();
 }
 
 // Valida permissão de visualização
 if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $idEscola = idEscolaUsuario($conexao, $userId);
     if ((int) $aluno['id_ue'] !== $idEscola) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 } elseif ($userPerfil === 'DIRIGENTE' || $userPerfil === 'USUARIO_SEFISC' || $userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
     $idUre = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
     if ($idUre > 0 && (int) $aluno['id_ure'] !== $idUre) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     $idEmpresa = idEmpresaSupervisor($conexao, $userId);
     $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresa);
     if (!in_array((int) $aluno['id_ure'], $uresAtendidas)) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 } elseif ($userPerfil === 'PAE') {
     $sqlAssoc = "SELECT id_associacao FROM associacoes WHERE id_aluno = $id_aluno AND id_pae = $userId AND ativo = 1";
     $resultAssoc = mysqli_query($conexao, $sqlAssoc);
-    if (mysqli_num_rows($resultAssoc) == 0) {
-        die("Você não tem permissão para visualizar este aluno.");
+    if (!$resultAssoc || mysqli_num_rows($resultAssoc) == 0) {
+        redirecionarAcessoNegado();
     }
 }
 
@@ -194,36 +194,38 @@ $foto = $aluno['foto_arquivo'] ?? '';
 
                     <!-- Grid Interno de Dados Pessoais: Label em Negrito em cima, Valor normal embaixo -->
                     <div class="row g-3">
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-md-6 col-sm-6">
                             <strong class="d-block text-dark">CPF</strong>
                             <span class="text-secondary"><?php echo htmlspecialchars($cpf ?: 'Não informado'); ?></span>
                         </div>
-                        <div class="col-md-4 col-sm-6">
+                        <div class="col-md-6 col-sm-6">
                             <strong class="d-block text-dark">RA</strong>
                             <span class="text-secondary"><?php echo htmlspecialchars($aluno['ra'] ?: 'Não informado'); ?></span>
                         </div>
-                        <div class="col-md-4 col-sm-6">
-                            <strong class="d-block text-dark">Data de Nascimento</strong>
-                            <span class="text-secondary">
-                                <?php if (!empty($aluno['data_nascimento'])): ?>
-                                    <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?><?php echo ($idadeAluno !== null) ? ' - ' . $idadeAluno . ' anos' : ''; ?>
-                                <?php else: ?>
-                                    Não informada
-                                <?php endif; ?>
-                            </span>
-                        </div>
-                        <div class="col-md-4 col-sm-6">
-                            <strong class="d-block text-dark">Gênero</strong>
-                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
-                        </div>
-                        <div class="col-md-4 col-sm-6">
-                            <strong class="d-block text-dark">Raça / Cor</strong>
-                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
-                        </div>
-                        <div class="col-md-4 col-sm-6">
-                            <strong class="d-block text-dark">Município de Nascimento</strong>
-                            <span class="text-secondary"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
-                        </div>
+                        <?php if ($userPerfil !== 'PAE'): ?>
+                            <div class="col-md-4 col-sm-6">
+                                <strong class="d-block text-dark">Data de Nascimento</strong>
+                                <span class="text-secondary">
+                                    <?php if (!empty($aluno['data_nascimento'])): ?>
+                                        <?php echo date('d/m/Y', strtotime($aluno['data_nascimento'])); ?><?php echo ($idadeAluno !== null) ? ' - ' . $idadeAluno . ' anos' : ''; ?>
+                                    <?php else: ?>
+                                        Não informada
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <strong class="d-block text-dark">Gênero</strong>
+                                <span class="text-secondary"><?php echo htmlspecialchars($aluno['genero'] ?: 'Não informado'); ?></span>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <strong class="d-block text-dark">Raça / Cor</strong>
+                                <span class="text-secondary"><?php echo htmlspecialchars($aluno['raca'] ?: 'Não informada'); ?></span>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <strong class="d-block text-dark">Município de Nascimento</strong>
+                                <span class="text-secondary"><?php echo htmlspecialchars($aluno['municipio_nascimento'] ?: 'Não informado'); ?></span>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>
@@ -302,12 +304,13 @@ $foto = $aluno['foto_arquivo'] ?? '';
                 </div>
             <?php endif; ?>
 
+            <?php if ($userPerfil !== 'PAE'): ?>
             <!-- 4. Card de Documentos e Laudos Anexos -->
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 flex-wrap gap-2">
                         <h5 class="fw-bold text-dark mb-0">Documentos e Laudos Anexos</h5>
-                                           </div>
+                    </div>
 
                     <!-- Formulário Retrátil para a Escola Anexar Laudos -->
                     <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && in_array($aluno['status_aprovacao'], ['PENDENTE', 'PENDENTE_CORRECAO'])): ?>
@@ -382,6 +385,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
 
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- 5. Relatórios de Atendimento (Exibido para Escola, Supervisor e Empresa) -->
             <?php if ($aluno['status_aprovacao'] === 'APROVADO' && in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'SUPERVISOR', 'USUARIO_EMPRESA'])): ?>
@@ -481,6 +485,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
             </div>
 
             <!-- 2. Card de Responsável Legal -->
+            <?php if ($userPerfil !== 'PAE'): ?>
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Responsável Legal</h5>
@@ -497,9 +502,10 @@ $foto = $aluno['foto_arquivo'] ?? '';
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- 3. Card de Histórico da Solicitação -->
-            <?php $historicoEventos = obterHistoricoSolicitacaoAluno($conexao, $aluno); ?>
+            <?php $historicoEventos = obterHistoricoSolicitacaoAluno($conexao, $aluno, ($userPerfil === 'PAE' ? $userId : 0)); ?>
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Histórico da Solicitação</h5>

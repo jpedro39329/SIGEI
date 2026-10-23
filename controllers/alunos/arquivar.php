@@ -1,16 +1,12 @@
 <?php
 require_once "../../config/init.php";
 
-// Apenas perfis autorizados (Escola, Educação Especial, SEDUC, ADMIN) podem arquivar
-exigirLogin();
+// Apenas perfis autorizados (Escola, ADMIN) podem arquivar
+exigirPerfil(array('USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'ADMIN'));
 exigirTokenCSRF();
 
 $userPerfil = $_SESSION['user_perfil'] ?? '';
 $userId = (int) ($_SESSION['user_id'] ?? 0);
-
-if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'ADMIN'])) {
-    die("Você não tem permissão para arquivar alunos. Esta ação é restrita à escola responsável.");
-}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../../views/alunos/listar.php");

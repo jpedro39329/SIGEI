@@ -35,7 +35,7 @@ if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
         $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
     }
     if ((int)$pae['id_empresa'] !== $idEmpresaUsuario) {
-        die("Acesso negado: este PAE pertence a outra empresa.");
+        redirecionarAcessoNegado();
     }
 }
 

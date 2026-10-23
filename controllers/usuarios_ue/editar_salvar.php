@@ -33,7 +33,8 @@ if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0) {
     $stmtVerifica->bind_param("ii", $idUsuarioUe, $idUreUsuario);
     $stmtVerifica->execute();
     if ($stmtVerifica->get_result()->num_rows === 0) {
-        die("Acesso negado: usuário não pertence à sua Diretoria Regional.");
+        $stmtVerifica->close();
+        redirecionarAcessoNegado();
     }
     $stmtVerifica->close();
 }

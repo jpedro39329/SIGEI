@@ -1,7 +1,7 @@
 <?php
 require_once "../../config/init.php";
 
-exigirLogin();
+exigirPerfil(array('ADMIN', 'SEDUC', 'DIRIGENTE', 'USUARIO_SEFISC', 'SUPERVISOR', 'USUARIO_EMPRESA'));
 
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
@@ -17,13 +17,13 @@ $result = mysqli_query($conexao, $sql);
 $pae = $result ? mysqli_fetch_assoc($result) : null;
 
 if (!$pae) {
-    die("PAE não encontrado.");
+    redirecionarAcessoNegado();
 }
 
 if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     $idEmpresa = idEmpresaSupervisor($conexao, $userId);
     if ((int) $pae['id_empresa'] !== $idEmpresa) {
-        die("Acesso negado.");
+        redirecionarAcessoNegado();
     }
 }
 

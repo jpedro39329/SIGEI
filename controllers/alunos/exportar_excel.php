@@ -1,7 +1,7 @@
 <?php
 require_once "../../config/init.php";
 
-exigirLogin();
+exigirPerfil(array('ADMIN', 'SEDUC', 'DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL', 'SUPERVISOR', 'USUARIO_EMPRESA', 'USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'));
 
 $userName = $_SESSION['user_name'] ?? 'Usuário';
 $userPerfil = $_SESSION['user_perfil'] ?? '';

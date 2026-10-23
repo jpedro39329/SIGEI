@@ -1,15 +1,8 @@
 <?php
 require_once "../../config/init.php";
 
-exigirLogin();
+exigirPerfil(array('USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC'));
 exigirTokenCSRF();
-
-$userPerfil = $_SESSION['user_perfil'] ?? '';
-$userId = (int) ($_SESSION['user_id'] ?? 0);
-
-if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'ADMIN', 'SEDUC'])) {
-    die("Você não tem permissão para reativar alunos.");
-}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../../views/alunos/listar.php?aba=arquivados");

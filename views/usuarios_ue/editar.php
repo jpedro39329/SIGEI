@@ -31,7 +31,7 @@ if (!$usuario) {
 }
 
 if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0 && (int)$usuario['id_ure'] !== $idUreUsuario) {
-    die("Acesso negado: este usuário pertence a outra Diretoria Regional.");
+    redirecionarAcessoNegado();
 }
 
 // Lista escolas disponíveis para vinculação

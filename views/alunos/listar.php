@@ -1,7 +1,7 @@
 <?php
 require_once "../../config/init.php";
 
-exigirLogin();
+exigirPerfil(array('ADMIN', 'SEDUC', 'DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL', 'SUPERVISOR', 'USUARIO_EMPRESA', 'USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'PAE'));
 
 $userName = $_SESSION['user_name'];
 $userPerfil = $_SESSION['user_perfil'];
@@ -80,7 +80,7 @@ $whereBaseSql = (count($where) > 0) ? 'WHERE ' . implode(' AND ', $where) : '';
 
 // Função auxiliar para carregar contagens e dados
 $baseSelect = "
-    SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, a.data_nascimento,
+    SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, a.descricao_cuidados, a.data_nascimento,
            TIMESTAMPDIFF(YEAR, a.data_nascimento, CURDATE()) AS idade,
            a.status_aprovacao, a.motivo_arquivamento, a.data_arquivamento, a.arquivado_por_nome, a.arquivado_por_cpf, a.arquivado_por_perfil, a.data_cadastro,
            e.nome AS escola_nome,
@@ -243,7 +243,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
     </div>
 
     <!-- Abas de Alunos -->
-    <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'DIRIGENTE'])): ?>
+    <?php if (!in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'DIRIGENTE', 'PAE'])): ?>
     <ul class="nav nav-tabs mb-3" id="alunosTabs">
         <li class="nav-item">
             <a class="nav-link fw-bold <?php echo ($abaAtiva === 'todos') ? 'active' : ''; ?>" href="listar.php?aba=todos<?php echo $busca !== '' ? '&busca=' . urlencode($busca) . '&tp_filtro=' . $tipoFiltro . '&campo_filtro=' . $campoFiltro : ''; ?>">
@@ -278,17 +278,22 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                             <th>Nome</th>
                             <th>RA</th>
                             <th>CPF</th>
-                            <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
-                                <th>Unidade Escolar</th>
-                            <?php endif; ?>
-                            <th>Deficiência</th>
-                            <?php if ($abaAtiva === 'arquivados'): ?>
-                                <th>Inativação</th>
-                                <th>Inativado Por</th>
-                                <th>Motivo</th>
-                            <?php else: ?>
-                                <th>Status</th>
+                            <?php if ($userPerfil === 'PAE'): ?>
                                 <th>Profissional de Apoio Escolar</th>
+                                <th>Cuidados</th>
+                            <?php else: ?>
+                                <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
+                                    <th>Unidade Escolar</th>
+                                <?php endif; ?>
+                                <th>Deficiência</th>
+                                <?php if ($abaAtiva === 'arquivados'): ?>
+                                    <th>Inativação</th>
+                                    <th>Inativado Por</th>
+                                    <th>Motivo</th>
+                                <?php else: ?>
+                                    <th>Status</th>
+                                    <th>Profissional de Apoio Escolar</th>
+                                <?php endif; ?>
                             <?php endif; ?>
                             <th>Ações</th>
                         </tr>
@@ -302,64 +307,77 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                                     </td>
                                     <td><?php echo htmlspecialchars($aluno['ra'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars(formatarCPF($aluno['cpf'])); ?></td>
-                                    <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
-                                        <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
-                                    <?php endif; ?>
-                                    <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
-
-                                    <?php if ($abaAtiva === 'arquivados'): ?>
+                                    <?php if ($userPerfil === 'PAE'): ?>
+                                        <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem Profissional'); ?></td>
                                         <td>
-                                            <?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>
-                                        </td>
-                                        <td>
-                                            <?php if (!empty($aluno['arquivado_por_cpf']) || !empty($aluno['arquivado_por_nome'])): ?>
-                                                <button type="button" 
-                                                        class="btn btn-sm btn-light border py-1 px-2 text-dark btn-detalhes-inativacao font-monospace small d-inline-flex align-items-center gap-1"
-                                                        data-nome-aluno="<?php echo htmlspecialchars($aluno['nome']); ?>"
-                                                        data-resp-nome="<?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?? 'Não informado'); ?>"
-                                                        data-resp-cpf="<?php echo htmlspecialchars(!empty($aluno['arquivado_por_cpf']) ? formatarCPF($aluno['arquivado_por_cpf']) : 'Não informado'); ?>"
-                                                        data-resp-perfil="<?php echo htmlspecialchars($aluno['arquivado_por_perfil'] ?? '-'); ?>"
-                                                        data-data="<?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>"
-                                                        data-motivo="<?php echo htmlspecialchars($aluno['motivo_arquivamento'] ?? 'Não informado'); ?>"
-                                                        title="Clique para ver os dados de quem inativou">
-                                                    <i class="bi bi-person-badge"></i>
-                                                    <?php echo !empty($aluno['arquivado_por_cpf']) ? htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])) : htmlspecialchars($aluno['arquivado_por_nome']); ?>
-                                                </button>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if (!empty($aluno['motivo_arquivamento'])): ?>
-                                                <span class="text-muted small" title="<?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?>">
-                                                    <?php echo htmlspecialchars(mb_strimwidth($aluno['motivo_arquivamento'], 0, 40, '...')); ?>
+                                            <?php if (!empty($aluno['descricao_cuidados'])): ?>
+                                                <span class="text-secondary small" title="<?php echo htmlspecialchars($aluno['descricao_cuidados']); ?>">
+                                                    <?php echo htmlspecialchars(mb_strimwidth($aluno['descricao_cuidados'], 0, 45, '...')); ?>
                                                 </span>
                                             <?php else: ?>
-                                                <span class="text-muted">-</span>
+                                                <span class="text-muted small">Não especificado</span>
                                             <?php endif; ?>
                                         </td>
                                     <?php else: ?>
-                                        <td>
-                                            <?php
-                                                if ($aluno['status_aprovacao'] == 'PENDENTE') {
-                                                    echo '<span class="badge bg-warning text-dark">Pendente</span>';
-                                                } elseif ($aluno['status_aprovacao'] == 'PENDENTE_CORRECAO') {
-                                                    echo '<span class="badge bg-warning text-dark">Em Correção</span>';
-                                                } elseif ($aluno['status_aprovacao'] == 'APROVADO') {
-                                                    echo '<span class="badge bg-success">Aprovado</span>';
-                                                } elseif ($aluno['status_aprovacao'] == 'REPROVADO') {
-                                                    echo '<span class="badge bg-danger">Reprovado</span>';
-                                                } else {
-                                                    echo '<span class="badge bg-secondary">Arquivado</span>';
-                                                }
-                                            ?>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem Profissional'); ?></td>
+                                        <?php if ($userPerfil !== 'USUARIO_ESCOLA'): ?>
+                                            <td><?php echo htmlspecialchars($aluno['escola_nome'] ?? '-'); ?></td>
+                                        <?php endif; ?>
+                                        <td><?php echo htmlspecialchars($aluno['descricao_deficiencia']); ?></td>
+
+                                        <?php if ($abaAtiva === 'arquivados'): ?>
+                                            <td>
+                                                <?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>
+                                            </td>
+                                            <td>
+                                                <?php if (!empty($aluno['arquivado_por_cpf']) || !empty($aluno['arquivado_por_nome'])): ?>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-light border py-1 px-2 text-dark btn-detalhes-inativacao font-monospace small d-inline-flex align-items-center gap-1"
+                                                            data-nome-aluno="<?php echo htmlspecialchars($aluno['nome']); ?>"
+                                                            data-resp-nome="<?php echo htmlspecialchars($aluno['arquivado_por_nome'] ?? 'Não informado'); ?>"
+                                                            data-resp-cpf="<?php echo htmlspecialchars(!empty($aluno['arquivado_por_cpf']) ? formatarCPF($aluno['arquivado_por_cpf']) : 'Não informado'); ?>"
+                                                            data-resp-perfil="<?php echo htmlspecialchars($aluno['arquivado_por_perfil'] ?? '-'); ?>"
+                                                            data-data="<?php echo !empty($aluno['data_arquivamento']) ? date('d/m/Y \à\s H:i', strtotime($aluno['data_arquivamento'])) : '-'; ?>"
+                                                            data-motivo="<?php echo htmlspecialchars($aluno['motivo_arquivamento'] ?? 'Não informado'); ?>"
+                                                            title="Clique para ver os dados de quem inativou">
+                                                        <i class="bi bi-person-badge"></i>
+                                                        <?php echo !empty($aluno['arquivado_por_cpf']) ? htmlspecialchars(formatarCPF($aluno['arquivado_por_cpf'])) : htmlspecialchars($aluno['arquivado_por_nome']); ?>
+                                                    </button>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if (!empty($aluno['motivo_arquivamento'])): ?>
+                                                    <span class="text-muted small" title="<?php echo htmlspecialchars($aluno['motivo_arquivamento']); ?>">
+                                                        <?php echo htmlspecialchars(mb_strimwidth($aluno['motivo_arquivamento'], 0, 40, '...')); ?>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                        <?php else: ?>
+                                            <td>
+                                                <?php
+                                                    if ($aluno['status_aprovacao'] == 'PENDENTE') {
+                                                        echo '<span class="badge bg-warning text-dark">Pendente</span>';
+                                                    } elseif ($aluno['status_aprovacao'] == 'PENDENTE_CORRECAO') {
+                                                        echo '<span class="badge bg-warning text-dark">Em Correção</span>';
+                                                    } elseif ($aluno['status_aprovacao'] == 'APROVADO') {
+                                                        echo '<span class="badge bg-success">Aprovado</span>';
+                                                    } elseif ($aluno['status_aprovacao'] == 'REPROVADO') {
+                                                        echo '<span class="badge bg-danger">Reprovado</span>';
+                                                    } else {
+                                                        echo '<span class="badge bg-secondary">Arquivado</span>';
+                                                    }
+                                                ?>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($aluno['pae_nome'] ?? 'Sem Profissional'); ?></td>
+                                        <?php endif; ?>
                                     <?php endif; ?>
 
                                     <td>
                                         <div class="d-flex gap-1 flex-wrap align-items-center">
-                                            <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Ver</a>
+                                            <a href="visualizar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">Acessar</a>
 
                                             <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA']) && !in_array($aluno['status_aprovacao'], ['ARQUIVADO', 'PENDENTE'])): ?>
                                                 <a href="editar.php?id=<?php echo $aluno['id_aluno']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Aluno">Editar</a>

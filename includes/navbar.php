@@ -137,6 +137,9 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 <!-- PAE -->
                 <?php if ($userPerfil === 'PAE') { ?>
                     <li class="nav-item">
+                        <a class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Meus Alunos</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?php echo (strpos($scriptPath, 'relatorios/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/relatorios/listar.php">Meus Relatórios</a>
                     </li>
                 <?php } ?>

@@ -9,7 +9,7 @@ $userId = (int) ($_SESSION['user_id'] ?? 0);
 $id_aluno = (int) ($_GET['id'] ?? 0);
 
 if ($id_aluno <= 0) {
-    die("Aluno não informado.");
+    redirecionarAcessoNegado();
 }
 
 // Busca os dados completos do aluno, escola e quem cadastrou
@@ -27,31 +27,31 @@ $resultAluno = mysqli_query($conexao, $sqlAluno);
 $aluno = $resultAluno ? mysqli_fetch_assoc($resultAluno) : null;
 
 if (!$aluno) {
-    die("Aluno não encontrado.");
+    redirecionarAcessoNegado();
 }
 
 // Valida permissão de visualização
 if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $idEscola = idEscolaUsuario($conexao, $userId);
     if ((int) $aluno['id_ue'] !== $idEscola) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 } elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL'])) {
     $idUre = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
     if ($idUre > 0 && (int) $aluno['id_ure'] !== $idUre) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     $idEmpresa = idEmpresaSupervisor($conexao, $userId);
     $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpresa);
     if (!in_array((int) $aluno['id_ure'], $uresAtendidas)) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 } elseif ($userPerfil === 'PAE') {
     $sqlAssoc = "SELECT id_associacao FROM associacoes WHERE id_aluno = $id_aluno AND id_pae = $userId AND ativo = 1";
     $resultAssoc = mysqli_query($conexao, $sqlAssoc);
     if (!$resultAssoc || mysqli_num_rows($resultAssoc) == 0) {
-        die("Você não tem permissão para visualizar este aluno.");
+        redirecionarAcessoNegado();
     }
 }
 

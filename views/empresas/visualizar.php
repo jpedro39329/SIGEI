@@ -12,7 +12,7 @@ if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     if ($id <= 0) {
         $id = $idEmpresaSupervisor;
     } elseif ($id !== $idEmpresaSupervisor) {
-        die("Acesso negado.");
+        redirecionarAcessoNegado();
     }
 }
 

@@ -29,20 +29,20 @@ $result = mysqli_query($conexao, $sql);
 $relatorio = $result ? mysqli_fetch_assoc($result) : null;
 
 if (!$relatorio) {
-    die("Relatório não encontrado.");
+    redirecionarAcessoNegado();
 }
 
 // Permissões
 if ($userPerfil === 'PAE') {
     if ((int)$relatorio['id_pae'] !== $userId) {
-        die("Acesso negado.");
+        redirecionarAcessoNegado();
     }
 } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     if ($idEmpresaUsuario <= 0) {
         $idEmpresaUsuario = idEmpresaSupervisor($conexao, $userId);
     }
     if ((int)$relatorio['id_empresa'] !== $idEmpresaUsuario) {
-        die("Acesso negado: este relatório pertence a outra empresa.");
+        redirecionarAcessoNegado();
     }
 }
 ?>

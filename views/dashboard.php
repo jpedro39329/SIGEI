@@ -33,6 +33,14 @@ function totalDashboard($conexao, $sql) {
 
 <div class="content">
 
+    <?php if (isset($_GET['erro']) && $_GET['erro'] === 'acesso_negado'): ?>
+        <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-shield-exclamation fs-5"></i>
+            <div>Você não possui permissão para acessar a página solicitada.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="mb-4">
         <h4 class="mb-1">Olá, <?php echo htmlspecialchars($userName); ?></h4>
         <p class="text-muted mb-0"><strong><?php echo htmlspecialchars(nomePerfil($userPerfil)); ?></strong> — bem-vindo(a) ao painel do SIGEI.</p>
@@ -800,7 +808,7 @@ function totalDashboard($conexao, $sql) {
     <?php endif; ?>
 
     <footer class="text-center text-muted py-3 small">
-        SIGEI — Sistema Integrado de Gestão da Educação Inclusiva &copy; <?php echo date('Y'); ?>
+        Sistema de Gestão Educacional Inclusivo &copy;
     </footer>
 
 </div>

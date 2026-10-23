@@ -17,7 +17,7 @@ if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
 
 // Apenas USUARIO_ESCOLA pode remover laudos
 if (!in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA', 'ADMIN', 'SEDUC'])) {
-    die("Acesso negado.");
+    redirecionarAcessoNegado();
 }
 
 $id_laudo = (int) ($_POST['id_laudo'] ?? 0);
@@ -45,7 +45,7 @@ if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $resAluno = mysqli_query($conexao, $sqlAluno);
     $dadosAluno = mysqli_fetch_assoc($resAluno);
     if (!$dadosAluno || (int)$dadosAluno['id_ue'] !== $idEscola) {
-        die("Acesso negado.");
+        redirecionarAcessoNegado();
     }
 }
 
