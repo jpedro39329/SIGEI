@@ -74,6 +74,7 @@ if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     $where[] = "a.status_aprovacao = 'APROVADO'";
 } elseif ($userPerfil === 'PAE') {
     $where[] = "a.id_aluno IN (SELECT id_aluno FROM associacoes WHERE id_pae = $userId AND ativo = 1)";
+    $where[] = "a.status_aprovacao = 'APROVADO'";
 }
 
 $whereBaseSql = (count($where) > 0) ? 'WHERE ' . implode(' AND ', $where) : '';

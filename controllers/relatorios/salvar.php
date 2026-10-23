@@ -17,10 +17,12 @@ if (mb_strlen($descricao, 'UTF-8') > 5000) {
     die("A descrição do relatório excede o limite de 5000 caracteres.");
 }
 
-// Verifica se o aluno está associado a este PAE
+// Verifica se o aluno está com atendimento aprovado e associado a este PAE
 $stmtVerifica = $conexao->prepare(
-    "SELECT id_associacao FROM associacoes
-     WHERE id_aluno = ? AND id_pae = ? AND ativo = 1
+    "SELECT ass.id_associacao 
+     FROM associacoes ass
+     JOIN alunos a ON ass.id_aluno = a.id_aluno
+     WHERE ass.id_aluno = ? AND ass.id_pae = ? AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
      LIMIT 1"
 );
 $stmtVerifica->bind_param("ii", $id_aluno, $id_pae);
@@ -28,7 +30,7 @@ $stmtVerifica->execute();
 $resultVerifica = $stmtVerifica->get_result();
 
 if ($resultVerifica->num_rows == 0) {
-    die("Aluno não está associado a você.");
+    die("Aluno não está associado a você ou o atendimento não está aprovado.");
 }
 
 $rowAssoc = $resultVerifica->fetch_assoc();

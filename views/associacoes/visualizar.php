@@ -57,7 +57,7 @@ $sqlAlunosAssoc = "
     JOIN alunos a ON ass.id_aluno = a.id_aluno
     LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
     LEFT JOIN unidades_regionais ure ON ue.id_ure = ure.id_ure
-    WHERE ass.id_pae = ? AND ass.ativo = 1
+    WHERE ass.id_pae = ? AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
     ORDER BY a.nome ASC
 ";
 $stmtAlunos = $conexao->prepare($sqlAlunosAssoc);

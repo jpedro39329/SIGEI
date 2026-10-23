@@ -32,7 +32,7 @@ $sqlAlunos = "
     FROM associacoes ass
     JOIN alunos a ON ass.id_aluno = a.id_aluno
     LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
-    WHERE ass.id_pae = $id_pae AND ass.ativo = 1
+    WHERE ass.id_pae = $id_pae AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
     ORDER BY a.nome
 ";
 $resultAlunos = mysqli_query($conexao, $sqlAlunos);

@@ -58,7 +58,7 @@ $sqlPaesAssociados = "
         GROUP_CONCAT(DISTINCT COALESCE(ue.nome, 'Sem escola') ORDER BY ue.nome SEPARATOR ', ') AS escola_nome
     FROM usuarios_pae p
     JOIN associacoes ass ON p.id_pae = ass.id_pae AND ass.ativo = 1
-    JOIN alunos a ON ass.id_aluno = a.id_aluno
+    JOIN alunos a ON ass.id_aluno = a.id_aluno AND a.status_aprovacao = 'APROVADO'
     LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
     LEFT JOIN empresas emp ON p.id_empresa = emp.id_empresa
     WHERE p.ativo = 1

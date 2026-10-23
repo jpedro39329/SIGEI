@@ -67,11 +67,11 @@ if ($busca !== '') {
 }
 
 if ($userPerfil === 'PAE') {
-    // Alunos associados ao PAE
+    // Alunos associados ao PAE (apenas alunos com atendimento aprovado e associação ativa)
     $sqlAlunos = "
         SELECT a.id_aluno, a.nome FROM associacoes ass
         JOIN alunos a ON ass.id_aluno = a.id_aluno
-        WHERE ass.id_pae = $userId AND ass.ativo = 1
+        WHERE ass.id_pae = $userId AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
         ORDER BY a.nome
     ";
     $resultAlunos = mysqli_query($conexao, $sqlAlunos);

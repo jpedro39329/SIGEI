@@ -455,10 +455,10 @@ function uresAtendidasEmpresa($conexao, $idEmpresa) {
     return $ures;
 }
 
-// Conta quantos alunos ativos um PAE possui
+// Conta quantos alunos ativos e aprovados um PAE possui
 function contarAlunosPAE($conexao, $idPae) {
     $idPae = (int) $idPae;
-    $query = "SELECT COUNT(*) AS total FROM associacoes WHERE id_pae = $idPae AND ativo = 1";
+    $query = "SELECT COUNT(*) AS total FROM associacoes ass JOIN alunos a ON ass.id_aluno = a.id_aluno WHERE ass.id_pae = $idPae AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
     return (int) ($row['total'] ?? 0);
@@ -478,11 +478,12 @@ function nomePAEAluno($conexao, $idAluno) {
     $idAluno = (int) $idAluno;
     $query = "SELECT p.nome FROM associacoes ass
               JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-              WHERE ass.id_aluno = $idAluno AND ass.ativo = 1
+              JOIN alunos a ON ass.id_aluno = a.id_aluno
+              WHERE ass.id_aluno = $idAluno AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
               LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return $row['nome'] ?? 'Sem PAE';
+    return $row['nome'] ?? null;
 }
 
 // ============================================================
@@ -1014,7 +1015,7 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
     elseif ($perfil === 'PAE') {
         // Eventos diretos de vinculação / desvinculação deste PAE registrados em auditoria
         $sqlAuditPae = "
-            SELECT aud.id_auditoria, aud.acao, aud.id_registro, aud.detalhes, aud.criado_em, a.nome AS aluno_nome
+            SELECT aud.id_auditoria, aud.acao, aud.id_registro, aud.detalhes, aud.criado_em, a.nome AS aluno_nome, a.status_aprovacao
             FROM auditoria aud
             LEFT JOIN alunos a ON aud.id_registro = a.id_aluno
             WHERE aud.entidade = 'alunos'
@@ -1023,7 +1024,7 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
         ";
         $resAudPae = mysqli_query($conexao, $sqlAuditPae);
         $idsAlunosAtivosPae = [];
-        $resAtivosPae = mysqli_query($conexao, "SELECT id_aluno FROM associacoes WHERE id_pae = $userId AND ativo = 1");
+        $resAtivosPae = mysqli_query($conexao, "SELECT a.id_aluno FROM associacoes ass JOIN alunos a ON ass.id_aluno = a.id_aluno WHERE ass.id_pae = $userId AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'");
         if ($resAtivosPae) {
             while ($rAt = mysqli_fetch_assoc($resAtivosPae)) {
                 $idsAlunosAtivosPae[(int) $rAt['id_aluno']] = true;
@@ -1037,8 +1038,9 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
                 $detEv = json_decode($ev['detalhes'] ?? '', true) ?: [];
                 $idPaeEv = (int) ($detEv['id_pae'] ?? 0);
                 $nomeAl = htmlspecialchars($ev['aluno_nome'] ?? ($detEv['aluno_nome'] ?? 'Aluno'));
+                $statusAlunoEv = $ev['status_aprovacao'] ?? '';
 
-                if ($acaoEv === 'ASSOCIAR_PAE' && $idPaeEv === $userId) {
+                if ($acaoEv === 'ASSOCIAR_PAE' && $idPaeEv === $userId && $statusAlunoEv === 'APROVADO') {
                     $notificacoes[] = [
                         'tipo' => 'success',
                         'icone' => 'bi-person-check-fill',
@@ -1058,7 +1060,7 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
                         'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
                         'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
                     ];
-                } elseif (isset($idsAlunosAtivosPae[$idAl]) && $acaoEv === 'EDITAR') {
+                } elseif (isset($idsAlunosAtivosPae[$idAl]) && $acaoEv === 'EDITAR' && $statusAlunoEv === 'APROVADO') {
                     $notificacoes[] = [
                         'tipo' => 'info',
                         'icone' => 'bi-pencil-square',
@@ -1068,7 +1070,7 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
                         'tempo' => date('d/m/Y', strtotime($ev['criado_em'])),
                         'ref_time' => $ev['criado_em'] . '_' . $ev['id_auditoria']
                     ];
-                } elseif (isset($idsAlunosAtivosPae[$idAl]) && $acaoEv === 'ANEXAR_DOCUMENTO') {
+                } elseif (isset($idsAlunosAtivosPae[$idAl]) && $acaoEv === 'ANEXAR_DOCUMENTO' && $statusAlunoEv === 'APROVADO') {
                     $notificacoes[] = [
                         'tipo' => 'info',
                         'icone' => 'bi-paperclip',
@@ -1086,7 +1088,8 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
         $sqlMeusAlunos = "
             SELECT COUNT(*) AS total
             FROM associacoes ass
-            WHERE ass.id_pae = $userId AND ass.ativo = 1
+            JOIN alunos a ON ass.id_aluno = a.id_aluno
+            WHERE ass.id_pae = $userId AND ass.ativo = 1 AND a.status_aprovacao = 'APROVADO'
         ";
         $resMeus = mysqli_query($conexao, $sqlMeusAlunos);
         $totMeus = $resMeus ? (int) mysqli_fetch_assoc($resMeus)['total'] : 0;

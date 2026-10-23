@@ -48,6 +48,10 @@ if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
         redirecionarAcessoNegado();
     }
 } elseif ($userPerfil === 'PAE') {
+    // PAE só pode exportar ficha de alunos APROVADOS e com associação ativa
+    if ($aluno['status_aprovacao'] !== 'APROVADO') {
+        redirecionarAcessoNegado();
+    }
     $sqlAssoc = "SELECT id_associacao FROM associacoes WHERE id_aluno = $id_aluno AND id_pae = $userId AND ativo = 1";
     $resultAssoc = mysqli_query($conexao, $sqlAssoc);
     if (!$resultAssoc || mysqli_num_rows($resultAssoc) == 0) {
@@ -55,16 +59,19 @@ if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     }
 }
 
-// Busca PAE associado
-$sqlPae = "
-    SELECT p.id_pae, p.nome, p.cpf, ass.data_inicio
-    FROM associacoes ass
-    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-    WHERE ass.id_aluno = $id_aluno AND ass.ativo = 1
-    LIMIT 1
-";
-$resultPae = mysqli_query($conexao, $sqlPae);
-$pae = $resultPae ? mysqli_fetch_assoc($resultPae) : null;
+// Busca PAE associado (apenas se aluno estiver APROVADO)
+$pae = null;
+if ($aluno['status_aprovacao'] === 'APROVADO') {
+    $sqlPae = "
+        SELECT p.id_pae, p.nome, p.cpf, ass.data_inicio
+        FROM associacoes ass
+        JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+        WHERE ass.id_aluno = $id_aluno AND ass.ativo = 1
+        LIMIT 1
+    ";
+    $resultPae = mysqli_query($conexao, $sqlPae);
+    $pae = $resultPae ? mysqli_fetch_assoc($resultPae) : null;
+}
 
 $historicoEventos = obterHistoricoSolicitacaoAluno($conexao, $aluno);
 

@@ -42,10 +42,10 @@ $sqlAlunos = "
 $resultAlunos = mysqli_query($conexao, $sqlAlunos);
 $alunosDisponiveis = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSOC) : [];
 
-// 2. Lista de PAEs ativos que têm menos de 3 alunos ativos vinculados
+// 2. Lista de PAEs ativos que têm menos de 3 alunos ativos aprovados vinculados
 $sqlPAEs = "
     SELECT p.id_pae, p.nome, p.cpf, e.nome AS empresa_nome,
-           (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_pae = p.id_pae AND ass.ativo = 1) AS qtd_alunos
+           (SELECT COUNT(*) FROM associacoes ass JOIN alunos al ON ass.id_aluno = al.id_aluno WHERE ass.id_pae = p.id_pae AND ass.ativo = 1 AND al.status_aprovacao = 'APROVADO') AS qtd_alunos
     FROM usuarios_pae p
     LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
     WHERE p.ativo = 1

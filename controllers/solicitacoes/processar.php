@@ -101,6 +101,16 @@ $stmt = $conexao->prepare(
 $stmt->bind_param("ssssi", $status, $motivo, $deliberadorNome, $deliberadorCpf, $id_aluno);
 
 if ($stmt->execute()) {
+    // Se a solicitação foi REPROVADA ou colocada em CORREÇÃO, qualquer associação de PAE ativa DEVE ser desativada imediatamente
+    if ($status === 'REPROVADO' || $status === 'PENDENTE_CORRECAO') {
+        $stmtDesativar = $conexao->prepare("UPDATE associacoes SET ativo = 0, data_fim = CURDATE() WHERE id_aluno = ? AND ativo = 1");
+        if ($stmtDesativar) {
+            $stmtDesativar->bind_param("i", $id_aluno);
+            $stmtDesativar->execute();
+            $stmtDesativar->close();
+        }
+    }
+
     registrarAuditoria($conexao, 'ALUNOS', 'DELIBERAR', 'alunos', $id_aluno, [
         'status' => $status,
         'motivo' => $motivo,

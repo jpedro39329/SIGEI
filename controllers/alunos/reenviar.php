@@ -45,6 +45,14 @@ $stmt = $conexao->prepare(
 $stmt->bind_param("ii", $id_aluno, $id_escola);
 
 if ($stmt->execute()) {
+    // Garante que nenhuma associação de PAE permaneça ativa enquanto o aluno volta para reanálise
+    $stmtDesativarAssoc = $conexao->prepare("UPDATE associacoes SET ativo = 0, data_fim = CURDATE() WHERE id_aluno = ? AND ativo = 1");
+    if ($stmtDesativarAssoc) {
+        $stmtDesativarAssoc->bind_param("i", $id_aluno);
+        $stmtDesativarAssoc->execute();
+        $stmtDesativarAssoc->close();
+    }
+
     registrarAuditoria($conexao, 'ALUNOS', 'REENVIAR', 'alunos', $id_aluno, [
         'nome' => $alunoDados['nome'] ?? '',
         'status_anterior' => $alunoDados['status_aprovacao'] ?? '',
