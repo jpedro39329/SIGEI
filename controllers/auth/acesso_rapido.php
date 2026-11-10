@@ -1,20 +1,12 @@
 <?php
 require_once "../../config/init.php";
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: ../../views/auth/acesso_rapido.php");
-    exit();
+$tabela = trim($_POST['tabela'] ?? $_GET['tabela'] ?? '');
+$id = (int) ($_POST['id'] ?? $_GET['id'] ?? 0);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirTokenCSRF();
 }
-
-exigirTokenCSRF();
-
-if (empty($_SESSION['acesso_rapido_autorizado']) && !estaLogado()) {
-    header("Location: ../../views/auth/acesso_rapido.php?erro=nao_autorizado");
-    exit();
-}
-
-$tabela = trim($_POST['tabela'] ?? '');
-$id = (int) ($_POST['id'] ?? 0);
 
 if (!$tabela || $id <= 0) {
     header("Location: ../../views/auth/acesso_rapido.php?erro=parametros_invalidos");
@@ -81,7 +73,6 @@ if ($result && $result->num_rows === 1) {
     session_regenerate_id(true);
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     $_SESSION['ultima_atividade'] = time();
-    $_SESSION['acesso_rapido_autorizado'] = true;
 
     unset(
         $_SESSION['id_ure'],
@@ -133,8 +124,7 @@ if ($result && $result->num_rows === 1) {
 
     registrarAuditoria($conexao, 'AUTH', 'ACESSO_RAPIDO', $tabela, $_SESSION['user_id'], [
         'perfil' => $_SESSION['user_perfil'],
-        'tabela' => $tabela,
-        'origem_cpf' => $_SESSION['acesso_rapido_origem_cpf'] ?? ''
+        'tabela' => $tabela
     ]);
 
     $stmt->close();

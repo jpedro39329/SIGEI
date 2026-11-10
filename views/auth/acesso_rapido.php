@@ -2,68 +2,6 @@
 require_once "../../config/init.php";
 
 $perfil = trim($_GET['perfil'] ?? '');
-$erroMsg = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'autorizar_acesso_rapido') {
-    exigirTokenCSRF();
-    $cpfInput = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
-    $senhaInput = $_POST['senha'] ?? '';
-
-    $agora = time();
-    if (((int) ($_SESSION['acesso_rapido_bloqueado_ate'] ?? 0)) > $agora) {
-        $erroMsg = 'Muitas tentativas inválidas. Aguarde 1 minuto e tente novamente.';
-    } elseif ($cpfInput === '' || $senhaInput === '') {
-        $erroMsg = 'Informe o CPF e a senha para liberar o Acesso Rápido.';
-    } else {
-        $autorizado = false;
-        $tabelasAuth = ['admin', 'seduc', 'usuarios_ure', 'usuarios_supervisor', 'usuarios_ue', 'usuarios_pae'];
-        foreach ($tabelasAuth as $tb) {
-            $sqlAuth = ($tb === 'admin')
-                ? "SELECT nome, cpf, senha FROM `admin` WHERE cpf = ? LIMIT 1"
-                : "SELECT nome, cpf, senha FROM `$tb` WHERE cpf = ? AND ativo = 1 LIMIT 1";
-            $st = $conexao->prepare($sqlAuth);
-            if (!$st) continue;
-            $st->bind_param("s", $cpfInput);
-            $st->execute();
-            $resAuth = $st->get_result();
-            if ($resAuth && $resAuth->num_rows === 1) {
-                $rowAuth = $resAuth->fetch_assoc();
-                if (password_verify($senhaInput, $rowAuth['senha'])) {
-                    $autorizado = true;
-                    session_regenerate_id(true);
-                    $_SESSION['acesso_rapido_autorizado'] = true;
-                    $_SESSION['acesso_rapido_origem_cpf'] = $cpfInput;
-                    $_SESSION['acesso_rapido_origem_nome'] = $rowAuth['nome'] ?? '';
-                    $_SESSION['ultima_atividade'] = time();
-                    unset($_SESSION['acesso_rapido_tentativas'], $_SESSION['acesso_rapido_bloqueado_ate']);
-                    $st->close();
-                    break;
-                }
-            }
-            $st->close();
-        }
-
-        if ($autorizado) {
-            $redirect = "acesso_rapido.php" . ($perfil !== '' ? "?perfil=" . urlencode($perfil) : "");
-            header("Location: $redirect");
-            exit();
-        } else {
-            $_SESSION['acesso_rapido_tentativas'] = (int) ($_SESSION['acesso_rapido_tentativas'] ?? 0) + 1;
-            if ($_SESSION['acesso_rapido_tentativas'] >= 5) {
-                $_SESSION['acesso_rapido_bloqueado_ate'] = time() + 60;
-                $_SESSION['acesso_rapido_tentativas'] = 0;
-            }
-            $erroMsg = 'Credenciais inválidas para liberação do Acesso Rápido.';
-        }
-    }
-}
-
-// Se o usuário já possui sessão autenticada no sistema, o Acesso Rápido fica liberado para troca de perfil
-if (estaLogado()) {
-    $_SESSION['acesso_rapido_autorizado'] = true;
-}
-
-$acessoRapidoAutorizado = !empty($_SESSION['acesso_rapido_autorizado']);
 
 $perfisDisponiveis = [
     'admin' => [
@@ -127,7 +65,7 @@ $perfisDisponiveis = [
 $usuarios = [];
 $perfilConfig = null;
 
-if ($acessoRapidoAutorizado && $perfil !== '') {
+if ($perfil !== '') {
     if ($perfil === 'dirigente') {
         $perfil = 'asure';
     }
@@ -192,9 +130,14 @@ if ($acessoRapidoAutorizado && $perfil !== '') {
             $usuarios[] = $row;
         }
     }
-}
 
-$csrfToken = gerarTokenCSRF();
+    if (count($usuarios) === 1) {
+        $uUnico = $usuarios[0];
+        $idUnico = (int) $uUnico[$campoId];
+        header("Location: ../../controllers/auth/acesso_rapido.php?tabela=" . urlencode($tabela) . "&id=" . $idUnico);
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -586,41 +529,7 @@ $csrfToken = gerarTokenCSRF();
     <!-- LADO DIREITO -->
     <div class="caixa direita">
 
-      <?php if ($erroMsg !== ''): ?>
-        <div class="alerta-erro"><?php echo htmlspecialchars($erroMsg); ?></div>
-      <?php elseif (isset($_GET['erro']) && $_GET['erro'] === 'nao_autorizado'): ?>
-        <div class="alerta-erro">Libere o modo de demonstração com uma conta válida antes de alternar perfis.</div>
-      <?php endif; ?>
-
-      <?php if (!$acessoRapidoAutorizado): ?>
-        <!-- ETAPA 0: VERIFICAÇÃO DE AUTORIZAÇÃO PARA O MODO DE DEMONSTRAÇÃO -->
-        <div style="text-align: center;">
-          <span class="badge-dev">Proteção de Segurança</span>
-        </div>
-        <h2 class="section-label">Acesso Rápido</h2>
-        <p class="section-sub">Autentique-se uma única vez na sessão para liberar a alternância rápida entre os perfis de demonstração.</p>
-
-        <form class="auth-form" method="POST" action="acesso_rapido.php<?php echo $perfil !== '' ? '?perfil=' . urlencode($perfil) : ''; ?>">
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
-          <input type="hidden" name="acao" value="autorizar_acesso_rapido">
-
-          <div class="form-group">
-            <label for="cpf_auth">CPF de Usuário Autorizado</label>
-            <input type="text" name="cpf" id="cpf_auth" class="form-control" maxlength="14" placeholder="000.000.000-00" required autofocus>
-          </div>
-
-          <div class="form-group">
-            <label for="senha_auth">Senha</label>
-            <input type="password" name="senha" id="senha_auth" class="form-control" maxlength="255" placeholder="Digite sua senha" required>
-          </div>
-
-          <button type="submit" class="btn-unlock">Liberar Acesso Rápido</button>
-        </form>
-
-        <a href="login.php" class="btn-voltar-link">← Ir para o Login padrão</a>
-        <a href="../../index.html" class="btn-voltar-link" style="margin-top: 8px;">← Voltar para tela inicial</a>
-
-      <?php elseif ($perfil === ''): ?>
+      <?php if ($perfil === ''): ?>
         <h2 class="section-label">Acesso Rápido</h2>
         <p class="section-sub">Selecione o perfil para entrar diretamente.</p>
 
@@ -656,23 +565,6 @@ $csrfToken = gerarTokenCSRF();
             Nenhum usuário ativo encontrado para este perfil no banco de dados.
           </div>
         <?php else: ?>
-          <?php if (count($usuarios) === 1): ?>
-            <?php
-              $uUnico = $usuarios[0];
-              $idUnico = (int) $uUnico[$campoId];
-            ?>
-            <form id="formAutoAcessoRapido" method="POST" action="../../controllers/auth/acesso_rapido.php">
-              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
-              <input type="hidden" name="tabela" value="<?php echo htmlspecialchars($tabela); ?>">
-              <input type="hidden" name="id" value="<?php echo $idUnico; ?>">
-            </form>
-            <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('formAutoAcessoRapido').submit();
-              });
-            </script>
-          <?php endif; ?>
-
           <?php foreach ($usuarios as $u): ?>
             <?php
               $idUsuario = (int) $u[$campoId];
@@ -687,23 +579,18 @@ $csrfToken = gerarTokenCSRF();
               if ($setor) $detalhes[] = "Setor: " . $setor;
               $detalhesTexto = implode(" — ", $detalhes);
             ?>
-            <form method="POST" action="../../controllers/auth/acesso_rapido.php" style="margin: 0;">
-              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
-              <input type="hidden" name="tabela" value="<?php echo htmlspecialchars($tabela); ?>">
-              <input type="hidden" name="id" value="<?php echo $idUsuario; ?>">
-              <button type="submit" class="profile-link">
-                <div class="profile-info user-card-info">
-                  <span class="profile-name" style="font-size: 1.15rem;"><?php echo htmlspecialchars($nome); ?></span>
-                  <?php if ($detalhesTexto): ?>
-                    <span class="profile-desc"><?php echo htmlspecialchars($detalhesTexto); ?></span>
-                  <?php endif; ?>
-                  <?php if (!empty($u['extra'])): ?>
-                    <span class="profile-badge"><?php echo htmlspecialchars($u['extra']); ?></span>
-                  <?php endif; ?>
-                </div>
-                <span class="arrow">&#8594;</span>
-              </button>
-            </form>
+            <a href="../../controllers/auth/acesso_rapido.php?tabela=<?php echo urlencode($tabela); ?>&id=<?php echo $idUsuario; ?>" class="profile-link">
+              <div class="profile-info user-card-info">
+                <span class="profile-name" style="font-size: 1.15rem;"><?php echo htmlspecialchars($nome); ?></span>
+                <?php if ($detalhesTexto): ?>
+                  <span class="profile-desc"><?php echo htmlspecialchars($detalhesTexto); ?></span>
+                <?php endif; ?>
+                <?php if (!empty($u['extra'])): ?>
+                  <span class="profile-badge"><?php echo htmlspecialchars($u['extra']); ?></span>
+                <?php endif; ?>
+              </div>
+              <span class="arrow">&#8594;</span>
+            </a>
           <?php endforeach; ?>
         <?php endif; ?>
 
