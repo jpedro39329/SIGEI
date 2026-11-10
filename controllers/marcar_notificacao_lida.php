@@ -8,7 +8,9 @@ $userPerfil = $_SESSION['user_perfil'] ?? '';
 $key = trim($_POST['key'] ?? ($_GET['key'] ?? ''));
 $destino = trim($_POST['destino'] ?? ($_GET['destino'] ?? ''));
 
-if ($userId > 0 && $userPerfil !== '' && $key !== '') {
+$tokenCsrf = $_POST['csrf_token'] ?? ($_GET['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));
+
+if ($userId > 0 && $userPerfil !== '' && $key !== '' && validarTokenCSRF($tokenCsrf)) {
     $stmt = $conexao->prepare("
         INSERT INTO notificacoes_lidas (id_usuario, perfil, notificacao_key, data_leitura)
         VALUES (?, ?, ?, NOW())
@@ -23,19 +25,24 @@ if ($userId > 0 && $userPerfil !== '' && $key !== '') {
 
 // Se for requisição AJAX/fetch, responde JSON
 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)) {
-    header('Content-Type: application/json');
+    header('Content-Type: application/json; charset=UTF-8');
     echo json_encode(['success' => true]);
     exit();
 }
 
-// Redireciona para o destino ou dashboard
+// Redireciona apenas para rotas internas seguras da pasta views/ (previne Open Redirect)
 if (!empty($destino)) {
-    // Normaliza destino removendo eventuais '../' do início para redirecionar a partir da pasta raiz
-    $destinoLimpo = preg_replace('#^(\.\./)+#', '', $destino);
-    header("Location: ../" . $destinoLimpo);
-    exit();
+    $destinoLimpo = ltrim(preg_replace('#^(\.\./)+#', '', str_replace('\\', '/', $destino)), '/');
+    if (
+        strpos($destinoLimpo, '://') === false &&
+        strpos($destinoLimpo, '//') === false &&
+        strpos($destinoLimpo, '..') === false &&
+        preg_match('#^views/[a-zA-Z0-9_/-]+\.php(\?[a-zA-Z0-9_=&%-]*)?$#', $destinoLimpo)
+    ) {
+        header("Location: ../" . $destinoLimpo);
+        exit();
+    }
 }
 
 header("Location: ../views/dashboard.php");
 exit();
-

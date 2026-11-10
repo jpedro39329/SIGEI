@@ -1,11 +1,35 @@
 # ============================================================
-# SIGEI - Páginas de erro
+# SIGEI - Proteção de Segurança, Rotas e Cabeçalhos HTTP
 # Caminho relativo: funciona tanto em / (hospedagem) quanto em /SIGEI/ (XAMPP)
 # ============================================================
+
+# Impede listagem pública de diretórios
+Options -Indexes
+
+# Cabeçalhos de Segurança HTTP
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Bloqueia acesso direto a pastas internas sensíveis e documentação/relatórios
+    RewriteRule ^(config|banco|includes|relatorios-seguranca)(/|$) - [F,L,NC]
+
+    # Bloqueia acesso a arquivos ocultos, dumps SQL e documentação Markdown
+    RewriteRule (^|/)\.(?!well-known) - [F,L]
+    RewriteRule \.(sql|md|log|bak|ini|sh)$ - [F,L,NC]
+
+    # Intercepta qualquer acesso à pasta uploads/ e exige autenticação/autorização via PHP
+    RewriteRule ^uploads/(contratos|documentos|fotos|laudos)/([^/]+)$ controllers/arquivo.php?pasta=$1&arquivo=$2 [QSA,L,NC]
+    RewriteRule ^uploads(/|$) - [F,L,NC]
+
+    # Rota amigável de 404 para caminhos inexistentes
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ 404.php [L]
 </IfModule>
-

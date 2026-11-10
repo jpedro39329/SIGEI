@@ -118,16 +118,83 @@
     }
 
     /**
+     * Sanitiza HTML da mensagem permitindo apenas <br>, <small> e <strong> seguros
+     */
+    function sanitizarMensagemHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = String(str || '');
+        let seguro = div.innerHTML;
+        seguro = seguro
+            .replace(/&lt;br\s*\/?&gt;/gi, '<br>')
+            .replace(/&lt;small(\s+class=&quot;text-muted&quot;)?&gt;/gi, '<small class="text-muted">')
+            .replace(/&lt;\/small&gt;/gi, '</small>')
+            .replace(/&lt;strong&gt;/gi, '<strong>')
+            .replace(/&lt;\/strong&gt;/gi, '</strong>');
+        return seguro;
+    }
+
+    /**
      * Fecha o modal resolvendo a Promise
      */
     function fecharModal(confirmado) {
         if (modalInstance) {
             modalInstance.hide();
+        } else if (modalElement) {
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            modalElement.setAttribute('aria-hidden', 'true');
+            const backdrop = document.getElementById('sigei-confirm-fallback-backdrop');
+            if (backdrop) backdrop.remove();
         }
         if (pendingResolver) {
             pendingResolver(confirmado);
             pendingResolver = null;
         }
+    }
+
+    /**
+     * Submete uma URL de controller via POST com token CSRF
+     */
+    function submeterLinkViaPost(href) {
+        try {
+            const urlObj = new URL(href, window.location.href);
+            // Se for logout, redirecionamento direto é suficiente
+            if (urlObj.pathname.endsWith('/logout.php')) {
+                window.location.href = href;
+                return;
+            }
+            // Se apontar para um controller de ação, envia via POST com csrf_token
+            if (urlObj.pathname.indexOf('/controllers/') !== -1) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = urlObj.origin + urlObj.pathname + urlObj.search;
+                form.style.display = 'none';
+
+                urlObj.searchParams.forEach(function (val, key) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = val;
+                    form.appendChild(input);
+                });
+
+                const csrfToken = (window.SIGEI_CONFIG && window.SIGEI_CONFIG.csrfToken) ? window.SIGEI_CONFIG.csrfToken : '';
+                if (csrfToken && !urlObj.searchParams.has('csrf_token')) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+                return;
+            }
+        } catch (err) {
+            // Fallback caso URL seja inválida
+        }
+        window.location.href = href;
     }
 
     /**
@@ -162,9 +229,9 @@
             iconEl.style.color = config.iconColor;
             iconEl.style.fontSize = '1.75rem';
 
-            // Configurar textos
+            // Configurar textos com sanitização segura
             titleEl.textContent = title;
-            messageEl.innerHTML = message;
+            messageEl.innerHTML = sanitizarMensagemHTML(message);
             btnCancel.textContent = cancelText;
             btnConfirm.textContent = actionText;
 
@@ -177,9 +244,16 @@
                 modalInstance = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
                 modalInstance.show();
             } else {
-                // Fallback de segurança se Bootstrap JS estiver indisponível
-                const nativo = window.confirm(`${title}\n\n${message.replace(/<[^>]*>?/gm, '')}`);
-                resolve(nativo);
+                // Fallback DOM próprio do SIGEI caso Bootstrap JS não esteja carregado (sem usar window.confirm nativo)
+                el.style.display = 'block';
+                el.classList.add('show');
+                el.removeAttribute('aria-hidden');
+                if (!document.getElementById('sigei-confirm-fallback-backdrop')) {
+                    const backdrop = document.createElement('div');
+                    backdrop.id = 'sigei-confirm-fallback-backdrop';
+                    backdrop.className = 'modal-backdrop fade show';
+                    document.body.appendChild(backdrop);
+                }
             }
         });
     };
@@ -200,7 +274,7 @@
 
             const confirmado = await extrairEConfirmar(trigger);
             if (confirmado) {
-                window.location.href = trigger.href;
+                submeterLinkViaPost(trigger.href);
             }
             return;
         }

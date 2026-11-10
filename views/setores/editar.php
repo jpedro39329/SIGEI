@@ -112,7 +112,9 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Setor<span class="text-danger">*</span></label>
                                 <select name="setor" id="setor" class="form-select" required onchange="atualizarCargos()">
-                                    <option value="ASURE" <?php echo ($servidor['setor'] === 'ASURE' || $servidor['setor'] === 'GABINETE') ? 'selected' : ''; ?>>Assistência Técnica (ASURE)</option>
+                                    <?php if ($userPerfil === 'ADMIN' || $userPerfil === 'SEDUC' || in_array($servidor['setor'], ['ASURE', 'GABINETE'], true)): ?>
+                                        <option value="ASURE" <?php echo ($servidor['setor'] === 'ASURE' || $servidor['setor'] === 'GABINETE') ? 'selected' : ''; ?>>Assistência Técnica (ASURE)</option>
+                                    <?php endif; ?>
                                     <option value="SEFISC" <?php echo $servidor['setor'] === 'SEFISC' ? 'selected' : ''; ?>>Seção de Fiscalização (SEFISC)</option>
                                     <option value="EDU_ESPECIAL" <?php echo $servidor['setor'] === 'EDU_ESPECIAL' ? 'selected' : ''; ?>>Educação Especial</option>
                                 </select>

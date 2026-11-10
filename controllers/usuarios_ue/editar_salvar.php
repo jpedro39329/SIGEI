@@ -51,6 +51,17 @@ if ($nome === '' || $idUe <= 0) {
     exit();
 }
 
+if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0) {
+    $stmtUe = $conexao->prepare("SELECT id_ue FROM unidades_escolares WHERE id_ue = ? AND id_ure = ? LIMIT 1");
+    $stmtUe->bind_param("ii", $idUe, $idUreUsuario);
+    $stmtUe->execute();
+    if ($stmtUe->get_result()->num_rows === 0) {
+        $stmtUe->close();
+        redirecionarAcessoNegado();
+    }
+    $stmtUe->close();
+}
+
 if ($email !== '' && !validarEmail($email, false)) {
     header("Location: ../../views/usuarios_ue/editar.php?id=$idUsuarioUe&erro=" . urlencode("Endereço de e-mail inválido."));
     exit();

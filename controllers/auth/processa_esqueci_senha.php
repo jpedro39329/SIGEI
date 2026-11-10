@@ -1,16 +1,18 @@
 <?php
 // controllers/auth/processa_esqueci_senha.php
 // Etapa 1 da recuperação de senha: gera o código de 6 dígitos para o e-mail informado.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once '../../config/database.php';
+require_once '../../config/init.php';
 
 // Validade do código (minutos)
 const RECUPERACAO_VALIDADE_MIN = 15;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../../views/auth/esqueciminha_senha.php');
+    exit;
+}
+
+if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+    $_SESSION['recuperacao_msg_erro'] = 'Sessão expirada ou token inválido. Tente novamente.';
     header('Location: ../../views/auth/esqueciminha_senha.php');
     exit;
 }

@@ -10,9 +10,9 @@ if ($id_associacao <= 0) {
     die("Associação inválida.");
 }
 
-// Busca dados da associação antes de desativar para registrar no histórico
+// Busca dados da associação antes de desativar para registrar no histórico e validar permissão
 $stmtBusca = $conexao->prepare("
-    SELECT ass.id_aluno, ass.id_pae, a.nome AS aluno_nome, p.nome AS pae_nome, p.cpf AS pae_cpf
+    SELECT ass.id_aluno, ass.id_pae, a.nome AS aluno_nome, p.nome AS pae_nome, p.cpf AS pae_cpf, p.id_empresa
     FROM associacoes ass
     LEFT JOIN alunos a ON ass.id_aluno = a.id_aluno
     LEFT JOIN usuarios_pae p ON ass.id_pae = p.id_pae
@@ -23,6 +23,19 @@ $stmtBusca->bind_param("i", $id_associacao);
 $stmtBusca->execute();
 $dadosAssoc = $stmtBusca->get_result()->fetch_assoc();
 $stmtBusca->close();
+
+if (!$dadosAssoc) {
+    redirecionarAcessoNegado();
+}
+
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'], true)) {
+    $idEmpresaSupervisor = (int) ($_SESSION['id_empresa'] ?? idEmpresaSupervisor($conexao, $userId));
+    if ((int) ($dadosAssoc['id_empresa'] ?? 0) !== $idEmpresaSupervisor) {
+        redirecionarAcessoNegado();
+    }
+}
 
 // Desativa a associação
 $stmt = $conexao->prepare("UPDATE associacoes SET ativo = 0, data_fim = CURDATE() WHERE id_associacao = ?");

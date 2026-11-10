@@ -187,7 +187,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                             <?php if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN'])): ?>
                                                 <a href="editar.php?id=<?php echo $pae['id_pae']; ?>" class="btn btn-sm btn-outline-warning" title="Editar PAE">Editar</a>
                                                 <?php if ($pae['ativo']): ?>
-                                                    <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                                    <a href="../../controllers/paes/excluir.php?id=<?php echo $pae['id_pae']; ?>"
                                                        class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                        title="Excluir PAE"
                                                        data-msg="Tem certeza que deseja excluir/inativar este Profissional de Apoio Escolar?">Excluir</a>

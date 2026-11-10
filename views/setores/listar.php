@@ -183,7 +183,7 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                                class="btn btn-sm btn-outline-warning"
                                                title="Editar Servidor">Editar</a>
                                             <?php if ((int)$s['id_usuario_ure'] !== $userId): ?>
-                                                <a href="../../controllers/setores/excluir.php?id=<?php echo $s['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                                <a href="../../controllers/setores/excluir.php?id=<?php echo $s['id_usuario_ure']; ?>"
                                                    class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                    title="Excluir Servidor"
                                                    data-msg="Tem certeza que deseja excluir este usuário dos serviços da regional?">Excluir</a>

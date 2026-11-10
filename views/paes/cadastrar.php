@@ -131,7 +131,9 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'])) {
     document.querySelector('form').addEventListener('submit', function (e) {
         if (document.getElementById('senha').value !== document.getElementById('confirmar_senha').value) {
             e.preventDefault();
-            alert('As senhas não coincidem.');
+            if (typeof window.sigeiExibirErro === 'function') {
+                window.sigeiExibirErro('Senhas divergentes', 'As senhas informadas não coincidem. Verifique e tente novamente.', 'SIGEI-VAL-003');
+            }
         }
     });
 </script>

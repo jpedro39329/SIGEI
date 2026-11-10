@@ -3,8 +3,8 @@ require_once "../../config/init.php";
 
 exigirPerfil(array('USUARIO_SEFISC', 'ADMIN', 'SEDUC'));
 
-$id = (int) ($_GET['id'] ?? 0);
-$token = $_GET['csrf_token'] ?? '';
+$id = (int) ($_POST['id'] ?? $_GET['id'] ?? 0);
+$token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
 
 if (!validarTokenCSRF($token)) {
     header("Location: ../../views/usuarios_ue/listar.php?erro=" . urlencode("Token de segurança inválido."));
@@ -16,8 +16,20 @@ if ($id <= 0) {
     exit();
 }
 
-// 1. Busca dados do usuário para auditoria e histórico
-$stmtUser = $conexao->prepare("SELECT nome, cpf, email, id_ue FROM usuarios_ue WHERE id_usuario_ue = ?");
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+$idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario <= 0) {
+    $idUreUsuario = idUreUsuario($conexao, $userId);
+}
+
+// 1. Busca dados do usuário para auditoria, histórico e validação regional
+$stmtUser = $conexao->prepare("
+    SELECT uue.nome, uue.cpf, uue.email, uue.id_ue, ue.id_ure
+    FROM usuarios_ue uue
+    LEFT JOIN unidades_escolares ue ON uue.id_ue = ue.id_ue
+    WHERE uue.id_usuario_ue = ?
+");
 $stmtUser->bind_param("i", $id);
 $stmtUser->execute();
 $dadosUser = $stmtUser->get_result()->fetch_assoc();
@@ -26,6 +38,10 @@ $stmtUser->close();
 if (!$dadosUser) {
     header("Location: ../../views/usuarios_ue/listar.php?erro=" . urlencode("Usuário não encontrado."));
     exit();
+}
+
+if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0 && (int) ($dadosUser['id_ure'] ?? 0) !== $idUreUsuario) {
+    redirecionarAcessoNegado();
 }
 
 // 2. Garante que qualquer aluno vinculado a este usuário preserve o histórico antes da desvinculação

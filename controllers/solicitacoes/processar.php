@@ -42,23 +42,39 @@ if ($acao === 'APROVAR') {
     die("Ação inválida.");
 }
 
-// Verifica que o aluno exista e esteja em status analisável
-$stmtVerifica = $conexao->prepare("SELECT id_aluno, status_aprovacao FROM alunos WHERE id_aluno = ?");
+// Verifica que o aluno exista, pertença à URE autorizada e esteja em status analisável
+$stmtVerifica = $conexao->prepare("
+    SELECT a.id_aluno, a.status_aprovacao, e.id_ure
+    FROM alunos a
+    LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
+    WHERE a.id_aluno = ?
+");
 $stmtVerifica->bind_param("i", $id_aluno);
 $stmtVerifica->execute();
 $resultVerifica = $stmtVerifica->get_result();
 $rowVerifica = $resultVerifica->fetch_assoc();
+$stmtVerifica->close();
 
 if (!$rowVerifica) {
-    die("Aluno não encontrado.");
+    redirecionarAcessoNegado();
+}
+
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
+    $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+    if ($idUreUsuario <= 0) {
+        $idUreUsuario = idUreUsuario($conexao, $userId);
+    }
+    if ($idUreUsuario > 0 && (int) ($rowVerifica['id_ure'] ?? 0) !== $idUreUsuario) {
+        redirecionarAcessoNegado();
+    }
 }
 
 if (!in_array($rowVerifica['status_aprovacao'], ['PENDENTE', 'REPROVADO', 'PENDENTE_CORRECAO'])) {
     header("Location: ../../views/solicitacoes/listar.php?msg=ya");
     exit();
 }
-
-$stmtVerifica->close();
 
 // Upload opcional de anexo (parecer ou documento de suporte da Educação Especial)
 if (isset($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {

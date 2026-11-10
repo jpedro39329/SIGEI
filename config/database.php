@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$user = 'admin';     
-$password = '123456';     
-$dbname = 'SIGEI';
+$user = 'root';     
+$password = '';     
+$dbname = 'wmshpicv_sigei';
 
 $conexao = new mysqli($host, $user, $password, $dbname);
 

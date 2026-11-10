@@ -134,7 +134,9 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
         const cs = document.getElementById('confirmar_senha').value;
         if (s !== '' && s !== cs) {
             e.preventDefault();
-            alert('As senhas não coincidem.');
+            if (typeof window.sigeiExibirErro === 'function') {
+                window.sigeiExibirErro('Senhas divergentes', 'As senhas informadas não coincidem. Verifique e tente novamente.', 'SIGEI-VAL-003');
+            }
         }
     });
 </script>

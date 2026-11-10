@@ -165,12 +165,17 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td><?php echo htmlspecialchars(formatarTelefone($sup['telefone']) ?: '-'); ?></td>
                                     <td>
                                         <div class="acoes-cell">
-                                            <a href="../../controllers/supervisores/inativar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/supervisores/inativar.php?id=<?php echo $sup['id_usuario_supervisor']; ?>"
                                                class="btn btn-sm btn-outline-secondary"
+                                               data-confirm="true"
+                                               data-confirm-type="warning"
+                                               data-confirm-title="<?php echo $sup['ativo'] == 1 ? 'Inativar Supervisor' : 'Ativar Supervisor'; ?>"
+                                               data-confirm-action="<?php echo $sup['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>"
+                                               data-msg="Deseja realmente <?php echo $sup['ativo'] == 1 ? 'inativar' : 'ativar'; ?> este supervisor?"
                                                title="<?php echo $sup['ativo'] == 1 ? 'Inativar Supervisor' : 'Ativar Supervisor'; ?>">
                                                 <?php echo $sup['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>
                                             </a>
-                                            <a href="../../controllers/supervisores/excluir.php?id=<?php echo $sup['id_usuario_supervisor']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/supervisores/excluir.php?id=<?php echo $sup['id_usuario_supervisor']; ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir Supervisor"
                                                data-msg="Tem certeza que deseja excluir este supervisor?">Excluir</a>

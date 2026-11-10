@@ -10,6 +10,12 @@ require_once __DIR__ . '/../config/init.php';
 $acao = $_GET['acao'] ?? 'ping';
 
 if ($acao === 'encerrar') {
+    if (estaLogado() && isset($conexao) && $conexao instanceof mysqli && function_exists('registrarAuditoria')) {
+        registrarAuditoria($conexao, 'AUTH', 'LOGOUT', 'sessao', (int) ($_SESSION['user_id'] ?? 0), [
+            'perfil' => $_SESSION['user_perfil'] ?? '',
+            'motivo' => 'inatividade'
+        ]);
+    }
     sigei_encerrar_sessao();
     header('Location: ../views/auth/login.php?aviso=sessao_expirada');
     exit;

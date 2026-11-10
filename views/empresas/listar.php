@@ -196,12 +196,17 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                         <div class="acoes-cell">
                                             <a href="visualizar.php?id=<?php echo $emp['id_empresa']; ?>" class="btn btn-sm btn-outline-primary" title="Ver detalhes da empresa e contrato">Ver</a>
                                             <?php if (in_array($userPerfil, ['ADMIN', 'SEDUC'])): ?>
-                                                <a href="../../controllers/empresas/inativar.php?id=<?php echo $emp['id_empresa']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                                <a href="../../controllers/empresas/inativar.php?id=<?php echo $emp['id_empresa']; ?>"
                                                    class="btn btn-sm btn-outline-secondary"
+                                                   data-confirm="true"
+                                                   data-confirm-type="warning"
+                                                   data-confirm-title="<?php echo $emp['ativo'] == 1 ? 'Inativar Empresa' : 'Ativar Empresa'; ?>"
+                                                   data-confirm-action="<?php echo $emp['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>"
+                                                   data-msg="Deseja realmente <?php echo $emp['ativo'] == 1 ? 'inativar' : 'ativar'; ?> o cadastro desta empresa?"
                                                    title="<?php echo $emp['ativo'] == 1 ? 'Inativar Empresa' : 'Ativar Empresa'; ?>">
                                                     <?php echo $emp['ativo'] == 1 ? 'Inativar' : 'Ativar'; ?>
                                                 </a>
-                                                <a href="../../controllers/empresas/excluir.php?id=<?php echo $emp['id_empresa']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                                <a href="../../controllers/empresas/excluir.php?id=<?php echo $emp['id_empresa']; ?>"
                                                    class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                    title="Excluir Empresa"
                                                    data-msg="Tem certeza que deseja excluir esta empresa?">Excluir</a>

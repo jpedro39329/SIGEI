@@ -1,12 +1,12 @@
 <?php
 require_once "../../config/init.php";
 
-exigirPerfil(array('SUPERVISOR', 'PERFIL_SUPERVISOR','USUARIO_EMPRESA'));
+exigirPerfil(array('SUPERVISOR', 'PERFIL_SUPERVISOR', 'USUARIO_EMPRESA', 'ADMIN', 'SEDUC'));
 
-$id = (int) ($_GET['id'] ?? 0);
+$id = (int) ($_POST['id'] ?? $_GET['id'] ?? 0);
 $userPerfil = $_SESSION['user_perfil'];
 $userId = (int) $_SESSION['user_id'];
-$token = $_GET['csrf_token'] ?? '';
+$token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
 
 if (!validarTokenCSRF($token)) {
     header("Location: ../../views/paes/listar.php?erro=" . urlencode("Token de segurança inválido."));

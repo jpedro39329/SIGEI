@@ -7,6 +7,15 @@ $perfil = trim($_POST['perfil'] ?? '');
 $cpf = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
 $senha = $_POST['senha'] ?? '';
 
+// Controle de tentativas de login na sessão (proteção contra força bruta)
+$agora = time();
+$bloqueioAte = (int) ($_SESSION['login_bloqueado_ate'] ?? 0);
+if ($bloqueioAte > $agora) {
+    $redirectUrl = "../../views/auth/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=muitas_tentativas" : "?erro=muitas_tentativas");
+    header("Location: $redirectUrl");
+    exit();
+}
+
 if ($cpf === '' || $senha === '') {
     $redirectUrl = "../../views/auth/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=dados_invalidos" : "?erro=dados_invalidos");
     header("Location: $redirectUrl");
@@ -103,6 +112,19 @@ foreach ($tabelas as $tabela => $info) {
 
         if (password_verify($senha, $user['senha'])) {
             session_regenerate_id(true);
+            unset($_SESSION['login_tentativas'], $_SESSION['login_bloqueado_ate']);
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $_SESSION['ultima_atividade'] = time();
+
+            // Limpa variáveis de perfil anterior caso estivesse logado
+            unset(
+                $_SESSION['id_ure'],
+                $_SESSION['id_empresa'],
+                $_SESSION['id_ue'],
+                $_SESSION['user_setor'],
+                $_SESSION['user_cargo'],
+                $_SESSION['nivel_acesso']
+            );
 
             $_SESSION['user_id']   = (int) $user[$campoId];
             $_SESSION['user_name'] = $user['nome'];
@@ -155,6 +177,12 @@ foreach ($tabelas as $tabela => $info) {
     }
 
     $stmt->close();
+}
+
+$_SESSION['login_tentativas'] = (int) ($_SESSION['login_tentativas'] ?? 0) + 1;
+if ($_SESSION['login_tentativas'] >= 5) {
+    $_SESSION['login_bloqueado_ate'] = time() + 60;
+    $_SESSION['login_tentativas'] = 0;
 }
 
 $redirectUrl = "../../views/auth/login.php" . ($perfil ? "?perfil=" . urlencode($perfil) . "&erro=usuario_nao_encontrado" : "?erro=usuario_nao_encontrado");

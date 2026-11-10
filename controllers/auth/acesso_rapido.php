@@ -1,8 +1,20 @@
 <?php
 require_once "../../config/init.php";
 
-$tabela = trim($_GET['tabela'] ?? $_POST['tabela'] ?? '');
-$id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../../views/auth/acesso_rapido.php");
+    exit();
+}
+
+exigirTokenCSRF();
+
+if (empty($_SESSION['acesso_rapido_autorizado']) && !estaLogado()) {
+    header("Location: ../../views/auth/acesso_rapido.php?erro=nao_autorizado");
+    exit();
+}
+
+$tabela = trim($_POST['tabela'] ?? '');
+$id = (int) ($_POST['id'] ?? 0);
 
 if (!$tabela || $id <= 0) {
     header("Location: ../../views/auth/acesso_rapido.php?erro=parametros_invalidos");
@@ -67,6 +79,18 @@ if ($result && $result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
     session_regenerate_id(true);
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['ultima_atividade'] = time();
+    $_SESSION['acesso_rapido_autorizado'] = true;
+
+    unset(
+        $_SESSION['id_ure'],
+        $_SESSION['id_empresa'],
+        $_SESSION['id_ue'],
+        $_SESSION['user_setor'],
+        $_SESSION['user_cargo'],
+        $_SESSION['nivel_acesso']
+    );
 
     $_SESSION['user_id']   = (int) $user[$campoId];
     $_SESSION['user_name'] = $user['nome'];
@@ -107,6 +131,12 @@ if ($result && $result->num_rows === 1) {
     $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $_SESSION['user_id'], $_SESSION['user_perfil']);
     $_SESSION['exibir_notificacoes_login'] = true;
 
+    registrarAuditoria($conexao, 'AUTH', 'ACESSO_RAPIDO', $tabela, $_SESSION['user_id'], [
+        'perfil' => $_SESSION['user_perfil'],
+        'tabela' => $tabela,
+        'origem_cpf' => $_SESSION['acesso_rapido_origem_cpf'] ?? ''
+    ]);
+
     $stmt->close();
     header("Location: ../../views/dashboard.php");
     exit();
@@ -115,4 +145,3 @@ if ($result && $result->num_rows === 1) {
 $stmt->close();
 header("Location: ../../views/auth/acesso_rapido.php?erro=usuario_nao_encontrado");
 exit();
-

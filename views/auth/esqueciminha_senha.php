@@ -1,10 +1,9 @@
 <?php
-// Inclua sua sessão ou gerador de token CSRF se necessário aqui
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once "../../config/init.php";
+
 $msgErro = $_SESSION['recuperacao_msg_erro'] ?? '';
 unset($_SESSION['recuperacao_msg_erro']);
+$csrfToken = gerarTokenCSRF();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -302,6 +301,7 @@ unset($_SESSION['recuperacao_msg_erro']);
       <?php endif; ?>
 
       <form class="login-form" action="../../controllers/auth/processa_esqueci_senha.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
         <div class="form-group">
           <label for="email">E-mail Cadastrado</label>
           <input type="email" name="email" id="email" class="form-control" maxlength="150" required placeholder="seu.email@exemplo.com">

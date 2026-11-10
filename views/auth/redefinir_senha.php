@@ -1,9 +1,7 @@
 <?php
 // views/auth/redefinir_senha.php
 // Etapa 3 da recuperação de senha: definição da nova senha (somente após o código ser verificado).
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once "../../config/init.php";
 
 $sucesso = !empty($_SESSION['recuperacao_sucesso']);
 unset($_SESSION['recuperacao_sucesso']);
@@ -15,6 +13,7 @@ if (!$sucesso && (empty($_SESSION['recuperacao_verificada']) || empty($_SESSION[
 
 $msgErro = $_SESSION['recuperacao_msg_erro'] ?? '';
 unset($_SESSION['recuperacao_msg_erro']);
+$csrfToken = gerarTokenCSRF();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -326,6 +325,7 @@ unset($_SESSION['recuperacao_msg_erro']);
       <?php endif; ?>
 
       <form class="login-form" action="../../controllers/auth/processa_redefinir_senha.php" method="POST" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
         <div class="form-group">
           <label for="nova_senha">Nova Senha</label>
           <input type="password" name="nova_senha" id="nova_senha" class="form-control" minlength="6" maxlength="255" required placeholder="••••••••">

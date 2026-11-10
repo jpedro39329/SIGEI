@@ -129,7 +129,7 @@ $uresVinculadas = $resVinculadas ? mysqli_fetch_all($resVinculadas, MYSQLI_ASSOC
                                 <?php if (!empty($empresa['contrato_arquivo'])): ?>
                                     <div class="mt-2 d-flex justify-content-between align-items-center p-2 border rounded bg-light">
                                         <span class="small fw-semibold"><?php echo htmlspecialchars(basename($empresa['contrato_arquivo'])); ?></span>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($empresa['contrato_arquivo'], '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['nome'])); ?>')">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($empresa['contrato_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode('Contrato - ' . $empresa['nome']), ENT_QUOTES, 'UTF-8'); ?>)">
                                             Visualizar
                                         </button>
                                     </div>

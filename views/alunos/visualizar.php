@@ -134,7 +134,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
             <span class="text-muted small">Prontuário e histórico de atendimento especializado</span>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button type="button" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, '<?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
+            <button type="button" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, <?php echo htmlspecialchars(json_encode($aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
                 <i class="bi bi-file-earmark-pdf-fill"></i> PDF
             </button>
             <?php if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])): ?>
@@ -350,7 +350,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                         <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                             <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
                                 <span class="text-dark small fw-semibold"><?php echo htmlspecialchars(basename($aluno['termo_responsabilidade_arquivo'])); ?></span>
-                                <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade — <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')">
+                                <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($aluno['termo_responsabilidade_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode('Termo de Responsabilidade — ' . $aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)">
                                     Visualizar
                                 </button>
                             </div>
@@ -363,7 +363,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                                     <span class="text-dark small fw-semibold"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?: basename($laudo['caminho_arquivo'] ?? 'Documento')); ?></span>
                                     <div class="d-inline-flex gap-2 align-items-center">
                                         <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                            <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?: 'Documento')); ?>')">
+                                            <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($laudo['caminho_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode($laudo['nome_arquivo'] ?: 'Documento'), ENT_QUOTES, 'UTF-8'); ?>)">
                                                 Visualizar
                                             </button>
                                         <?php endif; ?>

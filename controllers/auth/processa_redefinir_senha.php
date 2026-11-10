@@ -1,11 +1,7 @@
 <?php
 // controllers/auth/processa_redefinir_senha.php
 // Etapa 3 da recuperação de senha: define a nova senha após o código ter sido verificado.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once '../../config/database.php';
+require_once '../../config/init.php';
 
 const SENHA_TAMANHO_MINIMO = 6;
 
@@ -13,6 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST'
     || empty($_SESSION['recuperacao_verificada'])
     || empty($_SESSION['recuperacao_id'])) {
     header('Location: ../../views/auth/esqueciminha_senha.php');
+    exit;
+}
+
+if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+    $_SESSION['recuperacao_msg_erro'] = 'Token de segurança inválido. Tente novamente.';
+    header('Location: ../../views/auth/redefinir_senha.php');
     exit;
 }
 

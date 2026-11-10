@@ -18,10 +18,25 @@ if ($idServidor <= 0) {
     exit();
 }
 
+// Busca o servidor atual para validar vínculo regional e setor original
+$stmtAtual = $conexao->prepare("SELECT id_usuario_ure, id_ure, setor FROM usuarios_ure WHERE id_usuario_ure = ? LIMIT 1");
+$stmtAtual->bind_param("i", $idServidor);
+$stmtAtual->execute();
+$servidorAtual = $stmtAtual->get_result()->fetch_assoc();
+$stmtAtual->close();
+
+if (!$servidorAtual) {
+    header("Location: ../../views/setores/listar.php?erro=" . urlencode("Servidor não encontrado."));
+    exit();
+}
+
 if ($userPerfil === 'DIRIGENTE') {
     $idUre = (int) ($_SESSION['id_ure'] ?? 0);
     if ($idUre <= 0) {
         $idUre = idUreUsuario($conexao, $userId);
+    }
+    if ((int) $servidorAtual['id_ure'] !== $idUre) {
+        redirecionarAcessoNegado();
     }
 } else {
     $idUre = (int) ($_POST['id_ure'] ?? 0);
@@ -59,6 +74,11 @@ if ($telefone !== '' && !validarTelefone($telefone, false)) {
 
 if (!in_array($setor, ['SEFISC', 'EDU_ESPECIAL', 'ASURE', 'GABINETE'])) {
     header("Location: ../../views/setores/editar.php?id=$idServidor&erro=" . urlencode("Setor inválido."));
+    exit();
+}
+
+if ($userPerfil === 'DIRIGENTE' && in_array($setor, ['ASURE', 'GABINETE'], true) && !in_array($servidorAtual['setor'], ['ASURE', 'GABINETE'], true)) {
+    header("Location: ../../views/setores/editar.php?id=$idServidor&erro=" . urlencode("O Dirigente da regional não pode promover servidores para o setor ASURE."));
     exit();
 }
 

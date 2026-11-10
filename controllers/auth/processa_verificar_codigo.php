@@ -1,16 +1,18 @@
 <?php
 // controllers/auth/processa_verificar_codigo.php
 // Etapa 2 da recuperação de senha: valida o código digitado pelo usuário.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once '../../config/database.php';
+require_once '../../config/init.php';
 
 const RECUPERACAO_MAX_TENTATIVAS = 5;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['recuperacao_email'])) {
     header('Location: ../../views/auth/esqueciminha_senha.php');
+    exit;
+}
+
+if (!validarTokenCSRF($_POST['csrf_token'] ?? '')) {
+    $_SESSION['recuperacao_msg_erro'] = 'Token de segurança inválido. Tente novamente.';
+    header('Location: ../../views/auth/verificar_codigo.php');
     exit;
 }
 

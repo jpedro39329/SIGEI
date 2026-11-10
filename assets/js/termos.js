@@ -51,11 +51,14 @@ class TermosDeUso {
         } catch (e) {}
 
         try {
+            const csrfToken = (window.SIGEI_CONFIG && window.SIGEI_CONFIG.csrfToken) ? window.SIGEI_CONFIG.csrfToken : '';
             const resposta = await fetch(this.baseUrl + 'controllers/auth/aceitar_termos.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: 'csrf_token=' + encodeURIComponent(csrfToken)
             });
             const dados = await resposta.json();
             if (dados && dados.sucesso) {
@@ -243,8 +246,20 @@ class TermosDeUso {
 
         // Rejeitar termos
         btnRejeitar.addEventListener('click', () => {
-            alert('Você não pode continuar sem aceitar os termos de uso.');
-            window.location.href = this.baseUrl + 'controllers/auth/logout.php';
+            if (typeof window.sigeiAviso === 'function') {
+                window.sigeiAviso({
+                    tipo: 'warning',
+                    codigo: 'SIGEI-TRM-001',
+                    titulo: 'Aceite obrigatório',
+                    mensagem: 'Para utilizar o SIGEI, é necessário ler e concordar com os Termos de Uso e Política de Privacidade.',
+                    textoPrimario: 'Sair do sistema',
+                    onPrimario: () => {
+                        window.location.href = this.baseUrl + 'controllers/auth/logout.php';
+                    }
+                });
+            } else {
+                window.location.href = this.baseUrl + 'controllers/auth/logout.php';
+            }
         });
     }
 

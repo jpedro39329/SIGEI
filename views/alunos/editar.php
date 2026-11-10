@@ -349,7 +349,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                 <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                                     <div class="mb-2 d-flex justify-content-between align-items-center p-2 border rounded bg-light">
                                         <span class="small fw-semibold"><?php echo htmlspecialchars(basename($aluno['termo_responsabilidade_arquivo'])); ?></span>
-                                        <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade - <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-sm btn-outline-primary">
+                                        <button type="button" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($aluno['termo_responsabilidade_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode('Termo de Responsabilidade - ' . $aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-sm btn-outline-primary">
                                             Visualizar
                                         </button>
                                     </div>
@@ -373,7 +373,7 @@ $precisaReenvio = ($isAjuste || $isReprovado);
                                         <?php foreach ($laudos as $l): ?>
                                             <div class="d-flex justify-content-between align-items-center p-2 px-3 bg-light rounded border">
                                                 <span class="small fw-semibold"><?php echo htmlspecialchars($l['nome_arquivo'] ?? basename($l['caminho_arquivo'] ?? 'Documento')); ?></span>
-                                                <button type="button" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($l['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($l['nome_arquivo'] ?? 'Documento')); ?>')" class="btn btn-sm btn-outline-primary">
+                                                <button type="button" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($l['caminho_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode($l['nome_arquivo'] ?? 'Documento'), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-sm btn-outline-primary">
                                                     Visualizar
                                                 </button>
                                             </div>

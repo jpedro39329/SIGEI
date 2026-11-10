@@ -184,9 +184,10 @@ $homePage = $baseUrl . 'views/dashboard.php';
 
                         <?php if ($totalNotificacoes > 0): ?>
                             <div class="navbar-notifications-list" style="max-height: 360px; overflow-y: auto;">
+                                <?php $csrfNotif = gerarTokenCSRF(); ?>
                                 <?php foreach ($listaNotificacoes as $notif): ?>
                                     <?php 
-                                        $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']);
+                                        $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']) . "&csrf_token=" . urlencode($csrfNotif);
                                     ?>
                                     <a href="<?php echo htmlspecialchars($urlLida); ?>" class="dropdown-item p-3 border-bottom d-flex align-items-start gap-2 text-wrap navbar-notification-item">
                                         <div class="flex-shrink-0 mt-1">
@@ -317,7 +318,15 @@ $homePage = $baseUrl . 'views/dashboard.php';
 
                             <div class="dropdown-divider my-1"></div>
 
-                            <a class="dropdown-item navbar-menu-link text-danger d-flex align-items-center gap-3 py-2 px-3" href="<?php echo $baseUrl; ?>controllers/auth/logout.php">
+                            <a class="dropdown-item navbar-menu-link text-danger d-flex align-items-center gap-3 py-2 px-3"
+                               href="<?php echo $baseUrl; ?>controllers/auth/logout.php"
+                               data-confirm="true"
+                               data-confirm-type="warning"
+                               data-confirm-title="Encerrar sessão"
+                               data-confirm-action="Sair do sistema"
+                               data-confirm-cancel="Continuar conectado"
+                               data-confirm-icon="bi-box-arrow-right"
+                               data-msg="Deseja encerrar sua sessão atual no SIGEI?">
                                 <i class="bi bi-box-arrow-right fs-5"></i>
                                 <span class="fw-medium">Sair</span>
                             </a>
@@ -421,7 +430,10 @@ window.SIGEI_CONFIG = {
     userId: <?php echo json_encode($currentUserId); ?>,
     userPerfil: <?php echo json_encode($currentUserPerfil); ?>,
     termoAceito: <?php echo json_encode($termoAceito); ?>,
-    baseUrl: <?php echo json_encode($baseUrl); ?>
+    baseUrl: <?php echo json_encode($baseUrl); ?>,
+    csrfToken: <?php echo json_encode(gerarTokenCSRF()); ?>,
+    sessaoTimeout: <?php echo defined('SIGEI_SESSAO_TIMEOUT') ? (int) SIGEI_SESSAO_TIMEOUT : 600; ?>,
+    sessaoAviso: <?php echo defined('SIGEI_SESSAO_AVISO') ? (int) SIGEI_SESSAO_AVISO : 540; ?>
 };
 
 window.fecharModalVisualizarDocumento = function() {

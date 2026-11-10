@@ -15,6 +15,13 @@ if (!estaLogado()) {
     exit();
 }
 
+$tokenCsrf = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+if (!validarTokenCSRF($tokenCsrf)) {
+    http_response_code(403);
+    echo json_encode(['sucesso' => false, 'erro' => 'Token de segurança inválido.']);
+    exit();
+}
+
 $idUsuario = (int) ($_SESSION['user_id'] ?? 0);
 $perfil    = trim((string) ($_SESSION['user_perfil'] ?? ''));
 

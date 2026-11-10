@@ -16,27 +16,28 @@
 │       ├── mascaras.js
 │       └── termos.js
 ├── banco
-│   └── sql_backup_original.txt
+│   └── .gitkeep
 ├── config
-│   ├── auditoria.php
-│   ├── database.php
-│   ├── error_handler.php
-│   ├── init.php
-│   ├── perfil_functions.php
-│   └── session_guard.php
+│   ├── auditoria.php
+│   ├── database.php
+│   ├── error_handler.php
+│   ├── init.php
+│   ├── perfil_functions.php
+│   └── session_guard.php
 ├── controllers
-│   ├── alunos
-│   │   ├── arquivar.php
-│   │   ├── editar_salvar.php
-│   │   ├── exportar_excel.php
-│   │   ├── exportar_pdf.php
-│   │   ├── laudos_salvar.php
-│   │   ├── reativar.php
-│   │   ├── reenviar.php
-│   │   ├── remover_laudo.php
-│   │   ├── salvar.php
-│   │   └── status_atualizacao.php
-│   ├── associacoes
+│   ├── alunos
+│   │   ├── arquivar.php
+│   │   ├── editar_salvar.php
+│   │   ├── exportar_excel.php
+│   │   ├── exportar_pdf.php
+│   │   ├── laudos_salvar.php
+│   │   ├── reativar.php
+│   │   ├── reenviar.php
+│   │   ├── remover_laudo.php
+│   │   ├── salvar.php
+│   │   └── status_atualizacao.php
+│   ├── arquivo.php
+│   ├── associacoes
 │   │   ├── associar.php
 │   │   └── desassociar.php
 │   ├── auth
@@ -93,6 +94,12 @@
 │   └── pagina_erro.php
 ├── index.html
 ├── INSTRUCTIONS.md
+├── uploads
+│   ├── .htaccess
+│   ├── contratos
+│   ├── documentos
+│   ├── fotos
+│   └── laudos
 └── views
     ├── alunos
     │   ├── cadastrar.php
@@ -147,14 +154,12 @@
     │   ├── listar.php
     │   └── visualizar.php
     ├── ures
-    │   ├── cadastrar.php
-    │   ├── editar.php
-    │   └── listar.php
-    ├── usuarios
-    │   └── listar.php
+    │   ├── cadastrar.php
+    │   ├── editar.php
+    │   └── listar.php
     └── usuarios_ue
         ├── cadastrar.php
         ├── editar.php
         └── listar.php
 
-37 directories, 121 files
+41 directories, 122 files

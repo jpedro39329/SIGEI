@@ -176,7 +176,7 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                             <a href="editar.php?id=<?php echo $esc['id_ue']; ?>"
                                                class="btn btn-sm btn-outline-warning"
                                                title="Editar Escola">Editar</a>
-                                            <a href="../../controllers/escolas/excluir.php?id=<?php echo $esc['id_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/escolas/excluir.php?id=<?php echo $esc['id_ue']; ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir Escola"
                                                data-msg="Tem certeza que deseja excluir esta escola?">Excluir</a>

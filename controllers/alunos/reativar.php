@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
 $idAluno = (int) ($_POST['id_aluno'] ?? 0);
 
 if ($idAluno <= 0) {
@@ -16,29 +18,39 @@ if ($idAluno <= 0) {
     exit();
 }
 
-// Verifica se o aluno existe e está arquivado
-$check = $conexao->prepare("SELECT id_aluno, id_ue, status_aprovacao FROM alunos WHERE id_aluno = ?");
+// Verifica se o aluno existe e está arquivado, incluindo a URE da escola
+$check = $conexao->prepare("
+    SELECT a.id_aluno, a.id_ue, a.status_aprovacao, ue.id_ure
+    FROM alunos a
+    LEFT JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+    WHERE a.id_aluno = ?
+");
 $check->bind_param("i", $idAluno);
 $check->execute();
 $resAluno = $check->get_result();
 if ($resAluno->num_rows === 0) {
     $check->close();
-    die("Aluno não encontrado.");
+    redirecionarAcessoNegado();
 }
 $aluno = $resAluno->fetch_assoc();
 $check->close();
 
+// Verifica restrição de escola/URE antes de validar o status do aluno
+if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'], true)) {
+    $idEscola = idEscolaUsuario($conexao, $userId);
+    if ((int) $aluno['id_ue'] !== $idEscola) {
+        redirecionarAcessoNegado();
+    }
+} elseif (in_array($userPerfil, ['USUARIO_EDUCACAO_ESPECIAL', 'USUARIO_SEFISC', 'SEFISC', 'DIRIGENTE'], true)) {
+    $idUre = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
+    if ($idUre > 0 && (int) $aluno['id_ure'] !== $idUre) {
+        redirecionarAcessoNegado();
+    }
+}
+
 if ($aluno['status_aprovacao'] !== 'ARQUIVADO') {
     header("Location: ../../views/alunos/listar.php?aba=arquivados&erro=" . urlencode("Este aluno não está arquivado."));
     exit();
-}
-
-// Verifica restrição de escola se o perfil for escolar
-if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
-    $idEscola = idEscolaUsuario($conexao, $userId);
-    if ((int) $aluno['id_ue'] !== $idEscola) {
-        die("Aluno não pertence à sua unidade escolar.");
-    }
 }
 
 // Reativa o aluno voltando para APROVADO

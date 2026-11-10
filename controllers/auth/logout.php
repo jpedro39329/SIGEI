@@ -7,17 +7,8 @@ if (isset($_SESSION['user_id'])) {
     ]);
 }
 
-// Destrói todas as variáveis de sessão
-$_SESSION = [];
-
-// Invalida o cookie de sessão no navegador
-if (ini_get('session.use_cookies')) {
-    $p = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
-}
-
-// Destrói a sessão no servidor
-session_destroy();
+// Destrói todas as variáveis de sessão e invalida o cookie
+sigei_encerrar_sessao();
 
 // Redireciona para a tela inicial/login
 header("Location: ../../index.html");

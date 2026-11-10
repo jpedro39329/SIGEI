@@ -12,7 +12,7 @@ if ($id_aluno <= 0) {
 
 // Busca os dados completos do aluno incluindo escola, URE e quem cadastrou
 $sql = "
-    SELECT a.*, e.nome AS escola_nome, e.cie AS escola_cie, e.ua AS escola_ua, e.cidade AS escola_cidade,
+    SELECT a.*, e.id_ure, e.nome AS escola_nome, e.cie AS escola_cie, e.ua AS escola_ua, e.cidade AS escola_cidade,
            ure.nome AS ure_nome, ure.uge AS ure_uge,
            COALESCE(NULLIF(a.cadastrado_por_nome, ''), uue.nome) AS cadastrado_por_nome,
            COALESCE(NULLIF(a.cadastrado_por_cpf, ''), uue.cpf) AS cadastrado_por_cpf
@@ -29,6 +29,18 @@ $isLiveUpdate = !empty($_SERVER['HTTP_X_SIGEI_LIVE_UPDATE']);
 if (!$aluno || (!$isLiveUpdate && !in_array($aluno['status_aprovacao'], ['PENDENTE', 'REPROVADO', 'PENDENTE_CORRECAO']))) {
     header("Location: listar.php");
     exit();
+}
+
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
+    $idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+    if ($idUreUsuario <= 0) {
+        $idUreUsuario = idUreUsuario($conexao, $userId);
+    }
+    if ($idUreUsuario > 0 && (int) ($aluno['id_ure'] ?? 0) !== $idUreUsuario) {
+        redirecionarAcessoNegado();
+    }
 }
 
 // Busca os laudos e documentos do aluno
@@ -78,7 +90,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
             <span class="text-muted small">Processo de deliberação técnica para atendimento especializado</span>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button type="button" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, '<?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
+            <button type="button" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, <?php echo htmlspecialchars(json_encode($aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
                 <i class="bi bi-file-earmark-pdf-fill"></i> PDF
             </button>
             <a href="listar.php<?php echo ($aluno['status_aprovacao'] === 'REPROVADO') ? '?aba=reprovados' : ''; ?>" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
@@ -221,7 +233,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
                         <?php if (!empty($aluno['termo_responsabilidade_arquivo'])): ?>
                             <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
                                 <span class="text-dark small fw-semibold"><?php echo htmlspecialchars(basename($aluno['termo_responsabilidade_arquivo'])); ?></span>
-                                <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($aluno['termo_responsabilidade_arquivo'], '/')); ?>', 'Termo de Responsabilidade — <?php echo htmlspecialchars(addslashes($aluno['nome'])); ?>')">
+                                <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($aluno['termo_responsabilidade_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode('Termo de Responsabilidade — ' . $aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)">
                                     Visualizar
                                 </button>
                             </div>
@@ -237,7 +249,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
                                 <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
                                     <span class="text-dark small fw-semibold"><?php echo htmlspecialchars($laudo['nome_arquivo'] ?: basename($laudo['caminho_arquivo'] ?? 'Documento')); ?></span>
                                     <?php if (!empty($laudo['caminho_arquivo'])): ?>
-                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($laudo['caminho_arquivo'], '/')); ?>', '<?php echo htmlspecialchars(addslashes($laudo['nome_arquivo'] ?: 'Documento')); ?>')">
+                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-2" onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($laudo['caminho_arquivo'], '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode($laudo['nome_arquivo'] ?: 'Documento'), ENT_QUOTES, 'UTF-8'); ?>)">
                                             Visualizar
                                         </button>
                                     <?php endif; ?>

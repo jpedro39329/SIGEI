@@ -25,6 +25,14 @@ if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     if ((int) $pae['id_empresa'] !== $idEmpresa) {
         redirecionarAcessoNegado();
     }
+} elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC'], true)) {
+    $idUreUsuario = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
+    if ($idUreUsuario > 0) {
+        $uresEmpresa = uresAtendidasEmpresa($conexao, (int) ($pae['id_empresa'] ?? 0));
+        if (!in_array($idUreUsuario, $uresEmpresa, true)) {
+            redirecionarAcessoNegado();
+        }
+    }
 }
 
 $sqlAlunos = "

@@ -23,9 +23,18 @@ function sigei_encerrar_sessao(): void
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $p = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+        setcookie(session_name(), '', [
+            'expires'  => time() - 42000,
+            'path'     => $p['path'] ?? '/',
+            'domain'   => $p['domain'] ?? '',
+            'secure'   => (bool) ($p['secure'] ?? false),
+            'httponly' => (bool) ($p['httponly'] ?? true),
+            'samesite' => $p['samesite'] ?? 'Lax',
+        ]);
     }
-    session_destroy();
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
 }
 
 (function () {
@@ -43,6 +52,13 @@ function sigei_encerrar_sessao(): void
     $ultima = $_SESSION['ultima_atividade'] ?? time();
 
     if ((time() - $ultima) > SIGEI_SESSAO_TIMEOUT) {
+        global $conexao;
+        if (isset($conexao) && $conexao instanceof mysqli && function_exists('registrarAuditoria')) {
+            registrarAuditoria($conexao, 'AUTH', 'LOGOUT', 'sessao', (int) ($_SESSION['user_id'] ?? 0), [
+                'perfil' => $_SESSION['user_perfil'] ?? '',
+                'motivo' => 'inatividade'
+            ]);
+        }
         sigei_encerrar_sessao();
 
         if (function_exists('sigei_requisicao_ajax') && sigei_requisicao_ajax()) {

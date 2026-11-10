@@ -9,6 +9,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+$userPerfil = $_SESSION['user_perfil'] ?? '';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+$idUreUsuario = (int) ($_SESSION['id_ure'] ?? 0);
+if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario <= 0) {
+    $idUreUsuario = idUreUsuario($conexao, $userId);
+}
+
 $nome = trim($_POST['nome'] ?? '');
 $cpf = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
 $idUe = (int) ($_POST['id_ue'] ?? 0);
@@ -20,6 +27,18 @@ $confirmarSenha = $_POST['confirmar_senha'] ?? '';
 if ($nome === '' || $cpf === '' || $idUe <= 0 || $senha === '') {
     header("Location: ../../views/usuarios_ue/cadastrar.php?erro=" . urlencode("Preencha todos os campos obrigatórios."));
     exit();
+}
+
+// Se for USUARIO_SEFISC, valida que a escola pertence à URE do usuário logado
+if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0) {
+    $stmtUe = $conexao->prepare("SELECT id_ue FROM unidades_escolares WHERE id_ue = ? AND id_ure = ? LIMIT 1");
+    $stmtUe->bind_param("ii", $idUe, $idUreUsuario);
+    $stmtUe->execute();
+    if ($stmtUe->get_result()->num_rows === 0) {
+        $stmtUe->close();
+        redirecionarAcessoNegado();
+    }
+    $stmtUe->close();
 }
 
 if (!validarCPF($cpf, true)) {

@@ -2,6 +2,14 @@
 config/database.php
 config/mail.php
 
+# Backups, dumps SQL e relatórios de auditoria
+banco/*.sql
+banco/*.txt
+banco/*.bak
+banco/*.dump
+!banco/.gitkeep
+relatorios-seguranca/
+
 # Arquivos e diretórios de uploads
 uploads/fotos/*
 uploads/documentos/*

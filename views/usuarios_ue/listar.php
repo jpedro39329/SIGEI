@@ -174,7 +174,7 @@ $usuariosEscola = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <div class="acoes-cell">
                                             <a href="editar.php?id=<?php echo $u['id_usuario_ue']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Usuário">Editar</a>
-                                            <a href="../../controllers/usuarios_ue/excluir.php?id=<?php echo $u['id_usuario_ue']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/usuarios_ue/excluir.php?id=<?php echo $u['id_usuario_ue']; ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir Usuário"
                                                data-msg="Tem certeza que deseja excluir este usuário da escola? As ações realizadas e o histórico de alunos cadastrados serão mantidos.">Excluir</a>

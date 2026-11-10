@@ -14,21 +14,6 @@ function sigei_pagina_erro(int $codigo = 500, string $urlInicio = '', ?string $m
         : 'Ocorreu um problema ao processar a sua solicitação.';
 
     $inicio = $urlInicio !== '' ? $urlInicio : '/';
-
-    // Se temos arquivo, exibir apenas o caminho relativo limpo
-    $localLimpo = '';
-    if ($arquivoErro) {
-        $arquivoErroNorm = str_replace('\\', '/', $arquivoErro);
-        $pos = strpos($arquivoErroNorm, 'SIGEI/');
-        if ($pos !== false) {
-            $localLimpo = substr($arquivoErroNorm, $pos);
-        } else {
-            $localLimpo = basename($arquivoErro);
-        }
-        if ($linhaErro) {
-            $localLimpo .= ' (linha ' . $linhaErro . ')';
-        }
-    }
     ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -46,7 +31,7 @@ function sigei_pagina_erro(int $codigo = 500, string $urlInicio = '', ?string $m
       font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
     }
     .card-erro {
-      width: 100%; max-width: 520px; background: #fff; border: 1px solid #fee2e2;
+      width: 100%; max-width: 460px; background: #fff; border: 1px solid #fee2e2;
       border-radius: 16px; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.08);
       padding: 32px 28px; text-align: center; position: relative;
     }
@@ -57,16 +42,7 @@ function sigei_pagina_erro(int $codigo = 500, string $urlInicio = '', ?string $m
     }
     .marca { font-size: .8rem; font-weight: 800; letter-spacing: .12em; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
     h1 { font-size: 1.35rem; font-weight: 800; margin: 0 0 8px; color: #0f172a; }
-    .subtexto { margin: 0 0 20px; color: #64748b; font-size: .95rem; line-height: 1.5; }
-    .detalhe-box {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-      padding: 14px 16px; text-align: left; margin-bottom: 24px; font-size: .88rem;
-    }
-    .detalhe-item { margin-bottom: 8px; word-break: break-word; }
-    .detalhe-item:last-child { margin-bottom: 0; }
-    .detalhe-label { font-weight: 700; color: #475569; display: block; font-size: .78rem; text-transform: uppercase; margin-bottom: 2px; }
-    .detalhe-valor { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #b91c1c; font-size: .85rem; }
-    .detalhe-onde { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #334155; font-size: .85rem; }
+    .subtexto { margin: 0 0 24px; color: #64748b; font-size: .95rem; line-height: 1.5; }
     .acoes { display: flex; gap: 10px; justify-content: center; }
     .btn-fechar {
       display: inline-flex; align-items: center; justify-content: center; border: 0; cursor: pointer; text-decoration: none;
@@ -94,23 +70,6 @@ function sigei_pagina_erro(int $codigo = 500, string $urlInicio = '', ?string $m
     <div class="marca">SIGEI</div>
     <h1><?php echo htmlspecialchars($titulo); ?></h1>
     <p class="subtexto"><?php echo htmlspecialchars($texto); ?></p>
-
-    <?php if (!$is404 && ($mensagemErro || $localLimpo)): ?>
-      <div class="detalhe-box">
-        <?php if ($mensagemErro): ?>
-          <div class="detalhe-item">
-            <span class="detalhe-label">Erro Identificado</span>
-            <span class="detalhe-valor"><?php echo htmlspecialchars($mensagemErro); ?></span>
-          </div>
-        <?php endif; ?>
-        <?php if ($localLimpo): ?>
-          <div class="detalhe-item">
-            <span class="detalhe-label">Onde Ocorreu</span>
-            <span class="detalhe-onde"><?php echo htmlspecialchars($localLimpo); ?></span>
-          </div>
-        <?php endif; ?>
-      </div>
-    <?php endif; ?>
 
     <div class="acoes">
       <button class="btn-fechar" type="button" onclick="window.history.length > 1 ? window.history.back() : window.location.href = '<?php echo htmlspecialchars($inicio); ?>'">

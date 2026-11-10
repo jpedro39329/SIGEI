@@ -290,7 +290,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('formAssociacao').addEventListener('submit', function(e) {
         if (!hiddenId.value) {
             e.preventDefault();
-            alert('Por favor, selecione um aluno para associar.');
+            if (typeof window.sigeiExibirErro === 'function') {
+                window.sigeiExibirErro('Seleção obrigatória', 'Por favor, selecione um aluno para realizar a associação.', 'SIGEI-VAL-002');
+            }
             inputBusca.focus();
         }
     });

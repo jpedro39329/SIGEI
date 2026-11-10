@@ -152,7 +152,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <div class="acoes-cell d-flex gap-1 justify-content-center">
                                             <a href="editar.php?id=<?php echo $ure['id_ure']; ?>" class="btn btn-sm btn-outline-secondary" title="Editar URE">Editar</a>
-                                            <a href="../../controllers/ures/excluir.php?id=<?php echo $ure['id_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/ures/excluir.php?id=<?php echo $ure['id_ure']; ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir URE"
                                                data-msg="Tem certeza que deseja excluir esta URE?">Excluir</a>

@@ -46,8 +46,7 @@ function sigei_responder_erro(int $codigo = 500, ?string $mensagem = null, ?stri
         }
         echo json_encode([
             'sucesso' => false,
-            'erro'    => $mensagem ?? 'Ocorreu um problema ao processar a solicitação.',
-            'onde'    => $arquivo ? ($arquivo . ($linha ? ':' . $linha : '')) : null
+            'erro'    => 'Ocorreu um problema interno ao processar a solicitação.'
         ]);
         return;
     }
@@ -56,7 +55,7 @@ function sigei_responder_erro(int $codigo = 500, ?string $mensagem = null, ?stri
         header('Content-Type: text/html; charset=UTF-8');
     }
     require_once __DIR__ . '/../includes/pagina_erro.php';
-    sigei_pagina_erro($codigo, '/', $mensagem, $arquivo, $linha);
+    sigei_pagina_erro($codigo, '/');
 }
 
 // Handler de avisos e erros do PHP

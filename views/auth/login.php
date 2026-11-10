@@ -375,11 +375,21 @@ require_once "../../config/init.php";
               <input type="hidden" name="perfil" value="<?php echo htmlspecialchars($_GET['perfil']); ?>">
           <?php endif; ?>
 
+          <?php if (isset($_GET['aviso']) && $_GET['aviso'] === 'sessao_expirada'): ?>
+              <div style="background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; text-align: center;">
+                  Sua sessão foi encerrada por inatividade. Faça login novamente para continuar.
+              </div>
+          <?php endif; ?>
+
           <?php if (isset($_GET['erro'])): ?>
               <div style="background-color: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; text-align: center;">
                   <?php
                   if ($_GET['erro'] === 'usuario_nao_encontrado') {
                       echo "Usuário não localizado para o perfil selecionado ou credenciais inválidas.";
+                  } elseif ($_GET['erro'] === 'muitas_tentativas') {
+                      echo "Muitas tentativas de login sem sucesso. Aguarde 1 minuto antes de tentar novamente.";
+                  } elseif ($_GET['erro'] === 'csrf') {
+                      echo "Sessão do formulário expirada. Por favor, tente novamente.";
                   } else {
                       echo "CPF ou senha incorretos.";
                   }
@@ -447,6 +457,7 @@ require_once "../../config/init.php";
     });
   </script>
   <script src="<?php echo assetUrl('assets/js/acessibilidade.js', '../../'); ?>"></script>
+  <script src="<?php echo assetUrl('assets/js/erros.js', '../../'); ?>"></script>
 
 </body>
 </html>

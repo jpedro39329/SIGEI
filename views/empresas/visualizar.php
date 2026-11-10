@@ -183,7 +183,7 @@ $totalPaesAtivos = count(array_filter($paes, function($p) { return $p['ativo'] =
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="small fw-semibold"><?php echo htmlspecialchars(basename($contratoArquivo)); ?></span>
                             <button type="button" class="btn btn-sm btn-outline-primary"
-                                    onclick="visualizarDocumento('../../<?php echo htmlspecialchars(ltrim($contratoArquivo, '/')); ?>', 'Contrato - <?php echo htmlspecialchars(addslashes($empresa['numero_contrato'] ?: $empresa['nome'])); ?>')">
+                                    onclick="visualizarDocumento(<?php echo htmlspecialchars(json_encode('../../' . ltrim($contratoArquivo, '/')), ENT_QUOTES, 'UTF-8'); ?>, <?php echo htmlspecialchars(json_encode('Contrato - ' . ($empresa['numero_contrato'] ?: $empresa['nome'])), ENT_QUOTES, 'UTF-8'); ?>)">
                                 Visualizar
                             </button>
                         </li>

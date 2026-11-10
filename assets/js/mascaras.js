@@ -244,7 +244,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (var i = 0; i < this.files.length; i++) {
                     var arquivo = this.files[i];
                     if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
-                        alert('O arquivo "' + arquivo.name + '" excede o limite máximo permitido de 5 MB.');
+                        if (typeof window.sigeiExibirErro === 'function') {
+                            window.sigeiExibirErro(
+                                'Arquivo muito grande',
+                                'O arquivo "' + arquivo.name + '" excede o limite máximo permitido de 5 MB.',
+                                'SIGEI-VAL-001'
+                            );
+                        }
                         this.value = '';
                         return;
                     }

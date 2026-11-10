@@ -1,9 +1,7 @@
 <?php
 // views/auth/verificar_codigo.php
 // Etapa 2 da recuperação de senha: o usuário digita o código recebido por e-mail.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once "../../config/init.php";
 
 if (empty($_SESSION['recuperacao_email'])) {
     header('Location: esqueciminha_senha.php');
@@ -16,6 +14,7 @@ unset($_SESSION['recuperacao_msg_info'], $_SESSION['recuperacao_msg_erro']);
 
 // Disponível apenas em ambiente local (definido no controller)
 $codigoTeste = $_SESSION['recuperacao_codigo_teste'] ?? '';
+$csrfToken = gerarTokenCSRF();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -327,6 +326,7 @@ $codigoTeste = $_SESSION['recuperacao_codigo_teste'] ?? '';
       <?php endif; ?>
 
       <form class="login-form" action="../../controllers/auth/processa_verificar_codigo.php" method="POST" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
         <div class="form-group">
           <label for="codigo">Código de Verificação</label>
           <input type="text" name="codigo" id="codigo" class="form-control" inputmode="numeric" pattern="\d{6}" maxlength="6" required placeholder="000000" autofocus>

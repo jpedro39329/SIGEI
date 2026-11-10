@@ -174,7 +174,7 @@ $gestores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                                     <td>
                                         <div class="acoes-cell">
                                             <a href="editar.php?id=<?php echo $dir['id_usuario_ure']; ?>" class="btn btn-sm btn-outline-warning" title="Editar Servidor">Editar</a>
-                                            <a href="../../controllers/gestores/excluir.php?id=<?php echo $dir['id_usuario_ure']; ?>&csrf_token=<?php echo gerarTokenCSRF(); ?>"
+                                            <a href="../../controllers/gestores/excluir.php?id=<?php echo $dir['id_usuario_ure']; ?>"
                                                class="btn btn-sm btn-outline-danger btn-confirmar-exclusao"
                                                title="Excluir Servidor"
                                                data-msg="Tem certeza que deseja excluir este servidor?">Excluir</a>

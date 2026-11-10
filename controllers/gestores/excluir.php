@@ -3,8 +3,8 @@ require_once "../../config/init.php";
 
 exigirPerfil(array('ADMIN', 'SEDUC'));
 
-$id = (int) ($_GET['id'] ?? 0);
-$token = $_GET['csrf_token'] ?? '';
+$id = (int) ($_POST['id'] ?? $_GET['id'] ?? 0);
+$token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
 
 if (!validarTokenCSRF($token)) {
     header("Location: ../../views/gestores/listar.php?erro=" . urlencode("Token de segurança inválido."));
