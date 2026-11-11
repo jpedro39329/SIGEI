@@ -80,18 +80,6 @@ if ($userPerfil === 'PAE') {
     $wherePae = ["ass.id_pae = $userId"];
     $whereTotal = array_merge($wherePae, $whereFiltros);
     $whereSql = 'WHERE ' . implode(' AND ', $whereTotal);
-
-    // Relatórios do PAE logado
-    $sqlRelatorios = "
-        SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome, e.nome AS empresa_nome
-        FROM relatorios r
-        JOIN associacoes ass ON r.id_associacao = ass.id_associacao
-        JOIN alunos a ON ass.id_aluno = a.id_aluno
-        JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-        LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
-        $whereSql
-        ORDER BY r.data_cadastro DESC
-    ";
 } else {
     $whereEmpresa = [];
     if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
@@ -103,18 +91,32 @@ if ($userPerfil === 'PAE') {
 
     $whereTotal = array_merge($whereEmpresa, $whereFiltros);
     $whereSql = !empty($whereTotal) ? 'WHERE ' . implode(' AND ', $whereTotal) : '';
-
-    $sqlRelatorios = "
-        SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome, e.nome AS empresa_nome
-        FROM relatorios r
-        JOIN associacoes ass ON r.id_associacao = ass.id_associacao
-        JOIN alunos a ON ass.id_aluno = a.id_aluno
-        JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-        LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
-        $whereSql
-        ORDER BY r.data_cadastro DESC
-    ";
 }
+
+$sqlCountRelatorios = "
+    SELECT COUNT(*) AS total
+    FROM relatorios r
+    JOIN associacoes ass ON r.id_associacao = ass.id_associacao
+    JOIN alunos a ON ass.id_aluno = a.id_aluno
+    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+    LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
+    $whereSql
+";
+$resCountRel = mysqli_query($conexao, $sqlCountRelatorios);
+$totalRelatoriosCount = $resCountRel ? (int) (mysqli_fetch_assoc($resCountRel)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalRelatoriosCount, 20);
+
+$sqlRelatorios = "
+    SELECT r.id_relatorio, r.tipo, r.descricao, r.data_cadastro, a.nome AS aluno_nome, p.nome AS pae_nome, e.nome AS empresa_nome
+    FROM relatorios r
+    JOIN associacoes ass ON r.id_associacao = ass.id_associacao
+    JOIN alunos a ON ass.id_aluno = a.id_aluno
+    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+    LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
+    $whereSql
+    ORDER BY r.data_cadastro DESC
+    " . $paginacao['limit_sql'] . "
+";
 
 $resultRelatorios = mysqli_query($conexao, $sqlRelatorios);
 $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASSOC) : [];
@@ -264,7 +266,7 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="card-title fw-bold text-dark mb-0">Relatórios Cadastrados</h5>
-                <span class="text-muted small"><?php echo count($relatorios); ?> registro(s)</span>
+                <span class="text-muted small"><?php echo $totalRelatoriosCount; ?> registro(s)</span>
             </div>
 
             <div class="table-responsive">
@@ -318,6 +320,7 @@ $relatorios = $resultRelatorios ? mysqli_fetch_all($resultRelatorios, MYSQLI_ASS
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

@@ -45,6 +45,25 @@ if ($busca !== '') {
 
 $whereBase = implode(' AND ', $where);
 
+// Contagens das 3 abas em uma única consulta condicional
+$sqlCountsPend = "
+    SELECT
+        SUM(CASE WHEN status_aprovacao = 'PENDENTE' THEN 1 ELSE 0 END) AS total_pendentes,
+        SUM(CASE WHEN status_aprovacao = 'PENDENTE_CORRECAO' THEN 1 ELSE 0 END) AS total_correcao,
+        SUM(CASE WHEN status_aprovacao = 'REPROVADO' THEN 1 ELSE 0 END) AS total_reprovados
+    FROM alunos
+    WHERE $whereBase AND status_aprovacao IN ('PENDENTE', 'PENDENTE_CORRECAO', 'REPROVADO')
+";
+$resCountsPend = mysqli_query($conexao, $sqlCountsPend);
+$rowCountsPend = $resCountsPend ? mysqli_fetch_assoc($resCountsPend) : [];
+$totalPendentesCount = (int) ($rowCountsPend['total_pendentes'] ?? 0);
+$totalCorrecaoCount = (int) ($rowCountsPend['total_correcao'] ?? 0);
+$totalReprovadosCount = (int) ($rowCountsPend['total_reprovados'] ?? 0);
+
+$pagPendentes = calcularPaginacao($totalPendentesCount, 20, 'pag_analise');
+$pagCorrecao = calcularPaginacao($totalCorrecaoCount, 20, 'pag_correcao');
+$pagReprovados = calcularPaginacao($totalReprovadosCount, 20, 'pag_reprovados');
+
 // Consulta para alunos em análise (PENDENTE)
 $sqlPendentes = "
     SELECT id_aluno, nome, cpf, ra, descricao_deficiencia,
@@ -52,6 +71,7 @@ $sqlPendentes = "
     FROM alunos
     WHERE $whereBase AND status_aprovacao = 'PENDENTE'
     ORDER BY data_cadastro DESC
+    " . $pagPendentes['limit_sql'] . "
 ";
 $resultPendentes = mysqli_query($conexao, $sqlPendentes);
 $alunosPendentes = $resultPendentes ? mysqli_fetch_all($resultPendentes, MYSQLI_ASSOC) : [];
@@ -63,6 +83,7 @@ $sqlCorrecao = "
     FROM alunos
     WHERE $whereBase AND status_aprovacao = 'PENDENTE_CORRECAO'
     ORDER BY data_cadastro DESC
+    " . $pagCorrecao['limit_sql'] . "
 ";
 $resultCorrecao = mysqli_query($conexao, $sqlCorrecao);
 $alunosCorrecao = $resultCorrecao ? mysqli_fetch_all($resultCorrecao, MYSQLI_ASSOC) : [];
@@ -74,6 +95,7 @@ $sqlReprovados = "
     FROM alunos
     WHERE $whereBase AND status_aprovacao = 'REPROVADO'
     ORDER BY data_cadastro DESC
+    " . $pagReprovados['limit_sql'] . "
 ";
 $resultReprovados = mysqli_query($conexao, $sqlReprovados);
 $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQLI_ASSOC) : [];
@@ -163,17 +185,17 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
     <ul class="nav nav-tabs mb-3" id="solicitacoesTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold <?php echo ($abaAtiva === 'analise' || !in_array($abaAtiva, ['correcao', 'reprovados'])) ? 'active' : ''; ?>" id="analise-tab" data-bs-toggle="tab" data-bs-target="#analise" type="button" role="tab" aria-controls="analise" aria-selected="<?php echo ($abaAtiva === 'analise' || !in_array($abaAtiva, ['correcao', 'reprovados'])) ? 'true' : 'false'; ?>">
-                Em Análise <span class="badge bg-primary ms-1"><?php echo count($alunosPendentes); ?></span>
+                Em Análise <span class="badge bg-primary ms-1"><?php echo $totalPendentesCount; ?></span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold <?php echo ($abaAtiva === 'correcao') ? 'active' : ''; ?>" id="correcao-tab" data-bs-toggle="tab" data-bs-target="#correcao" type="button" role="tab" aria-controls="correcao" aria-selected="<?php echo ($abaAtiva === 'correcao') ? 'true' : 'false'; ?>">
-                Ajustes Solicitados <span class="badge bg-warning text-dark ms-1"><?php echo count($alunosCorrecao); ?></span>
+                Ajustes Solicitados <span class="badge bg-warning text-dark ms-1"><?php echo $totalCorrecaoCount; ?></span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold <?php echo ($abaAtiva === 'reprovados') ? 'active' : ''; ?>" id="reprovados-tab" data-bs-toggle="tab" data-bs-target="#reprovados" type="button" role="tab" aria-controls="reprovados" aria-selected="<?php echo ($abaAtiva === 'reprovados') ? 'true' : 'false'; ?>">
-                Alunos Reprovados <span class="badge bg-danger ms-1"><?php echo count($alunosReprovados); ?></span>
+                Alunos Reprovados <span class="badge bg-danger ms-1"><?php echo $totalReprovadosCount; ?></span>
             </button>
         </li>
     </ul>
@@ -219,6 +241,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                             </tbody>
                         </table>
                     </div>
+                    <?php echo renderizarPaginacao($pagPendentes, ['aba' => 'analise']); ?>
                 </div>
             </div>
         </div>
@@ -271,6 +294,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                             </tbody>
                         </table>
                     </div>
+                    <?php echo renderizarPaginacao($pagCorrecao, ['aba' => 'correcao']); ?>
                 </div>
             </div>
         </div>
@@ -323,6 +347,7 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
                             </tbody>
                         </table>
                     </div>
+                    <?php echo renderizarPaginacao($pagReprovados, ['aba' => 'reprovados']); ?>
                 </div>
             </div>
         </div>

@@ -1,7 +1,6 @@
 <?php
 require_once "../../config/init.php";
 ?><!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -351,7 +350,7 @@ require_once "../../config/init.php";
     <!-- LADO ESQUERDO -->
     <div class="caixa esquerda">
       <div class="logo-bloco">
-        <img src="../../assets/imgs/logo.png" alt="Logo SIGEI" class="logo">
+        <img src="../../assets/imgs/logo.png" alt="Logo SIGEI" width="340" height="339" decoding="async" class="logo">
         <div class="logo-texto">
           <h1>SIGEI</h1>
           <span>Sistema de Gestão Educacional Inclusivo</span>
@@ -456,8 +455,8 @@ require_once "../../config/init.php";
       this.value = value;
     });
   </script>
-  <script src="<?php echo assetUrl('assets/js/acessibilidade.js', '../../'); ?>"></script>
-  <script src="<?php echo assetUrl('assets/js/erros.js', '../../'); ?>"></script>
+  <script defer src="<?php echo assetUrl('assets/js/acessibilidade.js', '../../'); ?>"></script>
+  <script defer src="<?php echo assetUrl('assets/js/erros.js', '../../'); ?>"></script>
 
 </body>
 </html>

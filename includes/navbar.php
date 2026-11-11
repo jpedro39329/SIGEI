@@ -20,7 +20,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
     <div class="container-fluid">
 
         <a class="navbar-brand d-flex align-items-center gap-2" href="<?php echo $homePage; ?>">
-            <img src="<?php echo $baseUrl; ?>assets/imgs/logo_nav.png" alt="SIGEI" height="50" class="d-inline-block logo-nav">
+            <img src="<?php echo assetUrl('assets/imgs/logo_nav.png', $baseUrl); ?>" alt="SIGEI" width="50" height="50" decoding="async" class="d-inline-block logo-nav">
             <span class="fw-bold">SIGEI</span>
         </a>
 
@@ -248,6 +248,9 @@ $homePage = $baseUrl . 'views/dashboard.php';
                             <img
                                 src="<?php echo $baseUrl . ltrim($userFoto, '/'); ?>"
                                 alt="<?php echo htmlspecialchars($userName); ?>"
+                                width="38"
+                                height="38"
+                                decoding="async"
                                 class="navbar-avatar-circle navbar-avatar-img"
                             >
                         <?php else: ?>
@@ -267,6 +270,10 @@ $homePage = $baseUrl . 'views/dashboard.php';
                                 <img
                                     src="<?php echo $baseUrl . ltrim($userFoto, '/'); ?>"
                                     alt="<?php echo htmlspecialchars($userName); ?>"
+                                    width="38"
+                                    height="38"
+                                    loading="lazy"
+                                    decoding="async"
                                     class="navbar-avatar-circle navbar-avatar-img"
                                 >
                             <?php else: ?>
@@ -645,10 +652,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 <?php endif; ?>
 </script>
-<script src="<?php echo assetUrl('assets/js/acessibilidade.js', $baseUrl); ?>"></script>
-<script src="<?php echo assetUrl('assets/js/termos.js', $baseUrl); ?>"></script>
-<script src="<?php echo assetUrl('assets/js/confirmacao.js', $baseUrl); ?>"></script>
-<script src="<?php echo assetUrl('assets/js/mascaras.js', $baseUrl); ?>"></script>
-<script src="<?php echo assetUrl('assets/js/erros.js', $baseUrl); ?>"></script>
-<script src="<?php echo assetUrl('assets/js/atualizacao_dinamica.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/acessibilidade.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/termos.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/confirmacao.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/mascaras.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/erros.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/atualizacao_dinamica.js', $baseUrl); ?>"></script>
 

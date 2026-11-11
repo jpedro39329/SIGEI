@@ -85,31 +85,32 @@ if (count($where) > 0) {
 }
 
 $sql = "
-    SELECT a.*,
+    SELECT a.id_aluno, a.nome, a.ra, a.cpf, a.data_nascimento, a.genero, a.serie, a.turno,
+           a.descricao_deficiencia, a.descricao_cuidados, a.nome_responsavel, a.cpf_responsavel,
+           a.status_aprovacao, a.data_cadastro,
            TIMESTAMPDIFF(YEAR, a.data_nascimento, CURDATE()) AS idade,
            e.nome AS escola_nome,
            e.cie AS escola_cie,
            u.nome AS ure_nome,
-           (SELECT p.nome FROM associacoes ass
-            JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-            WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            LIMIT 1) AS pae_nome,
-           (SELECT p.cpf FROM associacoes ass
-            JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-            WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            LIMIT 1) AS pae_cpf,
-           (SELECT p.telefone FROM associacoes ass
-            JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-            WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            LIMIT 1) AS pae_telefone,
-           (SELECT emp.nome FROM associacoes ass
-            JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-            JOIN empresas emp ON p.id_empresa = emp.id_empresa
-            WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            LIMIT 1) AS pae_empresa
+           pae_ativo.pae_nome,
+           pae_ativo.pae_cpf,
+           pae_ativo.pae_telefone,
+           pae_ativo.pae_empresa
     FROM alunos a
     LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
     LEFT JOIN unidades_regionais u ON e.id_ure = u.id_ure
+    LEFT JOIN (
+        SELECT ass.id_aluno,
+               SUBSTRING_INDEX(GROUP_CONCAT(p.nome ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_nome,
+               SUBSTRING_INDEX(GROUP_CONCAT(p.cpf ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_cpf,
+               SUBSTRING_INDEX(GROUP_CONCAT(COALESCE(p.telefone, '') ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_telefone,
+               SUBSTRING_INDEX(GROUP_CONCAT(COALESCE(emp.nome, '') ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_empresa
+        FROM associacoes ass
+        JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+        LEFT JOIN empresas emp ON p.id_empresa = emp.id_empresa
+        WHERE ass.ativo = 1
+        GROUP BY ass.id_aluno
+    ) pae_ativo ON pae_ativo.id_aluno = a.id_aluno
     $whereSql
     ORDER BY a.nome ASC
 ";

@@ -59,12 +59,18 @@ if ($busca !== '') {
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$sqlCountEmpresas = "SELECT COUNT(*) AS total FROM empresas e $whereSql";
+$resCountEmpresas = mysqli_query($conexao, $sqlCountEmpresas);
+$totalEmpresasCount = $resCountEmpresas ? (int) (mysqli_fetch_assoc($resCountEmpresas)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalEmpresasCount, 20);
+
 $sqlEmpresas = "
-    SELECT e.*,
-           (SELECT COUNT(*) FROM usuarios_pae p WHERE p.id_empresa = e.id_empresa AND p.ativo = 1) AS total_paes
+    SELECT e.id_empresa, e.nome, e.cnpj, e.numero_contrato, e.data_inicio_contrato, e.data_fim_contrato,
+           e.email, e.telefone, e.ativo
     FROM empresas e
     $whereSql
     ORDER BY e.ativo DESC, e.nome ASC
+    " . $paginacao['limit_sql'] . "
 ";
 $result = mysqli_query($conexao, $sqlEmpresas);
 $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -223,6 +229,7 @@ $empresas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

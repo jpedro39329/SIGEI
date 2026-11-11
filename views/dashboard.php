@@ -54,31 +54,33 @@ function totalDashboard($conexao, $sql) {
         <?php
         $idEscola = idEscolaUsuario($conexao, $userId);
 
-        $alunosEmAtendimento = totalDashboard($conexao, "
-            SELECT COUNT(DISTINCT a.id_aluno) AS total
+        $resResumoEscola = mysqli_query($conexao, "
+            SELECT
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NOT NULL THEN 1 ELSE 0 END) AS em_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NULL THEN 1 ELSE 0 END) AS sem_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'PENDENTE' THEN 1 ELSE 0 END) AS pendentes
             FROM alunos a
-            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            WHERE a.id_ue = $idEscola AND a.status_aprovacao = 'APROVADO'
-        ");
-        $alunosSemAtendimento = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total
-            FROM alunos a
+            LEFT JOIN (
+                SELECT DISTINCT id_aluno FROM associacoes WHERE ativo = 1
+            ) ass_at ON ass_at.id_aluno = a.id_aluno
             WHERE a.id_ue = $idEscola
-              AND a.status_aprovacao = 'APROVADO'
-              AND NOT EXISTS (
-                  SELECT 1 FROM associacoes ass
-                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-              )
         ");
-        $alunosPendentes = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE id_ue = $idEscola AND status_aprovacao = 'PENDENTE'");
+        $rowResumoEscola = $resResumoEscola ? mysqli_fetch_assoc($resResumoEscola) : [];
+        $alunosEmAtendimento = (int) ($rowResumoEscola['em_atendimento'] ?? 0);
+        $alunosSemAtendimento = (int) ($rowResumoEscola['sem_atendimento'] ?? 0);
+        $alunosPendentes = (int) ($rowResumoEscola['pendentes'] ?? 0);
 
         $sqlAlunos = "
             SELECT a.id_aluno, a.nome, a.status_aprovacao,
-                   (SELECT p.nome FROM associacoes ass
-                    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-                    WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-                    LIMIT 1) AS pae_nome
+                   pae_at.pae_nome
             FROM alunos a
+            LEFT JOIN (
+                SELECT ass.id_aluno, SUBSTRING_INDEX(GROUP_CONCAT(p.nome ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_nome
+                FROM associacoes ass
+                JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+                WHERE ass.ativo = 1
+                GROUP BY ass.id_aluno
+            ) pae_at ON pae_at.id_aluno = a.id_aluno
             WHERE a.id_ue = $idEscola
             ORDER BY a.data_cadastro DESC
             LIMIT 10
@@ -153,31 +155,23 @@ function totalDashboard($conexao, $sql) {
         <?php
         if ($idUreUsuario <= 0) $idUreUsuario = idUreUsuario($conexao, $userId);
 
-        // 1. Status de Atendimento dos Alunos na Regional
-        $alunosEmAtendimentoUre = totalDashboard($conexao, "
-            SELECT COUNT(DISTINCT a.id_aluno) AS total
+        // 1. Status de Atendimento dos Alunos na Regional (consolidado em 1 consulta)
+        $resResumoUre = mysqli_query($conexao, "
+            SELECT
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NOT NULL THEN 1 ELSE 0 END) AS em_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NULL THEN 1 ELSE 0 END) AS sem_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'PENDENTE' THEN 1 ELSE 0 END) AS pendentes
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'
-        ");
-        $alunosSemAtendimentoUre = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total
-            FROM alunos a
-            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            LEFT JOIN (
+                SELECT DISTINCT id_aluno FROM associacoes WHERE ativo = 1
+            ) ass_at ON ass_at.id_aluno = a.id_aluno
             WHERE ue.id_ure = $idUreUsuario
-              AND a.status_aprovacao = 'APROVADO'
-              AND NOT EXISTS (
-                  SELECT 1 FROM associacoes ass
-                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-              )
         ");
-        $alunosPendentesUre = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total
-            FROM alunos a
-            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'PENDENTE'
-        ");
+        $rowResumoUre = $resResumoUre ? mysqli_fetch_assoc($resResumoUre) : [];
+        $alunosEmAtendimentoUre = (int) ($rowResumoUre['em_atendimento'] ?? 0);
+        $alunosSemAtendimentoUre = (int) ($rowResumoUre['sem_atendimento'] ?? 0);
+        $alunosPendentesUre = (int) ($rowResumoUre['pendentes'] ?? 0);
 
         // 2. Alunos por Escola na Regional
         $sqlEscolasUre = "
@@ -230,12 +224,16 @@ function totalDashboard($conexao, $sql) {
         // 5. Lista de Alunos Recentes da Regional
         $sqlAlunosUre = "
             SELECT a.id_aluno, a.nome, a.ra, a.descricao_deficiencia, a.status_aprovacao, ue.nome AS escola_nome,
-                   (SELECT p.nome FROM associacoes ass
-                    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-                    WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-                    LIMIT 1) AS pae_nome
+                   pae_at.pae_nome
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            LEFT JOIN (
+                SELECT ass.id_aluno, SUBSTRING_INDEX(GROUP_CONCAT(p.nome ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_nome
+                FROM associacoes ass
+                JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+                WHERE ass.ativo = 1
+                GROUP BY ass.id_aluno
+            ) pae_at ON pae_at.id_aluno = a.id_aluno
             WHERE ue.id_ure = $idUreUsuario
             ORDER BY a.data_cadastro DESC
             LIMIT 8
@@ -344,24 +342,25 @@ function totalDashboard($conexao, $sql) {
 
         <?php
         if ($idUreUsuario <= 0) $idUreUsuario = idUreUsuario($conexao, $userId);
-        $whereUre = ($idUreUsuario > 0) ? "JOIN unidades_escolares ue ON a.id_ue = ue.id_ue WHERE ue.id_ure = $idUreUsuario" : "";
+        $joinUreEec = ($idUreUsuario > 0) ? "JOIN unidades_escolares ue ON a.id_ue = ue.id_ue" : "";
+        $condUreEec = ($idUreUsuario > 0) ? "WHERE ue.id_ure = $idUreUsuario" : "";
 
-        $alunosEmAtendimento = totalDashboard($conexao, "
-            SELECT COUNT(DISTINCT a.id_aluno) AS total
+        $resResumoEec = mysqli_query($conexao, "
+            SELECT
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NOT NULL THEN 1 ELSE 0 END) AS em_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'PENDENTE' THEN 1 ELSE 0 END) AS pendentes,
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' THEN 1 ELSE 0 END) AS aprovados
             FROM alunos a
-            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            " . (($idUreUsuario > 0) ? "JOIN unidades_escolares ue ON a.id_ue = ue.id_ue WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'" : "WHERE a.status_aprovacao = 'APROVADO'") . "
+            $joinUreEec
+            LEFT JOIN (
+                SELECT DISTINCT id_aluno FROM associacoes WHERE ativo = 1
+            ) ass_at ON ass_at.id_aluno = a.id_aluno
+            $condUreEec
         ");
-        $alunosPendentes = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total
-            FROM alunos a
-            " . (($idUreUsuario > 0) ? "JOIN unidades_escolares ue ON a.id_ue = ue.id_ue WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'PENDENTE'" : "WHERE a.status_aprovacao = 'PENDENTE'") . "
-        ");
-        $alunosAprovados = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total
-            FROM alunos a
-            " . (($idUreUsuario > 0) ? "JOIN unidades_escolares ue ON a.id_ue = ue.id_ue WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'" : "WHERE a.status_aprovacao = 'APROVADO'") . "
-        ");
+        $rowResumoEec = $resResumoEec ? mysqli_fetch_assoc($resResumoEec) : [];
+        $alunosEmAtendimento = (int) ($rowResumoEec['em_atendimento'] ?? 0);
+        $alunosPendentes = (int) ($rowResumoEec['pendentes'] ?? 0);
+        $alunosAprovados = (int) ($rowResumoEec['aprovados'] ?? 0);
 
         $sqlSolicitacoesRecentes = "
             SELECT a.id_aluno, a.nome, a.descricao_deficiencia, a.data_cadastro, ue.nome AS escola_nome
@@ -405,7 +404,7 @@ function totalDashboard($conexao, $sql) {
                                         <td><?php echo !empty($sol['data_cadastro']) ? date('d/m/Y', strtotime($sol['data_cadastro'])) : '-'; ?></td>
                                         <td>
                                             <a href="solicitacoes/analisar.php?id=<?php echo $sol['id_aluno']; ?>" class="btn btn-action btn-action-view" title="Analisar Solicitação">
-                                                <i class="fa-solid fa-clipboard-check"></i>
+                                                <i class="bi bi-clipboard-check"></i>
                                             </a>
                                         </td>
                                     </tr>
@@ -571,7 +570,7 @@ function totalDashboard($conexao, $sql) {
         $empresaContratoUre = null;
         if ($idUreUsuario > 0) {
             $resEmpUre = mysqli_query($conexao, "
-                SELECT e.*
+                SELECT e.id_empresa, e.nome, e.cnpj, e.numero_contrato, e.ativo
                 FROM empresas e
                 JOIN empresa_ure eu ON e.id_empresa = eu.id_empresa
                 WHERE eu.id_ure = $idUreUsuario AND e.ativo = 1
@@ -594,27 +593,32 @@ function totalDashboard($conexao, $sql) {
             WHERE eu.id_ure = $idUreUsuario AND p.ativo = 1
         ");
 
-        // Alunos aprovados e pendentes da URE para o gráfico SEFISC
-        $alunosAprovadosUre = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total FROM alunos a
-            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'APROVADO'
-        ");
-        $alunosPendentesUre = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total FROM alunos a
-            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE ue.id_ure = $idUreUsuario AND a.status_aprovacao = 'PENDENTE'
-        ");
-
-        // Lista de alunos da URE com dados do PAE vinculado
-        $sqlAlunosSefisc = "
-            SELECT a.id_aluno, a.nome, a.ra, a.descricao_deficiencia, a.status_aprovacao,
-                   (SELECT p.nome FROM associacoes ass
-                    JOIN usuarios_pae p ON ass.id_pae = p.id_pae
-                    WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-                    LIMIT 1) AS pae_nome
+        // Alunos aprovados e pendentes da URE para o gráfico SEFISC (consolidado em 1 consulta)
+        $resResumoSefisc = mysqli_query($conexao, "
+            SELECT
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' THEN 1 ELSE 0 END) AS aprovados,
+                SUM(CASE WHEN a.status_aprovacao = 'PENDENTE' THEN 1 ELSE 0 END) AS pendentes
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            WHERE ue.id_ure = $idUreUsuario
+        ");
+        $rowResumoSefisc = $resResumoSefisc ? mysqli_fetch_assoc($resResumoSefisc) : [];
+        $alunosAprovadosUre = (int) ($rowResumoSefisc['aprovados'] ?? 0);
+        $alunosPendentesUre = (int) ($rowResumoSefisc['pendentes'] ?? 0);
+
+        // Lista de alunos da URE com dados do PAE vinculado (sem subconsulta correlacionada)
+        $sqlAlunosSefisc = "
+            SELECT a.id_aluno, a.nome, a.ra, a.descricao_deficiencia, a.status_aprovacao,
+                   pae_at.pae_nome
+            FROM alunos a
+            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            LEFT JOIN (
+                SELECT ass.id_aluno, SUBSTRING_INDEX(GROUP_CONCAT(p.nome ORDER BY ass.id_associacao ASC SEPARATOR '||'), '||', 1) AS pae_nome
+                FROM associacoes ass
+                JOIN usuarios_pae p ON ass.id_pae = p.id_pae
+                WHERE ass.ativo = 1
+                GROUP BY ass.id_aluno
+            ) pae_at ON pae_at.id_aluno = a.id_aluno
             WHERE ue.id_ure = $idUreUsuario
             ORDER BY a.data_cadastro DESC
             LIMIT 10
@@ -714,23 +718,21 @@ function totalDashboard($conexao, $sql) {
         }, $dadosEscolasUre);
         $valoresEscolasUre = array_map(function($item) { return (int) $item['total_escolas']; }, $dadosEscolasUre);
 
-        // 2. Alunos em Atendimento x Sem Atendimento x Pendentes (Geral)
-        $alunosEmAtendimentoGeral = totalDashboard($conexao, "
-            SELECT COUNT(DISTINCT a.id_aluno) AS total
+        // 2. Alunos em Atendimento x Sem Atendimento x Pendentes (Geral) consolidados em 1 consulta
+        $resResumoGeral = mysqli_query($conexao, "
+            SELECT
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NOT NULL THEN 1 ELSE 0 END) AS em_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'APROVADO' AND ass_at.id_aluno IS NULL THEN 1 ELSE 0 END) AS sem_atendimento,
+                SUM(CASE WHEN a.status_aprovacao = 'PENDENTE' THEN 1 ELSE 0 END) AS pendentes
             FROM alunos a
-            JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
-            WHERE a.status_aprovacao = 'APROVADO'
+            LEFT JOIN (
+                SELECT DISTINCT id_aluno FROM associacoes WHERE ativo = 1
+            ) ass_at ON ass_at.id_aluno = a.id_aluno
         ");
-        $alunosSemAtendimentoGeral = totalDashboard($conexao, "
-            SELECT COUNT(*) AS total
-            FROM alunos a
-            WHERE a.status_aprovacao = 'APROVADO'
-              AND NOT EXISTS (
-                  SELECT 1 FROM associacoes ass
-                  WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1
-              )
-        ");
-        $alunosPendentesGeral = totalDashboard($conexao, "SELECT COUNT(*) AS total FROM alunos WHERE status_aprovacao = 'PENDENTE'");
+        $rowResumoGeral = $resResumoGeral ? mysqli_fetch_assoc($resResumoGeral) : [];
+        $alunosEmAtendimentoGeral = (int) ($rowResumoGeral['em_atendimento'] ?? 0);
+        $alunosSemAtendimentoGeral = (int) ($rowResumoGeral['sem_atendimento'] ?? 0);
+        $alunosPendentesGeral = (int) ($rowResumoGeral['pendentes'] ?? 0);
 
         // 3. PAEs por URE (calculado pelas empresas contratadas atendendo as UREs)
         $sqlPaesPorUre = "

@@ -66,12 +66,23 @@ if ($busca !== '') {
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$sqlCountPaes = "
+    SELECT COUNT(*) AS total
+    FROM usuarios_pae p
+    LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
+    $whereSql
+";
+$resCountPaes = mysqli_query($conexao, $sqlCountPaes);
+$totalPaesCount = $resCountPaes ? (int) (mysqli_fetch_assoc($resCountPaes)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalPaesCount, 20);
+
 $sql = "
     SELECT p.id_pae, p.nome, p.cpf, p.email, p.telefone, p.ativo, p.data_cadastro, e.nome AS empresa_nome
     FROM usuarios_pae p
     LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
     $whereSql
     ORDER BY p.data_cadastro DESC
+    " . $paginacao['limit_sql'] . "
 ";
 $result = mysqli_query($conexao, $sql);
 $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -205,6 +216,7 @@ $paes = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 </div>

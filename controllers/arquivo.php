@@ -149,11 +149,23 @@ if (session_status() === PHP_SESSION_ACTIVE) {
     session_write_close();
 }
 
-header('Content-Type: ' . $contentType);
-header('Content-Length: ' . filesize($caminhoFisico));
-header('Content-Disposition: inline; filename="' . addslashes($arquivo) . '"');
+$fileSize = (int) @filesize($caminhoFisico);
+$fileMtime = (int) @filemtime($caminhoFisico);
+$etag = '"' . md5($userId . ':' . $userPerfil . ':' . $caminhoRelativo . ':' . $fileSize . ':' . $fileMtime) . '"';
+
+header('Cache-Control: private, must-revalidate, max-age=300');
+header('ETag: ' . $etag);
 header('X-Content-Type-Options: nosniff');
-header('Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0');
+
+$ifNoneMatch = trim($_SERVER['HTTP_IF_NONE_MATCH'] ?? '');
+if ($ifNoneMatch !== '' && $ifNoneMatch === $etag) {
+    http_response_code(304);
+    exit();
+}
+
+header('Content-Type: ' . $contentType);
+header('Content-Length: ' . $fileSize);
+header('Content-Disposition: inline; filename="' . addslashes($arquivo) . '"');
 
 readfile($caminhoFisico);
 exit();

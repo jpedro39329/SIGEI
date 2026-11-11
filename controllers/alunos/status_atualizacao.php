@@ -40,6 +40,7 @@ if ($perfilNorm === PERFIL_USUARIO_ESCOLA) {
 }
 
 // Calcula um resumo leve de todos os alunos, status, laudos e associações visíveis ao perfil
+// (utilizando índices de cobertura idx_associacoes_aluno_ativo e fk_laudo_aluno)
 $sqlAssinatura = "
     SELECT 
         COUNT(a.id_aluno) AS total_alunos,

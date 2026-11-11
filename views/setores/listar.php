@@ -53,12 +53,24 @@ if ($busca !== '') {
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$sqlCountSetores = "
+    SELECT COUNT(*) AS total
+    FROM usuarios_ure uu
+    JOIN unidades_regionais u ON uu.id_ure = u.id_ure
+    $whereSql
+";
+$resCountSetores = mysqli_query($conexao, $sqlCountSetores);
+$totalSetoresCount = $resCountSetores ? (int) (mysqli_fetch_assoc($resCountSetores)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalSetoresCount, 20);
+
 $sql = "
-    SELECT uu.*, u.nome AS ure_nome, u.uge AS ure_uge
+    SELECT uu.id_usuario_ure, uu.nome, uu.setor, uu.cargo, uu.cpf, uu.email, uu.ativo,
+           u.nome AS ure_nome, u.uge AS ure_uge
     FROM usuarios_ure uu
     JOIN unidades_regionais u ON uu.id_ure = u.id_ure
     $whereSql
     ORDER BY uu.setor ASC, uu.nome ASC
+    " . $paginacao['limit_sql'] . "
 ";
 $result = mysqli_query($conexao, $sql);
 $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -200,6 +212,7 @@ $servidores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

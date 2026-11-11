@@ -50,14 +50,24 @@ if ($busca !== '') {
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$sqlCountEscolas = "
+    SELECT COUNT(*) AS total
+    FROM unidades_escolares ue
+    JOIN unidades_regionais u ON ue.id_ure = u.id_ure
+    $whereSql
+";
+$resCountEscolas = mysqli_query($conexao, $sqlCountEscolas);
+$totalEscolasCount = $resCountEscolas ? (int) (mysqli_fetch_assoc($resCountEscolas)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalEscolasCount, 20);
+
 $sql = "
-    SELECT ue.*, u.nome AS ure_nome, u.uge AS ure_uge,
-           (SELECT COUNT(*) FROM alunos a WHERE a.id_ue = ue.id_ue) AS total_alunos,
-           (SELECT COUNT(*) FROM usuarios_ue uue WHERE uue.id_ue = ue.id_ue AND uue.ativo = 1) AS total_usuarios
+    SELECT ue.id_ue, ue.nome, ue.cie, ue.ua, ue.modalidade, ue.municipio,
+           u.nome AS ure_nome, u.uge AS ure_uge
     FROM unidades_escolares ue
     JOIN unidades_regionais u ON ue.id_ure = u.id_ure
     $whereSql
     ORDER BY ue.nome ASC
+    " . $paginacao['limit_sql'] . "
 ";
 $result = mysqli_query($conexao, $sql);
 $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -192,6 +202,7 @@ $escolas = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

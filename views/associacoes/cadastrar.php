@@ -30,13 +30,13 @@ if (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
 
 // 1. Lista de Alunos Aprovados que ainda NÃO possuem nenhum PAE ativo vinculado
 $sqlAlunos = "
-    SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, e.nome AS escola_nome,
-           (SELECT COUNT(*) FROM associacoes ass WHERE ass.id_aluno = a.id_aluno AND ass.ativo = 1) AS qtd_paes
+    SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, e.nome AS escola_nome
     FROM alunos a
     LEFT JOIN unidades_escolares e ON a.id_ue = e.id_ue
+    LEFT JOIN associacoes ass ON ass.id_aluno = a.id_aluno AND ass.ativo = 1
     WHERE a.status_aprovacao = 'APROVADO'
+      AND ass.id_associacao IS NULL
     $whereAlunoUre
-    HAVING qtd_paes = 0
     ORDER BY a.nome ASC
 ";
 $resultAlunos = mysqli_query($conexao, $sqlAlunos);
@@ -45,12 +45,19 @@ $alunosDisponiveis = $resultAlunos ? mysqli_fetch_all($resultAlunos, MYSQLI_ASSO
 // 2. Lista de PAEs ativos que têm menos de 3 alunos ativos aprovados vinculados
 $sqlPAEs = "
     SELECT p.id_pae, p.nome, p.cpf, e.nome AS empresa_nome,
-           (SELECT COUNT(*) FROM associacoes ass JOIN alunos al ON ass.id_aluno = al.id_aluno WHERE ass.id_pae = p.id_pae AND ass.ativo = 1 AND al.status_aprovacao = 'APROVADO') AS qtd_alunos
+           COALESCE(ass_cnt.qtd_alunos, 0) AS qtd_alunos
     FROM usuarios_pae p
     LEFT JOIN empresas e ON p.id_empresa = e.id_empresa
+    LEFT JOIN (
+        SELECT ass.id_pae, COUNT(*) AS qtd_alunos
+        FROM associacoes ass
+        JOIN alunos al ON ass.id_aluno = al.id_aluno
+        WHERE ass.ativo = 1 AND al.status_aprovacao = 'APROVADO'
+        GROUP BY ass.id_pae
+    ) ass_cnt ON ass_cnt.id_pae = p.id_pae
     WHERE p.ativo = 1
+      AND COALESCE(ass_cnt.qtd_alunos, 0) < 3
     $wherePaeEmpresa
-    HAVING qtd_alunos < 3
     ORDER BY p.nome ASC
 ";
 $resultPAEs = mysqli_query($conexao, $sqlPAEs);
@@ -212,22 +219,30 @@ document.addEventListener('DOMContentLoaded', function() {
     var detalhesConf = document.getElementById('detalhesAlunoConf');
     var btnAlterar = document.getElementById('btnAlterarAluno');
 
+    var debounceTimer = null;
+    items.forEach(function(item) {
+        item._searchText = (item.textContent || '').toLowerCase();
+    });
+
     function filtrar() {
         var termo = inputBusca.value.toLowerCase().trim();
         var count = 0;
         items.forEach(function(item) {
-            var texto = item.innerText.toLowerCase();
+            var texto = item._searchText || '';
             if (texto.indexOf(termo) !== -1) {
-                item.style.display = 'block';
+                if (item.style.display !== 'block') item.style.display = 'block';
                 count++;
             } else {
-                item.style.display = 'none';
+                if (item.style.display !== 'none') item.style.display = 'none';
             }
         });
         dropdown.style.display = (count > 0 && termo.length > 0) ? 'block' : 'none';
     }
 
-    inputBusca.addEventListener('input', filtrar);
+    inputBusca.addEventListener('input', function() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(filtrar, 180);
+    });
     inputBusca.addEventListener('focus', function() {
         if (inputBusca.value.trim().length > 0) {
             filtrar();

@@ -79,7 +79,7 @@ if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
 
 $whereBaseSql = (count($where) > 0) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-// Função auxiliar para carregar contagens e dados
+// Função auxiliar para carregar contagens e dados (subconsulta indexada apenas para os 20 itens da página)
 $baseSelect = "
     SELECT a.id_aluno, a.nome, a.cpf, a.ra, a.descricao_deficiencia, a.descricao_cuidados, a.data_nascimento,
            TIMESTAMPDIFF(YEAR, a.data_nascimento, CURDATE()) AS idade,
@@ -117,20 +117,27 @@ if ($idUreUsuario > 0) {
 
 // Cláusula da aba selecionada
 $whereAba = $where;
+$totalAbaAtual = (int) ($counts['total_todos'] ?? 0);
 if ($userPerfil === 'DIRIGENTE') {
     // DIRIGENTE / ASURE vê tabela geral com todos os alunos
+    $totalAbaAtual = (int) ($counts['total_todos'] ?? 0);
 } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
     $whereAba[] = "a.status_aprovacao = 'APROVADO'";
+    $totalAbaAtual = (int) ($counts['total_aprovados'] ?? 0);
 } elseif ($abaAtiva === 'aprovados') {
     $whereAba[] = "a.status_aprovacao = 'APROVADO'";
+    $totalAbaAtual = (int) ($counts['total_aprovados'] ?? 0);
 } elseif ($abaAtiva === 'pendentes') {
     $whereAba[] = "a.status_aprovacao IN ('PENDENTE', 'PENDENTE_CORRECAO')";
+    $totalAbaAtual = (int) ($counts['total_pendentes'] ?? 0);
 } elseif ($abaAtiva === 'arquivados') {
     $whereAba[] = "a.status_aprovacao = 'ARQUIVADO'";
+    $totalAbaAtual = (int) ($counts['total_arquivados'] ?? 0);
 }
 
+$paginacao = calcularPaginacao($totalAbaAtual, 20);
 $whereAbaSql = (count($whereAba) > 0) ? 'WHERE ' . implode(' AND ', $whereAba) : '';
-$sqlFinal = "$baseSelect $whereAbaSql ORDER BY a.data_cadastro DESC";
+$sqlFinal = "$baseSelect $whereAbaSql ORDER BY a.data_cadastro DESC " . $paginacao['limit_sql'];
 $result = mysqli_query($conexao, $sqlFinal);
 $alunos = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
@@ -417,6 +424,7 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

@@ -365,22 +365,33 @@ function nomePerfil($perfil) {
 
 // Retorna o id_ue do usuário logado (perfil USUARIO_ESCOLA)
 function idUeUsuario($conexao, $userId) {
+    static $cache = [];
     $userId = (int) $userId;
-    $query = "SELECT id_ue FROM usuarios_ue WHERE id_usuario_ue = $userId";
+    if (isset($cache[$userId])) {
+        return $cache[$userId];
+    }
+    if (isset($_SESSION['user_id'], $_SESSION['id_ue']) && (int) $_SESSION['user_id'] === $userId && (int) $_SESSION['id_ue'] > 0) {
+        return $cache[$userId] = (int) $_SESSION['id_ue'];
+    }
+    $query = "SELECT id_ue FROM usuarios_ue WHERE id_usuario_ue = $userId LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return (int) ($row['id_ue'] ?? 0);
+    return $cache[$userId] = (int) ($row['id_ue'] ?? 0);
 }
 
 // Retorna o nome da escola do usuário logado (perfil USUARIO_ESCOLA)
 function nomeUeUsuario($conexao, $userId) {
+    static $cache = [];
     $userId = (int) $userId;
+    if (isset($cache[$userId])) {
+        return $cache[$userId];
+    }
     $query = "SELECT ue.nome FROM usuarios_ue u
               JOIN unidades_escolares ue ON u.id_ue = ue.id_ue
-              WHERE u.id_usuario_ue = $userId";
+              WHERE u.id_usuario_ue = $userId LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return $row['nome'] ?? '';
+    return $cache[$userId] = ($row['nome'] ?? '');
 }
 
 // Alias para compatibilidade
@@ -394,22 +405,33 @@ function nomeEscolaUsuario($conexao, $userId) {
 
 // Retorna o id_empresa do supervisor logado (perfil SUPERVISOR)
 function idEmpresaSupervisor($conexao, $userId) {
+    static $cache = [];
     $userId = (int) $userId;
-    $query = "SELECT id_empresa FROM usuarios_supervisor WHERE id_usuario_supervisor = $userId";
+    if (isset($cache[$userId])) {
+        return $cache[$userId];
+    }
+    if (isset($_SESSION['user_id'], $_SESSION['id_empresa']) && (int) $_SESSION['user_id'] === $userId && (int) $_SESSION['id_empresa'] > 0) {
+        return $cache[$userId] = (int) $_SESSION['id_empresa'];
+    }
+    $query = "SELECT id_empresa FROM usuarios_supervisor WHERE id_usuario_supervisor = $userId LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return (int) ($row['id_empresa'] ?? 0);
+    return $cache[$userId] = (int) ($row['id_empresa'] ?? 0);
 }
 
 // Retorna o nome da empresa do supervisor logado
 function nomeEmpresaSupervisor($conexao, $userId) {
+    static $cache = [];
     $userId = (int) $userId;
+    if (isset($cache[$userId])) {
+        return $cache[$userId];
+    }
     $query = "SELECT e.nome FROM usuarios_supervisor u
               JOIN empresas e ON u.id_empresa = e.id_empresa
-              WHERE u.id_usuario_supervisor = $userId";
+              WHERE u.id_usuario_supervisor = $userId LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return $row['nome'] ?? '';
+    return $cache[$userId] = ($row['nome'] ?? '');
 }
 
 // Alias para compatibilidade
@@ -423,27 +445,42 @@ function nomeEmpresaUsuario($conexao, $userId) {
 
 // Retorna o id_ure do usuário URE logado
 function idUreUsuario($conexao, $userId) {
+    static $cache = [];
     $userId = (int) $userId;
-    $query = "SELECT id_ure FROM usuarios_ure WHERE id_usuario_ure = $userId";
+    if (isset($cache[$userId])) {
+        return $cache[$userId];
+    }
+    if (isset($_SESSION['user_id'], $_SESSION['id_ure']) && (int) $_SESSION['user_id'] === $userId && (int) $_SESSION['id_ure'] > 0) {
+        return $cache[$userId] = (int) $_SESSION['id_ure'];
+    }
+    $query = "SELECT id_ure FROM usuarios_ure WHERE id_usuario_ure = $userId LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return (int) ($row['id_ure'] ?? 0);
+    return $cache[$userId] = (int) ($row['id_ure'] ?? 0);
 }
 
 // Retorna o nome da URE do usuário logado
 function nomeUreUsuario($conexao, $userId) {
+    static $cache = [];
     $userId = (int) $userId;
+    if (isset($cache[$userId])) {
+        return $cache[$userId];
+    }
     $query = "SELECT u.nome FROM usuarios_ure uu
               JOIN unidades_regionais u ON uu.id_ure = u.id_ure
-              WHERE uu.id_usuario_ure = $userId";
+              WHERE uu.id_usuario_ure = $userId LIMIT 1";
     $result = mysqli_query($conexao, $query);
     $row = $result ? mysqli_fetch_assoc($result) : null;
-    return $row['nome'] ?? '';
+    return $cache[$userId] = ($row['nome'] ?? '');
 }
 
 // Retorna as UREs atendidas por uma empresa (array de ids)
 function uresAtendidasEmpresa($conexao, $idEmpresa) {
+    static $cache = [];
     $idEmpresa = (int) $idEmpresa;
+    if (isset($cache[$idEmpresa])) {
+        return $cache[$idEmpresa];
+    }
     $query = "SELECT id_ure FROM empresa_ure WHERE id_empresa = $idEmpresa";
     $result = mysqli_query($conexao, $query);
     $ures = [];
@@ -452,7 +489,7 @@ function uresAtendidasEmpresa($conexao, $idEmpresa) {
             $ures[] = (int) $row['id_ure'];
         }
     }
-    return $ures;
+    return $cache[$idEmpresa] = $ures;
 }
 
 // Conta quantos alunos ativos e aprovados um PAE possui
@@ -492,34 +529,48 @@ function nomePAEAluno($conexao, $idAluno) {
 
 // Garante a existência da tabela termos_aceite e verifica se o usuário aceitou os termos
 function verificarTermoAceito($conexao, $idUsuario, $perfil) {
+    static $cache = [];
     $idUsuario = (int) $idUsuario;
     $perfil = trim((string) $perfil);
     if ($idUsuario <= 0 || $perfil === '') {
         return false;
     }
 
-    $tabelaQuery = "CREATE TABLE IF NOT EXISTS `termos_aceite` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `id_usuario` int(11) NOT NULL,
-        `perfil` varchar(50) NOT NULL,
-        `data_aceite` datetime DEFAULT current_timestamp(),
-        `ip` varchar(45) DEFAULT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `uk_usuario_perfil` (`id_usuario`, `perfil`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
-    $conexao->query($tabelaQuery);
-
-    $stmt = $conexao->prepare("SELECT id FROM termos_aceite WHERE id_usuario = ? AND perfil = ? LIMIT 1");
-    if (!$stmt) {
-        return false;
+    $cacheKey = $idUsuario . ':' . $perfil;
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
     }
+
+    try {
+        $stmt = $conexao->prepare("SELECT id FROM termos_aceite WHERE id_usuario = ? AND perfil = ? LIMIT 1");
+    } catch (Throwable $e) {
+        $stmt = false;
+    }
+
+    if (!$stmt) {
+        $tabelaQuery = "CREATE TABLE IF NOT EXISTS `termos_aceite` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `id_usuario` int(11) NOT NULL,
+            `perfil` varchar(50) NOT NULL,
+            `data_aceite` datetime DEFAULT current_timestamp(),
+            `ip` varchar(45) DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uk_usuario_perfil` (`id_usuario`, `perfil`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+        $conexao->query($tabelaQuery);
+        $stmt = $conexao->prepare("SELECT id FROM termos_aceite WHERE id_usuario = ? AND perfil = ? LIMIT 1");
+        if (!$stmt) {
+            return false;
+        }
+    }
+
     $stmt->bind_param("is", $idUsuario, $perfil);
     $stmt->execute();
     $res = $stmt->get_result();
     $aceito = ($res && $res->num_rows > 0);
     $stmt->close();
 
-    return $aceito;
+    return $cache[$cacheKey] = $aceito;
 }
 
 // Registra o aceite do termo de uso para o usuário logado
@@ -580,88 +631,73 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
         $idUre = idUreUsuario($conexao, $userId);
         $whereUre = ($idUre > 0) ? "AND ue.id_ure = $idUre" : "";
 
-        // Solicitações devolvidas / reenviadas para reanálise pela escola
-        $sqlReanalise = "
-            SELECT a.id_aluno, a.nome,
-                   COALESCE(
-                       (SELECT MAX(aud.criado_em)
-                        FROM auditoria aud
-                        WHERE aud.entidade = 'alunos'
-                          AND aud.id_registro = a.id_aluno
-                          AND (aud.acao = 'REENVIAR' OR (aud.acao = 'EDITAR' AND aud.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))),
-                       a.data_deliberacao,
-                       a.data_cadastro
-                   ) AS ref_data
+        // Solicitações pendentes (novas e reanálise) consolidadas em uma única consulta sem subconsultas correlacionadas
+        $sqlPendentesEec = "
+            SELECT a.id_aluno, a.nome, a.data_cadastro, a.data_deliberacao,
+                   DATEDIFF(NOW(), a.data_cadastro) AS dias_pendente,
+                   aud_reenvio.max_reenvio
             FROM alunos a
             JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
+            LEFT JOIN (
+                SELECT aud.id_registro, MAX(aud.criado_em) AS max_reenvio
+                FROM auditoria aud
+                WHERE aud.entidade = 'alunos'
+                  AND (aud.acao = 'REENVIAR' OR (aud.acao = 'EDITAR' AND aud.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))
+                GROUP BY aud.id_registro
+            ) aud_reenvio ON aud_reenvio.id_registro = a.id_aluno
             WHERE a.status_aprovacao = 'PENDENTE'
-              AND (
-                  a.data_deliberacao IS NOT NULL
-                  OR EXISTS (
-                      SELECT 1 FROM auditoria aud2
-                      WHERE aud2.entidade = 'alunos'
-                        AND aud2.id_registro = a.id_aluno
-                        AND (aud2.acao = 'REENVIAR' OR (aud2.acao = 'EDITAR' AND aud2.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))
-                  )
-              )
               $whereUre
-            ORDER BY ref_data DESC LIMIT 5
+            ORDER BY COALESCE(aud_reenvio.max_reenvio, a.data_deliberacao, a.data_cadastro) DESC
         ";
-        $resReanalise = mysqli_query($conexao, $sqlReanalise);
-        if ($resReanalise) {
-            while ($row = mysqli_fetch_assoc($resReanalise)) {
-                $notificacoes[] = [
-                    'tipo' => 'info',
-                    'icone' => 'bi-arrow-repeat',
-                    'titulo' => 'Devolvido para Reanálise',
-                    'mensagem' => "A solicitação do aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi devolvida pela escola para reanálise.",
-                    'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
-                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Reanálise",
-                    'ref_time' => $row['ref_data'] ?? ''
-                ];
-            }
-        }
-
-        // Solicitações novas pendentes (ainda não deliberadas/reenviadas)
-        $sqlPendentesNovos = "
-            SELECT a.id_aluno, a.nome, a.data_cadastro, DATEDIFF(NOW(), a.data_cadastro) AS dias_pendente
-            FROM alunos a
-            JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-            WHERE a.status_aprovacao = 'PENDENTE'
-              AND a.data_deliberacao IS NULL
-              AND NOT EXISTS (
-                  SELECT 1 FROM auditoria aud2
-                  WHERE aud2.entidade = 'alunos'
-                    AND aud2.id_registro = a.id_aluno
-                    AND (aud2.acao = 'REENVIAR' OR (aud2.acao = 'EDITAR' AND aud2.detalhes LIKE '%\"status_pos_edicao\":\"PENDENTE\"%'))
-              )
-              $whereUre
-            ORDER BY a.data_cadastro DESC LIMIT 5
-        ";
-        $resNovos = mysqli_query($conexao, $sqlPendentesNovos);
-        if ($resNovos) {
-            while ($row = mysqli_fetch_assoc($resNovos)) {
-                $dias = (int) $row['dias_pendente'];
-                if ($dias >= 3) {
-                    $notificacoes[] = [
-                        'tipo' => 'danger',
-                        'icone' => 'bi-clock-history',
-                        'titulo' => 'Solicitação Pendente Crítica',
-                        'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise há {$dias} dias.",
-                        'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
-                        'tempo' => "Há {$dias} dias",
-                        'ref_time' => $row['data_cadastro'] ?? ''
-                    ];
+        $resPendEec = mysqli_query($conexao, $sqlPendentesEec);
+        if ($resPendEec) {
+            $countReanalise = 0;
+            $countNovos = 0;
+            while ($row = mysqli_fetch_assoc($resPendEec)) {
+                $isReanalise = (!empty($row['data_deliberacao']) || !empty($row['max_reenvio']));
+                if ($isReanalise) {
+                    if ($countReanalise < 5) {
+                        $refData = $row['max_reenvio'] ?: ($row['data_deliberacao'] ?: $row['data_cadastro']);
+                        $notificacoes[] = [
+                            'tipo' => 'info',
+                            'icone' => 'bi-arrow-repeat',
+                            'titulo' => 'Devolvido para Reanálise',
+                            'mensagem' => "A solicitação do aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi devolvida pela escola para reanálise.",
+                            'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
+                            'tempo' => !empty($refData) ? date('d/m/Y', strtotime($refData)) : "Reanálise",
+                            'ref_time' => $refData ?? ''
+                        ];
+                        $countReanalise++;
+                    }
                 } else {
-                    $notificacoes[] = [
-                        'tipo' => 'warning',
-                        'icone' => 'bi-inbox-fill',
-                        'titulo' => 'Nova Solicitação para Análise',
-                        'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise técnica.",
-                        'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
-                        'tempo' => !empty($row['data_cadastro']) ? date('d/m/Y', strtotime($row['data_cadastro'])) : "Nova",
-                        'ref_time' => $row['data_cadastro'] ?? ''
-                    ];
+                    if ($countNovos < 5) {
+                        $dias = (int) $row['dias_pendente'];
+                        if ($dias >= 3) {
+                            $notificacoes[] = [
+                                'tipo' => 'danger',
+                                'icone' => 'bi-clock-history',
+                                'titulo' => 'Solicitação Pendente Crítica',
+                                'mensagem' => "Aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise há {$dias} dias.",
+                                'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
+                                'tempo' => "Há {$dias} dias",
+                                'ref_time' => $row['data_cadastro'] ?? ''
+                            ];
+                        } else {
+                            $notificacoes[] = [
+                                'tipo' => 'warning',
+                                'icone' => 'bi-inbox-fill',
+                                'titulo' => 'Nova Solicitação para Análise',
+                                'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> aguarda análise técnica.",
+                                'link' => $baseUrl . "views/solicitacoes/analisar.php?id=" . $row['id_aluno'],
+                                'tempo' => !empty($row['data_cadastro']) ? date('d/m/Y', strtotime($row['data_cadastro'])) : "Nova",
+                                'ref_time' => $row['data_cadastro'] ?? ''
+                            ];
+                        }
+                        $countNovos++;
+                    }
+                }
+                if ($countReanalise >= 5 && $countNovos >= 5) {
+                    break;
                 }
             }
         }
@@ -805,69 +841,57 @@ function obterNotificacoesUsuario($conexao, $perfil, $userId, $baseUrl = '../') 
             }
         }
 
-        // Alunos aprovados recentemente pela Educação Especial
-        $sqlAprovados = "
-            SELECT id_aluno, nome, COALESCE(data_deliberacao, data_cadastro) AS ref_data
+        // Alunos aprovados, em ajuste (PENDENTE_CORRECAO) ou reprovados na escola (consolidado em 1 consulta)
+        $sqlStatusUe = "
+            SELECT id_aluno, nome, status_aprovacao, motivo_reprovacao, COALESCE(data_deliberacao, data_cadastro) AS ref_data
             FROM alunos
-            WHERE id_ue = $idEscola AND status_aprovacao = 'APROVADO'
-            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC LIMIT 4
+            WHERE id_ue = $idEscola AND status_aprovacao IN ('APROVADO', 'PENDENTE_CORRECAO', 'REPROVADO')
+            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC
         ";
-        $resApr = mysqli_query($conexao, $sqlAprovados);
-        if ($resApr) {
-            while ($row = mysqli_fetch_assoc($resApr)) {
-                $notificacoes[] = [
-                    'tipo' => 'success',
-                    'icone' => 'bi-check-circle-fill',
-                    'titulo' => 'Solicitação Aprovada',
-                    'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi aprovado pela Educação Especial.",
-                    'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
-                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Aprovado",
-                    'ref_time' => $row['ref_data'] ?? ''
-                ];
-            }
-        }
-
-        // Alunos com ajustes solicitados (PENDENTE_CORRECAO)
-        $sqlCorrecao = "
-            SELECT id_aluno, nome, COALESCE(data_deliberacao, data_cadastro) AS ref_data
-            FROM alunos
-            WHERE id_ue = $idEscola AND status_aprovacao = 'PENDENTE_CORRECAO'
-            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC LIMIT 4
-        ";
-        $resCorr = mysqli_query($conexao, $sqlCorrecao);
-        if ($resCorr) {
-            while ($row = mysqli_fetch_assoc($resCorr)) {
-                $notificacoes[] = [
-                    'tipo' => 'warning',
-                    'icone' => 'bi-exclamation-circle-fill',
-                    'titulo' => 'Ajustes Solicitados',
-                    'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> teve ajustes solicitados pela Educação Especial.",
-                    'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
-                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Ajuste",
-                    'ref_time' => $row['ref_data'] ?? ''
-                ];
-            }
-        }
-
-        // Alunos reprovados que precisam de atenção/ajuste
-        $sqlReprovados = "
-            SELECT id_aluno, nome, motivo_reprovacao, COALESCE(data_deliberacao, data_cadastro) AS ref_data
-            FROM alunos
-            WHERE id_ue = $idEscola AND status_aprovacao = 'REPROVADO'
-            ORDER BY COALESCE(data_deliberacao, data_cadastro) DESC LIMIT 4
-        ";
-        $resRep = mysqli_query($conexao, $sqlReprovados);
-        if ($resRep) {
-            while ($row = mysqli_fetch_assoc($resRep)) {
-                $notificacoes[] = [
-                    'tipo' => 'danger',
-                    'icone' => 'bi-x-circle-fill',
-                    'titulo' => 'Solicitação Reprovada',
-                    'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi reprovado pela Educação Especial. Verifique os motivos.",
-                    'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
-                    'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Atenção",
-                    'ref_time' => $row['ref_data'] ?? ''
-                ];
+        $resStUe = mysqli_query($conexao, $sqlStatusUe);
+        if ($resStUe) {
+            $cntApr = 0;
+            $cntCorr = 0;
+            $cntRep = 0;
+            while ($row = mysqli_fetch_assoc($resStUe)) {
+                $stAl = $row['status_aprovacao'];
+                if ($stAl === 'APROVADO' && $cntApr < 4) {
+                    $notificacoes[] = [
+                        'tipo' => 'success',
+                        'icone' => 'bi-check-circle-fill',
+                        'titulo' => 'Solicitação Aprovada',
+                        'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi aprovado pela Educação Especial.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
+                        'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Aprovado",
+                        'ref_time' => $row['ref_data'] ?? ''
+                    ];
+                    $cntApr++;
+                } elseif ($stAl === 'PENDENTE_CORRECAO' && $cntCorr < 4) {
+                    $notificacoes[] = [
+                        'tipo' => 'warning',
+                        'icone' => 'bi-exclamation-circle-fill',
+                        'titulo' => 'Ajustes Solicitados',
+                        'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> teve ajustes solicitados pela Educação Especial.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
+                        'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Ajuste",
+                        'ref_time' => $row['ref_data'] ?? ''
+                    ];
+                    $cntCorr++;
+                } elseif ($stAl === 'REPROVADO' && $cntRep < 4) {
+                    $notificacoes[] = [
+                        'tipo' => 'danger',
+                        'icone' => 'bi-x-circle-fill',
+                        'titulo' => 'Solicitação Reprovada',
+                        'mensagem' => "O aluno <strong>" . htmlspecialchars($row['nome']) . "</strong> foi reprovado pela Educação Especial. Verifique os motivos.",
+                        'link' => $baseUrl . "views/alunos/visualizar.php?id=" . $row['id_aluno'],
+                        'tempo' => !empty($row['ref_data']) ? date('d/m/Y', strtotime($row['ref_data'])) : "Atenção",
+                        'ref_time' => $row['ref_data'] ?? ''
+                    ];
+                    $cntRep++;
+                }
+                if ($cntApr >= 4 && $cntCorr >= 4 && $cntRep >= 4) {
+                    break;
+                }
             }
         }
 
@@ -1150,9 +1174,15 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno, $filtroPaeId = 0
 
     // Helper interno para buscar CPF de um usuário pelo nome ou ID se o registro antigo estiver sem CPF
     $resolverCpfUsuario = function($nome, $idUsuario = 0, $perfil = '') use ($conexao) {
+        static $cpfCache = [];
         $nomeEsc = mysqli_real_escape_string($conexao, trim((string) $nome));
         $idUsuario = (int) $idUsuario;
         $perfil = strtoupper(trim((string) $perfil));
+        $cacheKey = $perfil . ':' . $idUsuario . ':' . $nomeEsc;
+
+        if (isset($cpfCache[$cacheKey])) {
+            return $cpfCache[$cacheKey];
+        }
 
         if ($idUsuario > 0) {
             if ($perfil === 'ADMIN') {
@@ -1169,20 +1199,26 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno, $filtroPaeId = 0
                 $r = mysqli_query($conexao, "SELECT cpf FROM usuarios_ure WHERE id_usuario_ure = $idUsuario LIMIT 1");
             }
             if (!empty($r) && ($row = mysqli_fetch_assoc($r)) && !empty($row['cpf'])) {
-                return formatarCPF($row['cpf']);
+                return $cpfCache[$cacheKey] = formatarCPF($row['cpf']);
             }
         }
 
         if ($nomeEsc !== '') {
-            $tabelasBusca = ['usuarios_ure', 'usuarios_ue', 'usuarios_supervisor', 'usuarios_pae', 'admin', 'seduc'];
-            foreach ($tabelasBusca as $tb) {
-                $r = mysqli_query($conexao, "SELECT cpf FROM `$tb` WHERE nome = '$nomeEsc' LIMIT 1");
-                if ($r && ($row = mysqli_fetch_assoc($r)) && !empty($row['cpf'])) {
-                    return formatarCPF($row['cpf']);
-                }
+            $sqlUnion = "
+                SELECT cpf FROM usuarios_ure WHERE nome = '$nomeEsc'
+                UNION ALL SELECT cpf FROM usuarios_ue WHERE nome = '$nomeEsc'
+                UNION ALL SELECT cpf FROM usuarios_supervisor WHERE nome = '$nomeEsc'
+                UNION ALL SELECT cpf FROM usuarios_pae WHERE nome = '$nomeEsc'
+                UNION ALL SELECT cpf FROM admin WHERE nome = '$nomeEsc'
+                UNION ALL SELECT cpf FROM seduc WHERE nome = '$nomeEsc'
+                LIMIT 1
+            ";
+            $r = mysqli_query($conexao, $sqlUnion);
+            if ($r && ($row = mysqli_fetch_assoc($r)) && !empty($row['cpf'])) {
+                return $cpfCache[$cacheKey] = formatarCPF($row['cpf']);
             }
         }
-        return 'Não informado';
+        return $cpfCache[$cacheKey] = 'Não informado';
     };
 
     // 1. Solicitação Enviada (Cadastro Inicial)
@@ -1562,11 +1598,132 @@ function obterHistoricoSolicitacaoAluno($conexao, array $aluno, $filtroPaeId = 0
  * Garante que alterações nos arquivos atualizem automaticamente a URL para invalidar o cache do navegador.
  */
 function assetUrl($caminhoRelativo, $prefixoUrl = '') {
+    static $mtimeCache = [];
     $caminhoRelativoLimpo = preg_replace('/\?.*$/', '', ltrim(str_replace('\\', '/', $caminhoRelativo), './'));
-    $caminhoFisico = dirname(__DIR__) . '/' . $caminhoRelativoLimpo;
-    $versao = is_file($caminhoFisico) ? @filemtime($caminhoFisico) : false;
+    if (!array_key_exists($caminhoRelativoLimpo, $mtimeCache)) {
+        $caminhoFisico = dirname(__DIR__) . '/' . $caminhoRelativoLimpo;
+        $mtimeCache[$caminhoRelativoLimpo] = is_file($caminhoFisico) ? @filemtime($caminhoFisico) : false;
+    }
+    $versao = $mtimeCache[$caminhoRelativoLimpo];
     $url = $prefixoUrl . $caminhoRelativoLimpo;
     return $versao ? ($url . '?v=' . $versao) : $url;
+}
+
+/**
+ * Calcula metadados de paginação no backend (página atual, total de páginas, LIMIT e OFFSET).
+ *
+ * @param int $totalRegistros Total de registros encontrados para o filtro atual
+ * @param int $porPagina Quantidade padrão de itens por página (default: 20)
+ * @param string $paramPagina Nome do parâmetro GET da página (default: 'pagina')
+ * @return array{pagina_atual:int, por_pagina:int, total_registros:int, total_paginas:int, offset:int, limit_sql:string, inicio:int, fim:int}
+ */
+function calcularPaginacao($totalRegistros, $porPagina = 20, $paramPagina = 'pagina') {
+    $totalRegistros = max(0, (int) $totalRegistros);
+    $porPagina = max(1, (int) $porPagina);
+    $totalPaginas = $totalRegistros > 0 ? (int) ceil($totalRegistros / $porPagina) : 1;
+
+    $paginaSolicitada = isset($_GET[$paramPagina]) ? (int) $_GET[$paramPagina] : 1;
+    $paginaAtual = max(1, min($paginaSolicitada, $totalPaginas));
+    $offset = ($paginaAtual - 1) * $porPagina;
+
+    $inicio = $totalRegistros > 0 ? ($offset + 1) : 0;
+    $fim = min($offset + $porPagina, $totalRegistros);
+
+    return [
+        'pagina_atual' => $paginaAtual,
+        'por_pagina' => $porPagina,
+        'total_registros' => $totalRegistros,
+        'total_paginas' => $totalPaginas,
+        'offset' => $offset,
+        'limit_sql' => "LIMIT $porPagina OFFSET $offset",
+        'inicio' => $inicio,
+        'fim' => $fim,
+        'param_pagina' => $paramPagina,
+    ];
+}
+
+/**
+ * Renderiza a barra de controles de paginação Bootstrap 5 preservando todos os filtros ($_GET) ativos.
+ *
+ * @param array $paginacao Array retornado por calcularPaginacao()
+ * @param array $paramsExtras Parâmetros adicionais a preservar/sobrescrever na URL
+ * @return string HTML da barra de paginação
+ */
+function renderizarPaginacao(array $paginacao, array $paramsExtras = []) {
+    $totalRegistros = (int) ($paginacao['total_registros'] ?? 0);
+    $totalPaginas = (int) ($paginacao['total_paginas'] ?? 1);
+    $paginaAtual = (int) ($paginacao['pagina_atual'] ?? 1);
+    $inicio = (int) ($paginacao['inicio'] ?? 0);
+    $fim = (int) ($paginacao['fim'] ?? 0);
+    $paramPagina = $paginacao['param_pagina'] ?? 'pagina';
+
+    if ($totalRegistros <= 0) {
+        return '';
+    }
+
+    $queryParams = array_merge($_GET, $paramsExtras);
+    // Remove mensagens transitórias de feedback para não reexecutar alertas ao trocar de página
+    unset($queryParams['msg'], $queryParams['erro']);
+
+    $gerarUrl = function ($numPagina) use ($queryParams, $paramPagina) {
+        $params = $queryParams;
+        if ($numPagina <= 1) {
+            unset($params[$paramPagina]);
+        } else {
+            $params[$paramPagina] = (int) $numPagina;
+        }
+        $qs = http_build_query($params);
+        $scriptNome = basename($_SERVER['PHP_SELF'] ?? 'listar.php');
+        return htmlspecialchars($scriptNome . ($qs !== '' ? '?' . $qs : ''), ENT_QUOTES, 'UTF-8');
+    };
+
+    $html = '<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top sigei-pagination-bar" data-dynamic-pagination="1">';
+    $html .= '<div class="text-muted small">';
+    $html .= 'Exibindo <strong>' . $inicio . '–' . $fim . '</strong> de <strong>' . $totalRegistros . '</strong> registro(s)';
+    $html .= '</div>';
+
+    if ($totalPaginas > 1) {
+        $html .= '<nav aria-label="Navegação de páginas"><ul class="pagination pagination-sm mb-0">';
+
+        // Botão Anterior
+        $prevDisabled = ($paginaAtual <= 1) ? ' disabled' : '';
+        $prevHref = ($paginaAtual <= 1) ? '#' : $gerarUrl($paginaAtual - 1);
+        $html .= '<li class="page-item' . $prevDisabled . '"><a class="page-link" href="' . $prevHref . '" aria-label="Página anterior">&laquo;</a></li>';
+
+        $janela = 2;
+        $ini = max(1, $paginaAtual - $janela);
+        $fimJanela = min($totalPaginas, $paginaAtual + $janela);
+
+        if ($ini > 1) {
+            $html .= '<li class="page-item"><a class="page-link" href="' . $gerarUrl(1) . '">1</a></li>';
+            if ($ini > 2) {
+                $html .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+            }
+        }
+
+        for ($p = $ini; $p <= $fimJanela; $p++) {
+            $active = ($p === $paginaAtual) ? ' active' : '';
+            $ariaCurrent = ($p === $paginaAtual) ? ' aria-current="page"' : '';
+            $html .= '<li class="page-item' . $active . '"><a class="page-link" href="' . $gerarUrl($p) . '"' . $ariaCurrent . '>' . $p . '</a></li>';
+        }
+
+        if ($fimJanela < $totalPaginas) {
+            if ($fimJanela < $totalPaginas - 1) {
+                $html .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+            }
+            $html .= '<li class="page-item"><a class="page-link" href="' . $gerarUrl($totalPaginas) . '">' . $totalPaginas . '</a></li>';
+        }
+
+        // Botão Próxima
+        $nextDisabled = ($paginaAtual >= $totalPaginas) ? ' disabled' : '';
+        $nextHref = ($paginaAtual >= $totalPaginas) ? '#' : $gerarUrl($paginaAtual + 1);
+        $html .= '<li class="page-item' . $nextDisabled . '"><a class="page-link" href="' . $nextHref . '" aria-label="Próxima página">&raquo;</a></li>';
+
+        $html .= '</ul></nav>';
+    }
+
+    $html .= '</div>';
+    return $html;
 }
 
 ?>

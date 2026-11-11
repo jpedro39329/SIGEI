@@ -45,7 +45,7 @@ if ($busca !== '') {
 $havingSql = !empty($having) ? 'HAVING ' . implode(' AND ', $having) : '';
 
 // Consulta agrupada por PAE para listar 1 linha por Profissional de Apoio com suas escolas e alunos
-$sqlPaesAssociados = "
+$sqlBasePaesAssociados = "
     SELECT 
         p.id_pae,
         p.nome AS pae_nome,
@@ -65,8 +65,13 @@ $sqlPaesAssociados = "
     $whereAssocEmpresa
     GROUP BY p.id_pae, p.nome, p.cpf, p.telefone, p.email, emp.nome
     $havingSql
-    ORDER BY p.nome ASC
 ";
+
+$resCountAssoc = mysqli_query($conexao, "SELECT COUNT(*) AS total FROM ($sqlBasePaesAssociados) AS sub_assoc");
+$totalAssocCount = $resCountAssoc ? (int) (mysqli_fetch_assoc($resCountAssoc)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalAssocCount, 20);
+
+$sqlPaesAssociados = $sqlBasePaesAssociados . " ORDER BY pae_nome ASC " . $paginacao['limit_sql'];
 
 $resultAssociacoes = mysqli_query($conexao, $sqlPaesAssociados);
 $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_ASSOC) : [];
@@ -185,6 +190,7 @@ $listaPaes = $resultAssociacoes ? mysqli_fetch_all($resultAssociacoes, MYSQLI_AS
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

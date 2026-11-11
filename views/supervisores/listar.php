@@ -38,6 +38,16 @@ if ($busca !== '') {
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$sqlCountSup = "
+    SELECT COUNT(*) AS total
+    FROM usuarios_supervisor us
+    JOIN empresas e ON us.id_empresa = e.id_empresa
+    $whereSql
+";
+$resCountSup = mysqli_query($conexao, $sqlCountSup);
+$totalSupCount = $resCountSup ? (int) (mysqli_fetch_assoc($resCountSup)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalSupCount, 20);
+
 $sqlSupervisores = "
     SELECT us.id_usuario_supervisor, us.nome, us.cpf, us.ativo, us.email, us.telefone,
            e.nome AS empresa_nome
@@ -45,6 +55,7 @@ $sqlSupervisores = "
     JOIN empresas e ON us.id_empresa = e.id_empresa
     $whereSql
     ORDER BY us.nome ASC
+    " . $paginacao['limit_sql'] . "
 ";
 $result = mysqli_query($conexao, $sqlSupervisores);
 $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -191,6 +202,7 @@ $supervisores = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 

@@ -1771,5 +1771,30 @@ html[data-sigei-contrast="high"] [tabindex]:focus-visible {
     animation: sigeiLivePulse 1.2s ease-out;
 }
 
+/* Skeleton loading durante filtragens e atualizações dinâmicas */
+@keyframes sigeiSkeletonShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.sigei-skeleton-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.65;
+    transition: opacity 0.15s ease;
+}
+
+.sigei-skeleton-loading::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    animation: sigeiSkeletonShimmer 1.25s infinite linear;
+    border-radius: 0.5rem;
+    z-index: 5;
+}
+
+
 
 

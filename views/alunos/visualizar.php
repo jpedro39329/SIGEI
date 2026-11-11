@@ -182,7 +182,7 @@ $foto = $aluno['foto_arquivo'] ?? '';
                     <!-- Avatar e Nome do Aluno -->
                     <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
                         <?php if (!empty($foto) && file_exists("../../$foto")): ?>
-                            <img src="../../<?php echo htmlspecialchars($foto); ?>" alt="Foto do aluno" class="rounded-3 object-fit-cover shadow-sm flex-shrink-0" style="width: 64px; height: 64px;">
+                            <img src="../../<?php echo htmlspecialchars($foto); ?>" alt="Foto do aluno" width="64" height="64" loading="lazy" decoding="async" class="rounded-3 object-fit-cover shadow-sm flex-shrink-0" style="width: 64px; height: 64px;">
                         <?php else: ?>
                             <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 fw-bold fs-5 text-primary" style="width: 64px; height: 64px; background-color: #e8f1ff;">
                                 <?php echo htmlspecialchars($iniciais); ?>

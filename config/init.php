@@ -32,6 +32,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/performance_monitor.php';
 require_once __DIR__ . '/error_handler.php';
 require_once __DIR__ . '/database.php';
 if (isset($conexao) && $conexao instanceof mysqli) {

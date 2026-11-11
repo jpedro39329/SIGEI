@@ -34,13 +34,17 @@ if ($busca !== '') {
 
 $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$sqlCountUres = "SELECT COUNT(*) AS total FROM unidades_regionais u $whereSql";
+$resCountUres = mysqli_query($conexao, $sqlCountUres);
+$totalUresCount = $resCountUres ? (int) (mysqli_fetch_assoc($resCountUres)['total'] ?? 0) : 0;
+$paginacao = calcularPaginacao($totalUresCount, 20);
+
 $sql = "
-    SELECT u.*,
-           (SELECT COUNT(*) FROM unidades_escolares ue WHERE ue.id_ure = u.id_ure) AS total_escolas,
-           (SELECT COUNT(*) FROM usuarios_ure uu WHERE uu.id_ure = u.id_ure AND uu.ativo = 1) AS total_usuarios
+    SELECT u.id_ure, u.uge, u.nome, u.municipio, u.endereco, u.telefone, u.email
     FROM unidades_regionais u
     $whereSql
     ORDER BY u.id_ure ASC
+    " . $paginacao['limit_sql'] . "
 ";
 $result = mysqli_query($conexao, $sql);
 $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -168,6 +172,7 @@ $ures = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     </tbody>
                 </table>
             </div>
+            <?php echo renderizarPaginacao($paginacao); ?>
         </div>
     </div>
 
