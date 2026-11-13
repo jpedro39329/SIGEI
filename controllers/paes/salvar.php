@@ -78,6 +78,8 @@ $stmt = $conexao->prepare($sql);
 $stmt->bind_param("ssssssii", $nome, $cpf, $senhaHash, $email, $telefone, $contratoArquivo, $idEmpresa, $ativo);
 
 if ($stmt->execute()) {
+    // Senha criada pelo administrador é provisória: o usuário deverá trocá-la no primeiro acesso
+    marcarSenhaProvisoria($conexao, 'usuarios_pae', 'id_pae', (int) $stmt->insert_id);
     header("Location: ../../views/paes/listar.php?msg=salvo");
     exit();
 }

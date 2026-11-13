@@ -91,6 +91,8 @@ if (!$stmt) {
 $stmt->bind_param("isssss", $idUe, $nome, $cpf, $senhaHash, $email, $telefone);
 
 if ($stmt->execute()) {
+    // Senha criada pelo administrador é provisória: o usuário deverá trocá-la no primeiro acesso
+    marcarSenhaProvisoria($conexao, 'usuarios_ue', 'id_usuario_ue', (int) $stmt->insert_id);
     $novoId = $stmt->insert_id;
     registrarAuditoria($conexao, 'USUARIOS', 'CRIAR', 'usuarios_ue', $novoId, [
         'nome' => $nome,

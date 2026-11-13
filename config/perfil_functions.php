@@ -1728,3 +1728,42 @@ function renderizarPaginacao(array $paginacao, array $paramsExtras = []) {
 }
 
 ?>
+<?php
+// ============================================================
+// SENHA PROVISÓRIA (primeiro acesso)
+// ============================================================
+
+// Tabelas de usuários que suportam senha provisória => coluna de ID
+function tabelasSenhaProvisoria(): array {
+    return [
+        'usuarios_ure'        => 'id_usuario_ure',
+        'usuarios_supervisor' => 'id_usuario_supervisor',
+        'usuarios_ue'         => 'id_usuario_ue',
+        'usuarios_pae'        => 'id_pae',
+    ];
+}
+
+// Verifica se a coluna senha_provisoria existe (permite rodar antes da migração SQL)
+function tabelaTemSenhaProvisoria($conexao, string $tabela): bool {
+    if (!isset(tabelasSenhaProvisoria()[$tabela])) {
+        return false;
+    }
+    $res = $conexao->query("SHOW COLUMNS FROM `$tabela` LIKE 'senha_provisoria'");
+    return $res && $res->num_rows > 0;
+}
+
+// Marca (ou desmarca) a senha do usuário como provisória
+function marcarSenhaProvisoria($conexao, string $tabela, string $campoId, int $id, int $valor = 1): bool {
+    $mapa = tabelasSenhaProvisoria();
+    if ($id <= 0 || !isset($mapa[$tabela]) || $mapa[$tabela] !== $campoId || !tabelaTemSenhaProvisoria($conexao, $tabela)) {
+        return false;
+    }
+    $stmt = $conexao->prepare("UPDATE `$tabela` SET senha_provisoria = ? WHERE `$campoId` = ?");
+    if (!$stmt) {
+        return false;
+    }
+    $stmt->bind_param("ii", $valor, $id);
+    $ok = $stmt->execute();
+    $stmt->close();
+    return $ok;
+}

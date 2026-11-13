@@ -76,6 +76,10 @@ if ($novaSenha !== '') {
 }
 
 if ($stmt->execute()) {
+    if (isset($senhaHash)) {
+        // Senha redefinida pelo administrador volta a ser provisória
+        marcarSenhaProvisoria($conexao, 'usuarios_supervisor', 'id_usuario_supervisor', (int) $idSupervisor);
+    }
     header("Location: ../../views/supervisores/listar.php?msg=atualizado");
     exit();
 }

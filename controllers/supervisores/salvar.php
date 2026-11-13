@@ -72,6 +72,8 @@ if (!$stmt) {
 $stmt->bind_param("ssisssi", $nome, $cpf, $idEmpresa, $email, $telefone, $senhaHash, $ativo);
 
 if ($stmt->execute()) {
+    // Senha criada pelo administrador é provisória: o usuário deverá trocá-la no primeiro acesso
+    marcarSenhaProvisoria($conexao, 'usuarios_supervisor', 'id_usuario_supervisor', (int) $stmt->insert_id);
     header("Location: ../../views/supervisores/listar.php?msg=cadastrado");
     exit();
 }

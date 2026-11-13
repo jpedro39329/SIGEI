@@ -120,6 +120,10 @@ if (!empty($novaSenha)) {
 }
 
 if ($stmt->execute()) {
+    if (isset($senhaHash)) {
+        // Senha redefinida pelo administrador volta a ser provisória
+        marcarSenhaProvisoria($conexao, 'usuarios_ure', 'id_usuario_ure', (int) $idServidor);
+    }
     registrarAuditoria($conexao, 'GESTAO_SETORES', 'EDITAR_SERVIDOR', 'usuarios_ure', $idServidor, [
         'nome' => $nome,
         'setor' => $setor,

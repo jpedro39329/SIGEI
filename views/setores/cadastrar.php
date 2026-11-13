@@ -111,7 +111,7 @@ $todasUres = $resultUres ? mysqli_fetch_all($resultUres, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Senha de Acesso <span class="text-danger">*</span></label>
-                                <input type="password" name="senha" id="senha" class="form-control" placeholder="Mínimo 6 caracteres" required>
+                                <input type="password" name="senha" id="senha" data-senha-gerada="1" class="form-control" placeholder="Mínimo 6 caracteres" required>
                             </div>
 
                             <div class="col-md-6 mb-3">

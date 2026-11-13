@@ -162,6 +162,10 @@ foreach ($tabelas as $tabela => $info) {
                 $_SESSION['user_perfil'] = $perfilBase;
             }
 
+            // Senha provisória (definida pelo administrador): exige troca no primeiro acesso
+            $_SESSION['user_tabela'] = $tabela;
+            $_SESSION['senha_provisoria'] = !empty($user['senha_provisoria']);
+
             $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $_SESSION['user_id'], $_SESSION['user_perfil']);
             $_SESSION['exibir_notificacoes_login'] = true;
 

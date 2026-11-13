@@ -77,6 +77,10 @@ if ($novaSenha !== '') {
 }
 
 if ($stmt->execute()) {
+    if (isset($senhaHash)) {
+        // Senha redefinida pelo administrador volta a ser provisória
+        marcarSenhaProvisoria($conexao, 'usuarios_ure', 'id_usuario_ure', (int) $idDirigente);
+    }
     header("Location: ../../views/gestores/listar.php?msg=atualizado");
     exit();
 }

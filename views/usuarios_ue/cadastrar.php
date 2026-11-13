@@ -92,7 +92,7 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Senha</label>
-                        <input type="password" name="senha" id="senha" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres" required>
+                        <input type="password" name="senha" id="senha" data-senha-gerada="1" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Confirmar Senha</label>

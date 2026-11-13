@@ -94,6 +94,10 @@ if ($senha !== '') {
 }
 
 if ($stmt->execute()) {
+    if (isset($senhaHash)) {
+        // Senha redefinida pelo administrador volta a ser provisória
+        marcarSenhaProvisoria($conexao, 'usuarios_ue', 'id_usuario_ue', (int) $idUsuarioUe);
+    }
     registrarAuditoria($conexao, 'USUARIOS', 'EDITAR', 'usuarios_ue', $idUsuarioUe, [
         'nome' => $nome,
         'id_ue' => $idUe,

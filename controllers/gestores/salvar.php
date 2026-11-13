@@ -75,6 +75,8 @@ if (!$stmt) {
 $stmt->bind_param("isssssisi", $idUre, $nome, $cpf, $senhaHash, $setor, $cargo, $nivelAcesso, $email, $ativo);
 
 if ($stmt->execute()) {
+    // Senha criada pelo administrador é provisória: o usuário deverá trocá-la no primeiro acesso
+    marcarSenhaProvisoria($conexao, 'usuarios_ure', 'id_usuario_ure', (int) $stmt->insert_id);
     header("Location: ../../views/gestores/listar.php?msg=cadastrado");
     exit();
 }

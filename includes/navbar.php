@@ -433,6 +433,7 @@ window.SIGEI_CONFIG = {
     userId: <?php echo json_encode($currentUserId); ?>,
     userPerfil: <?php echo json_encode($currentUserPerfil); ?>,
     termoAceito: <?php echo json_encode($termoAceito); ?>,
+    senhaProvisoria: <?php echo json_encode(!empty($_SESSION['senha_provisoria'])); ?>,
     baseUrl: <?php echo json_encode($baseUrl); ?>,
     csrfToken: <?php echo json_encode(gerarTokenCSRF()); ?>,
     sessaoTimeout: <?php echo defined('SIGEI_SESSAO_TIMEOUT') ? (int) SIGEI_SESSAO_TIMEOUT : 600; ?>,
@@ -655,6 +656,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script defer src="<?php echo assetUrl('assets/js/erros.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/atualizacao_dinamica.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/ux-helpers.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/senha-provisoria.js', $baseUrl); ?>"></script>
 <?php
 $tourScriptPath = '';
 if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
