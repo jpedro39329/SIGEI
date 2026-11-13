@@ -144,10 +144,10 @@
         function campoSenha(id, rotulo) {
             return '<div class="sp-field"><label class="form-label" for="' + id + '">' + rotulo + '</label>' +
                 '<div class="sp-input">' +
-                '<input type="password" class="form-control" id="' + id + '" autocomplete="new-password" maxlength="15" required>' +
+                '<input type="password" class="form-control" id="' + id + '" autocomplete="new-password" maxlength="20" required>' +
                 '<button type="button" class="sp-eye" data-alvo="' + id + '" aria-label="Mostrar senha" title="Mostrar senha"><i class="bi bi-eye"></i></button>' +
                 '</div>' +
-                '<small class="form-text text-muted" style="display:block;margin-top:2px;font-size:0.75rem;">A senha deve ter no máximo 15 caracteres.</small>' +
+                '<small class="form-text text-muted" style="display:block;margin-top:2px;font-size:0.75rem;">A senha deve ter no máximo 20 caracteres.</small>' +
                 '</div>';
         }
         function regra(id, texto) {
@@ -161,7 +161,7 @@
             '<div class="modal-body">' +
             campoSenha('sp-nova', 'Nova senha') +
             '<ul class="sp-rules" aria-live="polite">' +
-            regra('sp-r-len', 'Entre 8 e 15 caracteres') +
+            regra('sp-r-len', 'Entre 8 e 20 caracteres') +
             regra('sp-r-letra', 'Uma letra') +
             regra('sp-r-num', 'Um número') +
             regra('sp-r-sim', 'Um símbolo (ex.: ! @ # $)') +
@@ -186,7 +186,7 @@
 
         function avaliar(nova, conf) {
             return {
-                len: nova.length >= 8 && nova.length <= 15,
+                len: nova.length >= 8 && nova.length <= 20,
                 letra: /[A-Za-z]/.test(nova),
                 num: /\d/.test(nova),
                 sim: /[^A-Za-z0-9\s]/.test(nova),

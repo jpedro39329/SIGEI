@@ -63,8 +63,8 @@ if ($novaSenha !== '') {
         header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("A senha deve ter pelo menos 6 caracteres."));
         exit();
     }
-    if (mb_strlen($novaSenha, 'UTF-8') > 15) {
-        header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("A senha deve ter no máximo 15 caracteres."));
+    if (mb_strlen($novaSenha, 'UTF-8') > 20) {
+        header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("A senha deve ter no máximo 20 caracteres."));
         exit();
     }
     $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);

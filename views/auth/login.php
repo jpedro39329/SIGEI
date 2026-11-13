@@ -417,7 +417,7 @@ require_once "../../config/init.php";
             name="senha" 
             class="form-control"
             placeholder="Digite sua senha"
-            maxlength="15"
+            maxlength="20"
             required
           >
         </div>

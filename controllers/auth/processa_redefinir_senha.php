@@ -27,8 +27,8 @@ if (strlen($novaSenha) < SENHA_TAMANHO_MINIMO) {
     exit;
 }
 
-if (mb_strlen($novaSenha, 'UTF-8') > 15) {
-    $_SESSION['recuperacao_msg_erro'] = 'A senha deve ter no máximo 15 caracteres.';
+if (mb_strlen($novaSenha, 'UTF-8') > 20) {
+    $_SESSION['recuperacao_msg_erro'] = 'A senha deve ter no máximo 20 caracteres.';
     header('Location: ../../views/auth/redefinir_senha.php');
     exit;
 }

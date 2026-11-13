@@ -48,8 +48,8 @@ if (strlen($senha) < 6) {
     exit();
 }
 
-if (mb_strlen($senha, 'UTF-8') > 15) {
-    header("Location: ../../views/supervisores/cadastrar.php?erro=" . urlencode("A senha deve ter no máximo 15 caracteres."));
+if (mb_strlen($senha, 'UTF-8') > 20) {
+    header("Location: ../../views/supervisores/cadastrar.php?erro=" . urlencode("A senha deve ter no máximo 20 caracteres."));
     exit();
 }
 
