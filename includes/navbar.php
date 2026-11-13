@@ -177,34 +177,27 @@ $homePage = $baseUrl . 'views/dashboard.php';
                         <?php endif; ?>
                     </button>
 
-                    <div class="dropdown-menu dropdown-menu-end navbar-custom-dropdown shadow-lg p-0" aria-labelledby="dropdownNotificacoes" style="width: min(340px, 92vw);">
-                        <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light rounded-top">
-                            <span class="fw-bold small text-dark d-flex align-items-center gap-2">
-                                <i class="bi bi-bell-fill text-primary"></i> Notificações
-                            </span>
+                    <div class="dropdown-menu dropdown-menu-end navbar-custom-dropdown navbar-notifications-dropdown shadow-lg p-0" aria-labelledby="dropdownNotificacoes">
+                        <div class="navbar-notifications-header">
+                            Notificações
                         </div>
 
                         <?php if ($totalNotificacoes > 0): ?>
-                            <div class="navbar-notifications-list" style="max-height: 360px; overflow-y: auto;">
+                            <div class="navbar-notifications-list">
                                 <?php $csrfNotif = gerarTokenCSRF(); ?>
                                 <?php foreach ($listaNotificacoes as $notif): ?>
                                     <?php 
                                         $urlLida = $baseUrl . "controllers/marcar_notificacao_lida.php?key=" . urlencode($notif['key'] ?? '') . "&destino=" . urlencode($notif['link']) . "&csrf_token=" . urlencode($csrfNotif);
                                     ?>
-                                    <a href="<?php echo htmlspecialchars($urlLida); ?>" class="dropdown-item p-3 border-bottom d-flex align-items-start gap-2 text-wrap navbar-notification-item">
-                                        <div class="flex-shrink-0 mt-1">
-                                            <span class="navbar-notif-icon-badge bg-<?php echo $notif['tipo']; ?>-subtle text-<?php echo $notif['tipo']; ?>">
-                                                <i class="bi <?php echo htmlspecialchars($notif['icone']); ?>"></i>
-                                            </span>
-                                        </div>
+                                    <a href="<?php echo htmlspecialchars($urlLida); ?>" class="dropdown-item p-3 border-bottom d-flex align-items-start text-wrap navbar-notification-item">
                                         <div class="flex-grow-1 overflow-hidden">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <strong class="text-dark small text-truncate" style="font-size: 0.85rem;">
+                                                <strong class="text-dark small text-truncate">
                                                     <?php echo htmlspecialchars($notif['titulo']); ?>
                                                 </strong>
-                                                <small class="text-muted" style="font-size: 0.7rem;"><?php echo htmlspecialchars($notif['tempo']); ?></small>
+                                                <small class="text-muted navbar-notification-time"><?php echo htmlspecialchars($notif['tempo']); ?></small>
                                             </div>
-                                            <p class="mb-0 text-muted small lh-sm" style="font-size: 0.8rem;">
+                                            <p class="mb-0 text-muted small lh-sm">
                                                 <?php echo $notif['mensagem']; ?>
                                             </p>
                                         </div>
@@ -212,10 +205,8 @@ $homePage = $baseUrl . 'views/dashboard.php';
                                 <?php endforeach; ?>
                             </div>
                         <?php else: ?>
-                            <div class="p-4 text-center text-muted">
-                                <i class="bi bi-bell-slash d-block mb-2 text-secondary" style="font-size: 1.75rem; opacity: 0.5;"></i>
+                            <div class="navbar-notifications-empty">
                                 <p class="mb-0 small fw-medium">Nenhuma notificação nova</p>
-                                <small class="text-muted opacity-75">Tudo em dia com os registros do seu perfil.</small>
                             </div>
                         <?php endif; ?>
                     </div>

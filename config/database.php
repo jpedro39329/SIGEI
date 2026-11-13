@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
-$user = 'root';     
-$password = '';     
+$user = 'admin';     
+$password = '123456';     
 $dbname = 'wmshpicv_SIGEI';
 
 $conexao = new mysqli($host, $user, $password, $dbname);
