@@ -39,7 +39,7 @@ if (!$servidorAlvo) {
 
 if ($userPerfil === 'DIRIGENTE') {
     $idUre = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
-    if ($idUre > 0 && (int) $servidorAlvo['id_ure'] !== $idUre) {
+    if (($idUre <= 0 || (int) $servidorAlvo['id_ure'] !== $idUre)) {
         redirecionarAcessoNegado();
     }
     if (in_array($servidorAlvo['setor'], ['ASURE', 'GABINETE'], true)) {

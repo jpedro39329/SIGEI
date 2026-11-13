@@ -38,7 +38,7 @@ if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
     if ($idUreUsuario <= 0) {
         $idUreUsuario = idUreUsuario($conexao, $userId);
     }
-    if ($idUreUsuario > 0 && (int) ($aluno['id_ure'] ?? 0) !== $idUreUsuario) {
+    if (($idUreUsuario <= 0 || (int) ($aluno['id_ure'] ?? 0) !== $idUreUsuario)) {
         redirecionarAcessoNegado();
     }
 }
@@ -90,7 +90,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
             <span class="text-muted small">Processo de deliberação técnica para atendimento especializado</span>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button type="button" id="tour-ee-analise-pdf" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, <?php echo htmlspecialchars(json_encode($aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
+            <button type="button" id="tour-ee-analise-pdf" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, <?php echo htmlspecialchars(json_encode($aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-outline-secondary btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
                 <i class="bi bi-file-earmark-pdf-fill"></i> PDF
             </button>
             <a href="listar.php<?php echo ($aluno['status_aprovacao'] === 'REPROVADO') ? '?aba=reprovados' : ''; ?>" class="btn btn-outline-secondary btn-sm px-3 rounded-3">

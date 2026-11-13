@@ -1,0 +1,136 @@
+/* ===== SIGEI - UX Enhancements =====
+   Microinterações, áreas de clique, feedback e skeleton.
+   Importado por style.css. Não altera regras de negócio. */
+
+:root {
+    --sigei-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Snappy timing & slow in/slow out */
+.btn,
+.navbar .nav-link,
+.dropdown-item,
+.card-interativo,
+a.card,
+.form-control,
+.form-select,
+tbody tr {
+    transition: var(--sigei-transition);
+}
+
+a.card:hover,
+.card-interativo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.10);
+}
+
+.table-hover > tbody > tr:hover > *,
+tbody tr:hover > td {
+    background-color: rgba(0, 56, 187, 0.04);
+}
+
+/* Fitts's Law: áreas de clique confortáveis */
+.table .btn-sm,
+td .btn-sm,
+td .btn-group .btn,
+.btn-acao {
+    min-height: 36px;
+    min-width: 36px;
+    padding: 0.45rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+td .btn-sm + .btn-sm {
+    margin-left: 0.25rem;
+}
+
+.navbar .nav-link,
+.dropdown-item {
+    padding: 0.65rem 1rem;
+}
+
+/* Staging the focus: modais */
+.modal-backdrop {
+    background-color: rgba(15, 23, 42, 0.55);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+}
+
+/* Feedback exagerado: erro de validação */
+@keyframes sigeiShake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+}
+
+.is-invalid-shake {
+    animation: sigeiShake 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    border-color: #dc3545 !important;
+}
+
+/* Badges de status semânticos */
+.badge-pendente,
+.badge-aprovado,
+.badge-em-atendimento,
+.badge-reprovado {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4em 0.75em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.badge-pendente        { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.badge-aprovado        { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+.badge-em-atendimento  { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+.badge-reprovado       { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
+/* Skeleton loading */
+.sigei-skeleton {
+    color: transparent !important;
+    pointer-events: none;
+    user-select: none;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: sigeiShimmer 1.4s ease-in-out infinite;
+}
+
+.sigei-skeleton * {
+    visibility: hidden;
+}
+
+@keyframes sigeiShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Hick's Law: ações secundárias discretas */
+.acoes-secundarias .btn {
+    font-weight: 500;
+}
+
+/* Ícone de carregamento em botões */
+.btn-loading-text {
+    vertical-align: middle;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn, .form-control, .form-select, tbody tr,
+    .is-invalid-shake, .sigei-skeleton {
+        animation: none !important;
+        transition: none !important;
+    }
+}

@@ -75,7 +75,7 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'], true)) {
             } elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC', 'SEFISC', 'ASURE'], true)) {
                 $idUreUser = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
                 $uresEmp = uresAtendidasEmpresa($conexao, (int) $resPae['id_empresa']);
-                $autorizado = ($idUreUser <= 0 || in_array($idUreUser, $uresEmp, true));
+                $autorizado = ($idUreUser > 0 && in_array($idUreUser, $uresEmp, true));
             }
         }
     }
@@ -110,7 +110,7 @@ if (in_array($userPerfil, ['ADMIN', 'SEDUC'], true)) {
             $autorizado = ($idUeDoc === $idEscolaUser);
         } elseif (in_array($userPerfil, ['DIRIGENTE', 'USUARIO_SEFISC', 'USUARIO_EDUCACAO_ESPECIAL', 'SEFISC', 'ASURE'], true)) {
             $idUreUser = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
-            $autorizado = ($idUreUser <= 0 || $idUreDoc === $idUreUser);
+            $autorizado = ($idUreUser > 0 && $idUreDoc === $idUreUser);
         } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'], true)) {
             $idEmpUser = (int) ($_SESSION['id_empresa'] ?? idEmpresaSupervisor($conexao, $userId));
             $uresAtendidas = uresAtendidasEmpresa($conexao, $idEmpUser);

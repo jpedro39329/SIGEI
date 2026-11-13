@@ -84,7 +84,8 @@ $stmt = $conexao->prepare(
 );
 
 if (!$stmt) {
-    die("Erro ao preparar consulta: " . $conexao->error);
+    error_log("SIGEI: Erro ao preparar consulta: " . $conexao->error);
+    die("Erro ao preparar consulta. Tente novamente ou contate o suporte.");
 }
 
 $stmt->bind_param("isssss", $idUe, $nome, $cpf, $senhaHash, $email, $telefone);

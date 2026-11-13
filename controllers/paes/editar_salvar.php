@@ -53,5 +53,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao editar PAE: " . $stmt->error;
+error_log("SIGEI: Erro ao editar PAE: " . $stmt->error);
+echo "Erro ao editar PAE. Tente novamente ou contate o suporte.";
 ?>

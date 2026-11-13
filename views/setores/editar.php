@@ -31,7 +31,7 @@ if (!$servidor) {
     exit();
 }
 
-if ($userPerfil === 'DIRIGENTE' && $idUreUsuario > 0 && (int)$servidor['id_ure'] !== $idUreUsuario) {
+if ($userPerfil === 'DIRIGENTE' && ($idUreUsuario <= 0 || (int)$servidor['id_ure'] !== $idUreUsuario)) {
     header("Location: listar.php?erro=" . urlencode("Você não tem permissão para editar servidores de outra regional."));
     exit();
 }

@@ -112,7 +112,8 @@ $query = "UPDATE alunos SET
 $stmt = $conexao->prepare($query);
 
 if (!$stmt) {
-    die("Erro ao preparar a consulta: " . $conexao->error);
+    error_log("SIGEI: Erro ao preparar a consulta: " . $conexao->error);
+    die("Erro ao preparar a consulta. Tente novamente ou contate o suporte.");
 }
 
 $params = [
@@ -270,5 +271,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao salvar dados do aluno: " . $stmt->error;
+error_log("SIGEI: Erro ao salvar dados do aluno: " . $stmt->error);
+echo "Erro ao salvar dados do aluno. Tente novamente ou contate o suporte.";
 ?>

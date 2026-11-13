@@ -66,7 +66,7 @@ if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
     if ($idUreUsuario <= 0) {
         $idUreUsuario = idUreUsuario($conexao, $userId);
     }
-    if ($idUreUsuario > 0 && (int) ($rowVerifica['id_ure'] ?? 0) !== $idUreUsuario) {
+    if (($idUreUsuario <= 0 || (int) ($rowVerifica['id_ure'] ?? 0) !== $idUreUsuario)) {
         redirecionarAcessoNegado();
     }
 }
@@ -112,11 +112,17 @@ if ($deliberadorCpf === '' && !empty($_SESSION['user_id'])) {
 }
 
 $stmt = $conexao->prepare(
-    "UPDATE alunos SET status_aprovacao = ?, motivo_reprovacao = ?, deliberado_por_nome = ?, deliberado_por_cpf = ?, data_deliberacao = NOW() WHERE id_aluno = ?"
+    "UPDATE alunos SET status_aprovacao = ?, motivo_reprovacao = ?, deliberado_por_nome = ?, deliberado_por_cpf = ?, data_deliberacao = NOW() WHERE id_aluno = ? AND status_aprovacao = ?"
 );
-$stmt->bind_param("ssssi", $status, $motivo, $deliberadorNome, $deliberadorCpf, $id_aluno);
+$stmt->bind_param("ssssis", $status, $motivo, $deliberadorNome, $deliberadorCpf, $id_aluno, $rowVerifica['status_aprovacao']);
 
-if ($stmt->execute()) {
+if ($stmt->execute() && $stmt->affected_rows === 0) {
+    // Outra requisição (duplo clique/corrida) já alterou o status: não reaplica
+    header("Location: ../../views/solicitacoes/listar.php?msg=ya");
+    exit();
+}
+
+if ($stmt->errno === 0) {
     // Se a solicitação foi REPROVADA ou colocada em CORREÇÃO, qualquer associação de PAE ativa DEVE ser desativada imediatamente
     if ($status === 'REPROVADO' || $status === 'PENDENTE_CORRECAO') {
         $stmtDesativar = $conexao->prepare("UPDATE associacoes SET ativo = 0, data_fim = CURDATE() WHERE id_aluno = ? AND ativo = 1");
@@ -137,5 +143,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao atualizar aluno: " . $stmt->error;
+error_log("SIGEI: Erro ao atualizar aluno: " . $stmt->error);
+echo "Erro ao atualizar aluno. Tente novamente ou contate o suporte.";
 ?>

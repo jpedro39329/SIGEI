@@ -61,5 +61,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao desassociar: " . $stmt->error;
+error_log("SIGEI: Erro ao desassociar: " . $stmt->error);
+echo "Erro ao desassociar. Tente novamente ou contate o suporte.";
 ?>

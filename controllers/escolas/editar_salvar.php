@@ -34,7 +34,7 @@ if (!$escolaAtual) {
     exit();
 }
 
-if ($userPerfil === 'DIRIGENTE' && $idUreUsuario > 0 && (int)$escolaAtual['id_ure'] !== $idUreUsuario) {
+if ($userPerfil === 'DIRIGENTE' && ($idUreUsuario <= 0 || (int)$escolaAtual['id_ure'] !== $idUreUsuario)) {
     header("Location: ../../views/escolas/listar.php?erro=" . urlencode("Você não tem permissão para editar esta escola."));
     exit();
 }

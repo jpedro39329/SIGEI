@@ -30,7 +30,7 @@ if (!$usuario) {
     die("Usuário não encontrado.");
 }
 
-if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0 && (int)$usuario['id_ure'] !== $idUreUsuario) {
+if ($userPerfil === 'USUARIO_SEFISC' && ($idUreUsuario <= 0 || (int)$usuario['id_ure'] !== $idUreUsuario)) {
     redirecionarAcessoNegado();
 }
 

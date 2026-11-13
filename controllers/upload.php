@@ -25,7 +25,7 @@ function uploadArquivo($arquivo, $pasta) {
 
     // Se a pasta de destino não existir, cria automaticamente
     if (!is_dir($caminhoPasta)) {
-        if (!mkdir($caminhoPasta, 0777, true) && !is_dir($caminhoPasta)) {
+        if (!mkdir($caminhoPasta, 0755, true) && !is_dir($caminhoPasta)) {
             return false;
         }
     }
@@ -49,9 +49,14 @@ function uploadArquivo($arquivo, $pasta) {
         }
     }
 
-    if ($mimeReal === null) {
-        // Fallback: usa o MIME enviado pelo cliente
-        $mimeReal = $arquivo['type'];
+    // Sem detecção de conteúdo real não há como confiar no arquivo: rejeita (sem fallback no MIME do cliente)
+    if ($mimeReal === null || $mimeReal === false) {
+        return false;
+    }
+
+    // Garante que o arquivo veio de um upload HTTP legítimo
+    if (!is_uploaded_file($arquivo['tmp_name'])) {
+        return false;
     }
 
     if (!isset($tiposPermitidos[$mimeReal])) {

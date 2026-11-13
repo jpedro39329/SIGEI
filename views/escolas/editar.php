@@ -31,7 +31,7 @@ if (!$escola) {
     exit();
 }
 
-if ($userPerfil === 'DIRIGENTE' && $idUreUsuario > 0 && (int)$escola['id_ure'] !== $idUreUsuario) {
+if ($userPerfil === 'DIRIGENTE' && ($idUreUsuario <= 0 || (int)$escola['id_ure'] !== $idUreUsuario)) {
     header("Location: listar.php?erro=" . urlencode("Você não tem permissão para editar escolas de outra regional."));
     exit();
 }

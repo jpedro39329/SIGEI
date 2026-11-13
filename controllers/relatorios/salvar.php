@@ -38,6 +38,19 @@ $id_associacao = (int) $rowAssoc['id_associacao'];
 
 $stmtVerifica->close();
 
+// Bloqueio de envio duplicado (duplo clique): mesmo relatório nos últimos 15 segundos
+$stmtDup = $conexao->prepare("SELECT 1 FROM relatorios WHERE id_associacao = ? AND tipo = ? AND descricao = ? AND data_cadastro >= (NOW() - INTERVAL 15 SECOND) LIMIT 1");
+if ($stmtDup) {
+    $stmtDup->bind_param("iss", $id_associacao, $tipo, $descricao);
+    $stmtDup->execute();
+    $ehDuplicado = $stmtDup->get_result()->num_rows > 0;
+    $stmtDup->close();
+    if ($ehDuplicado) {
+        header("Location: ../../views/relatorios/listar.php?msg=ok");
+        exit();
+    }
+}
+
 // Insere o relatório
 $stmt = $conexao->prepare(
     "INSERT INTO relatorios (id_associacao, tipo, descricao) VALUES (?, ?, ?)"
@@ -54,5 +67,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao salvar relatório: " . $stmt->error;
+error_log("SIGEI: Erro ao salvar relatório: " . $stmt->error);
+echo "Erro ao salvar relatório. Tente novamente ou contate o suporte.";
 ?>

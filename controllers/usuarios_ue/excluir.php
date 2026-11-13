@@ -40,7 +40,7 @@ if (!$dadosUser) {
     exit();
 }
 
-if ($userPerfil === 'USUARIO_SEFISC' && $idUreUsuario > 0 && (int) ($dadosUser['id_ure'] ?? 0) !== $idUreUsuario) {
+if ($userPerfil === 'USUARIO_SEFISC' && ($idUreUsuario <= 0 || (int) ($dadosUser['id_ure'] ?? 0) !== $idUreUsuario)) {
     redirecionarAcessoNegado();
 }
 

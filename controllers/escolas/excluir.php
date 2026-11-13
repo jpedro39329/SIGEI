@@ -32,7 +32,7 @@ if (!$escolaAlvo) {
 
 if ($userPerfil === 'DIRIGENTE') {
     $idUre = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
-    if ($idUre > 0 && (int) $escolaAlvo['id_ure'] !== $idUre) {
+    if (($idUre <= 0 || (int) $escolaAlvo['id_ure'] !== $idUre)) {
         redirecionarAcessoNegado();
     }
 }

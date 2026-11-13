@@ -18,11 +18,15 @@ if (!validarDataISO($data_inicio, true, false, 2000)) {
     die("Data de início da associação inválida.");
 }
 
+// Transação + bloqueio da linha do aluno: impede associações simultâneas (duplo clique / corrida)
+$conexao->begin_transaction();
+
 // Verifica se o aluno existe e está APROVADO
 $stmtAluno = $conexao->prepare(
     "SELECT a.id_aluno, a.nome, ue.id_ure FROM alunos a
      JOIN unidades_escolares ue ON a.id_ue = ue.id_ue
-     WHERE a.id_aluno = ? AND a.status_aprovacao = 'APROVADO'"
+     WHERE a.id_aluno = ? AND a.status_aprovacao = 'APROVADO'
+     FOR UPDATE"
 );
 $stmtAluno->bind_param("i", $id_aluno);
 $stmtAluno->execute();
@@ -98,9 +102,12 @@ if ($stmt->execute()) {
         'data_inicio' => $data_inicio
     ]);
 
+    $conexao->commit();
     header("Location: ../../views/associacoes/gerenciar.php?msg=ok");
     exit();
 }
 
-echo "Erro ao associar: " . $stmt->error;
+$conexao->rollback();
+error_log("SIGEI: Erro ao associar: " . $stmt->error);
+echo "Erro ao associar. Tente novamente ou contate o suporte.";
 ?>

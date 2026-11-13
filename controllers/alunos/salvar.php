@@ -123,7 +123,8 @@ $query = "INSERT INTO alunos (
 $stmt = $conexao->prepare($query);
 
 if (!$stmt) {
-    die("Erro ao preparar a consulta: " . $conexao->error);
+    error_log("SIGEI: Erro ao preparar a consulta: " . $conexao->error);
+    die("Erro ao preparar a consulta. Tente novamente ou contate o suporte.");
 }
 
 $stmt->bind_param(
@@ -229,5 +230,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao cadastrar aluno: " . $stmt->error;
+error_log("SIGEI: Erro ao cadastrar aluno: " . $stmt->error);
+echo "Erro ao cadastrar aluno. Tente novamente ou contate o suporte.";
 ?>

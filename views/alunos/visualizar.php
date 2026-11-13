@@ -38,7 +38,7 @@ if (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
     }
 } elseif ($userPerfil === 'DIRIGENTE' || $userPerfil === 'USUARIO_SEFISC' || $userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
     $idUre = (int) ($_SESSION['id_ure'] ?? idUreUsuario($conexao, $userId));
-    if ($idUre > 0 && (int) $aluno['id_ure'] !== $idUre) {
+    if (($idUre <= 0 || (int) $aluno['id_ure'] !== $idUre)) {
         redirecionarAcessoNegado();
     }
 } elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {

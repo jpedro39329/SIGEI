@@ -63,5 +63,6 @@ if ($stmt->execute()) {
     exit();
 }
 
-echo "Erro ao reenviar solicitação: " . $stmt->error;
+error_log("SIGEI: Erro ao reenviar solicitação: " . $stmt->error);
+echo "Erro ao reenviar solicitação. Tente novamente ou contate o suporte.";
 ?>

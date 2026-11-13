@@ -32,6 +32,18 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Cabeçalhos de segurança e anti-cache: impede que o botão "Voltar" exiba páginas
+// autenticadas (dados pessoais/LGPD) após o logout. Endpoints que precisam de cache
+// (ex.: controllers/arquivo.php) sobrescrevem o Cache-Control com header().
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+}
+
 require_once __DIR__ . '/performance_monitor.php';
 require_once __DIR__ . '/error_handler.php';
 require_once __DIR__ . '/database.php';

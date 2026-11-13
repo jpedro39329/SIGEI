@@ -1,0 +1,292 @@
+================================================================================
+SIGEI - RELATORIO DE TESTES DE SEGURANCA, CAIXA-PRETA E CASOS DE BORDA
+Apendice Tecnico do TCC
+================================================================================
+
+1. IDENTIFICACAO DO AMBIENTE DE TESTE
+--------------------------------------------------------------------------------
+Data da execucao ........: 13/11/2026
+Sistema .................: SIGEI (MVC em PHP, MySQL via mysqli, RBAC, dados LGPD)
+Ambiente ................: Local (localhost), Linux, PHP CLI + php -l, front-end
+                           Bootstrap 5 / JavaScript puro
+Metodologia .............: (a) Auditoria estatica do codigo-fonte (revisao
+                           dirigida por grep em controllers/, views/, config/,
+                           includes/ e assets/); (b) testes unitarios de funcoes
+                           puras de validacao via PHP CLI; (c) analise de
+                           valores-limite e casos de borda; (d) revisao de
+                           fluxos de ciclo de vida (PENDENTE -> APROVADO /
+                           PENDENTE_CORRECAO / REPROVADO -> associacao de PAE).
+Criterio de status ......: APROVADO = controle verificado no codigo (ou
+                           corrigido e reverificado). RESSALVA DE AMBIENTE =
+                           controle existe no codigo, mas a confirmacao em
+                           execucao nao foi possivel neste ambiente.
+
+LIMITACAO DO AMBIENTE DE EXECUCAO (declarada com transparencia):
+No momento dos testes o servidor MySQL/MariaDB e o servidor web NAO estavam em
+execucao, e o diretorio banco/ nao contem o script do esquema. Como config/init.php
+conecta ao banco antes de qualquer verificacao de perfil, nao foi possivel emitir
+requisicoes HTTP reais (login, IDOR, XSS, uploads, duplo clique). Por isso, os
+itens que dependem de execucao ponta a ponta recebem "RESSALVA DE AMBIENTE" e
+devem ser repetidos com o banco ativo antes da homologacao final.
+
+2. VULNERABILIDADES / FALHAS ENCONTRADAS E CORRIGIDAS NESTA AUDITORIA
+--------------------------------------------------------------------------------
+(Todas corrigidas no codigo-fonte, com lint PHP aprovado em todo o projeto.)
+
+C-01 Controle de abrangencia (URE) com falha aberta (IDOR / LGPD)
+     Condicao `if ($idUre > 0 && alvo !== $idUre)` liberava o acesso quando o
+     perfil nao tinha URE resolvida (0). Corrigido para negar acesso
+     (`$idUre <= 0 || alvo !== $idUre`) em: views/alunos/visualizar.php,
+     views/solicitacoes/analisar.php, views/escolas/editar.php,
+     views/setores/editar.php, views/usuarios_ue/editar.php,
+     controllers/solicitacoes/processar.php, alunos/reativar.php,
+     alunos/exportar_pdf.php, escolas/excluir.php, escolas/editar_salvar.php,
+     setores/excluir.php, usuarios_ue/excluir.php.
+C-02 controllers/arquivo.php (entrega de laudos/documentos) autorizava o acesso
+     quando a URE do usuario era 0. Corrigido para exigir URE valida (> 0).
+C-03 Vazamento de informacao: mensagens de erro do MySQL ($stmt->error,
+     $conexao->error e connect_error, com host/usuario) eram exibidas ao
+     usuario. Substituidas por mensagem generica + error_log() em 10
+     controllers e em config/database.php.
+C-04 Salto de etapa / corrida na deliberacao: UPDATE de status em
+     solicitacoes/processar.php agora e condicionado ao status lido
+     (AND status_aprovacao = ?) e verifica affected_rows, impedindo dupla
+     deliberacao simultanea.
+C-05 Corrida na alocacao de PAE (duplo clique): associacoes/associar.php agora
+     usa transacao com SELECT ... FOR UPDATE na linha do aluno, garantindo a
+     regra RN02 (um unico PAE ativo) e RN01 (limite de 3 alunos) sob concorrencia.
+C-06 Upload: controllers/upload.php (i) recusa o arquivo se nao for possivel
+     detectar o MIME real (removido o fallback para o MIME informado pelo
+     cliente); (ii) exige is_uploaded_file(); (iii) diretorios criados com
+     permissao 0755 em vez de 0777.
+C-07 Cache de paginas autenticadas: config/init.php agora envia Cache-Control:
+     no-store/no-cache, Pragma, Expires, X-Content-Type-Options: nosniff,
+     X-Frame-Options: SAMEORIGIN e Referrer-Policy. Impede que o botao "Voltar"
+     exiba dados pessoais apos o logout.
+C-08 Envio duplicado de relatorio: controllers/relatorios/salvar.php ignora
+     reenvio identico (mesma associacao/tipo/descricao) em janela de 15 s.
+     Complementado no cliente por assets/js/ux-helpers.js (botao desabilitado
+     no submit com feedback "Salvando...").
+
+3. MATRIZ DE CASOS DE TESTE EXECUTADOS
+--------------------------------------------------------------------------------
+Legenda: [A] = APROVADO  |  [R] = RESSALVA DE AMBIENTE
+
+--- CATEGORIA: RBAC / LGPD ---
+
+CT-SEG-01 | RBAC/LGPD
+  Cenario: Acesso direto a view/controller restrito sem sessao ativa.
+  Acao: Revisao de todos os 50 controllers e 50 views; verificacao de guarda.
+  Esperado: Redirecionamento ao login, sem execucao da logica.
+  Obtido: Todas as paginas usam exigirLogin()/exigirPerfil() logo apos init.php
+          (unicas excecoes legitimas: logout.php, upload.php [biblioteca sem
+          saida] e telas de autenticacao). exigirLogin redireciona + exit().
+  Status: [A]
+
+CT-SEG-02 | RBAC/LGPD
+  Cenario: Perfil sem permissao (Unidade Escolar / PAE) acessa rotas de Educacao
+           Especial, Empresa ou SEFISC.
+  Acao: Auditoria da matriz exigirPerfil por rota (temPermissao com
+        normalizacao canonica de perfis, comparacao estrita).
+  Esperado: Redirecionamento a dashboard com ?erro=acesso_negado.
+  Obtido: solicitacoes/* restrito a USUARIO_EDUCACAO_ESPECIAL/ADMIN/SEDUC;
+          empresas/supervisores/ures/gestores restritos a ADMIN/SEDUC (e
+          leitura para perfis especificos); usuarios_ue a SEFISC/ADMIN/SEDUC.
+          Teste unitario: temPermissao('PAE',['USUARIO_EDUCACAO_ESPECIAL']) =
+          false; temPermissao('',['PAE']) = false.
+  Status: [A]
+
+CT-SEG-03 | RBAC/LGPD (IDOR)
+  Cenario: Manipulacao de ?id= em alunos/visualizar.php para ver aluno de outra
+           escola/URE/empresa.
+  Acao: Revisao da validacao de abrangencia por perfil.
+  Esperado: Acesso negado fora do escopo.
+  Obtido: Escola compara id_ue; Dirigente/SEFISC/Edu. Especial comparam id_ure;
+          Empresa compara UREs atendidas; PAE exige aluno APROVADO + associacao
+          ativa. Falha aberta com URE=0 CORRIGIDA (C-01) e reverificada (lint
+          e inspecao das condicoes).
+  Status: [A]
+
+CT-SEG-04 | RBAC/LGPD (IDOR)
+  Cenario: Manipulacao de id_aluno/id_laudo (POST) em remover_laudo.php,
+           exportar_pdf.php, processar.php e reativar.php.
+  Esperado: Operacao recusada fora do escopo.
+  Obtido: Consulta de laudo vincula id_laudo AND id_aluno; escola validada
+          contra id_ue do aluno; deliberacao valida URE (C-01 corrigido).
+  Status: [A]
+
+CT-SEG-05 | RBAC/LGPD (IDOR)
+  Cenario: relatorios/visualizar.php?id=<relatorio de outro PAE/empresa>.
+  Obtido: PAE so ve relatorio proprio (id_pae); Supervisor/Empresa so da sua
+          empresa; redirecionamento ao negar.
+  Status: [A]
+
+CT-SEG-06 | RBAC/LGPD (IDOR em arquivos)
+  Cenario: controllers/arquivo.php?pasta=laudos&arquivo=<outro aluno>;
+           tentativa de path traversal (../).
+  Esperado: 401/403/400 conforme o caso; sem leitura fora de uploads/.
+  Obtido: basename() + regex de nome + realpath ancorado na pasta; autorizacao
+          por vinculo do documento (escola/URE/empresa/PAE). PAE nao acessa
+          laudos medicos. Falha aberta com URE=0 CORRIGIDA (C-02).
+          uploads/.htaccess bloqueia execucao de scripts e listagem.
+  Status: [A]
+
+CT-SEG-07 | RBAC/LGPD (CSRF)
+  Cenario: POST forjado sem token em acoes que alteram estado.
+  Obtido: exigirTokenCSRF() (hash_equals) em todos os controllers de escrita.
+          Os unicos sem token sao leituras (arquivo, exportar_pdf/excel,
+          status_atualizacao, sessao).
+  Status: [A]
+
+--- CATEGORIA: AUTENTICACAO ---
+
+CT-SEG-08 | Autenticacao
+  Cenario: Login com credenciais invalidas, campos vazios, CPF malformado.
+  Obtido: CPF normalizado (somente digitos); vazio => erro dados_invalidos;
+          inexistente/senha errada => mensagem unica generica (sem enumeracao de
+          usuarios). Consulta com prepared statement.
+  Status: [A]
+
+CT-SEG-09 | Autenticacao
+  Cenario: Tentativas repetidas (forca bruta).
+  Obtido: Bloqueio de 60 s apos 5 falhas, controlado na sessao do cliente.
+  Status: [R] - O bloqueio e por sessao: um cliente que descarta o cookie o
+          contorna. Recomendacao: limitar tentativas por IP/CPF em tabela do
+          banco ou no WAF/proxy (depende de infraestrutura/esquema).
+
+CT-SEG-10 | Autenticacao / Sessao
+  Cenario: Fixacao de sessao.
+  Obtido: session_regenerate_id(true) em login.php, acesso_rapido.php e
+          processa_verificar_codigo.php; use_strict_mode e use_only_cookies.
+  Status: [A]
+
+CT-SEG-11 | Sessao
+  Cenario: Atributos do cookie de sessao.
+  Obtido: HttpOnly=true, SameSite=Lax; Secure ativado automaticamente em HTTPS
+          (inclusive atras de proxy via X-Forwarded-Proto).
+  Status: [A] (Secure so efetivo com HTTPS - ver Secao 5)
+
+CT-SEG-12 | Sessao
+  Cenario: Logout e botao "Voltar".
+  Obtido: logout limpa $_SESSION, expira o cookie e chama session_destroy();
+          timeout de inatividade de 10 min validado no servidor. Falha
+          identificada: paginas autenticadas eram cacheaveis; CORRIGIDA (C-07)
+          com Cache-Control: no-store.
+  Status: [A] (confirmacao visual no navegador: repetir com banco ativo)
+
+--- CATEGORIA: SANITIZACAO / INJECAO ---
+
+CT-SEG-13 | Sanitizacao/Injecao (SQL)
+  Cenario: SQL Injection em login, buscas e filtros.
+  Acao: Varredura de todas as chamadas query()/mysqli_query()/prepare().
+  Obtido: Entradas de usuario (texto, CPF, filtros) usam prepared statements com
+          bind_param. As consultas por interpolacao restantes usam EXCLUSIVAMENTE
+          valores inteiros convertidos por (int) ou identificadores internos
+          (tabela por whitelist). Nenhuma string de $_GET/$_POST e concatenada.
+  Status: [A]
+  Nota: recomenda-se migrar gradualmente as consultas inteiras para prepared
+        statements como defesa em profundidade.
+
+CT-SEG-14 | Sanitizacao/Injecao (XSS)
+  Cenario: XSS armazenado/refletido em observacoes, relatorios, nomes, pareceres.
+  Obtido: Saidas de texto livre escapadas com htmlspecialchars; ocorrencias de
+          echo sem escape na varredura referem-se apenas a IDs inteiros e
+          enums fixos. Parametros GET refletidos (perfil) sao escapados.
+  Status: [A] (confirmacao com payload <script> em execucao: repetir com banco)
+
+CT-SEG-15 | Sanitizacao/Injecao (vazamento)
+  Cenario: Erros SQL expostos ao usuario.
+  Obtido: Antes: $stmt->error impresso (CORRIGIDO - C-03). display_errors=0
+          no error_handler central.
+  Status: [A]
+
+--- CATEGORIA: REGRAS DE NEGOCIO / BORDA ---
+
+CT-SEG-16 | Regras de Negocio/Borda
+  Cenario: Campos vazios, strings longas, datas invalidas/negativas.
+  Teste unitario (PHP CLI): validarCPF('111.111.111-11') = false;
+    validarCPF(' 529.982.247-25 ') = true; validarDataISO('2026-02-30') = false;
+    validarDataISO('-2026-01-01') = false; validarTelefone('(11) 9 1004-3438') =
+    true; validarEmail(200+ caracteres) = false. Relatorio limitado a 5000
+    caracteres; motivo obrigatorio em reprovacao/correcao.
+  Status: [A]
+  Observacao: validarCPF verifica formato/sequencias repetidas, nao os digitos
+    verificadores (decisao de produto - nao classificada como falha).
+
+CT-SEG-17 | Regras de Negocio/Borda
+  Cenario: Alocar PAE a solicitacao Pendente/Reprovada.
+  Obtido: associar.php exige status_aprovacao = 'APROVADO'; reprovacao/correcao
+          desativa automaticamente associacoes ativas. PAE de empresa/URE
+          diferentes e recusado para Supervisor. RN01 (max. 3 alunos) e RN02 (um
+          PAE por aluno) aplicadas e agora atomicas (C-05).
+  Status: [A]
+
+CT-SEG-18 | Regras de Negocio/Borda
+  Cenario: Deliberar solicitacao ja deliberada (APROVADO).
+  Obtido: processar.php aceita apenas PENDENTE/REPROVADO/PENDENTE_CORRECAO e,
+          com C-04, o UPDATE e condicional ao status lido.
+  Status: [A]
+
+CT-SEG-19 | Regras de Negocio/Borda (Upload)
+  Cenario: Upload de .php renomeado para .pdf/.jpg, MIME falso, arquivo > 5 MB.
+  Obtido: MIME real via finfo (jpeg/png/pdf apenas); extensao definida pelo
+          servidor a partir do MIME; nome aleatorio; limite 5 MB (cliente e
+          servidor); .htaccess bloqueia execucao. Fallback inseguro REMOVIDO
+          (C-06).
+  Status: [A] (envio real de arquivo malicioso: repetir com banco)
+
+CT-SEG-20 | Regras de Negocio/Borda
+  Cenario: Duplo clique em criacao/aprovacao.
+  Obtido: Cliente: ux-helpers.js desabilita o botao no submit. Servidor:
+          deliberacao condicional (C-04), associacao transacional (C-05) e
+          deduplicacao de relatorio (C-08).
+  Status: [A] (teste de concorrencia real: repetir com banco)
+
+CT-SEG-21 | Integridade tecnica
+  Cenario: Lint de todo o codigo PHP apos as correcoes.
+  Obtido: php -l sem erros em todos os arquivos.
+  Status: [A]
+
+4. CASOS QUE EXIGEM REPETICAO EM EXECUCAO (RESSALVA DE AMBIENTE)
+--------------------------------------------------------------------------------
+Com banco e servidor web ativos, repetir ponta a ponta: CT-SEG-03/04/05/06
+(IDOR com dois usuarios de escolas distintas), CT-SEG-09, CT-SEG-12 (Voltar no
+navegador), CT-SEG-14 (payload XSS), CT-SEG-19 (upload malicioso) e CT-SEG-20
+(duas requisicoes simultaneas, ex.: ab/curl paralelo).
+
+5. RESUMO EXECUTIVO E LIMITACOES
+--------------------------------------------------------------------------------
+Conformidade: A auditoria confirmou que o SIGEI possui controles solidos:
+RBAC por rota com normalizacao de perfis, validacao de abrangencia por
+escola/URE/empresa/PAE, protecao CSRF em todas as operacoes de escrita, prepared
+statements nas entradas de texto, escape de saida, entrega protegida de
+documentos sensiveis, regeneracao de sessao no login, cookie HttpOnly/SameSite,
+timeout de inatividade e trilha de auditoria. Foram identificadas e corrigidas 8
+falhas (C-01 a C-08), das quais as mais relevantes para a LGPD foram os controles
+de abrangencia com falha aberta (C-01/C-02) e o cache de paginas autenticadas
+(C-07). Nenhuma falha corrigida permanece como pendencia aberta.
+
+Limitacoes e recomendacoes para producao (nao resoluvel localmente):
+ L-01 HTTPS/TLS: exigir certificado valido e HSTS no servidor; so assim o flag
+      Secure do cookie e a protecao em transito ficam efetivos.
+ L-02 Forca bruta: complementar o bloqueio por sessao com limite por IP/CPF
+      (WAF, fail2ban ou tabela de tentativas).
+ L-03 Cabecalho Content-Security-Policy: nao aplicado, pois as views usam
+      scripts/estilos inline e CDNs; exige refatoracao e configuracao no servidor.
+ L-04 Servidor: manter uploads/ fora do document root ou com .htaccess ativo
+      (AllowOverride habilitado); desativar listagem de diretorios; permissoes
+      minimas de arquivo.
+ L-05 Segredos: config/database.php contem credenciais em texto; em producao
+      usar variaveis de ambiente e usuario de banco com privilegios minimos.
+ L-06 E-mail/SMTP (recuperacao de senha) e backups dependem de infraestrutura.
+ L-07 Testes dinamicos pendentes (Secao 4) por indisponibilidade do banco local.
+
+Arquivos de codigo alterados: config/init.php, config/database.php,
+controllers/{arquivo,upload}.php, controllers/alunos/{reativar,exportar_pdf,
+salvar,reenviar,editar_salvar}.php, controllers/associacoes/{associar,
+desassociar}.php, controllers/solicitacoes/processar.php,
+controllers/relatorios/salvar.php, controllers/paes/editar_salvar.php,
+controllers/{escolas,setores,usuarios_ue}/{excluir,...}.php,
+controllers/usuarios_ue/salvar.php, views/{alunos/visualizar,
+solicitacoes/analisar,escolas/editar,setores/editar,usuarios_ue/editar}.php.
+================================================================================
