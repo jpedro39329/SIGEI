@@ -663,7 +663,22 @@ document.addEventListener('DOMContentLoaded', function () {
 <script defer src="<?php echo assetUrl('assets/js/mascaras.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/erros.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/atualizacao_dinamica.js', $baseUrl); ?>"></script>
-<script defer src="<?php echo assetUrl('assets/js/tours/tour-educacao-especial.js', $baseUrl); ?>"></script>
+<?php
+$tourScriptPath = '';
+if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {
+    $tourScriptPath = 'assets/js/tours/tour-educacao-especial.js';
+} elseif (in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA'])) {
+    $tourScriptPath = 'assets/js/tours/tour-unidade-escolar.js';
+} elseif (in_array($userPerfil, ['SUPERVISOR', 'USUARIO_EMPRESA'])) {
+    $tourScriptPath = 'assets/js/tours/tour-supervisor.js';
+} elseif ($userPerfil === 'PAE') {
+    $tourScriptPath = 'assets/js/tours/tour-pae.js';
+} elseif ($userPerfil === 'USUARIO_SEFISC') {
+    $tourScriptPath = 'assets/js/tours/tour-sefisc.js';
+}
+if ($tourScriptPath !== ''): ?>
+<script defer src="<?php echo assetUrl($tourScriptPath, $baseUrl); ?>"></script>
+<?php endif; ?>
 <script>
 document.addEventListener('click', function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
