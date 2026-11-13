@@ -28,6 +28,7 @@ jobs:
             config/database.php
             config/mail.php
             banco/**
+            backups/**
             relatorios-seguranca/**
             RELATORIO_TESTES_SEGURANCA.txt
             Redireciona

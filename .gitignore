@@ -31,3 +31,6 @@ vendor/
 
 .graphify/
 .venv/
+
+backups/
+backups/**
