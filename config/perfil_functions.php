@@ -1677,10 +1677,11 @@ function renderizarPaginacao(array $paginacao, array $paramsExtras = []) {
         return htmlspecialchars($scriptNome . ($qs !== '' ? '?' . $qs : ''), ENT_QUOTES, 'UTF-8');
     };
 
-    $html = '<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3 pt-2 border-top sigei-pagination-bar" data-dynamic-pagination="1">';
-    $html .= '<div class="text-muted small">';
-    $html .= 'Exibindo <strong>' . $inicio . '–' . $fim . '</strong> de <strong>' . $totalRegistros . '</strong> registro(s)';
-    $html .= '</div>';
+    if ($totalPaginas <= 1) {
+        return '';
+    }
+
+    $html = '<div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mt-3 pt-2 border-top sigei-pagination-bar" data-dynamic-pagination="1">';
 
     if ($totalPaginas > 1) {
         $html .= '<nav aria-label="Navegação de páginas"><ul class="pagination pagination-sm mb-0">';
