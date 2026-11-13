@@ -45,10 +45,13 @@ if (mb_strlen($nova, 'UTF-8') < 8) {
 if (strlen($nova) > 72) {
     responderSenha(422, false, 'A senha deve ter no máximo 72 caracteres.');
 }
+if (preg_match('/\s/', $nova)) {
+    responderSenha(422, false, 'A senha não pode conter espaços.');
+}
 if (!preg_match('/[A-Za-z]/', $nova) || !preg_match('/\d/', $nova)) {
     responderSenha(422, false, 'Use letras e números na senha.');
 }
-if (!preg_match('/[^A-Za-z0-9]/', $nova)) {
+if (!preg_match('/[^A-Za-z0-9\s]/', $nova)) {
     responderSenha(422, false, 'Inclua ao menos um símbolo na senha.');
 }
 if ($nova !== $confirmar) {

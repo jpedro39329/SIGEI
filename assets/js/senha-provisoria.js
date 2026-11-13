@@ -184,10 +184,11 @@
 
         function avaliar(nova, conf) {
             return {
-                len: nova.length >= 8,
+                len: nova.length >= 8 && nova.length <= 72,
                 letra: /[A-Za-z]/.test(nova),
                 num: /\d/.test(nova),
-                sim: /[^A-Za-z0-9]/.test(nova),
+                sim: /[^A-Za-z0-9\s]/.test(nova),
+                semEspaco: !/\s/.test(nova),
                 conf: nova !== '' && nova === conf
             };
         }
@@ -225,6 +226,12 @@
             erro.textContent = '';
 
             var st = avaliar(nova, conf);
+            if (!st.semEspaco) {
+                erro.textContent = 'A senha não pode conter espaços.';
+                var campoEsp = document.getElementById('sp-nova');
+                campoEsp.classList.remove('is-invalid-shake'); void campoEsp.offsetWidth; campoEsp.classList.add('is-invalid-shake');
+                return;
+            }
             if (!(st.len && st.letra && st.num && st.sim && st.conf)) {
                 erro.textContent = !st.conf && st.len && st.letra && st.num && st.sim
                     ? 'As senhas não coincidem.' : 'A senha ainda não atende a todos os requisitos.';
