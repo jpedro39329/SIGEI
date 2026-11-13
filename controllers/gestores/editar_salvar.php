@@ -64,6 +64,10 @@ if ($novaSenha !== '') {
         header("Location: ../../views/gestores/editar.php?id=$idDirigente&erro=" . urlencode("A senha deve ter pelo menos 6 caracteres."));
         exit();
     }
+    if (mb_strlen($novaSenha, 'UTF-8') > 15) {
+        header("Location: ../../views/gestores/editar.php?id=$idDirigente&erro=" . urlencode("A senha deve ter no máximo 15 caracteres."));
+        exit();
+    }
     $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
     $stmt = $conexao->prepare(
         "UPDATE usuarios_ure SET id_ure = ?, nome = ?, cpf = ?, cargo = ?, email = ?, ativo = ?, senha = ? WHERE id_usuario_ure = ?"

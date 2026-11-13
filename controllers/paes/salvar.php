@@ -52,6 +52,11 @@ if (strlen($senha) < 6) {
     exit();
 }
 
+if (mb_strlen($senha, 'UTF-8') > 15) {
+    header("Location: ../../views/paes/cadastrar.php?erro=" . urlencode("A senha deve ter no máximo 15 caracteres."));
+    exit();
+}
+
 if ($senha !== $confirmarSenha) {
     header("Location: ../../views/paes/cadastrar.php?erro=" . urlencode("As senhas não coincidem."));
     exit();

@@ -328,12 +328,13 @@ $csrfToken = gerarTokenCSRF();
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
         <div class="form-group">
           <label for="nova_senha">Nova Senha</label>
-          <input type="password" name="nova_senha" id="nova_senha" class="form-control" minlength="6" maxlength="255" required placeholder="••••••••">
+          <input type="password" name="nova_senha" id="nova_senha" class="form-control" minlength="6" maxlength="15" required placeholder="••••••••">
+          <small class="form-text text-muted" style="display: block; margin-top: 4px;">A senha deve ter no máximo 15 caracteres.</small>
         </div>
 
         <div class="form-group">
           <label for="confirma_senha">Confirmar Nova Senha</label>
-          <input type="password" name="confirma_senha" id="confirma_senha" class="form-control" minlength="6" maxlength="255" required placeholder="••••••••">
+          <input type="password" name="confirma_senha" id="confirma_senha" class="form-control" minlength="6" maxlength="15" required placeholder="••••••••">
         </div>
         
         <button type="submit" class="btn-login">Salvar Nova Senha</button>
@@ -349,5 +350,6 @@ $csrfToken = gerarTokenCSRF();
   </section>
 
   <script src="../../assets/js/acessibilidade.js?v=<?php echo @filemtime(__DIR__ . '/../../assets/js/acessibilidade.js') ?: '1'; ?>"></script>
+  <script defer src="../../assets/js/cookies.js?v=<?php echo @filemtime(__DIR__ . '/../../assets/js/cookies.js') ?: '1'; ?>"></script>
 </body>
 </html>

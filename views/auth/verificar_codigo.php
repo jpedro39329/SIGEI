@@ -345,5 +345,6 @@ $csrfToken = gerarTokenCSRF();
   </section>
 
   <script src="../../assets/js/acessibilidade.js?v=<?php echo @filemtime(__DIR__ . '/../../assets/js/acessibilidade.js') ?: '1'; ?>"></script>
+  <script defer src="../../assets/js/cookies.js?v=<?php echo @filemtime(__DIR__ . '/../../assets/js/cookies.js') ?: '1'; ?>"></script>
 </body>
 </html>

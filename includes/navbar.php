@@ -657,6 +657,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script defer src="<?php echo assetUrl('assets/js/atualizacao_dinamica.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/ux-helpers.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/senha-provisoria.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/cookies.js', $baseUrl); ?>"></script>
 <?php
 $tourScriptPath = '';
 if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') {

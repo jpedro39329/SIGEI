@@ -34,3 +34,6 @@ vendor/
 
 backups/
 backups/**
+
+docs/
+docs/**

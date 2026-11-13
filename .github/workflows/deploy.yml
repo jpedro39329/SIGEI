@@ -29,11 +29,8 @@ jobs:
             config/mail.php
             banco/**
             backups/**
+            docs/**
             relatorios-seguranca/**
-            RELATORIO_TESTES_SEGURANCA.txt
-            Redireciona
-            ARCHITECTURE_GRAPH.md
-            INSTRUCTIONS.md
             *.md
             *.sql
             *.log

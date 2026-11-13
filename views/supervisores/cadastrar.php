@@ -83,12 +83,13 @@ $empresas = $resultEmpresas ? mysqli_fetch_all($resultEmpresas, MYSQLI_ASSOC) : 
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Senha Inicial <span class="text-danger">*</span></label>
-                                <input type="password" name="senha" id="senha" data-senha-gerada="1" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres" required>
+                                <input type="password" name="senha" id="senha" data-senha-gerada="1" class="form-control" maxlength="15" placeholder="Mínimo 6 caracteres" required>
+                                <small class="form-text text-muted">A senha deve ter no máximo 15 caracteres.</small>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
-                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255" placeholder="Repita a senha" required>
+                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="15" placeholder="Repita a senha" required>
                             </div>
                         </div>
 

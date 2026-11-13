@@ -27,6 +27,12 @@ if (strlen($novaSenha) < SENHA_TAMANHO_MINIMO) {
     exit;
 }
 
+if (mb_strlen($novaSenha, 'UTF-8') > 15) {
+    $_SESSION['recuperacao_msg_erro'] = 'A senha deve ter no máximo 15 caracteres.';
+    header('Location: ../../views/auth/redefinir_senha.php');
+    exit;
+}
+
 if ($novaSenha !== $confirmaSenha) {
     $_SESSION['recuperacao_msg_erro'] = 'As senhas não coincidem.';
     header('Location: ../../views/auth/redefinir_senha.php');

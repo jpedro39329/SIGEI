@@ -108,12 +108,13 @@ $escolas = $resultEscolas ? mysqli_fetch_all($resultEscolas, MYSQLI_ASSOC) : [];
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nova Senha <small class="text-muted">(deixe em branco para não alterar)</small></label>
-                                <input type="password" name="senha" id="senha" class="form-control" maxlength="255" placeholder="Mínimo 6 caracteres">
+                                <input type="password" name="senha" id="senha" class="form-control" maxlength="15" placeholder="Mínimo 6 caracteres">
+                                <small class="form-text text-muted">A senha deve ter no máximo 15 caracteres.</small>
                             </div>
 
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">Confirmar Nova Senha</label>
-                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="255">
+                                <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" maxlength="15">
                             </div>
                         </div>
 

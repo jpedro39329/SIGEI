@@ -605,5 +605,6 @@ if ($perfil !== '') {
 
   <script src="<?php echo assetUrl('assets/js/acessibilidade.js', '../../'); ?>"></script>
   <script src="<?php echo assetUrl('assets/js/mascaras.js', '../../'); ?>"></script>
+  <script defer src="<?php echo assetUrl('assets/js/cookies.js', '../../'); ?>"></script>
 </body>
 </html>

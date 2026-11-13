@@ -417,7 +417,7 @@ require_once "../../config/init.php";
             name="senha" 
             class="form-control"
             placeholder="Digite sua senha"
-            maxlength="255"
+            maxlength="15"
             required
           >
         </div>
@@ -457,6 +457,7 @@ require_once "../../config/init.php";
   </script>
   <script defer src="<?php echo assetUrl('assets/js/acessibilidade.js', '../../'); ?>"></script>
   <script defer src="<?php echo assetUrl('assets/js/erros.js', '../../'); ?>"></script>
+  <script defer src="<?php echo assetUrl('assets/js/cookies.js', '../../'); ?>"></script>
 
 </body>
 </html>

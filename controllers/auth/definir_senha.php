@@ -42,8 +42,8 @@ $confirmar = (string) ($_POST['confirmar_senha'] ?? '');
 if (mb_strlen($nova, 'UTF-8') < 8) {
     responderSenha(422, false, 'A senha deve ter pelo menos 8 caracteres.');
 }
-if (strlen($nova) > 72) {
-    responderSenha(422, false, 'A senha deve ter no máximo 72 caracteres.');
+if (mb_strlen($nova, 'UTF-8') > 15) {
+    responderSenha(422, false, 'A senha deve ter no máximo 15 caracteres.');
 }
 if (preg_match('/\s/', $nova)) {
     responderSenha(422, false, 'A senha não pode conter espaços.');

@@ -71,6 +71,11 @@ if (strlen($senha) < 6) {
     exit();
 }
 
+if (mb_strlen($senha, 'UTF-8') > 15) {
+    header("Location: ../../views/setores/cadastrar.php?erro=" . urlencode("A senha deve ter no máximo 15 caracteres."));
+    exit();
+}
+
 // Verifica se o CPF já existe
 $stmtVerifica = $conexao->prepare("SELECT id_usuario_ure FROM usuarios_ure WHERE cpf = ?");
 $stmtVerifica->bind_param("s", $cpf);

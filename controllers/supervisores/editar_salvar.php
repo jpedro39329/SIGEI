@@ -63,6 +63,10 @@ if ($novaSenha !== '') {
         header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("A senha deve ter pelo menos 6 caracteres."));
         exit();
     }
+    if (mb_strlen($novaSenha, 'UTF-8') > 15) {
+        header("Location: ../../views/supervisores/editar.php?id=$idSupervisor&erro=" . urlencode("A senha deve ter no máximo 15 caracteres."));
+        exit();
+    }
     $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
     $stmt = $conexao->prepare(
         "UPDATE usuarios_supervisor SET nome = ?, cpf = ?, id_empresa = ?, email = ?, telefone = ?, ativo = ?, senha = ? WHERE id_usuario_supervisor = ?"
