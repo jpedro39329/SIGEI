@@ -19,8 +19,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
+          protocol: ftp
           server-dir: /
           exclude: |
             **/.git*
@@ -30,6 +29,8 @@ jobs:
             config/mail.php
             banco/**
             relatorios-seguranca/**
+            RELATORIO_TESTES_SEGURANCA.txt
+            Redireciona
             ARCHITECTURE_GRAPH.md
             INSTRUCTIONS.md
             *.md
