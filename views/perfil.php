@@ -196,11 +196,18 @@ if ($stmtTermo) {
 
                     <div class="mt-4 pt-3 border-top d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
                         <div>
-                            <strong class="text-dark d-block">LGPD - Termos de Uso e Privacidade</strong>
-                            
-                               
+                            <strong class="text-dark d-block">Guia do Sistema</strong>
                         </div>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="window.exibirModalTermosConsulta && window.exibirModalTermosConsulta()">
+                        <button type="button" id="btn-tutorial-perfil" class="btn btn-secondary btn-sm" onclick="if (window.sigeiReiniciarTutorial) { window.sigeiReiniciarTutorial(); } else if (window.iniciarTourGuiado) { window.iniciarTourGuiado(); }">
+                            Tutorial
+                        </button>
+                    </div>
+
+                    <div id="tour-ee-perfil-termos" class="mt-3 pt-3 border-top d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                        <div>
+                            <strong class="text-dark d-block">LGPD - Termos de Uso e Privacidade</strong>
+                        </div>
+                        <button type="button" id="btn-consultar-termo-perfil" class="btn btn-secondary btn-sm" onclick="window.exibirModalTermosConsulta && window.exibirModalTermosConsulta()">
                             Consultar Termo Completo
                         </button>
                     </div>

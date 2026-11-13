@@ -277,10 +277,10 @@ $podeArquivar = in_array($userPerfil, ['USUARIO_ESCOLA', 'USUARIO_UE', 'ESCOLA',
     <?php endif; ?>
 
     <!-- Tabela de Alunos -->
-    <div class="card border-0 shadow-sm">
+    <div id="tour-ee-alunos-card" class="card border-0 shadow-sm">
         <div class="card-body p-4">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table id="tour-ee-alunos-tabela" class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th>Nome</th>

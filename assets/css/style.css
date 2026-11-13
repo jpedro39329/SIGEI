@@ -1795,6 +1795,262 @@ html[data-sigei-contrast="high"] [tabindex]:focus-visible {
     z-index: 5;
 }
 
+/* ===== ESTILIZAÇÃO DO TOUR GUIADO (DRIVER.JS) - IDENTIDADE VISUAL SIGEI ===== */
+.driver-popover {
+    background-color: #ffffff !important;
+    color: var(--sigei-ink, #1e293b) !important;
+    border: 1px solid var(--sigei-border, #dbe6f5) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 40px rgba(0, 56, 187, 0.14), 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+    padding: 24px 26px !important;
+    width: 440px !important;
+    max-width: calc(100vw - 32px) !important;
+    min-width: 340px !important;
+    font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
+    z-index: 1000000 !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    will-change: transform, top, left;
+    transition: opacity 0.18s ease-out !important;
+}
+
+.driver-popover * {
+    font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
+    pointer-events: auto !important;
+}
+
+/* Oculta/remove o 'X' padrão do topo */
+.driver-popover-close-btn {
+    display: none !important;
+}
+
+/* Setas do popover */
+.driver-popover-arrow-side-top.driver-popover-arrow {
+    border-top-color: #ffffff !important;
+}
+.driver-popover-arrow-side-bottom.driver-popover-arrow {
+    border-bottom-color: #ffffff !important;
+}
+.driver-popover-arrow-side-left.driver-popover-arrow {
+    border-left-color: #ffffff !important;
+}
+.driver-popover-arrow-side-right.driver-popover-arrow {
+    border-right-color: #ffffff !important;
+}
+
+.driver-popover-title {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: var(--sigei-blue-900, #0038bb) !important;
+    margin-bottom: 10px !important;
+    line-height: 1.35 !important;
+}
+
+.driver-popover-description {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    color: #475569 !important;
+    margin-bottom: 20px !important;
+}
+
+.driver-popover-progress-text {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    color: var(--sigei-muted, #52637a) !important;
+    white-space: nowrap !important;
+}
+
+.driver-popover-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid #f1f5f9 !important;
+    pointer-events: auto !important;
+}
+
+.driver-popover-navigation-btns {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-left: auto !important;
+    pointer-events: auto !important;
+}
+
+.driver-popover-btn,
+.driver-popover-footer button {
+    font-family: inherit !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    padding: 8px 16px !important;
+    border-radius: 10px !important;
+    transition: all 0.15s ease !important;
+    cursor: pointer !important;
+    text-shadow: none !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.driver-popover-btn.driver-popover-btn-disabled,
+.driver-popover-footer button.driver-popover-btn-disabled,
+.driver-popover-footer button[disabled] {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.driver-popover-next-btn {
+    background-color: var(--sigei-blue-900, #0038bb) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--sigei-blue-900, #0038bb) !important;
+}
+
+.driver-popover-next-btn:hover {
+    background-color: var(--sigei-blue-700, #114ecf) !important;
+    border-color: var(--sigei-blue-700, #114ecf) !important;
+}
+
+.driver-popover-prev-btn {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.driver-popover-prev-btn:hover {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+}
+
+/* Botão Pular customizado no rodapé */
+.driver-popover-skip-btn {
+    background-color: #f8fafc !important;
+    color: #64748b !important;
+    border: 1px solid #e2e8f0 !important;
+    font-weight: 700 !important;
+    padding: 8px 14px !important;
+}
+
+.driver-popover-skip-btn:hover {
+    color: #0f172a !important;
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Transição suave no overlay do driver.js (sem transition: all para evitar flicker no SVG path) */
+.driver-overlay {
+    transition: opacity 0.22s ease !important;
+}
+
+/* Transição suave entre páginas (.content) */
+@keyframes sigeiPageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content {
+    animation: sigeiPageFadeIn 0.22s ease-out;
+}
+
+.content.sigei-page-leaving {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.16s ease-in, transform 0.16s ease-in;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .content {
+        animation: none;
+    }
+    .content.sigei-page-leaving {
+        transition: none;
+    }
+}
+
+/* Suporte para Alto Contraste (Acessibilidade) no Driver.js */
+html[data-sigei-contrast="high"] .driver-popover {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffbf00 !important;
+    box-shadow: 0 0 0 2px #000000 !important;
+}
+
+html[data-sigei-contrast="high"] .driver-popover-title {
+    color: #ffbf00 !important;
+}
+
+html[data-sigei-contrast="high"] .driver-popover-description {
+    color: #ffffff !important;
+}
+
+html[data-sigei-contrast="high"] .driver-popover-progress-text {
+    color: #ffbf00 !important;
+}
+
+html[data-sigei-contrast="high"] .driver-popover-next-btn {
+    background-color: #ffbf00 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-weight: 900 !important;
+}
+
+html[data-sigei-contrast="high"] .driver-popover-prev-btn {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+html[data-sigei-contrast="high"] .driver-popover-skip-btn {
+    background-color: #000000 !important;
+    color: #ffbf00 !important;
+    border: 1px solid #ffbf00 !important;
+}
+
+/* Suporte para Modo Escuro */
+html[data-sigei-theme="dark"] .driver-popover {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-sigei-theme="dark"] .driver-popover-title {
+    color: #60a5fa !important;
+}
+
+html[data-sigei-theme="dark"] .driver-popover-description {
+    color: #cbd5e1 !important;
+}
+
+html[data-sigei-theme="dark"] .driver-popover-footer {
+    border-top-color: #334155 !important;
+}
+
+html[data-sigei-theme="dark"] .driver-popover-prev-btn {
+    background-color: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+html[data-sigei-theme="dark"] .driver-popover-skip-btn {
+    color: #94a3b8 !important;
+}
+
+html[data-sigei-theme="dark"] .driver-popover-skip-btn:hover {
+    color: #f1f5f9 !important;
+    background-color: #334155 !important;
+}
+
+
 
 
 

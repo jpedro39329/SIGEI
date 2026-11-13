@@ -90,7 +90,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
             <span class="text-muted small">Processo de deliberação técnica para atendimento especializado</span>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button type="button" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, <?php echo htmlspecialchars(json_encode($aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
+            <button type="button" id="tour-ee-analise-pdf" onclick="abrirModalExportarFicha(<?php echo (int) $aluno['id_aluno']; ?>, <?php echo htmlspecialchars(json_encode($aluno['nome']), ENT_QUOTES, 'UTF-8'); ?>)" class="btn btn-danger btn-sm px-3 rounded-3 d-flex align-items-center gap-2" title="Exportar ficha do aluno para PDF">
                 <i class="bi bi-file-earmark-pdf-fill"></i> PDF
             </button>
             <a href="listar.php<?php echo ($aluno['status_aprovacao'] === 'REPROVADO') ? '?aba=reprovados' : ''; ?>" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
@@ -117,10 +117,10 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
         <!-- ============================================== -->
         <!-- COLUNA PRINCIPAL (ESQUERDA - 8 COLUNAS)        -->
         <!-- ============================================== -->
-        <div class="col-lg-8">
+        <div id="tour-ee-analise-principal" class="col-lg-8">
 
             <!-- 1. Card de Informações Pessoais do Aluno -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div id="tour-ee-analise-dados" class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     
                     <!-- Avatar e Nome do Aluno -->
@@ -181,7 +181,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
             </div>
 
             <!-- 2. Card de Dados Escolares e Necessidades -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div id="tour-ee-analise-clinico" class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Dados Escolares & Necessidades</h5>
 
@@ -224,7 +224,7 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
             </div>
 
             <!-- 3. Card de Documentos e Laudos Anexos -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div id="tour-ee-analise-laudos" class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Documentação e Laudos Anexos</h5>
 
@@ -270,10 +270,10 @@ $iniciais = mb_strtoupper(mb_substr($nomesPartes[0] ?? 'A', 0, 1) . (isset($nome
         <!-- ============================================== -->
         <!-- COLUNA LATERAL (DIREITA - 4 COLUNAS)           -->
         <!-- ============================================== -->
-        <div class="col-lg-4">
+        <div id="tour-ee-analise-acoes" class="col-lg-4">
 
             <!-- 1. Card de Deliberação Técnica & Ações -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div id="tour-ee-analise-deliberacao" class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Deliberação Técnica</h5>
 

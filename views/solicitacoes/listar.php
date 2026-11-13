@@ -208,10 +208,10 @@ $alunosReprovados = $resultReprovados ? mysqli_fetch_all($resultReprovados, MYSQ
     <div class="tab-content" id="solicitacoesTabsContent">
         <!-- Aba: Para Análise -->
         <div class="tab-pane fade <?php echo ($abaAtiva === 'analise' || !in_array($abaAtiva, ['correcao', 'reprovados'])) ? 'show active' : ''; ?>" id="analise" role="tabpanel" aria-labelledby="analise-tab">
-            <div class="card border-0 shadow-sm">
+            <div id="tour-ee-solicitacoes-card" class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table id="tour-ee-solicitacoes-tabela" class="table table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th>Nome</th>

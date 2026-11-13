@@ -242,6 +242,9 @@ class TermosDeUso {
             btnAceitar.innerHTML = 'Processando...';
             await this.marcarComoAceito();
             fecharModal();
+            try {
+                window.dispatchEvent(new CustomEvent('sigei:termos_aceitos'));
+            } catch (e) {}
         });
 
         // Rejeitar termos

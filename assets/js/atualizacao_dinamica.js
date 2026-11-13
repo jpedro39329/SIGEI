@@ -34,6 +34,16 @@
     }
 
     function usuarioInteragindoComFormularioOuModal() {
+        // Se o tour guiado estiver ativo ou visível, pausa atualizações dinâmicas do DOM para não interromper o Driver.js
+        if (document.body.classList.contains('driver-active') || document.querySelector('.driver-popover')) {
+            return true;
+        }
+        try {
+            if (sessionStorage.getItem('sigei_tour_ativo') === '1') {
+                return true;
+            }
+        } catch (e) {}
+
         // Se houver qualquer modal Bootstrap aberto, aguarda o fechamento para não interromper a ação
         if (document.querySelector('.modal.show')) {
             return true;

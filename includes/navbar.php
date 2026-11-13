@@ -15,6 +15,8 @@ $homePage = $baseUrl . 'views/dashboard.php';
 
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Driver.js CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
     <div class="container-fluid">
@@ -101,10 +103,10 @@ $homePage = $baseUrl . 'views/dashboard.php';
                 <!-- EDUCAÇÃO ESPECIAL -->
                 <?php if ($userPerfil === 'USUARIO_EDUCACAO_ESPECIAL') { ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'solicitacoes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/solicitacoes/listar.php">Solicitações</a>
+                        <a id="tour-ee-menu-solicitacoes" class="nav-link <?php echo (strpos($scriptPath, 'solicitacoes/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/solicitacoes/listar.php">Solicitações</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Alunos</a>
+                        <a id="tour-ee-menu-alunos" class="nav-link <?php echo (strpos($scriptPath, 'alunos/') !== false) ? 'active' : ''; ?>" href="<?php echo $baseUrl; ?>views/alunos/listar.php">Alunos</a>
                     </li>
                 <?php } ?>
 
@@ -318,7 +320,7 @@ $homePage = $baseUrl . 'views/dashboard.php';
 
                         <!-- Links de Ação -->
                         <div class="py-2">
-                            <a class="dropdown-item navbar-menu-link d-flex align-items-center gap-3 py-2 px-3" href="<?php echo $baseUrl; ?>views/perfil.php">
+                            <a id="tour-nav-link-perfil" class="dropdown-item navbar-menu-link d-flex align-items-center gap-3 py-2 px-3" href="<?php echo $baseUrl; ?>views/perfil.php">
                                 <i class="bi bi-person fs-5"></i>
                                 <span class="fw-medium">Perfil</span>
                             </a>
@@ -424,13 +426,16 @@ $homePage = $baseUrl . 'views/dashboard.php';
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
 <?php
 $currentUserId = (int) ($_SESSION['user_id'] ?? 0);
 $currentUserPerfil = $_SESSION['user_perfil'] ?? '';
-if ($currentUserId > 0 && empty($_SESSION['termos_aceitos']) && isset($conexao)) {
-    $_SESSION['termos_aceitos'] = verificarTermoAceito($conexao, $currentUserId, $currentUserPerfil);
+// Sempre consulta o banco diretamente para não usar valor stale de sessão
+$termoAceito = false;
+if ($currentUserId > 0 && isset($conexao)) {
+    $termoAceito = (bool) verificarTermoAceito($conexao, $currentUserId, $currentUserPerfil);
+    $_SESSION['termos_aceitos'] = $termoAceito;
 }
-$termoAceito = !empty($_SESSION['termos_aceitos']);
 ?>
 <script>
 window.SIGEI_CONFIG = {
@@ -658,4 +663,26 @@ document.addEventListener('DOMContentLoaded', function () {
 <script defer src="<?php echo assetUrl('assets/js/mascaras.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/erros.js', $baseUrl); ?>"></script>
 <script defer src="<?php echo assetUrl('assets/js/atualizacao_dinamica.js', $baseUrl); ?>"></script>
+<script defer src="<?php echo assetUrl('assets/js/tours/tour-educacao-especial.js', $baseUrl); ?>"></script>
+<script>
+document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+    if (link.hasAttribute('download') || link.getAttribute('target') === '_blank' || link.getAttribute('data-confirm') === 'true') return;
+    if (link.origin && link.origin !== window.location.origin) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var content = document.querySelector('.content');
+    if (!content) return;
+
+    e.preventDefault();
+    content.classList.add('sigei-page-leaving');
+    setTimeout(function () {
+        window.location.href = link.href;
+    }, 150);
+});
+</script>
 

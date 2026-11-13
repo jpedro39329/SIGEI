@@ -41,7 +41,7 @@ function totalDashboard($conexao, $sql) {
         </div>
     <?php endif; ?>
 
-    <div class="mb-4">
+    <div id="tour-ee-dashboard-boasvindas" class="mb-4">
         <h4 class="mb-1">Olá, <?php echo htmlspecialchars($userName); ?></h4>
         <p class="text-muted mb-0"><strong><?php echo htmlspecialchars(nomePerfil($userPerfil)); ?></strong> — bem-vindo(a) ao painel do SIGEI.</p>
     </div>
@@ -375,7 +375,7 @@ function totalDashboard($conexao, $sql) {
         $solicitacoesPendentesLista = $resSol ? mysqli_fetch_all($resSol, MYSQLI_ASSOC) : [];
         ?>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div id="tour-ee-dashboard-indicadores" class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Análise de Solicitações da URE</h5>
@@ -385,11 +385,11 @@ function totalDashboard($conexao, $sql) {
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div id="tour-ee-dashboard-tabela" class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Solicitações Aguardando Análise</h5>
-                    <a href="solicitacoes/listar.php" class="btn btn-outline-primary btn-sm">Ver Fila Completa</a>
+                    <a id="tour-ee-btn-fila-solicitacoes" href="solicitacoes/listar.php" class="btn btn-outline-primary btn-sm">Ver Fila Completa</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">

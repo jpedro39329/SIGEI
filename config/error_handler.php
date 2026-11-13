@@ -29,7 +29,7 @@ function sigei_requisicao_ajax(): bool
 }
 
 // Descarta a saída atual e renderiza o card de erro
-function sigei_responder_erro(int $codigo = 500, ?string $mensagem = null, ?string $arquivo = null, ?int $linha = null): void
+function sigei_responder_erro(int $codigo = 500, ?string $mensagem = null, ?string $arquivo = null, ?int $linha = null, ?string $trace = null): void
 {
     while (ob_get_level() > 0) {
         @ob_end_clean();
@@ -55,7 +55,7 @@ function sigei_responder_erro(int $codigo = 500, ?string $mensagem = null, ?stri
         header('Content-Type: text/html; charset=UTF-8');
     }
     require_once __DIR__ . '/../includes/pagina_erro.php';
-    sigei_pagina_erro($codigo, '/');
+    sigei_pagina_erro($codigo, '/', $mensagem, $arquivo, $linha, $trace);
 }
 
 // Handler de avisos e erros do PHP
@@ -66,7 +66,7 @@ set_error_handler(function (int $errno, string $errstr, string $errfile = '', in
     error_log(sprintf('[SIGEI] PHP erro %d: %s em %s:%d', $errno, $errstr, $errfile, $errline));
 
     if (in_array($errno, [E_USER_ERROR, E_RECOVERABLE_ERROR], true)) {
-        sigei_responder_erro(500, $errstr, $errfile, $errline);
+        sigei_responder_erro(500, $errstr, $errfile, $errline, (new Exception())->getTraceAsString());
         exit;
     }
     return true; // Suprime warnings soltos que poluiriam a interface
@@ -76,7 +76,7 @@ set_error_handler(function (int $errno, string $errstr, string $errfile = '', in
 set_exception_handler(function (Throwable $e): void {
     error_log('[SIGEI] Exceção: ' . get_class($e) . ': ' . $e->getMessage()
         . ' em ' . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getTraceAsString());
-    sigei_responder_erro(500, $e->getMessage(), $e->getFile(), $e->getLine());
+    sigei_responder_erro(500, $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
     exit;
 });
 
